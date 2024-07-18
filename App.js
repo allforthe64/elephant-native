@@ -1,9 +1,19 @@
+//import gesture handler code for drawer navigator
+import './gestureHandler';
+
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+
+//import SafeAreaProvider to provide safe area context to the app
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+
+//import Main component
 import Main from './screens/Main';
 
 export default function App() {
   return (
-    <Main />
+    <SafeAreaProvider>
+      <Main />
+      <StatusBar style="auto" />
+    </SafeAreaProvider>
   );
 }

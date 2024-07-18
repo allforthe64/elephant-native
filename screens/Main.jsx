@@ -1,12 +1,35 @@
-import { Text, View } from 'react-native'
-import React, { Component } from 'react'
+import React from 'react'
 
-export default class Main extends Component {
-  render() {
-    return (
-      <View>
-        <Text>Main</Text>
-      </View>
-    )
-  }
+//import drawer navigator from @react-navigation/drawer
+import { createDrawerNavigator } from "@react-navigation/drawer";
+import { NavigationContainer } from "@react-navigation/native"; //import NavigationContainer (is a required as a dependency of the drawerNavigator)
+
+//instantiate drawer navigator in Drawer variable
+const Drawer = createDrawerNavigator()
+
+//Screen Component imports
+import Home from './Home';
+import Dashboard from './Dashboard';
+import Contact from './Contact';
+import About from './About';
+import Auth from './Auth';
+import Settings from './Settings';
+import ThankYou from './ThankYou';
+
+const Main = () => {
+  return (
+    <NavigationContainer>
+        <Drawer.Navigator initialRouteName='Home'>
+            <Drawer.Screen name='Home' component={Home} /* options={authUser && {drawerItemStyle: {display: 'none'}, title: ''}} */ />
+            <Drawer.Screen name="Sign In/Sign Up" component={Auth} /* options={authUser && {drawerItemStyle: {display: 'none'}, title: ''}} *//>
+            <Drawer.Screen name='About' component={About} />
+            <Drawer.Screen name='Contact' component={Contact} />
+            <Drawer.Screen name="Dashboard" component={Dashboard} /* options={!authUser && {drawerItemStyle: {display: 'none'}, title: ''}} */ />
+            <Drawer.Screen name="Settings" component={Settings} /* options={!authUser && {drawerItemStyle: {display: 'none'}, title: ''}} */ />
+            <Drawer.Screen name="Registration Complete" component={ThankYou} options={{drawerItemStyle: {height: 0}, title: ''}}/>
+        </Drawer.Navigator>
+    </NavigationContainer>
+  )
 }
+
+export default Main
