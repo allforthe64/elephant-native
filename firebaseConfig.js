@@ -1,5 +1,5 @@
 import { initializeApp } from 'firebase/app'
-import { initializeAuth, getReactNativePersistence } from 'firebase/auth'
+import { initializeAuth, getReactNativePersistence, connectAuthEmulator } from 'firebase/auth'
 import { getFirestore } from 'firebase/firestore'
 import { getStorage } from 'firebase/storage'
 import firebase from 'firebase/compat/app'
