@@ -9,6 +9,7 @@ const EMAIL_REGEX = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/
 const Login = ({navigation: {navigate}}) => {
     const [userEmail, setUserEmail] = useState('')
     const [password, setPassword] = useState('')
+    const [passwordConf, setPasswordConf] = useState('')
     const [loading, setLoading] = useState(false)
     const [validEmail, setValidEmail] = useState(false)
     const [signUpMode, setSignUpMode] = useState(false)
@@ -36,7 +37,9 @@ const Login = ({navigation: {navigate}}) => {
     }
 
     const signUp = async () =>{
-        setLoading(true)
+        if (password !== passwordConf || !validEmail || userEmail === '') {
+            alert('Sign up error! Make sure you entered your details correctly!')
+        }
         try {
             const response = await createUserWithEmailAndPassword(auth, userEmail, password)
             console.log(response)
@@ -66,12 +69,19 @@ const Login = ({navigation: {navigate}}) => {
                         <Text style={(validEmail || userEmail === '') ? {display: 'none'} : styles.invalid}>Please Enter A Valid Email</Text>
                         <Text style={styles.subheading}>Enter Password:</Text>
                         <TextInput secureTextEntry={true} style={styles.input} placeholder='Enter Password' placeholderTextColor={'rgb(0, 0, 0)'} value={password} onChangeText={(e) => setPassword(e)}/>
+                        {signUpMode && 
+                            <>
+                                <Text style={styles.subheading}>Confirm Password:</Text>
+                                <TextInput secureTextEntry={true} style={styles.input} placeholder='Confirm Password' placeholderTextColor={'rgb(0, 0, 0)'} value={passwordConf} onChangeText={(e) => setPasswordConf(e)}/>
+                                <Text style={((password.length > 0 && passwordConf.length > 0) && (password === passwordConf)) ? {display: 'none'} : styles.invalid}>Passwords Do Not Match</Text>
+                            </>
+                        }
                     </View>
                 </View>
                 <View style={styles.wrapperContainer}>
-                        <View style={styles.buttonWrapper}>
+                        <View style={userEmail === '' || !validEmail || password !== passwordConf ? styles.buttonWrapperDisabled : styles.buttonWrapper}>
                             {signUpMode ? 
-                                <TouchableOpacity onPress={() => signUp()}>
+                                <TouchableOpacity onPress={() => signUp()} disabled={!validEmail || userEmail === '' || password !== passwordConf ? true : false}>
                                     <Text style={styles.inputButton}>Register</Text>
                                 </TouchableOpacity>
                             :
@@ -104,24 +114,22 @@ const styles = StyleSheet.create({
         fontSize: 40,
         textAlign: 'center',
         fontWeight: '700',
-        marginBottom: '15%',
+        marginBottom: '5%',
     },
 
     subheading: {
         color: 'white',
-        fontSize: 30,
+        fontSize: 22,
         textAlign: 'left',
         width: '80%',
         fontWeight: '500',
-        marginBottom: '8%'
+        marginBottom: '4%'
     },
     innerContainer: {
         width: '100%',
-        height: '100%',
         display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        position: 'absolute',
+        height: '100%',
+        justifyContent: 'center'
     },
     formCon: {
         width: '100%',
@@ -129,7 +137,6 @@ const styles = StyleSheet.create({
         marginBottom: '10%',
         display: 'flex',
         alignItems: 'center',
-        justifyContent: 'center'
     },
     wrapperContainer: {
         display: 'flex',
@@ -149,6 +156,16 @@ const styles = StyleSheet.create({
         paddingBottom: '2%',
         marginBottom: '5%'
     },
+    buttonWrapperDisabled: {
+        width: '60%',
+        borderColor: '#777',
+        borderRadius: 25,
+        backgroundColor: 'rgba(255, 255, 255, .5)',
+        borderWidth: 1,
+        paddingTop: '2%',
+        paddingBottom: '2%',
+        marginBottom: '5%'
+    },
     buttonWrapperSm: {
         width: '40%',
         borderColor: '#777',
@@ -161,11 +178,11 @@ const styles = StyleSheet.create({
     input: {
         backgroundColor: 'white',
         width: '80%',
-        fontSize: 18,
+        fontSize: 15,
         paddingLeft: '2%',
-        paddingTop: '2%',
-        paddingBottom: '2%',
-        marginBottom: '18.5%'
+        paddingTop: '1%',
+        paddingBottom: '1%',
+        marginBottom: '7%'
     },
     inputInvalid: {
         backgroundColor: 'white',
