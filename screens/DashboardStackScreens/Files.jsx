@@ -38,6 +38,9 @@ export default function Files({navigation: { navigate }, route}) {
   const [newFolderName, setNewFolderName] = useState('')
   const [keyBoardClosed, setKeyboardClosed] = useState(true)
 
+  //consume toast context for notifications
+  const toast = useToast()
+
 
   //get the auth user context object
   const auth = firebaseAuth
@@ -85,7 +88,7 @@ export default function Files({navigation: { navigate }, route}) {
         }
         await updateUser(updatedUser)
         if (index === 'delete') {
-          useToast.show(`Deleted File`, {
+          toast.show(`Deleted File`, {
             type: 'success'
           })
         }
@@ -104,7 +107,7 @@ export default function Files({navigation: { navigate }, route}) {
         })
         const updatedUser = {...currentUser, files: input.newFolders, fileRefs: input.refsToKeep, spaceUsed: newSpaceUsed} 
         await updateUser(updatedUser)
-        useToast.show(`Deleted ${input.target}`, {
+        toast.show(`Deleted ${input.target}`, {
           type: 'success'
         })
       } else if (index === 'rename' || index === 'move') {
@@ -116,7 +119,7 @@ export default function Files({navigation: { navigate }, route}) {
             let newFiles = [...currentUser.files]
             newFiles[fileIndex] = input.newFolder
             const updatedUser = {...currentUser, files: newFiles}
-            useToast.show(`Moved folder to ${input.target}`, {
+            toast.show(`Moved folder to ${input.target}`, {
               type: 'success'
             })
             await updateUser(updatedUser)

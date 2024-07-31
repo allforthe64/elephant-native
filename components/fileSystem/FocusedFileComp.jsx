@@ -53,6 +53,9 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
     const [noteText, setNoteText] = useState('')
     const [editingMode, setEditingMode] = useState(false)
 
+    //consume toast context for notifications
+    const toast = useToast()
+
     const ref = useRef()
 
     const auth = firebaseAuth
@@ -182,7 +185,7 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
                     setDestination({id: null, fileName: null, nestedUnder: null})
                     setMoveFile(false)
                     /* handleFileMove(newFile) */
-                    useToast.show(`Moved file to ${destination.fileName} and renamed it`, {
+                    toast.show(`Moved file to ${destination.fileName} and renamed it`, {
                         type: 'success'
                     })
                 } else if (destination.id === null && focusedFolder !== null && focusedFolder !== undefined) {
@@ -208,7 +211,7 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
                     setDestination({id: null, fileName: null, nestedUnder: null})
                     setMoveFile(false)
                     /* handleFileMove(newFile) */
-                    useToast.show(`Moved file to ${folderInst[0].fileName} and renamed it`, {
+                    toast.show(`Moved file to ${folderInst[0].fileName} and renamed it`, {
                         type: 'success'
                     })
                 }
@@ -230,7 +233,7 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
                 setDestination({id: null, fileName: null, nestedUnder: null})
                 setMoveFile(false)
                 handleFileMove(newFile)
-                useToast.show(`Moved file to ${destination.fileName}`, {
+                toast.show(`Moved file to ${destination.fileName}`, {
                     type: 'success'
                 })
             } else if (destination.id === null && focusedFolder !== null && focusedFolder !== undefined) {
@@ -245,7 +248,7 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
                 setDestination({id: null, fileName: null, nestedUnder: null})
                 setMoveFile(false)
                 handleFileMove(newFile)
-                useToast.show(`Moved file to ${folderInst[0].fileName}`, {
+                toast.show(`Moved file to ${folderInst[0].fileName}`, {
                     type: 'success'
                 })
             }
@@ -373,8 +376,6 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
             alert('Please enter a folder name')
             }
         }
-
-        console.log(useToast)
 
     return (
         <>
@@ -777,7 +778,7 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
                                                             if (editingMode) setEditingMode(false)
                                                             else {
                                                                 updateNote()
-                                                                useToast.show('Note successfully edited', {
+                                                                toast.show('Note successfully edited', {
                                                                     type: 'success'
                                                                 })
                                                             }
