@@ -9,7 +9,7 @@ import DashMain from './DashboardStackScreens/DashMain';
 import CameraComponent from './DashboardStackScreens/CameraComponent';
 import AudioRecorder from './DashboardStackScreens/AudioRecorder';
 import Files from './DashboardStackScreens/Files'
-import FileUploader from './DashboardStackScreens/FileUploader'
+import DocumentPickerComp from './DashboardStackScreens/DocumentPicker';
 import Notepad from './DashboardStackScreens/Notes'
 import QRScanner from './DashboardStackScreens/QRScanner'
 import DocScanner from './DashboardStackScreens/DocScanner'
@@ -23,7 +23,7 @@ const Dashboard = () => {
     <Stack.Navigator>
         <Stack.Screen name='DashMain' component={DashMain} options={{headerShown: false}}/>
         <Stack.Screen name='Files' component={Files} />
-        <Stack.Screen name='Upload Files' component={FileUploader} />
+        <Stack.Screen name='Upload Files' component={DocumentPickerComp} />
         <Stack.Screen name='Camera' component={CameraComponent} />
         <Stack.Screen name='Document Scanner' component={DocScanner} />
         <Stack.Screen name='Record Audio' component={AudioRecorder} />

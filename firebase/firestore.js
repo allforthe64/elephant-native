@@ -62,6 +62,46 @@ export async function updateUser(updatedUser) {
 
 //manipulate file data:
 
+//create a new fileData obj, upload the document into cloud storage
+export async function addfile(file, destination) {
+
+    try {
+        let fileRef
+        if (file.linksTo) {
+            fileRef = await addDoc(collection(db, 'files'), {
+                fileName: file.name,
+                documentType: file.fileType,
+                linksTo: file.linksTo,
+                size: file.size,
+                uri: file.name.split('.')[1] === 'doc' || file.name.split('.')[1] === 'docx' ? BUCKET_URL + '/' + file.timeStamp + '^&' + file.user
+                : BUCKET_URL + '/' + file.user + '/' + file.timeStamp,
+                version: file.version
+            })
+        } else {
+            fileRef = await addDoc(collection(db, 'files'), {
+                fileName: file.name,
+                documentType: file.fileType,
+                size: file.size,
+                uri: file.name.split('.')[1] === 'doc' || file.name.split('.')[1] === 'docx' ? BUCKET_URL + '/' + file.timeStamp + '^&' + file.user
+                : BUCKET_URL + '/' + file.user + '/' + file.timeStamp,
+                version: file.version
+            })
+        }
+
+        const reference = {
+            fileId: fileRef.id,
+            fileName: file.name,
+            flag: destination ? destination : 'Staging',
+            version: file.version,
+            size: file.size
+        }
+
+        return reference
+    } catch (error) {
+        console.log('error within storage: ', error)
+    }
+}
+
 //find a fileData obj using a file id and return the file data
 export const getFile = async (fileId) => {
     const docSnap = await getDoc(doc(db, 'files', fileId))
