@@ -219,7 +219,7 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
 
         //move a file by changing its flag property
         const handleMove = () => {
-            if (destination.id !== null) {4
+            if (destination.id !== null) {
                 console.log('In the destination !== null check')
                 const newFile = {
                     ...file,
