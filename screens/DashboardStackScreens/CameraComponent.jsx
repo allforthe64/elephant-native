@@ -23,8 +23,7 @@ import { format } from 'date-fns'
 
 //import addFile, updateUser, userListener from firestore/storage, firbaseAuth object from firebaseConfig/ref uploadBytesResumable from firebase storage
 import { addfile, updateUser, userListener } from '../../firebase/firestore'
-import { storage } from '../../firebaseConfig'
-import { firebaseAuth } from '../../firebaseConfig'
+import { firebaseAuth, storage } from '../../firebaseConfig'
 import {ref, uploadBytesResumable} from 'firebase/storage'
 
 //import PinchGestureHandler for zoom controls
