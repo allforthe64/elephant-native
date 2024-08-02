@@ -1,18 +1,19 @@
-import { CameraView, useCameraPermissions } from 'expo-camera';
 import { useState, useRef, useEffect } from 'react';
 import { View, Text, StatusBar, StyleSheet, Animated, Image, TouchableOpacity, Platform, Pressable, TextInput, Modal, ScrollView } from 'react-native'
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
 import { faCloudArrowUp, faEnvelope, faFolder, faTrash, faRepeat, faVideoCamera, faCamera, faSquare, faXmark, faFile, faArrowLeft } from '@fortawesome/free-solid-svg-icons'
 import { faCircle } from '@fortawesome/free-regular-svg-icons'
-import { Camera, CameraType, VideoCodec } from 'expo-camera'
+import { faCircle as solidCircle } from '@fortawesome/free-solid-svg-icons'
+import { Camera } from 'expo-camera'
+import { CameraView, useCameraPermissions } from 'expo-camera';
 import { Video, Audio } from 'expo-av'
 import { shareAsync } from 'expo-sharing'
 import * as MediaLibrary from 'expo-media-library'
 import { format } from 'date-fns'
 import { addfile, updateUser, userListener } from '../../firebase/firestore'
 import { storage } from '../../firebaseConfig'
-import {ref, uploadBytes, uploadBytesResumable} from 'firebase/storage'
-import { faCircle as solidCircle } from '@fortawesome/free-solid-svg-icons'
+import {ref, uploadBytesResumable} from 'firebase/storage'
+
 import { PinchGestureHandler } from 'react-native-gesture-handler'
 import { useToast } from 'react-native-toast-notifications'
 import { firebaseAuth } from '../../firebaseConfig'
