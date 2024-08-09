@@ -457,60 +457,66 @@ return (
                 </View>
             </Modal>
         :
-            <View style={{
-                backgroundColor: 'rgb(23,23,23)',
-                flex: 1,
-                justifyContent: 'center',
-                alignItems: 'center',
-                height: '100%'
-            }}>
-            <Image style={styles.bgImg } source={require('../../assets/elephant_bg.jpg')} />
-            {scanData ? 
-                <View style={{
-                        width: '100%',
-                        height: '100%',
-                        display: 'flex',
-                        alignItems: 'center',
-                        position: 'absolute',
-                        paddingTop: insets.top,
-                        paddingBottom: insets.bottom
-                    }}>
-                    <Text style={styles.bigHeader}>Currently Captured QR URLS:</Text>
-                    <View style={styles.scrollCon}>
-                        <ScrollView contentContainerStyle={styles.scroll}>
-                            {mapUrls()}
-                        </ScrollView>
-                    </View> 
-                    <View style={styles.wrapperContainer}>
-                        <View style={styles.buttonWrapper}>
-                            <TouchableOpacity onPress={() => setScanData(undefined)}>
-                            <Text style={styles.input}>Scan Another Code</Text>
-                            </TouchableOpacity>
+        <>
+          {scanData ?
+            <>
+              <View style={{
+                  backgroundColor: 'rgb(23,23,23)',
+                  flex: 1,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+              }}>
+                <Image style={styles.bgImg } source={require('../../assets/elephant_bg.jpg')} />
+                {scanData ? 
+                    <View style={{
+                            width: '100%',
+                            height: '100%',
+                            display: 'flex',
+                            alignItems: 'center',
+                            position: 'absolute',
+                            paddingTop: insets.top,
+                            paddingBottom: insets.bottom
+                        }}>
+                        <Text style={styles.bigHeader}>Currently Captured QR URLS:</Text>
+                        <View style={styles.scrollCon}>
+                            <ScrollView contentContainerStyle={styles.scroll}>
+                                {mapUrls()}
+                            </ScrollView>
+                        </View> 
+                        <View style={styles.wrapperContainer}>
+                            <View style={styles.buttonWrapper}>
+                                <TouchableOpacity onPress={() => setScanData(undefined)}>
+                                <Text style={styles.input}>Scan Another Code</Text>
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+                        <View style={styles.wrapperContainer}>
+                            <View style={styles.buttonWrapper}>
+                                <TouchableOpacity onPress={() => setPreAdd(true)}>
+                                <Text style={styles.input}>Save All</Text>
+                                </TouchableOpacity>
+                            </View>
                         </View>
                     </View>
-                    <View style={styles.wrapperContainer}>
-                        <View style={styles.buttonWrapper}>
-                            <TouchableOpacity onPress={() => setPreAdd(true)}>
-                            <Text style={styles.input}>Save All</Text>
-                            </TouchableOpacity>
-                        </View>
-                    </View>
-                </View>
-            :
-              <View style={styles.container}>
-                <CameraView
-                  onBarcodeScanned={scanned ? undefined : handleBarCodeScanned}
-                  barcodeScannerSettings={{
-                    barcodeTypes: ["qr", "pdf417"],
-                  }}
-                  
-                />
-                {/* {scanned && (
-                  <Button title={"Tap to Scan Again"} onPress={() => setScanned(false)} />
-                )} */}
+                :
+                  <></>
+                }
               </View>
-            }
-        </View>
+            </>
+          :
+            <View style={styles.container}>
+              <CameraView
+                style={{flex: 1}}
+                facing='back'
+                onBarcodeScanned={handleBarCodeScanned}
+                barcodeScannerSettings={{
+                  barcodeTypes: ["qr", "pdf417"],
+                }}
+                
+              />
+            </View>
+          }
+        </>
         }
     </>
 )
@@ -525,8 +531,7 @@ export default Scanner
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    flexDirection: "column",
-    justifyContent: "center",
+    justifyContent: 'center',
   },
     bigHeader: {
         color: 'white',
