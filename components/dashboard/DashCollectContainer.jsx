@@ -34,7 +34,7 @@ export default function DashCollectContainer({ navigate }) {
                     </TouchableOpacity>
                 </View>
                 <View style={styles.buttonWrapper}>
-                    <TouchableOpacity onPress={() => navigate('Scan Document')} style={{display: 'flex', flexDirection: 'coulumn', alignItems: 'center'}}>
+                    <TouchableOpacity onPress={() => navigate('Document Scanner')} style={{display: 'flex', flexDirection: 'coulumn', alignItems: 'center'}}>
                       <FontAwesomeIcon icon={faFile} size={30}/>
                         <Text style={styles.input}>Scan</Text>
                     </TouchableOpacity>
