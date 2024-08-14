@@ -495,7 +495,7 @@ const DocScanner = () => {
                               opacity: .5
                               }
                               }>
-                              <TouchableOpacity onPress={() => setPreAdd(true)} style={{
+                              <TouchableOpacity onPress={() => generatePDF()} style={{
                               display: 'flex', 
                               flexDirection: 'row', 
                               width: '100%', 
@@ -668,7 +668,7 @@ const DocScanner = () => {
                     paddingTop: '2%',
                     paddingBottom: '2%',
                   }}>
-                    <TouchableOpacity onPress={() => generatePDF()}>
+                    <TouchableOpacity onPress={() => setPreAdd(true)}>
                     <Text style={{
                       textAlign: 'center',
                       fontSize: 15,
