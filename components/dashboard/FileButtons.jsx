@@ -76,8 +76,7 @@ const styles = StyleSheet.create({
         paddingTop: 6,
         paddingBottom: 6,
         paddingLeft: 6,
-        marginTop: '4%',
-        marginBottom: '2%',
+        marginTop: '2%',
         marginLeft: '2%'
       },
     file: {

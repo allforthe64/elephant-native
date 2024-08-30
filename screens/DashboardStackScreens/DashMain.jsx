@@ -27,7 +27,7 @@ export default function DashMain({navigation: { navigate }}) {
 
   return (
     <View style={styles.mainContainer}>
-      {/* <DashCollectContainer navigate={navigate}/> */}
+      <DashCollectContainer navigate={navigate}/>
       <FileButtons navigate={navigate}/>
       <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'center', marginTop: '5%'}}>
         <View style={styles.buttonWrapperLogout}>
