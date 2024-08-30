@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, TouchableOpacity, Image } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity} from 'react-native';
 import { firebaseAuth } from '../../firebaseConfig';
 import DashCollectContainer from '../../components/dashboard/DashCollectContainer';
 import { useEffect } from 'react';
@@ -6,6 +6,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faFolder, faBox, faFile } from '@fortawesome/free-solid-svg-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
+import FileButtons from '../../components/dashboard/FileButtons';
 
 /* import * as Sentry from '@sentry/react-native'; */
 
@@ -25,66 +26,18 @@ export default function DashMain({navigation: { navigate }}) {
   const insets = useSafeAreaInsets()
 
   return (
-    <View>
-        <Image style={styles.bgImg} source={require('../../assets/elephant_bg.jpg')} />
-        <View style={styles.buttonContainer}>
-          <View style={{display: 'flex', flexDirection: 'row-reverse', justifyContent: 'space-around', height: 600}}>
-            <DashCollectContainer navigate={navigate}/>
-            <View style={{display: 'flex', flexDirection: 'column', width:'55%'}}>
-              <View style={styles.wrapperContainer}>
-                <View style={styles.buttonWrapper}>
-                  <TouchableOpacity onPress={() => navigate('Files', {staging: false})} style={styles.file}>
-                      <Text style={styles.input}>My Files</Text>
-                      <FontAwesomeIcon icon={faFolder} size={30} style={{marginLeft: '3%', marginTop: '1%'}}/>
-                  </TouchableOpacity>
-                </View>
-              </View>
-
-              <View style={styles.wrapperContainer}>
-                <View style={{width: '80%',
-                    borderColor: '#777',
-                    borderRadius: 25,
-                    backgroundColor: 'white',
-                    borderWidth: 1,
-                    paddingTop: '2%',
-                    paddingBottom: '2%',
-                    marginBottom: '8%',
-                    marginLeft: '2%'}}>
-                  <TouchableOpacity onPress={() => navigate('Upload Files')} style={styles.file}>
-                      <Text style={styles.input}>Upload Doc</Text>
-                      <FontAwesomeIcon icon={faFile} size={30} style={{marginLeft: '3%', marginTop: '1%'}}/>
-                  </TouchableOpacity>
-                </View>
-              </View>
-
-              <View style={styles.wrapperContainer}>
-                <View style={{width: '80%',
-                    borderColor: '#777',
-                    borderRadius: 25,
-                    backgroundColor: 'white',
-                    borderWidth: 1,
-                    paddingTop: '2%',
-                    paddingBottom: '2%',
-                    marginBottom: '8%',
-                    marginLeft: '2%'}}>
-                  <TouchableOpacity onPress={() => navigate('Files', {staging: true})} style={styles.file}>
-                      <Text style={styles.input}>Staging</Text>
-                      <FontAwesomeIcon icon={faBox} size={30} style={{marginLeft: '3%', marginTop: '1%'}}/>
-                  </TouchableOpacity>
-                </View>
-              </View>
-            </View>
-          </View>
-          <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'center', marginTop: '5%'}}>
-            <View style={styles.buttonWrapperLogout}>
-                  <TouchableOpacity onPress={async () => {
-                    auth.signOut()
-                    navigate('Home')
-                    }}>
-                      <Text style={styles.inputLogout}>Sign Out</Text>
-                  </TouchableOpacity>
-            </View>
-          </View>
+    <View style={styles.mainContainer}>
+      {/* <DashCollectContainer navigate={navigate}/> */}
+      <FileButtons navigate={navigate}/>
+      <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'center', marginTop: '5%'}}>
+        <View style={styles.buttonWrapperLogout}>
+              <TouchableOpacity onPress={async () => {
+                auth.signOut()
+                navigate('Home')
+                }}>
+                  <Text style={styles.inputLogout}>Sign Out</Text>
+              </TouchableOpacity>
+        </View>
       </View>
       <StatusBar style='auto' />
     </View>
@@ -93,18 +46,15 @@ export default function DashMain({navigation: { navigate }}) {
 }
 
 const styles = StyleSheet.create({
+  mainContainer: {
+    backgroundColor: '#FFFCF6'
+  },  
   container: {
     flex: 1,
     backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
     height: '100%'
-  },
-  buttonContainer: {
-    width: '100%',
-    height: '100%',
-    backgroundColor: 'rgba(0, 0, 0, .6)',
-    position: 'absolute',
   },
   bigHeader: {
     color: 'white',
