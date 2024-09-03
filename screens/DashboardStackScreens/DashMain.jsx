@@ -39,7 +39,8 @@ export default function DashMain({navigation: { navigate }}) {
 
 const styles = StyleSheet.create({
   mainContainer: {
-    backgroundColor: '#FFFCF6'
+    backgroundColor: '#FFFCF6',
+    height: '100vh'
   },  
   container: {
     flex: 1,
