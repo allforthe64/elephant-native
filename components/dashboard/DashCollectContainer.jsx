@@ -7,6 +7,7 @@ export default function DashCollectContainer({ navigate }) {
 
   return (
         <View style={styles.mainContainer}>
+            <Text style={styles.quickFilesHeading}>Quick Files</Text>
             <View style={styles.container}>      
                 <TouchableOpacity onPress={() => navigate('Document Scanner')} style={styles.buttonWrapper}>
                   <View style={styles.iconContainer}>
@@ -52,14 +53,16 @@ export default function DashCollectContainer({ navigate }) {
 const styles = StyleSheet.create({
 
   mainContainer: {
-    width: '100%'
+    width: '100%',
+    marginBottom: 20, 
+    paddingHorizontal: 15
   },
   container: {
     width: '100%',
     display: 'flex',
     flexDirection: 'row', 
     justifyContent: 'space-around',
-    paddingTop: '4%'
+    paddingTop: '2%'
   },
   column: {
     width: '100%',
@@ -82,7 +85,7 @@ const styles = StyleSheet.create({
   },
   buttonWrapper: {
     width: '48%',
-    height: 125,
+    height: 115,
     backgroundColor: '#593060',
     borderRadius: 10,
     display: 'flex',
@@ -95,14 +98,14 @@ const styles = StyleSheet.create({
   input: {
     /* padding: 8, */
     textAlign: 'center',
-    fontSize: 22,
+    fontSize: 18,
     paddingTop: '1%',
     color: 'white'
   },
   iconContainer: {
     backgroundColor: '#DDCADB', 
-    width: '40%', 
-    height: 75, 
+    width: '39%', 
+    height: 65, 
     borderRadius: 100, 
     display: 'flex', 
     justifyContent: 'center', 
@@ -111,10 +114,17 @@ const styles = StyleSheet.create({
   iconContainerWhiteBG: {
     backgroundColor: 'white', 
     width: '23%', 
-    height: 70, 
+    height: 65, 
     borderRadius: 100, 
     display: 'flex', 
     justifyContent: 'center', 
     alignItems: 'center',
-  }
+  },
+  quickFilesHeading: {
+    fontSize: 20,
+    color: '#593060',
+    fontWeight: '500',
+    marginTop: '2%',
+    paddingLeft: 5
+  },
 });

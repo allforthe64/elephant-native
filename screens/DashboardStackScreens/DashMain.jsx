@@ -1,12 +1,13 @@
-import { StyleSheet, Text, View, TouchableOpacity} from 'react-native';
+import { StyleSheet, View} from 'react-native';
 import { firebaseAuth } from '../../firebaseConfig';
-import DashCollectContainer from '../../components/dashboard/DashCollectContainer';
 import { useEffect } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faFolder, faBox, faFile } from '@fortawesome/free-solid-svg-icons';
+
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
+
+import DashCollectContainer from '../../components/dashboard/DashCollectContainer';
 import FileButtons from '../../components/dashboard/FileButtons';
+import DashHeader from '../../components/dashboard/DashHeader';
 
 /* import * as Sentry from '@sentry/react-native'; */
 
@@ -27,18 +28,9 @@ export default function DashMain({navigation: { navigate }}) {
 
   return (
     <View style={styles.mainContainer}>
+      <DashHeader navigate={navigate}/>
       <DashCollectContainer navigate={navigate}/>
       <FileButtons navigate={navigate}/>
-      <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'center', marginTop: '5%'}}>
-        <View style={styles.buttonWrapperLogout}>
-              <TouchableOpacity onPress={async () => {
-                auth.signOut()
-                navigate('Home')
-                }}>
-                  <Text style={styles.inputLogout}>Sign Out</Text>
-              </TouchableOpacity>
-        </View>
-      </View>
       <StatusBar style='auto' />
     </View>
     

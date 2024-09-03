@@ -30,7 +30,7 @@ const FileButtons = ({navigate}) => {
                 <View style={styles.iconContainer}>
                     <FontAwesomeIcon icon={faBox} size={22} style={{color: '#9F37B0'}}/>
                 </View>
-                <Text style={{fontSize: 24, color: '#9F37B0', fontWeight: '500', paddingTop: 6, marginLeft: '22%'}}>Staging</Text>
+                <Text style={{fontSize: 24, color: '#9F37B0', fontWeight: '500', paddingTop: 6, marginLeft: '22%'}}>To Be Filed</Text>
             </TouchableOpacity>
         </View>
     </View>
