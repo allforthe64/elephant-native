@@ -15,6 +15,27 @@ import { ToastProvider } from 'react-native-toast-notifications';
 //import Main component
 import Main from './screens/Main';
 
+//import and initialize react-native-exception-handler(s) and Sentry packages
+import { setNativeExceptionHandler, setJSExceptionHandler } from 'react-native-exception-handler';
+import * as Sentry from '@sentry/react-native';
+
+
+Sentry.init({
+  dsn: 'https://d460ada50918758584a197b5b1d0793e@o4507346968772608.ingest.us.sentry.io/4507346971328512',
+});
+
+
+//set a handler to take care of all native errors
+setNativeExceptionHandler((errorString) => {
+  Sentry.captureException(new Error(errorString))
+});
+
+
+//set a handler to take care of all JS errors
+setJSExceptionHandler((error, isFatal) => {
+  const sentryId = Sentry.captureException(new Error(error.name));
+})
+
 export default function App() {
   return (
     <SafeAreaProvider>
