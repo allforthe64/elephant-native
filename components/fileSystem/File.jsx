@@ -44,22 +44,22 @@ const File = ({file, focus}) => {
     <TouchableOpacity style={styles.file} onPress={() => focus(file)}>
         <View style={styles.fileTitle}>
             {thumbnailURL ?
-              <Image source={{uri: thumbnailURL}} width={32} height={32}/>
+              <Image source={{uri: thumbnailURL}} width={64} height={64}/>
             : 
               <>
                 {fileType === 'pdf' ?
-                  <FontAwesomeIcon icon={faFilePdf} color={'white'} size={32} />
+                  <FontAwesomeIcon icon={faFilePdf} color={'white'} size={64} />
                 :
                   fileType === 'mp3' || fileType === 'mp4a' ?
-                  <FontAwesomeIcon icon={faFileAudio} color={'white'} size={32} />
+                  <FontAwesomeIcon icon={faFileAudio} color={'white'} size={64} />
                 :
                   fileType === 'txt' ?
-                  <FontAwesomeIcon icon={faFileLines} color={'white'} size={32} />
+                  <FontAwesomeIcon icon={faFileLines} color={'white'} size={64} />
                 :
                   fileType === 'mov' || fileType === 'mp4' ?
-                  <FontAwesomeIcon icon={faVideo} color={'white'} size={32} />
+                  <FontAwesomeIcon icon={faVideo} color={'white'} size={64} />
                 :
-                  <FontAwesomeIcon icon={faFile} color={'white'} size={32} />
+                  <FontAwesomeIcon icon={faFile} color={'white'} size={64} />
                 }
               </>
             }
