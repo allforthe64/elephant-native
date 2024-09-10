@@ -22,6 +22,7 @@ export default function DashMain({navigation: { navigate }}) {
     if (!auth.currentUser) {
       navigate('Home')
     }
+    throw new Error('Test error');
   }, [])
 
   const insets = useSafeAreaInsets()
