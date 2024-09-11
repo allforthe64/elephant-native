@@ -44,7 +44,7 @@ const File = ({file, focus}) => {
     <TouchableOpacity style={styles.file} onPress={() => focus(file)}>
         <View style={styles.fileTitle}>
             {thumbnailURL ?
-              <Image source={{uri: thumbnailURL}} width={96} height={96}/>
+              <Image source={{uri: thumbnailURL}} width={64} height={64}/>
             : 
               <>
                 {fileType === 'pdf' ?
@@ -101,7 +101,8 @@ const styles = StyleSheet.create({
       display: 'flex',
       flexDirection: 'row',
       justifyContent: 'center',
-      alignItems: 'center'
+      alignItems: 'end',
+      paddingBottom: '2%'
     },  
     fileName: {
     color: 'white',
