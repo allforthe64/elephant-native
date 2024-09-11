@@ -44,26 +44,28 @@ const File = ({file, focus}) => {
     <TouchableOpacity style={styles.file} onPress={() => focus(file)}>
         <View style={styles.fileTitle}>
             {thumbnailURL ?
-              <Image source={{uri: thumbnailURL}} width={64} height={64}/>
+              <Image source={{uri: thumbnailURL}} width={96} height={96}/>
             : 
               <>
                 {fileType === 'pdf' ?
-                  <FontAwesomeIcon icon={faFilePdf} color={'white'} size={64} />
+                  <FontAwesomeIcon icon={faFilePdf} color={'white'} size={32} />
                 :
                   fileType === 'mp3' || fileType === 'mp4a' ?
-                  <FontAwesomeIcon icon={faFileAudio} color={'white'} size={64} />
+                  <FontAwesomeIcon icon={faFileAudio} color={'white'} size={32} />
                 :
                   fileType === 'txt' ?
-                  <FontAwesomeIcon icon={faFileLines} color={'white'} size={64} />
+                  <FontAwesomeIcon icon={faFileLines} color={'white'} size={32} />
                 :
                   fileType === 'mov' || fileType === 'mp4' ?
-                  <FontAwesomeIcon icon={faVideo} color={'white'} size={64} />
+                  <FontAwesomeIcon icon={faVideo} color={'white'} size={32} />
                 :
-                  <FontAwesomeIcon icon={faFile} color={'white'} size={64} />
+                  <FontAwesomeIcon icon={faFile} color={'white'} size={32} />
                 }
               </>
             }
-            <Text numberOfLines={1} style={styles.fileName}>{fileName}</Text>
+            <View style={{styles.fileNameHolder}}>
+              <Text numberOfLines={1} style={styles.fileName}>{fileName}</Text>
+            </View>
         </View>
     </TouchableOpacity>
   )
@@ -93,12 +95,18 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
     width: '80%',
     },
+    fileNameHolder: {
+      width: '70%',
+      height: '100%',
+      display: 'flex',
+      flexDirection: 'row',
+      justifyContent: 'center',
+      alignItems: 'center'
+    },  
     fileName: {
     color: 'white',
     textAlign: 'center',
     fontSize: 15,
     fontWeight: '500',
-    paddingTop: '4%',
-    width: '70%'
     }
 })
