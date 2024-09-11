@@ -63,7 +63,7 @@ const File = ({file, focus}) => {
                 }
               </>
             }
-            <View style={{styles.fileNameHolder}}>
+            <View style={styles.fileNameHolder}>
               <Text numberOfLines={1} style={styles.fileName}>{fileName}</Text>
             </View>
         </View>
