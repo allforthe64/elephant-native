@@ -38,14 +38,14 @@ const Staging = ({staging, reset, folders, deleteFile, renameFile, moveFile, use
                 paddingBottom: '5%',
                 position: 'absolute',
                 top: 0,
-                backgroundColor: 'rgba(0, 0, 0, .8)',
+                backgroundColor: '#FFFCF6',
                 paddingTop: insets.top,
                 paddingBottom: insets.bottom
             }}>
             <View style={styles.title}>
-                <Text style={styles.header}>Files In Staging</Text>
-                <TouchableOpacity style={{marginLeft: '10%'}} onPressOut={() => reset(false)}>
-                    <FontAwesomeIcon icon={faXmark} size={35} color='white' />
+                <Text style={styles.header}>Files to be filed</Text>
+                <TouchableOpacity style={{marginLeft: '10%', paddingTop: '5%'}} onPressOut={() => reset(false)}>
+                    <FontAwesomeIcon icon={faXmark} size={35} color='#593060' />
                 </TouchableOpacity>
             </View>
             <View style={{height: '80%', paddingBottom: '5%'}}>
@@ -55,7 +55,7 @@ const Staging = ({staging, reset, folders, deleteFile, renameFile, moveFile, use
                             return <File key={file + i}  file={file} focus={setFocusedFile}/>
                         })}        
                     </ScrollView> 
-                    : <Text style={{color: 'white', marginLeft: 'auto', marginRight: 'auto', marginTop: 'auto', marginBottom: 'auto'}}>No Files In Staging!</Text>
+                    : <Text style={{color: '#593060', marginLeft: 'auto', marginRight: 'auto', marginTop: 'auto', marginBottom: 'auto'}}>No Files to be filed!</Text>
                 }
             </View>
         </View>}
@@ -72,10 +72,10 @@ const styles = StyleSheet.create({
         marginBottom: '15%'
     },
     header: {
-        color: 'white',
+        color: '#593060',
         fontSize: 30,
-        fontWeight: '500',
         marginLeft: '25%',
         width: '60%',
+        fontWeight: '600'
     }
 })

@@ -255,11 +255,13 @@ const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolder
       <View style={visible ? styles.folderVisibleMenu : styles.folder}>
         <TouchableOpacity onPress={() => getTargetFolder(folder)} style={{width: '85%'}}>
             <View style={styles.folderTitle}>
-                <FontAwesomeIcon icon={faFolder} color={'white'} size={32} />
+                <View style={styles.iconHolder}>
+                  <FontAwesomeIcon icon={faFolder} color={'#593060'} size={22} />
+                </View>
                 <Text style={styles.folderName}>{folder.fileName}</Text>
             </View>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => setVisible(prev => !prev)} style={visible ? {backgroundColor: 'rgba(38, 38, 38, .75)', width: '15%', display: 'flex', justifyContent: 'center', paddingBottom: '1%', flexDirection: 'row'} : {width: '15%', display: 'flex', justifyContent: 'center', flexDirection: 'row', paddingBottom: '1%'}}>
+        <TouchableOpacity onPress={() => setVisible(prev => !prev)} style={visible ? {backgroundColor: 'rgba(38, 38, 38, .75)', width: '15%', display: 'flex', justifyContent: 'center', paddingBottom: '1%', flexDirection: 'row'} : {width: '15%', display: 'flex', justifyContent: 'center', flexDirection: 'row', paddingBottom: '2%'}}>
           <FontAwesomeIcon icon={faEllipsisVertical} size={26} color={'white'} style={styles.folderArrow}/>
         </TouchableOpacity>
       </View>
@@ -279,12 +281,13 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         marginLeft: 'auto',
         marginRight: 'auto',
-        borderBottomWidth: 2,
-        borderBottomColor: 'white',
+        backgroundColor: '#593060',
         width: '90%',
-        paddingBottom: '1.5%',
-        paddingLeft: '4%',
-        marginBottom: '8%'
+        paddingTop: '2%',
+        paddingBottom: '2%',
+        paddingLeft: '2%',
+        marginBottom: '2%',
+        borderRadius: 100
     },
     folderVisibleMenu: {
       display: 'flex',
@@ -315,5 +318,15 @@ const styles = StyleSheet.create({
     },
     folderArrow: {
     marginTop: 'auto'
+    },
+    iconHolder: {
+      backgroundColor: '#DDCADB',
+      height: 44,
+      width: 44,
+      display: 'flex',
+      flexDirection: 'row',
+      justifyContent: 'center',
+      alignItems: 'center',
+      borderRadius: 100
     }
 })

@@ -44,22 +44,32 @@ const File = ({file, focus}) => {
     <TouchableOpacity style={styles.file} onPress={() => focus(file)}>
         <View style={styles.fileTitle}>
             {thumbnailURL ?
-              <Image source={{uri: thumbnailURL}} width={64} height={64}/>
+              <Image source={{uri: thumbnailURL}} width={44} height={44} style={{borderRadius: 100}}/>
             : 
               <>
                 {fileType === 'pdf' ?
-                  <FontAwesomeIcon icon={faFilePdf} color={'white'} size={32} />
+                  <View style={styles.iconHolder}>
+                    <FontAwesomeIcon icon={faFilePdf} color={'#593060'} size={22} />
+                  </View>
                 :
                   fileType === 'mp3' || fileType === 'mp4a' ?
-                  <FontAwesomeIcon icon={faFileAudio} color={'white'} size={32} />
+                  <View style={styles.iconHolder}>
+                    <FontAwesomeIcon icon={faFileAudio} color={'#593060'} size={22} />
+                  </View>
                 :
                   fileType === 'txt' ?
-                  <FontAwesomeIcon icon={faFileLines} color={'white'} size={32} />
+                  <View style={styles.iconHolder}>
+                    <FontAwesomeIcon icon={faFileLines} color={'#593060'} size={22} />
+                  </View>
                 :
                   fileType === 'mov' || fileType === 'mp4' ?
-                  <FontAwesomeIcon icon={faVideo} color={'white'} size={32} />
+                  <View style={styles.iconHolder}>
+                    <FontAwesomeIcon icon={faVideo} color={'#593060'} size={22} />
+                  </View>
                 :
-                  <FontAwesomeIcon icon={faFile} color={'white'} size={32} />
+                  <View style={styles.iconHolder}>
+                    <FontAwesomeIcon icon={faFile} color={'#593060'} size={22} />
+                  </View>
                 }
               </>
             }
@@ -83,31 +93,38 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     marginLeft: 'auto',
     marginRight: 'auto',
-    borderBottomWidth: 2,
-    borderBottomColor: 'white',
+    backgroundColor: '#DDCADB',
     width: '90%',
-    paddingBottom: '1.5%',
-    marginBottom: '8%'
+    paddingBottom: '2%',
+    paddingTop: '2%',
+    paddingLeft: '2%',
+    marginBottom: '2%',
+    borderRadius: 100
     },
     fileTitle: {
     display: 'flex',
     flexDirection: 'row',
-    justifyContent: 'space-around',
     width: '80%',
     },
     fileNameHolder: {
-      width: '70%',
-      height: '100%',
+      width: '80%',
+      paddingTop: '2.5%'
+    },  
+    fileName: {
+      color: '#593060',
+      textAlign: 'center',
+      fontSize: 22,
+      fontWeight: '500',
+      marginLeft: '5%'
+    },
+    iconHolder: {
+      backgroundColor: 'white',
+      height: 44,
+      width: 44,
       display: 'flex',
       flexDirection: 'row',
       justifyContent: 'center',
-      alignItems: 'end',
-      paddingBottom: '2%'
-    },  
-    fileName: {
-    color: 'white',
-    textAlign: 'center',
-    fontSize: 15,
-    fontWeight: '500',
+      alignItems: 'center',
+      borderRadius: 100
     }
 })

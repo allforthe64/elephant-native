@@ -16,7 +16,7 @@ import { firebaseAuth } from '../../firebaseConfig';
 
 //fontAwesome imports
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faBox, faFolder } from '@fortawesome/free-solid-svg-icons';
+import { faBox, faFile, faFolder, faPlus } from '@fortawesome/free-solid-svg-icons';
 
 //safe area context import
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -252,14 +252,12 @@ export default function Files({navigation: { navigate }, route}) {
               add && !keyBoardClosed ? {
               width: '100%', /*Expand height to allow the text input to scroll into view*/
               height: '190%',
-              backgroundColor: 'rgba(0, 0, 0, .8)',
               paddingTop: insets.top,
               paddingBottom: insets.bottom,
               position: 'absolute'
             } : {
             width: '100%', /* Default styling */
             height: '100%',
-            backgroundColor: 'rgba(0, 0, 0, .8)',
             paddingTop: insets.top,
             paddingBottom: insets.bottom,
             position: 'absolute'
@@ -268,12 +266,14 @@ export default function Files({navigation: { navigate }, route}) {
           >
                   <View>
                     <View style={styles.header}>
-                      <TouchableOpacity style={{display: 'flex', flexDirection: 'row'}} onPress={() => setStagingMode(true)}>
-                        <Text style={styles.subheading}>Go To Staging</Text>
-                        <FontAwesomeIcon icon={faBox} color='white' size={40}/>
+                      <TouchableOpacity style={styles.nonFolderButton65} onPress={() => setStagingMode(true)}>
+                        <View style={styles.iconHolder}>
+                          <FontAwesomeIcon icon={faBox} color='#9F37B0' size={22}/>
+                        </View>
+                        <Text style={styles.subheading}>To be filed</Text>
                       </TouchableOpacity>
                     </View>
-                    <View style={add ? {height: 300} : {height: 350, marginBottom: '10%'}}>
+                    <View style={add ? {height: 300} : {height: 330, marginBottom: '6%'}}>
                       <ScrollView>
                         {currentUser.files.map((file, i) => {
                           if (file.nestedUnder === '') {
@@ -309,52 +309,26 @@ export default function Files({navigation: { navigate }, route}) {
                       </View>
                     : 
                     <View style={{display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%'}}>
-                      <View style={{display: 'flex', flexDirection: 'row'}}>
-                        <FontAwesomeIcon icon={faFolder} size={30} color='white'/>
-                        <View style={{width: '50%',
-                                  borderColor: '#777',
-                                  borderRadius: 25,
-                                  backgroundColor: 'white',
-                                  borderWidth: 1,
-                                  paddingTop: '2%',
-                                  paddingBottom: '2%',
-                                  marginBottom: '7%',
-                                  marginLeft: '2%'}}>
-                                <TouchableOpacity style={{
-                                  display: 'flex', 
-                                  flexDirection: 'row', 
-                                  width: '100%', 
-                                  justifyContent: 'center',
-                                }}
-                                  onPress={() => {
-                                    setAdd(true)
-                                    setKeyboardClosed(false)
-                                  }}
-                                >
-                                    <Text style={{fontSize: 15, color: 'black', fontWeight: '600'}}>Add New Folder</Text>
-                                </TouchableOpacity>
-                        </View>
-                      </View>
-                      <View style={{width: '60%',
-                                borderColor: '#777',
-                                borderRadius: 25,
-                                backgroundColor: 'white',
-                                borderWidth: 1,
-                                paddingTop: '2%',
-                                paddingBottom: '2%',
-                                paddingRight: '8%',
-                                paddingLeft: '8%',
-                                marginLeft: '2%'}}>
-                          <TouchableOpacity onPress={() => navigate('Upload A File')} style={{
-                                display: 'flex', 
-                                flexDirection: 'row', 
-                                width: '100%', 
-                                justifyContent: 'space-around',
-                              }}>
-                              <FontAwesomeIcon icon={faFolder} size={20}/>
-                              <Text style={{fontSize: 15, color: 'black', fontWeight: '600'}}>Get Document</Text>
+                      <View style={{display: 'flex', flexDirection: 'row', marginBottom: 10}}>                  
+                          <TouchableOpacity style={styles.nonFolderButton80}
+                            onPress={() => {
+                              setAdd(true)
+                              setKeyboardClosed(false)
+                            }}
+                          >
+                              <View style={styles.iconHolderSM}>
+                                <FontAwesomeIcon icon={faPlus} size={18} color='#9F37B0'/>
+                              </View>
+                              <Text style={styles.subheadingMLLarge}>Add New Folder</Text>
                           </TouchableOpacity>
                       </View>
+                        <TouchableOpacity onPress={() => navigate('Upload A File')} style={styles.nonFolderButton80}>
+                            <View style={styles.iconHolderSM}>
+                              <FontAwesomeIcon icon={faFile} size={18} color='#9F37B0'/>
+                            </View>
+                            <Text style={styles.subheadingMLLarge}>Get Document</Text>
+                        </TouchableOpacity>
+                      
                     </View>
                     }
                   </View>
@@ -389,13 +363,22 @@ const styles = StyleSheet.create({
     marginBottom: '2.5%'
   },
   subheading: {
-    color: 'white',
+    color: '#9F37B0',
     textAlign: 'center',
     fontWeight: '600',
     fontSize: 22,
     marginTop: 'auto',
     marginBottom: 'auto',
-    marginRight: '2%'
+    marginLeft: '10%'
+  },
+  subheadingMLLarge: {
+    color: '#9F37B0',
+    textAlign: 'center',
+    fontWeight: '600',
+    fontSize: 18,
+    marginTop: 'auto',
+    marginBottom: 'auto',
+    marginLeft: '15%'
   },
   header: {
     display: 'flex', 
@@ -421,8 +404,44 @@ const styles = StyleSheet.create({
     margin: 10,
     width: '50%'
   },
-  bgImg: {
-    objectFit: 'scale-down',
-    opacity: .9,
+  nonFolderButton65: {
+    display: 'flex', 
+    flexDirection: 'row', 
+    backgroundColor: '#FFE562', 
+    paddingLeft: '2%', 
+    paddingTop: '2%', 
+    paddingBottom: '2%', 
+    borderRadius: 100, 
+    width: '65%'
   },
+  nonFolderButton80: {
+    display: 'flex', 
+    flexDirection: 'row', 
+    backgroundColor: '#FFE562', 
+    paddingLeft: '2%', 
+    paddingTop: '2%', 
+    paddingBottom: '2%', 
+    borderRadius: 100, 
+    width: '80%'
+  },
+  iconHolder: {
+    backgroundColor: 'white', 
+    height: 44, 
+    width: 44, 
+    borderRadius: 100, 
+    display: 'flex', 
+    flexDirection: 'row', 
+    justifyContent: 'center', 
+    alignItems: 'center'
+  },
+  iconHolderSM: {
+    backgroundColor: 'white', 
+    height: 36, 
+    width: 36, 
+    borderRadius: 100, 
+    display: 'flex', 
+    flexDirection: 'row', 
+    justifyContent: 'center', 
+    alignItems: 'center'
+  }
 });
