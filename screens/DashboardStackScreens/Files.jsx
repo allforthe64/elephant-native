@@ -244,7 +244,6 @@ export default function Files({navigation: { navigate }, route}) {
 
   return ( 
       <View style={styles.container}>
-        <Image style={styles.bgImg} source={require('../../assets/elephant_bg.jpg')} />
         {!loading && currentUser ? 
           focusedFolder ? <FocusedFolder folder={focusedFolder} renameFolder={renameFolder} moveFolder={moveFolder} addFolder={addFolder} deleteFolder={deleteFolder} folders={currentUser.files} clear={setFocusedFolder} getTargetFolder={getTargetFolder} deleteFile={deleteFile} renameFile={renameFile} moveFile={moveFile} files={currentUser.fileRefs}/> 
           : stagingMode ? <Staging reset={setStagingMode} staging={staging} userFiles={currentUser.fileRefs} folders={currentUser.files} deleteFile={deleteFile} renameFile={renameFile} moveFile={moveFile}/> 
@@ -378,7 +377,7 @@ export default function Files({navigation: { navigate }, route}) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#FFFCF6',
     alignItems: 'center',
     justifyContent: 'center',
   },
