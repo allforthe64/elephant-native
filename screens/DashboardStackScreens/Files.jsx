@@ -51,8 +51,8 @@ export default function Files({navigation: { navigate }, route}) {
     if (auth) {
       try {
         const getCurrentUser = async () => {
+          console.log('running from files comp')
           const unsubscribe = await userListener(setCurrentUser, setStaging, auth.currentUser.uid)
-    
           return () => unsubscribe()
         }
         getCurrentUser()
@@ -63,7 +63,9 @@ export default function Files({navigation: { navigate }, route}) {
 
   //once a current user has been pushed into state, allow component to render files/folders
   useEffect(() => {
-    if (currentUser) setLoading(false)
+    if (currentUser) {
+      setLoading(false)
+    }
   }, [currentUser])  
 
   //get the files and folders nested under a particular folder

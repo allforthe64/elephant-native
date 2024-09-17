@@ -25,7 +25,6 @@ import { deleteFile } from './cloudStorage'
 
 //pull a user from the firestore data base by using a localId/uid token
 export async function getUser(user) {
-    
     const docSnap = await getDoc(doc(db, 'users', user.localId))
 
     if (!docSnap.exists()) {
@@ -38,11 +37,11 @@ export async function getUser(user) {
 
 //get a user document using a uid, setup snapshot listener to monitor changes
 export async function userListener(setCurrentUser, setStaging, user) {
-    console.log(user)
     const unsub = onSnapshot(doc(db, 'users', user), (doc) => {
         try {
             //filter file references from the current user that are in staging
             console.log(doc.data())
+            console.log('running')
             const stagingRefs = doc.data().fileRefs.filter(el => el.flag === 'Staging')
             if (setStaging) setStaging(stagingRefs)
             setCurrentUser({...doc.data(), uid: user})
@@ -54,7 +53,6 @@ export async function userListener(setCurrentUser, setStaging, user) {
 
 //find a user by uid, replace current user data with new user data object (coming in as input for function)
 export async function updateUser(updatedUser) {
-    console.log(updatedUser)
     const userRef = doc(db, 'users', updatedUser.uid)
     await updateDoc(userRef, {...updatedUser})
 }
