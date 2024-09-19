@@ -388,55 +388,34 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
                     {preDelete ? 
                             (   
                                 <Modal animationType='slide' presentationStyle='pageSheet'>
-                                    <View style={{ paddingTop: '10%', backgroundColor: 'rgb(23 23 23)', height: '100%', width: '100%'}}>
+                                    <View style={{ paddingTop: '10%', backgroundColor: '#593060', height: '100%', width: '100%'}}>
                                         {/* if the user hits the delete button on a file, open a modal that confirms they want to delete the file*/}
                                         <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', paddingRight: '5%', paddingTop: '10%',     width: '100%'}}>
-                                            <Pressable onPress={() => setPreDelete(false)}>
-                                            <FontAwesomeIcon icon={faXmark} color={'white'} size={30}/>
-                                            </Pressable>
+                                            <TouchableOpacity onPress={() => setPreDelete(false)}>
+                                                <FontAwesomeIcon icon={faXmark} color={'white'} size={30}/>
+                                            </TouchableOpacity>
                                         </View>
-                                        <View style={{width: '100%', height: '95%', flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-                                        <Text style={{fontSize: 22, color: 'white', textAlign: 'center'}}>Are you sure you want to delete {file.fileName}?</Text>
-
-                                        {/* button with onPress function to delete the file */}
-                                        <View style={{width: '50%',
-                                                borderRadius: 25,
-                                                backgroundColor: 'red',
-                                                paddingTop: '2%',
-                                                paddingBottom: '2%',
-                                                marginTop: '10%',
-                                                marginLeft: '2%'}}>
+                                        <View style={{width: '100%', display: 'flex', flexDirection: 'column', paddingTop: '10%', justifyContent: 'center', alignItems: 'center'}}>
+                                        <Text style={{fontSize: 32, color: 'white', textAlign: 'center', paddingLeft: 8, paddingRight: 8, fontWeight: '600', marginBottom: '6%'}}>Are you sure you want to <Text style={{color: 'red'}}>delete</Text> the file:</Text>
+                                        <Text style={{fontSize: 18, color: 'white', textAlign: 'center', paddingLeft: 30, paddingRight: 30, fontWeight: '600'}}>{file.fileName}?</Text>
+                                        <View style={{width: '100%', display: 'flex', flexDirection: 'row', justifyContent: 'space-around', paddingTop: '10%'}}>
+                                            {/* button with onPress function to delete the file */}
                                             <TouchableOpacity onPress={() => {
                                                 setPreDelete(false)
                                                 focus(false)
                                                 deleteFile(file.fileId)
-                                            }} style={{
-                                            display: 'flex', 
-                                            flexDirection: 'row', 
-                                            width: '100%', 
-                                            justifyContent: 'center',
-                                            }}>
-                                                <Text style={{fontSize: 15, color: 'white', fontWeight: '600'}}>Delete</Text>
+                                            }} style={styles.deleteButtonSM}>
+                                                <View style={styles.iconHolderSmall}>
+                                                    <FontAwesomeIcon icon={faTrash} size={18} color='red' />
+                                                </View>
+                                                <Text style={{fontSize: 18, color: 'red', fontWeight: '600', marginLeft: '18%'}}>Delete</Text>
                                             </TouchableOpacity>
-                                        </View>
 
-                                        <View style={{width: '50%',
-                                            borderColor: '#777',
-                                            borderRadius: 25,
-                                            backgroundColor: 'white',
-                                            borderWidth: 1,
-                                            paddingTop: '2%',
-                                            paddingBottom: '2%',
-                                            marginTop: '7%',
-                                            marginBottom: '10%',
-                                            marginLeft: '2%'}}>
-                                            <TouchableOpacity onPress={() => setPreDelete(false)} style={{
-                                            display: 'flex', 
-                                            flexDirection: 'row', 
-                                            width: '100%', 
-                                            justifyContent: 'center',
-                                            }}>
-                                                <Text style={{fontSize: 15, color: 'black', fontWeight: '600'}}>Cancel</Text>
+                                            <TouchableOpacity onPress={() => setPreDelete(false)} style={styles.yellowButtonSM}>
+                                                <View style={styles.iconHolderSmall}>
+                                                    <FontAwesomeIcon icon={faXmark} color='#9F37B0' size={18} />
+                                                </View>
+                                                <Text style={{fontSize: 18, color: '#9F37B0', fontWeight: '600', marginLeft: '18%'}}>Cancel</Text>
                                             </TouchableOpacity>
                                         </View>
 
@@ -453,7 +432,7 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
                                     {/* if the moveFile state is true, display the modal with the file movement code*/}
                                     {/* xMark icon for closing out the moveFile modal */}
                                     <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', paddingRight: '5%', paddingTop: '10%', width: '100%'}}>
-                                        <Pressable onPress={() => {
+                                        <TouchableOpacity onPress={() => {
                                                 if (addFolderForm) setAddFolderForm(false)
                                                 else {
                                                     setFocusedFolder(null)
@@ -462,7 +441,7 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
                                             }
                                             }>
                                             <FontAwesomeIcon icon={faXmark} color={'white'} size={30}/>
-                                        </Pressable>
+                                        </TouchableOpacity>
                                     </View>
                                     
                                     {addFolderForm ? 
@@ -976,6 +955,17 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         width: '80%',
         marginTop: '2%'
+    },
+    deleteButtonSM: {
+        backgroundColor: '#BCBCBC',
+        paddingLeft: 6,
+        paddingTop: 6,
+        paddingBottom: 6,
+        paddingRight: 20,
+        borderRadius: 100,
+        width: '45%',
+        display: 'flex',
+        flexDirection: 'row',
     },
     iconHolder: {
         backgroundColor: 'white', 
