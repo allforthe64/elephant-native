@@ -69,7 +69,7 @@ const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolder
           <Modal animationType='slide' presentationStyle='pageSheet'>
               {preDelete ? 
                 /*Code for deleting a folder */
-                <Modal animationType='slide' presentationStyle='pageSheet' >
+                <Modal animationType='slide' presentationStyle='pageSheet'>
                     <View style={{height: '100%', width: '100%', backgroundColor: 'rgb(23 23 23)'}}>
                     
                       <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', paddingRight: '5%', paddingTop: '10%', width: '100%'}}>

@@ -1,11 +1,11 @@
-import { StyleSheet, Text, View, Keyboard } from 'react-native'
+import { StyleSheet, Text, View, Keyboard, Modal, Pressable } from 'react-native'
 import React, {useEffect, useState} from 'react'
-import { ScrollView, TouchableOpacity, TextInput, Modal } from 'react-native-gesture-handler'
+import { ScrollView, TouchableOpacity, TextInput } from 'react-native-gesture-handler'
 
 //fontAwesome imports
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
 import { faArrowLeft, faXmark } from '@fortawesome/free-solid-svg-icons'
-import { faFolder } from '@fortawesome/free-solid-svg-icons'
+import { faFolder, faFloppyDisk } from '@fortawesome/free-solid-svg-icons'
 
 //file system component imports
 import Folder from './Folder'
@@ -132,33 +132,39 @@ const FocusedFolder = ({folder, folders, clear, getTargetFolder, addFolder, rena
                         </ScrollView> 
                     </View>
                     {add ? 
-                        <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center'}}>
-                                <FontAwesomeIcon icon={faFolder} size={30} color='white'/>
-                                <TextInput value={newFolderName} style={{color: 'white', fontSize: 20, fontWeight: 'bold', borderBottomColor: 'white', borderBottomWidth: 2, width: '40%'}} onChangeText={(e) => setNewFolderName(e)} autoFocus onFocus={() => setKeyboardClosed(false)} onBlur={() => {if (newFolderName === '') setAdd(false)}}/>
-                                <View style={{width: '25%',
-                                        borderColor: '#777',
-                                        borderRadius: 25,
-                                        backgroundColor: 'white',
-                                        borderWidth: 1,
-                                        paddingTop: '2%',
-                                        paddingBottom: '2%',
-                                        marginLeft: '2%'}}>
-                                        <TouchableOpacity style={{
-                                        display: 'flex', 
-                                        flexDirection: 'row', 
-                                        width: '100%', 
-                                        justifyContent: 'center',
-                                        }}
+                        <Modal presentationStyle='pageSheet' animationType='slide'>
+                            <View style={{height: '100%', width: '100%', backgroundColor: '#593060'}}>
+                                <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', paddingRight: '5%', paddingTop: '10%',width: '100%'}}>
+                                    <Pressable onPress={() => {
+                                        setAdd(false)
+                                        setNewFolderName('')
+                                    }}>
+                                    <FontAwesomeIcon icon={faXmark} color={'white'} size={30}/>
+                                    </Pressable>
+                                </View>
+                                <View style={styles.addFolderContainer}>
+                                    <Text style={styles.addFolderHeading}>Add new folder:</Text>
+                                    <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-around', marginBottom: '6%'}}  
+                                    >
+                                        <View style={styles.iconHolder}>
+                                        <FontAwesomeIcon icon={faFolder} size={22} color='#9F37B0'/>
+                                        </View>
+                                        <TextInput value={newFolderName} style={{color: 'white', fontSize: 22, fontWeight: 'bold', borderBottomColor: 'white', borderBottomWidth: 2, width: '70%', marginLeft: '5%'}} onChangeText={(e) => setNewFolderName(e)} autoFocus onFocus={() => setKeyboardClosed(false)} onBlur={() => {if (newFolderName === '') setAdd(false)}}/>
+                                    </View>
+                                    <Pressable style={styles.nonFolderButtonSM}
                                         onPress={() => {
                                             addFolder(newFolderName, folder.folder.id)
-                                            setNewFolderName('')
                                             setAdd(false)
                                         }}
-                                        >
-                                            <Text style={{fontSize: 15, color: 'black', fontWeight: '600'}}>Save</Text>
-                                        </TouchableOpacity>
+                                    >
+                                        <View style={styles.iconHolderSM}>
+                                            <FontAwesomeIcon icon={faFloppyDisk} size={18} color='#9F37B0'/>
+                                        </View>
+                                        <Text style={{fontSize: 22, color: '#9F37B0', fontWeight: '600', paddingTop: '1%', marginLeft: '15%'}}>Save</Text>
+                                    </Pressable>
                                 </View>
-                        </View>
+                            </View>
+                        </Modal>
                     : 
                         <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'center'}}>
                             <TouchableOpacity style={styles.nonFolderButton65}
@@ -240,5 +246,39 @@ const styles = StyleSheet.create({
         flexDirection: 'row', 
         justifyContent: 'center', 
         alignItems: 'center'
-      }
+      },
+        iconHolderSM: {
+            backgroundColor: 'white', 
+            height: 36, 
+            width: 36, 
+            borderRadius: 100, 
+            display: 'flex', 
+            flexDirection: 'row', 
+            justifyContent: 'center', 
+            alignItems: 'center'
+        },
+      nonFolderButtonSM: {
+        display: 'flex', 
+        flexDirection: 'row', 
+        backgroundColor: '#FFE562', 
+        paddingLeft: '2%', 
+        paddingTop: '2%', 
+        paddingBottom: '2%', 
+        borderRadius: 100, 
+        width: 180,
+      },
+    addFolderContainer: {
+        width: '100%',
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    addFolderHeading: {
+        fontWeight: '600',
+        fontSize: 40,
+        color: 'white',
+        marginBottom: '10%',
+    }
 })
