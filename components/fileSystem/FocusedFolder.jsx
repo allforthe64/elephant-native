@@ -15,7 +15,7 @@ import FocusedFileComp from './FocusedFileComp'
 //safe area context imports
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
-const FocusedFolder = ({folder, folders, clear, getTargetFolder, addFolder, renameFolder, moveFolder, deleteFolder, deleteFile, renameFile, moveFile, files}) => {
+const FocusedFolder = ({folder, folders, clear, getTargetFolder, addFolder, renameFolder, moveFolder, deleteFolder, deleteFile, renameFile, moveFile, files, updateUser}) => {
 
     const [nestedFolder, setNestedFolder] = useState()
     const [loading, setLoading] = useState(true)
@@ -127,7 +127,7 @@ const FocusedFolder = ({folder, folders, clear, getTargetFolder, addFolder, rena
                     </View>
                     <View style={add ? {height: 250} : {height: 365, marginBottom: '10%'}}>
                         <ScrollView style={{height: '100%'}}>
-                            {folder.folders.map((f, i) => {return <Folder key={f + i} getTargetFolder={getTargetFolder} folders={folders} renameFolder={renameFolder} moveFolderFunc={moveFolder} folder={f} deleteFolder={deleteFolder}/>})}
+                            {folder.folders.map((f, i) => {return <Folder key={f + i} getTargetFolder={getTargetFolder} folders={folders} renameFolder={renameFolder} moveFolderFunc={moveFolder} folder={f} deleteFolder={deleteFolder} updateUser={updateUser}/>})}
                             {nestedFiles.map((file, i) => {return <File key={file + i} focus={setFocusedFile} file={file} />})}
                         </ScrollView> 
                     </View>

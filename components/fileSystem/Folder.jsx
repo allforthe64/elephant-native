@@ -4,9 +4,12 @@ import { ScrollView } from 'react-native-gesture-handler';
 
 //font awesome imports
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faArrowRight, faEllipsisVertical, faFloppyDisk, faFolder, faPencil, faTrash, faXmark, faArrowLeft, faCheck } from '@fortawesome/free-solid-svg-icons';
+import { faArrowRight, faEllipsisVertical, faFloppyDisk, faFolder, faPencil, faTrash, faXmark, faArrowLeft, faPlus } from '@fortawesome/free-solid-svg-icons';
 
-const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolderFunc, folders}) => {
+import { firebaseAuth } from '../../firebaseConfig';
+import { userListener } from '../../firebase/firestore';
+
+const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolderFunc, folders, updateUser}) => {
 
   const [visible, setVisible] = useState(false)
   const [preDelete, setPreDelete] = useState(false)
@@ -17,19 +20,45 @@ const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolder
   const [validFolders, setValidFolders] = useState()
   const [focusedFolder, setFocusedFolder] = useState()
   const [subFolders, setSubFolders] = useState()
+  const [addFolderForm, setAddFolderForm] = useState(false)
+  const [newFolderName, setNewFolderName] = useState('')
+  const [userInst, setUserInst] = useState()
+
+  const auth = firebaseAuth
 
 
   useEffect(() => {
-    if (folder.nestedUnder === '') setValidFolders(folders.filter(f => {if (f.nestedUnder === '') return f}))
+    if (folder.nestedUnder === '') {
+      setValidFolders(folders.filter(f => {
+        if (f.nestedUnder === '' && f.fileName !== folder.fileName) return f
+      }))
+    }
     else setValidFolders(folders)
-  }, [folders])
+  }, [folders, addFolderForm])
+
+  //get the current user 
+  useEffect(() => {
+    if (auth) {
+        try {
+            const getCurrentUser = async () => {
+                console.log('running from FocusedFileComp')
+                const unsubscribe = await userListener(setUserInst, false, auth.currentUser.uid)
+            
+                return () => unsubscribe()
+            }
+            getCurrentUser()
+        } catch (err) {alert(err)}
+    } else console.log('no user yet')
+    
+  }, [addFolderForm])
 
   useEffect(() => {
     const exists = Object.values(folders).some((value) => {
         return value.nestedUnder === focusedFolder
     })
     setSubFolders(exists)
-}, [focusedFolder])
+}, [focusedFolder, addFolderForm])
+
 
   //call the delete folder function from the main component and hide both modals
   const deleteFolderFunction = () => {
@@ -71,6 +100,42 @@ const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolder
       setDestination({id: null, folderName: null})
     }
   }
+
+  //add a folder
+  const addFolder = async (folderName, targetNest) => {
+    //if the incoming targetNest is empty string, create the new folder under the home directory
+    if (folderName.length > 0) {
+    if (targetNest === '') {
+        const newFile = {
+        id: Math.random().toString(20).toString().split('.')[1] + Math.random().toString(20).toString().split('.')[1],
+        fileName: folderName,
+        nestedUnder: ''
+        }
+
+        const newFiles = [...userInst.files, newFile]
+        const updatedUser = {...userInst, files: newFiles}
+        await updateUser(updatedUser)
+        setNewFolderName('')
+        setAddFolderForm(false)
+    } else {           //if the incoming targetNest has a value, create the new folder with the nestedUnder property set to targetNest
+        const newFile = {
+        id: Math.random().toString(20).toString().split('.')[1] + Math.random().toString(20).toString().split('.')[1],
+        fileName: folderName,
+        nestedUnder: targetNest
+        }
+
+        const newFiles = [...userInst.files, newFile]
+        const updatedUser = {...userInst, files: newFiles}
+
+        await updateUser(updatedUser)
+        setNewFolderName('')
+        setAddFolderForm(false)
+    }
+    } else {
+    alert('Please enter a folder name')
+    }
+  }
+
 
 
   return (
@@ -168,109 +233,147 @@ const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolder
                     /*Code for moving a folder */
                     : moveFolder ? 
                       <Modal animationType='slide' presentationStyle='pageSheet' >
-                          <View style={{height: '100%', width: '100%', backgroundColor: 'rgb(23 23 23)'}}>
+                          <View style={{height: '100%', width: '100%', backgroundColor: '#593060'}}>
                           
                             <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', paddingRight: '5%', paddingTop: '10%', width: '100%'}}>
-                              <Pressable onPress={() => setMoveFolder(false)}>
+                              <Pressable onPress={() => {
+                                setMoveFolder(false)
+                                setNewFolderName('')
+                                setAddFolderForm(false)
+                              }}>
                                 <FontAwesomeIcon icon={faXmark} color={'white'} size={30}/>
                               </Pressable>
                             </View>
                           <View style={{width: '100%', height: '95%', flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-                            <Text style={{fontSize: 40, color: 'white', fontWeight: 'bold', textAlign: 'left', width: '100%', paddingLeft: '5%', marginBottom: '10%'}}>Move To...</Text>
-      
-                            <View style={{width: '100%', height: '65%', marginBottom: '6%'}}>
-                                    {focusedFolder ? 
-                                      <View style={{paddingLeft: '2%'}}>
-                                          <TouchableOpacity style={styles.yellowButtonSM} onPress={() => {
-                                              try {
-                                                  const folderInst = folders.filter(folder => folder.id === focusedFolder) 
-                                                  const parentFolderInst = folders.filter(folder => folder.id === folderInst[0].nestedUnder)
-                                                  console.log(parentFolderInst)
-                                                  if (parentFolderInst.length > 0) {
-                                                      setDestination({id: parentFolderInst[0].id, fileName: parentFolderInst[0].fileName, nestedUnder: parentFolderInst[0].nestedUnder})
-                                                      setFocusedFolder(folderInst[0].nestedUnder)
-                                                  } else {
-                                                      setDestination({id: null, fileName: null, nestedUnder: null})
-                                                      setFocusedFolder(null)
-                                                  }
-                                              } catch (error) {
-                                                  console.log('this is an error within focusedFile: ', error)
-                                              }
-                                          }}>
-                                              <View style={styles.iconHolderSmall}>
-                                                  <FontAwesomeIcon icon={faArrowLeft} size={18} color='#9F37B0' /> 
-                                              </View>
-                                              <Text style={{fontSize: 20, color: '#9F37B0', fontWeight: '600', marginLeft: '10%'}}>Back</Text>
-                                          </TouchableOpacity>
+                            {!addFolderForm &&
+                              <Text style={{fontSize: 40, color: 'white', fontWeight: 'bold', textAlign: 'left', width: '100%', paddingLeft: '5%', marginBottom: '10%'}}>Move To...</Text>
+                            }
+                            {addFolderForm ? 
+                              <View style={{width: '100%', height: '100%', display: 'flex', flexDirection:'column', alignItems: 'center'}}>
+                                  <Text style={{color: 'white', fontSize: 35, fontWeight: '700', marginTop: '40%', textAlign: 'center'}}>Add A New Folder:</Text>
+                                  <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', marginTop: '10%', width: '100%'}}>
+                                      <View style={styles.iconHolder}> 
+                                          <FontAwesomeIcon icon={faFolder} size={22} color='#9F37B0'/>
                                       </View>
-                                  :
-                                      <></>
-                                  }
-                                  <ScrollView style={focusedFolder ? {paddingTop: '5%', marginTop: '2%'} : {}}>
-                                    {focusedFolder && !subFolders ? 
-                                        <Text style={{fontSize: 30, color: 'white', fontWeight: 'bold', marginTop: '30%', textAlign: 'center'}}>No Subfolders...</Text>
-                                    :
-                                      <>
-                                        {folders.map((f, index) => {
-                                            if (focusedFolder) {
-                                                if (f.nestedUnder === focusedFolder) {
-                                                        return (
-                                                            <Pressable key={index} style={{display: 'flex', flexDirection: 'row', justifyContent: 'center', marginTop: '1%'}} onPress={() => {
-                                                                    if (destination.id === null || f.id !== destination.id) {
-                                                                        setDestination({id: f.id, fileName: f.fileName, nestedUnder: f.nestedUnder})
-                                                                    } else {
-                                                                        setFocusedFolder(f.id)
-                                                                        setDestination({id: null, fileName: null, nestedUnder: null})
-                                                                    }
-                                                                }
-                                                                }>
-                                                                <View style={f.id === destination.id ? styles.moveFolderWhite : styles.moveFolder}>
-                                                                <View style={f.id === destination.id ? styles.iconHolderBlack : styles.iconHolderWhite}>
-                                                                    <FontAwesomeIcon icon={faFolder} size={28} color={f.id === destination.id ? 'white' : '#9F37B0'}/>
-                                                                </View>
-                                                                <Text style={f.id === destination.id ? {color: 'black', fontSize: 28, width: '80%', paddingTop: '1%'} : {color: '#9F37B0', fontSize: 28, width: '80%', textAlign: 'left', paddingTop: '1%'}}>{f.fileName}</Text>
-                                                                </View>
-                                                            </Pressable>
-                                                        )
-                                                    
-                                                }
-                                            } else {
-                                                if (f.id !== folder.nestedUnder && f.nestedUnder === '') {
-                                                    return (
-                                                        <Pressable key={index} style={{display: 'flex', flexDirection: 'row', justifyContent: 'center', marginTop: '1%'}} onPress={() => {
-                                                                if (destination.id === null || f.id !== destination.id) {
-                                                                    setDestination({id: f.id, fileName: f.fileName, nestedUnder: f.nestedUnder})
-                                                                } else {
-                                                                    setFocusedFolder(f.id)
-                                                                    setDestination({id: null, fileName: null, nestedUnder: null})
-                                                                }
-                                                            }
-                                                            }>
-                                                            <View style={f.id === destination.id ? styles.moveFolderWhite : styles.moveFolder}>
-                                                            <View style={f.id === destination.id ? styles.iconHolderBlack : styles.iconHolderWhite}>
-                                                                <FontAwesomeIcon icon={faFolder} size={28} color={f.id === destination.id ? 'white' : '#9F37B0'}/>
-                                                            </View>
-                                                            <Text style={f.id === destination.id ? {color: 'black', fontSize: 28, width: '80%', paddingTop: '1%'} : {color: '#9F37B0', fontSize: 28, width: '80%', textAlign: 'left', paddingTop: '1%'}}>{f.fileName}</Text>
-                                                            </View>
-                                                        </Pressable>
-                                                        )
-                                                    }
-                                                }
-                                            }
-                                        )}   
-                                      </>
-                                    }
-                                  </ScrollView>
-                            </View>
-      
-                              <TouchableOpacity onPress={handleMove} style={styles.yellowButtonMed}>
-                                  <View style={styles.iconHolderSmall}>
-                                    <FontAwesomeIcon icon={faCheck} color='#9F37B0' size={18} />
+                                      <TextInput value={newFolderName} style={{color: 'white', fontSize: 20, fontWeight: 'bold', borderBottomColor: 'white', borderBottomWidth: 2, width: '75%'}} onChangeText={(e) => setNewFolderName(e)} autoFocus onBlur={() => {if (newFolderName === '') setAddFolderForm(false)}}/>
                                   </View>
-                                  <Text style={{fontSize: 18, color: '#9F37B0', fontWeight: '600', paddingTop: '1%', marginLeft: '20%'}}>Confirm Move</Text>
-                              </TouchableOpacity>
+                                  <View style={{width: '100%', paddingTop: '10%', display: 'flex', flexDirection: 'row', justifyContent: 'center'}}>
+                                      <TouchableOpacity style={styles.yellowButtonSM}
+                                      onPress={async () => {
+                                          addFolder(newFolderName, focusedFolder ? focusedFolder : '')
+                                      }}
+                                      >   
+                                          <View style={styles.iconHolderSmall}>
+                                              <FontAwesomeIcon icon={faFloppyDisk} size={18} color='#9F37B0' />
+                                          </View>
+                                          <Text style={{fontSize: 18, color: '#9F37B0', fontWeight: '600', marginLeft: '22%'}}>Save</Text>
+                                      </TouchableOpacity>
+                                  </View>
+                              </View>
+
+                            :
       
-      
+                              <View style={{width: '100%', height: '65%', marginBottom: '6%'}}>
+                                      {focusedFolder ? 
+                                        <View style={{paddingLeft: '2%'}}>
+                                            <TouchableOpacity style={styles.yellowButtonSM} onPress={() => {
+                                                try {
+                                                    const folderInst = folders.filter(folder => folder.id === focusedFolder) 
+                                                    const parentFolderInst = folders.filter(folder => folder.id === folderInst[0].nestedUnder)
+                                                    console.log(parentFolderInst)
+                                                    if (parentFolderInst.length > 0) {
+                                                        setDestination({id: parentFolderInst[0].id, fileName: parentFolderInst[0].fileName, nestedUnder: parentFolderInst[0].nestedUnder})
+                                                        setFocusedFolder(folderInst[0].nestedUnder)
+                                                    } else {
+                                                        setDestination({id: null, fileName: null, nestedUnder: null})
+                                                        setFocusedFolder(null)
+                                                    }
+                                                } catch (error) {
+                                                    console.log('this is an error within focusedFile: ', error)
+                                                }
+                                            }}>
+                                                <View style={styles.iconHolderSmall}>
+                                                    <FontAwesomeIcon icon={faArrowLeft} size={18} color='#9F37B0' /> 
+                                                </View>
+                                                <Text style={{fontSize: 20, color: '#9F37B0', fontWeight: '600', marginLeft: '10%'}}>Back</Text>
+                                            </TouchableOpacity>
+                                        </View>
+                                    :
+                                        <></>
+                                    }
+                                    <ScrollView style={focusedFolder ? {paddingTop: '5%', marginTop: '2%'} : {}}>
+                                      {focusedFolder && !subFolders ? 
+                                          <Text style={{fontSize: 30, color: 'white', fontWeight: 'bold', marginTop: '30%', textAlign: 'center'}}>No Subfolders...</Text>
+                                      :
+                                        <>
+                                          {validFolders.map((f, index) => {
+                                              if (focusedFolder) {
+                                                  if (f.nestedUnder === focusedFolder) {
+                                                          return (
+                                                              <Pressable key={index} style={{display: 'flex', flexDirection: 'row', justifyContent: 'center', marginTop: '1%'}} onPress={() => {
+                                                                      if (destination.id === null || f.id !== destination.id) {
+                                                                          setDestination({id: f.id, fileName: f.fileName, nestedUnder: f.nestedUnder})
+                                                                      } else {
+                                                                          setFocusedFolder(f.id)
+                                                                          setDestination({id: null, fileName: null, nestedUnder: null})
+                                                                      }
+                                                                  }
+                                                                  }>
+                                                                  <View style={f.id === destination.id ? styles.moveFolderWhite : styles.moveFolder}>
+                                                                  <View style={f.id === destination.id ? styles.iconHolderBlack : styles.iconHolderWhite}>
+                                                                      <FontAwesomeIcon icon={faFolder} size={28} color={f.id === destination.id ? 'white' : '#9F37B0'}/>
+                                                                  </View>
+                                                                  <Text style={f.id === destination.id ? {color: 'black', fontSize: 28, width: '80%', paddingTop: '1%'} : {color: '#9F37B0', fontSize: 28, width: '80%', textAlign: 'left', paddingTop: '1%'}}>{f.fileName}</Text>
+                                                                  </View>
+                                                              </Pressable>
+                                                          )
+                                                      
+                                                  }
+                                              } else {
+                                                  if (f.id !== folder.nestedUnder && f.nestedUnder === '') {
+                                                      return (
+                                                          <Pressable key={index} style={{display: 'flex', flexDirection: 'row', justifyContent: 'center', marginTop: '1%'}} onPress={() => {
+                                                                  if (destination.id === null || f.id !== destination.id) {
+                                                                      setDestination({id: f.id, fileName: f.fileName, nestedUnder: f.nestedUnder})
+                                                                  } else {
+                                                                      setFocusedFolder(f.id)
+                                                                      setDestination({id: null, fileName: null, nestedUnder: null})
+                                                                  }
+                                                              }
+                                                              }>
+                                                              <View style={f.id === destination.id ? styles.moveFolderWhite : styles.moveFolder}>
+                                                              <View style={f.id === destination.id ? styles.iconHolderBlack : styles.iconHolderWhite}>
+                                                                  <FontAwesomeIcon icon={faFolder} size={28} color={f.id === destination.id ? 'white' : '#9F37B0'}/>
+                                                              </View>
+                                                              <Text style={f.id === destination.id ? {color: 'black', fontSize: 28, width: '80%', paddingTop: '1%'} : {color: '#9F37B0', fontSize: 28, width: '80%', textAlign: 'left', paddingTop: '1%'}}>{f.fileName}</Text>
+                                                              </View>
+                                                          </Pressable>
+                                                          )
+                                                      }
+                                                  }
+                                              }
+                                          )}   
+                                        </>
+                                      }
+                                    </ScrollView>
+                              </View>
+                            }
+                            {!addFolderForm &&
+                              <View style={{display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'space-around'}}>                    
+                                <TouchableOpacity onPress={() => setAddFolderForm(true)} style={styles.yellowButtonSM}>
+                                    <View style={styles.iconHolderSmall}>
+                                        <FontAwesomeIcon icon={faPlus} color='#9F37B0'/>
+                                    </View>
+                                    <Text style={{fontSize: 18, color: '#9F37B0', fontWeight: '600', marginLeft: '10%'}}>Add Folder</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity onPress={handleMove} style={styles.yellowButtonSM}>
+                                    <View style={styles.iconHolderSmall}>
+                                        <FontAwesomeIcon icon={faArrowRight} color='#9F37B0'/>
+                                    </View>
+                                    <Text style={{fontSize: 18, color: '#9F37B0', fontWeight: '600', marginLeft: '5%'}}>Confirm Move</Text>
+                                </TouchableOpacity>  
+                            </View>
+                            }
                           </View>
                         </View>
                       </Modal>

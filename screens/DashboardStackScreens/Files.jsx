@@ -245,7 +245,7 @@ export default function Files({navigation: { navigate }, route}) {
   return ( 
       <View style={styles.container}>
         {!loading && currentUser ? 
-          focusedFolder ? <FocusedFolder folder={focusedFolder} renameFolder={renameFolder} moveFolder={moveFolder} addFolder={addFolder} deleteFolder={deleteFolder} folders={currentUser.files} clear={setFocusedFolder} getTargetFolder={getTargetFolder} deleteFile={deleteFile} renameFile={renameFile} moveFile={moveFile} files={currentUser.fileRefs}/> 
+          focusedFolder ? <FocusedFolder folder={focusedFolder} renameFolder={renameFolder} moveFolder={moveFolder} addFolder={addFolder} deleteFolder={deleteFolder} folders={currentUser.files} clear={setFocusedFolder} getTargetFolder={getTargetFolder} deleteFile={deleteFile} renameFile={renameFile} moveFile={moveFile} files={currentUser.fileRefs} updateUser={updateUser}/> 
           : stagingMode ? <Staging reset={setStagingMode} staging={staging} userFiles={currentUser.fileRefs} folders={currentUser.files} deleteFile={deleteFile} renameFile={renameFile} moveFile={moveFile}/> 
           :
           <ScrollView ref={scrollRef} style={
@@ -277,7 +277,7 @@ export default function Files({navigation: { navigate }, route}) {
                       <ScrollView>
                         {currentUser.files.map((file, i) => {
                           if (file.nestedUnder === '') {
-                            return <Folder key={i + file.fileName} files={currentUser.files} renameFolder={renameFolder} pressable={true} moveFolderFunc={moveFolder} folders={currentUser.files} folder={file} getTargetFolder={getTargetFolder} deleteFolder={deleteFolder}/>
+                            return <Folder key={i + file.fileName} files={currentUser.files} renameFolder={renameFolder} pressable={true} moveFolderFunc={moveFolder} folders={currentUser.files} folder={file} getTargetFolder={getTargetFolder} deleteFolder={deleteFolder} updateUser={updateUser}/>
                           }
                         })}
                       </ScrollView>
@@ -286,7 +286,10 @@ export default function Files({navigation: { navigate }, route}) {
                     <Modal animationType='slide' presentationStyle='pageSheet'>
                       <View style={{height: '100%', width: '100%', backgroundColor: '#593060'}}>
                         <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', paddingRight: '5%', paddingTop: '10%',width: '100%'}}>
-                            <Pressable onPress={() => setPreDelete(false)}>
+                            <Pressable onPress={() => {
+                              setAdd(false)
+                              setNewFolderName('')
+                            }}>
                             <FontAwesomeIcon icon={faXmark} color={'white'} size={30}/>
                             </Pressable>
                         </View>
