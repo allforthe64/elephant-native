@@ -408,7 +408,7 @@ try {
   const onPinchEvent = (event) => {
         if (event.nativeEvent.velocity > 0) {
             setZoom(prev => {
-                if (type === CameraType.back) {
+                if (facing === 'back') {
                     let newZoom = prev += .01
                     if (newZoom > 1) newZoom = 1
                     return newZoom
