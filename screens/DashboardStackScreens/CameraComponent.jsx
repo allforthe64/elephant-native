@@ -419,7 +419,7 @@ try {
                 }
             })
         } else setZoom(prev => {
-            if (type === CameraType.back) {
+            if (facing === 'back') {
                 let newZoom = prev -= .01
                 if (newZoom < 0) newZoom = 0
                 return newZoom
