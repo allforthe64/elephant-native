@@ -34,6 +34,7 @@ import { useToast } from 'react-native-toast-notifications'
 
 
 export default function CameraComponent() {
+try {
     const [facing, setFacing] = useState('back');
     const [permission, requestPermission] = useCameraPermissions();
     const [hasCameraPermission, setHasCameraPermission] = useState()
@@ -405,7 +406,6 @@ export default function CameraComponent() {
 
   //if velocity of pinch event is positive increase zoom, if it is negative decrease zoom
   const onPinchEvent = (event) => {
-
         if (event.nativeEvent.velocity > 0) {
             setZoom(prev => {
                 if (type === CameraType.back) {
@@ -883,6 +883,9 @@ export default function CameraComponent() {
         </PinchGestureHandler>
     </View>
   );
+    } catch (err) {
+        alert(err)
+    }
 }
 
 const styles = StyleSheet.create({
