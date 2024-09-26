@@ -36,8 +36,6 @@ setJSExceptionHandler((error, isFatal) => {
   const sentryId = Sentry.captureException(new Error(error.name));
 })
 
-const foo = 'bar'
-
 export default function App() {
   return (
     <SafeAreaProvider>
