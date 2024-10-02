@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, TouchableOpacity, Image } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 import React, {useEffect, useState} from 'react'
 
 //fontAwesome imports
@@ -7,6 +7,12 @@ import { faFile, faFileAudio, faFileLines, faFilePdf, faVideo } from '@fortaweso
 
 import { getFileDownloadURL } from '../../firebase/cloudStorage';
 import { getFile } from '../../firebase/firestore';
+
+
+const blurhash =
+  '|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj[';
+
+import { Image } from 'expo-image';
 
 const File = ({file, focus}) => {
 
@@ -44,7 +50,15 @@ const File = ({file, focus}) => {
     <TouchableOpacity style={styles.file} onPress={() => focus(file)}>
         <View style={styles.fileTitle}>
             {thumbnailURL ?
-              <Image source={{uri: thumbnailURL}} width={44} height={44} style={{borderRadius: 100}}/>
+              <View style={styles.container}>
+                <Image
+                  style={styles.image}
+                  source={thumbnailURL}
+                  placeholder={{ blurhash }}
+                  contentFit="cover"
+                  transition={1000}
+                />
+              </View>
             : 
               <>
                 {fileType === 'pdf' ?
@@ -126,5 +140,17 @@ const styles = StyleSheet.create({
       justifyContent: 'center',
       alignItems: 'center',
       borderRadius: 100
-    }
+    },
+    container: {
+      width: 44,
+      height: 44,
+      backgroundColor: '#fff',
+      borderRadius: 100
+    },
+    image: {
+      flex: 1,
+      width: '100%',
+      backgroundColor: '#0553',
+    },
+  
 })
