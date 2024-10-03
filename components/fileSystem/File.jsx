@@ -151,6 +151,7 @@ const styles = StyleSheet.create({
       flex: 1,
       width: '100%',
       backgroundColor: '#0553',
+      borderRadius: 100
     },
   
 })

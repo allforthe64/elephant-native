@@ -12,7 +12,7 @@ import Files from './DashboardStackScreens/Files'
 import DocumentPickerComp from './DashboardStackScreens/DocumentPicker';
 import Notepad from './DashboardStackScreens/Notes'
 import QRScanner from './DashboardStackScreens/QRScanner'
-import DocScanner from './DashboardStackScreens/DocScanner'
+/* import DocScanner from './DashboardStackScreens/DocScanner' */
 
 
 //instantiate stack navigator
@@ -25,7 +25,7 @@ const Dashboard = () => {
         <Stack.Screen name='Files' component={Files} />
         <Stack.Screen name='Upload Files' component={DocumentPickerComp} />
         <Stack.Screen name='Camera' component={CameraComponent} />
-        <Stack.Screen name='Document Scanner' component={DocScanner} />
+        {/* <Stack.Screen name='Document Scanner' component={DocScanner} /> */}
         <Stack.Screen name='Record Audio' component={AudioRecorder} />
         <Stack.Screen name='Notepad' component={Notepad} />
         <Stack.Screen name='QR Scanner' component={QRScanner} />
