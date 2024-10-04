@@ -130,5 +130,8 @@ export const updateFileObj = async (input) => {
 export const deleteFileObj = async (id) => {
     const file = await getDoc(doc(db, 'files', id))
     deleteFile(file.data().uri)
+    if (file.data().thumbnailUri) {
+        deleteFile(file.data().thumbnailUri)
+    }
     await deleteDoc(doc(db, 'files', id))
 }
