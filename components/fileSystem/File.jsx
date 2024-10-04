@@ -27,12 +27,11 @@ const File = ({file, focus}) => {
     setFileType(fileType)
 
     const getImageURL = async (file) => {
-
+      
       //get the fileObj
       const fileObj = await getFile(file.fileId)
-      
       //get the download url for the jpg and set it into state
-      const url = await getFileDownloadURL(fileObj.uri)
+      const url = await getFileDownloadURL(fileObj.thumbnailUri)
       setThumbnailURL(url)
     }
 
@@ -151,6 +150,7 @@ const styles = StyleSheet.create({
       flex: 1,
       width: '100%',
       backgroundColor: '#0553',
+      borderRadius: 100
     },
   
 })

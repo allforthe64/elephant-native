@@ -76,14 +76,26 @@ export async function addfile(file, destination) {
                 version: file.version
             })
         } else {
-            fileRef = await addDoc(collection(db, 'files'), {
-                fileName: file.name,
-                documentType: file.fileType,
-                size: file.size,
-                uri: file.name.split('.')[1] === 'doc' || file.name.split('.')[1] === 'docx' ? BUCKET_URL + '/' + file.timeStamp + '^&' + file.user
-                : BUCKET_URL + '/' + file.user + '/' + file.timeStamp,
-                version: file.version
-            })
+            if (file.fileType !== 'jpg' && file.fileType !== 'jpeg' && file.fileType !== 'png' && file.fileType !== "JPG" && file.fileType !== 'JPEG' && file.fileType !== 'PNG') {
+                fileRef = await addDoc(collection(db, 'files'), {
+                    fileName: file.name,
+                    documentType: file.fileType,
+                    size: file.size,
+                    uri: file.name.split('.')[1] === 'doc' || file.name.split('.')[1] === 'docx' ? BUCKET_URL + '/' + file.timeStamp + '^&' + file.user
+                    : BUCKET_URL + '/' + file.user + '/' + file.timeStamp,
+                    version: file.version
+                })
+            } else {
+                alert('running this')
+                fileRef = await addDoc(collection(db, 'files'), {
+                    fileName: file.name,
+                    documentType: file.fileType,
+                    size: file.size,
+                    uri: file.name.split('.')[1] === 'doc' || file.name.split('.')[1] === 'docx' ? BUCKET_URL + '/' + file.timeStamp + '^&' + file.user : BUCKET_URL + '/' + file.user + '/' + file.timeStamp,
+                    thumbnailUri:  BUCKET_URL + '/' + file.user + '/' + `thumbnail&${file.timeStamp}`,
+                    version: file.version
+                })
+            }
         }
 
         const reference = {
@@ -118,5 +130,8 @@ export const updateFileObj = async (input) => {
 export const deleteFileObj = async (id) => {
     const file = await getDoc(doc(db, 'files', id))
     deleteFile(file.data().uri)
+    if (file.data().thumbnailUri) {
+        deleteFile(file.data().thumbnailUri)
+    }
     await deleteDoc(doc(db, 'files', id))
 }
