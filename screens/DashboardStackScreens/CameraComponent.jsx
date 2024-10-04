@@ -32,6 +32,9 @@ import { PinchGestureHandler } from 'react-native-gesture-handler'
 //import useToast for notifications
 import { useToast } from 'react-native-toast-notifications'
 
+//import ImageManipulator object from expo
+import { manipulateAsync, SaveFormat } from 'expo-image-manipulator';
+
 
 export default function CameraComponent() {
 try {
@@ -222,6 +225,7 @@ try {
                     const formattedDate = format(new Date(), "yyyy-MM-dd:hh:mm:ss")
 
                     try {  
+
                         //create blob using the photo from state and save it to elephant staging
                         const blob = await new Promise(async (resolve, reject) => {
                             const xhr = new XMLHttpRequest()
@@ -275,6 +279,33 @@ try {
                     const formattedDate = format(new Date(), "yyyy-MM-dd:hh:mm:ss")
 
                     try {  
+
+                        //generate a resized version of the image for thumbnails
+                        const manipResult = await manipulateAsync(
+                            photo.uri,
+                            [{ resize: {height: photo.height * .1, width: photo.width * .1} }],
+                            { compress: 1, format: SaveFormat.PNG }
+                          );
+
+                        //upload thumbnail version
+                        const thumbNailBlob = await new Promise(async (resolve, reject) => {
+                            const xhr = new XMLHttpRequest()
+                            xhr.onload = () => {
+                                resolve(xhr.response)
+                            }
+                            xhr.onerror = (e) => {
+                                reject(new TypeError('Network request failed'))
+                            }
+                            xhr.responseType = 'blob'
+                            xhr.open('GET', manipResult.uri, true)
+                            xhr.send(null)
+                        })
+                        const thumbnailFilename = mediaName !== '' ? `${mediaName}&thumbnail.jpg` : `${formattedDate}&thumbnail.jpg`
+                        const thumbnailFileUri = `${currentUser}/${mediaName !== '' ? `thumbnail&${mediaName}` : `thumbnail&${formattedDate}`}`
+                        const thumbnailFileRef = ref(storage, `${currentUser}/thumbnail&${formattedDate}`)
+                        const thumbnailResult = await uploadBytesResumable(thumbnailFileRef, thumbNailBlob) 
+
+                        //upload regular version
                         //create blob using the photo from state and save it to elephant staging
                         const blob = await new Promise(async (resolve, reject) => {
                             const xhr = new XMLHttpRequest()
@@ -304,6 +335,7 @@ try {
                                 fileType: 'jpg',
                                 size: result.metadata.size,
                                 uri: fileUri,
+                                thumbnailUri: thumbnailFileUri,
                                 user: currentUser,
                                 version: 0,
                                 timeStamp: `${formattedDate}`

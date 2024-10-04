@@ -27,12 +27,11 @@ const File = ({file, focus}) => {
     setFileType(fileType)
 
     const getImageURL = async (file) => {
-
+      
       //get the fileObj
       const fileObj = await getFile(file.fileId)
-      
       //get the download url for the jpg and set it into state
-      const url = await getFileDownloadURL(fileObj.uri)
+      const url = await getFileDownloadURL(fileObj.thumbnailUri)
       setThumbnailURL(url)
     }
 
