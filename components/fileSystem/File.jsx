@@ -30,18 +30,20 @@ const File = ({file, focus}) => {
       
       //get the fileObj
       const fileObj = await getFile(file.fileId)
-      //get the download url for the jpg and set it into state
-      const url = await getFileDownloadURL(fileObj.thumbnailUri)
-      setThumbnailURL(url)
-    }
 
-    //if the fileType is a photo, generate the thumbnail url
-    if ((fileType === 'jpg' || fileType === 'png' || fileType === 'jpeg') && file) {
-      if (file.thumbnailUri) {
-        getImageURL(file)
+      //fetch thumbnails for any file objs with thumbnailUri field
+      if (fileObj.thumbnailUri) {
+        //get the download url for the jpg and set it into state
+        const url = await getFileDownloadURL(fileObj.thumbnailUri)
+        setThumbnailURL(url)
       } else {
         setThumbnailURL(false)
       }
+    }
+
+    //if the fileType is a photo, generate the thumbnail url
+    if ((fileType === 'jpg' || fileType === 'png' || fileType === 'jpeg' || fileType === 'JPG' || fileType === 'JPEG' || fileType === 'PNG') && file) {
+      getImageURL(file)
     }
     else {
       setThumbnailURL(false)
