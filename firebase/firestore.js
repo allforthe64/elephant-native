@@ -86,7 +86,6 @@ export async function addfile(file, destination) {
                     version: file.version
                 })
             } else {
-                alert('running this')
                 fileRef = await addDoc(collection(db, 'files'), {
                     fileName: file.name,
                     documentType: file.fileType,

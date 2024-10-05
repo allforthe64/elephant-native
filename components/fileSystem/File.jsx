@@ -3,7 +3,7 @@ import React, {useEffect, useState} from 'react'
 
 //fontAwesome imports
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faFile, faFileAudio, faFileLines, faFilePdf, faVideo } from '@fortawesome/free-solid-svg-icons';
+import { faFile, faFileAudio, faFileLines, faFilePdf, faImage, faVideo } from '@fortawesome/free-solid-svg-icons';
 
 import { getFileDownloadURL } from '../../firebase/cloudStorage';
 import { getFile } from '../../firebase/firestore';
@@ -37,7 +37,11 @@ const File = ({file, focus}) => {
 
     //if the fileType is a photo, generate the thumbnail url
     if ((fileType === 'jpg' || fileType === 'png' || fileType === 'jpeg') && file) {
-      getImageURL(file)
+      if (file.thumbnailUri) {
+        getImageURL(file)
+      } else {
+        setThumbnailURL(false)
+      }
     }
     else {
       setThumbnailURL(false)
@@ -80,6 +84,11 @@ const File = ({file, focus}) => {
                     <FontAwesomeIcon icon={faVideo} color={'#593060'} size={22} />
                   </View>
                 :
+                fileType === 'jpg' || fileType === 'png' || fileType === 'jpeg' || fileType === 'JPG' || fileType === 'PNG' || fileType === 'JPEG' ?
+                  <View style={styles.iconHolder}>
+                    <FontAwesomeIcon icon={faImage} color={'#593060'} size={22} />
+                  </View>
+                : 
                   <View style={styles.iconHolder}>
                     <FontAwesomeIcon icon={faFile} color={'#593060'} size={22} />
                   </View>
