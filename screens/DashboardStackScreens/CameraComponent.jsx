@@ -245,10 +245,10 @@ try {
                         const fileRef = ref(storage, `${currentUser}/${formattedDate}`)
                         const result = await uploadBytesResumable(fileRef, blob)
 
-                        let finalDestintation 
-                        if (destination.id !== null) finalDestintation = destination.id
-                        else if (focusedFolder) finalDestintation = focusedFolder 
-                        else finalDestintation = false
+                        let finalDestination 
+                        if (destination.id !== null) finalDestination = destination.id
+                        else if (focusedFolder) finalDestination = focusedFolder 
+                        else finalDestination = false
 
                         const reference = await addfile({
                                 name: filename,
@@ -325,10 +325,10 @@ try {
                         const fileRef = ref(storage, `${currentUser}/${formattedDate}`)
                         const result = await uploadBytesResumable(fileRef, blob)
 
-                        let finalDestintation 
-                        if (destination.id !== null) finalDestintation = destination.id
-                        else if (focusedFolder) finalDestintation = focusedFolder 
-                        else finalDestintation = false
+                        let finalDestination 
+                        if (destination.id !== null) finalDestination = destination.id
+                        else if (focusedFolder) finalDestination = focusedFolder 
+                        else finalDestination = false
 
                         const reference = await addfile({
                                 name: filename,
@@ -339,7 +339,7 @@ try {
                                 user: currentUser,
                                 version: 0,
                                 timeStamp: `${formattedDate}`
-                            }, finalDestintation)
+                            }, finalDestination)
                         const updatedUser = {...userInst, fileRefs: [...userInst.fileRefs, reference], spaceUsed: userInst.spaceUsed + result.metadata.size}
                         updateUser(updatedUser)
                         toast.show('Upload successful', {

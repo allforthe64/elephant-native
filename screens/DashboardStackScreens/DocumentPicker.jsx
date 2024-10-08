@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react'
-import {View, Text, StyleSheet, Image, ScrollView, TouchableOpacity, Modal, Pressable, TextInput} from 'react-native'
+import {View, Text, StyleSheet, ScrollView, TouchableOpacity, Modal, Pressable, TextInput, Image} from 'react-native'
 
 //FileRow component import
 import FileRow from '../../components/documentPicker/FileRow'
@@ -22,7 +22,11 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 //useToast import
 import { useToast } from 'react-native-toast-notifications'
 
+//date format import
 import { format } from 'date-fns'
+
+//import ImageManipulator object from expo
+import { manipulateAsync, SaveFormat } from 'expo-image-manipulator';
 
 const DocumentPickerComp = () => {
 
@@ -98,6 +102,7 @@ const DocumentPickerComp = () => {
 
         updatedFiles.push({name: fileName, uri: img.assets[0].uri, fileType: fileName.split('.')[1]})
         setFiles(updatedFiles)
+
     };
 
     const renderFiles = () => {
@@ -122,6 +127,8 @@ const DocumentPickerComp = () => {
     const saveFiles = async () => {
         
         setLoading(true)
+        setPreAdd(false)
+        setFiles([])
         let uploadSize = 0
 
         const references =  await Promise.all(files.map(async (el) => {
@@ -135,7 +142,39 @@ const DocumentPickerComp = () => {
             })
 
             //generate formatted date for file name
-            const formattedDate = format(new Date(), `yyyy-MM-dd:hh:mm:ss::${Date.now()}`)
+            const formattedDate = format(new Date(), `yyyy-MM-dd:hh:mm:ss::${Date.now()}`) + `${Math.random().toString(36).slice(2)}`
+
+            let thumbnailFilename
+            let thumbnailFileUri
+            let thumbnailFileRef
+            let thumbnailResult
+
+            if (el.fileType === 'jpg' || el.fileType === 'jpeg' || el.fileType === 'png' || el.fileType === 'JPG' || el.fileType === 'JPEG' || el.fileType === 'PNG') {
+                //generate a resized version of the image for thumbnails
+                const manipResult = await manipulateAsync(
+                    el.uri,
+                    [{ resize: {height: 300} }],
+                    { compress: 1, format: SaveFormat.PNG }
+                  );
+
+                //upload thumbnail version
+                const thumbNailBlob = await new Promise(async (resolve, reject) => {
+                    const xhr = new XMLHttpRequest()
+                    xhr.onload = () => {
+                        resolve(xhr.response)
+                    }
+                    xhr.onerror = (e) => {
+                        reject(new TypeError('Network request failed'))
+                    }
+                    xhr.responseType = 'blob'
+                    xhr.open('GET', manipResult.uri, true)
+                    xhr.send(null)
+                })
+                thumbnailFilename = `${formattedDate}&thumbnail.jpg`
+                thumbnailFileUri = `${currentUser}/${`thumbnail&${formattedDate}`}`
+                thumbnailFileRef = ref(storage, `${currentUser}/thumbnail&${formattedDate}`)
+                thumbnailResult = await uploadBytesResumable(thumbnailFileRef, thumbNailBlob) 
+            }
 
             //create blob and upload it into firebase storage
             try {
@@ -170,9 +209,26 @@ const DocumentPickerComp = () => {
                 //increase the upload size
                 uploadSize += result.metadata.size
 
-                
-                //generate references
-                const reference = await addfile({...el, name: el.name, user: currentUser, size: result.metadata.size, timeStamp: formattedDate, version: versionNo}, finalDestination)
+                let reference
+                if (el.fileType === 'jpg' || el.fileType === 'jpeg' || el.fileType === 'png' || el.fileType === 'JPG' || el.fileType === 'JPEG' || el.fileType === 'PNG') {
+                    reference = await addfile({
+                        name: el.name,
+                        fileType: el.fileType,
+                        size: result.metadata.size,
+                        user: currentUser,
+                        version: 0,
+                        timeStamp: `${formattedDate}`
+                    }, finalDestination)
+                } else {
+                    //generate references
+                    reference = await addfile({
+                        ...el, 
+                        name: el.name, 
+                        user: currentUser, 
+                        size: result.metadata.size, 
+                        timeStamp: formattedDate, 
+                        version: versionNo}, finalDestination)
+                }
                 
                 return reference
 
@@ -191,10 +247,8 @@ const DocumentPickerComp = () => {
 
             //reset the form
             setLoading(false)
-            setFiles([])
             setDestination({id: null, fileName: null, nestedUnder: null})
             setFocusedFolder(null)
-            setPreAdd(false)
             toast.show('File upload successful', {
                 type: 'success'
             }) 
@@ -474,7 +528,6 @@ const DocumentPickerComp = () => {
             </Modal>
         :
             <View style={styles.container}>
-                <Image style={styles.bgImg } source={require('../../assets/elephant_bg.jpg')} />
                 <View style={{
                     width: '100%',
                     height: '100%',

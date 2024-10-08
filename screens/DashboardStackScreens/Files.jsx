@@ -328,7 +328,7 @@ export default function Files({navigation: { navigate }, route}) {
                               <Text style={styles.subheadingMLLarge}>Add New Folder</Text>
                           </TouchableOpacity>
                       </View>
-                        <TouchableOpacity onPress={() => navigate('Upload A File')} style={styles.nonFolderButton80}>
+                        <TouchableOpacity onPress={() => navigate('Upload Files')} style={styles.nonFolderButton80}>
                             <View style={styles.iconHolderSM}>
                               <FontAwesomeIcon icon={faFile} size={18} color='#9F37B0'/>
                             </View>
