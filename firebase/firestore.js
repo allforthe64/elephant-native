@@ -40,8 +40,6 @@ export async function userListener(setCurrentUser, setStaging, user) {
     const unsub = onSnapshot(doc(db, 'users', user), (doc) => {
         try {
             //filter file references from the current user that are in staging
-            console.log(doc.data())
-            console.log('running')
             const stagingRefs = doc.data().fileRefs.filter(el => el.flag === 'Staging')
             if (setStaging) setStaging(stagingRefs)
             setCurrentUser({...doc.data(), uid: user})
@@ -62,7 +60,6 @@ export async function updateUser(updatedUser) {
 
 //create a new fileData obj, upload the document into cloud storage
 export async function addfile(file, destination) {
-
     try {
         let fileRef
         if (file.linksTo) {
@@ -104,7 +101,6 @@ export async function addfile(file, destination) {
             version: file.version,
             size: file.size
         }
-
         return reference
     } catch (error) {
         console.log('error within storage: ', error)

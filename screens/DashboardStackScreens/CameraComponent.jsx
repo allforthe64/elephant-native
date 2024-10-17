@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useContext } from 'react';
 import { View, Text, StatusBar, StyleSheet, Animated, Image, TouchableOpacity, Platform, Pressable, TextInput, Modal, ScrollView, Button } from 'react-native'
 
 //fontAwesome imports
@@ -34,6 +34,7 @@ import { useToast } from 'react-native-toast-notifications'
 
 //import ImageManipulator object from expo
 import { manipulateAsync, SaveFormat } from 'expo-image-manipulator';
+import { QueContext } from '../../context/QueContext';
 
 
 export default function CameraComponent() {
@@ -64,6 +65,8 @@ try {
     const cameraRef = useRef()
 
         const currentUser = firebaseAuth.currentUser.uid
+
+        const {setQue} = useContext(QueContext)
 
         const toast = useToast()
 
@@ -174,7 +177,11 @@ try {
                 }
     
                 const newPhoto = await cameraRef.current.takePictureAsync(options)
-                setPhoto(newPhoto)
+                if (session) {
+                    setQue(prev => [...prev, newPhoto])
+                } else {
+                    setPhoto(newPhoto)
+                }
             } catch (err) {
                 alert(err)
             }
