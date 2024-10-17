@@ -51,11 +51,17 @@ const Main = () => {
 
   //initialize state to hole user inst
   const [userInst, setUserInst] = useState()
+  const [currentUser, setCurrentUser] = useState()
 
   //get the current user 
-  const currentUser = firebaseAuth.currentUser.uid
+  /* const currentUser = firebaseAuth.currentUser.uid */
+
   useEffect(() => {
-    if (firebaseAuth) {
+    if (firebaseAuth.currentUser) setCurrentUser(firebaseAuth.currentUser.uid)
+  }, [firebaseAuth.currentUser])
+
+  useEffect(() => {
+    if (currentUser) {
     try {
         const getCurrentUser = async () => {
         const unsubscribe = await userListener(setUserInst, false, currentUser)
@@ -66,7 +72,7 @@ const Main = () => {
     } catch (err) {console.log(err)}
     } else console.log('no user yet')
       
-  }, [firebaseAuth])
+  }, [currentUser])
 
   const uploadImages = async () => {
     //create new formatted date for file
@@ -166,8 +172,6 @@ const Main = () => {
       return () => clearTimeout(timer)
     }
   }, [que])
-
-  console.log(que.length)
 
   return (
     <NavigationContainer>
