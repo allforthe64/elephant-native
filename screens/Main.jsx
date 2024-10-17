@@ -75,10 +75,12 @@ const Main = () => {
   }, [currentUser])
 
   const uploadImages = async () => {
-    //create new formatted date for file
-    const formattedDate = format(new Date(), "yyyy-MM-dd:hh:mm:ss")
 
       const references = await Promise.all(que.map(async (photo) => {
+            //create new formatted date for file
+            const formattedDate = format(new Date(), "yyyy-MM-dd:hh:mm:ss") + (Math.random() + 1).toString(36).substring(7)
+            const nonRandomFormattedDate = format(new Date(), "yyyy-MM-dd:hh:mm:ss")
+
             //generate a resized version of the image for thumbnails
             const manipResult = await manipulateAsync(
                 photo.uri,
@@ -140,7 +142,6 @@ const Main = () => {
                 version: 0,
                 timeStamp: `${formattedDate}`
             }, finalDestination)
-
             return reference
         }))
 
@@ -172,6 +173,8 @@ const Main = () => {
       return () => clearTimeout(timer)
     }
   }, [que])
+
+  console.log(que)
 
   return (
     <NavigationContainer>

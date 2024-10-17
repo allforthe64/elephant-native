@@ -60,6 +60,7 @@ export async function updateUser(updatedUser) {
 
 //create a new fileData obj, upload the document into cloud storage
 export async function addfile(file, destination) {
+    console.log(file)
     try {
         let fileRef
         if (file.linksTo) {

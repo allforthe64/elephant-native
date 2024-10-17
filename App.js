@@ -26,10 +26,10 @@ Sentry.init({
 });
 
 
-//set a handler to take care of all native errors
+/* //set a handler to take care of all native errors
 setNativeExceptionHandler((errorString) => {
   Sentry.captureException(new Error(errorString))
-});
+}); */
 
 
 //set a handler to take care of all JS errors
