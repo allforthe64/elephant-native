@@ -1,4 +1,4 @@
-import React, {useContext, useEffect, useState} from 'react';
+import React, {useContext, useEffect, useState, useRef} from 'react';
 
 //import drawer navigator from @react-navigation/drawer
 import { createDrawerNavigator } from "@react-navigation/drawer";
@@ -52,6 +52,9 @@ const Main = () => {
   //initialize state to hole user inst
   const [userInst, setUserInst] = useState()
   const [currentUser, setCurrentUser] = useState()
+  const [screen, setScreen] = useState('')
+
+  const navigationRef = useRef(null);
 
   //get the current user 
   /* const currentUser = firebaseAuth.currentUser.uid */
@@ -76,9 +79,9 @@ const Main = () => {
 
   const uploadImages = async () => {
 
-      const references = await Promise.all(que.map(async (photo) => {
+      const references = await Promise.all(que.map(async (photo, i) => {
             //create new formatted date for file
-            const formattedDate = format(new Date(), "yyyy-MM-dd:hh:mm:ss")/*  + (Math.random() + 1).toString(36).substring(7) */
+            const formattedDate = format(new Date(), "yyyy-MM-dd:hh:mm:ss") + `_${i}`
             /* const nonRandomFormattedDate = format(new Date(), "yyyy-MM-dd:hh:mm:ss") */
 
             //generate a resized version of the image for thumbnails
@@ -167,17 +170,19 @@ const Main = () => {
 
 
   useEffect(() => {
-    if (que.length > 0) {
-      const timer = setTimeout(() => uploadImages(), 5000)
-
-      return () => clearTimeout(timer)
+    if (que.length > 0 && screen !== 'Camera') {
+      uploadImages()
     }
-  }, [que])
+  }, [que, screen])
 
   console.log(que)
-
+  console.log(screen)
+  
   return (
-    <NavigationContainer>
+    <NavigationContainer
+      ref={navigationRef}
+      onStateChange={() => {setScreen(navigationRef.current.getCurrentRoute().name)}}
+    >
         <Drawer.Navigator initialRouteName='Home'>
             <Drawer.Screen name='Home' component={Home} options={authUser && {drawerItemStyle: {display: 'none'}, title: ''}} />
             <Drawer.Screen name="Sign In/Sign Up" component={Auth} options={authUser && {drawerItemStyle: {display: 'none'}, title: ''}}/>
