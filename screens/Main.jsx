@@ -78,80 +78,8 @@ const Main = () => {
   }, [currentUser])
 
   const uploadImages = async () => {
-
-      const references = await Promise.all(que.map(async (photo, i) => {
-            //create new formatted date for file
-            const formattedDate = format(new Date(), "yyyy-MM-dd:hh:mm:ss") + `_${i}`
-            /* const nonRandomFormattedDate = format(new Date(), "yyyy-MM-dd:hh:mm:ss") */
-
-            //generate a resized version of the image for thumbnails
-            const manipResult = await manipulateAsync(
-                photo.uri,
-                [{ resize: {height: photo.height * .1, width: photo.width * .1} }],
-                { compress: 1, format: SaveFormat.PNG }
-              );
-
-            //upload thumbnail version
-            const thumbNailBlob = await new Promise(async (resolve, reject) => {
-                const xhr = new XMLHttpRequest()
-                xhr.onload = () => {
-                    resolve(xhr.response)
-                }
-                xhr.onerror = (e) => {
-                    reject(new TypeError('Network request failed'))
-                }
-                xhr.responseType = 'blob'
-                xhr.open('GET', manipResult.uri, true)
-                xhr.send(null)
-            })
-            const thumbnailFilename = `${formattedDate}&thumbnail.jpg`
-            const thumbnailFileUri = `thumbnail&${formattedDate}`
-            const thumbnailFileRef = ref(storage, `${currentUser}/thumbnail&${formattedDate}`)
-            const thumbnailResult = await uploadBytesResumable(thumbnailFileRef, thumbNailBlob) 
-
-            //upload regular version
-            //create blob using the photo from state and save it to elephant staging
-            const blob = await new Promise(async (resolve, reject) => {
-                const xhr = new XMLHttpRequest()
-                xhr.onload = () => {
-                resolve(xhr.response) 
-                }
-                xhr.onerror = (e) => {
-                    reject(new TypeError('Network request failed'))
-                }
-                xhr.responseType = 'blob'
-                xhr.open('GET', photo.uri, true)
-                xhr.send(null)
-            })
-
-            const filename = `${formattedDate}.jpg`
-            const fileUri = `${currentUser}/${formattedDate}`
-            const fileRef = ref(storage, `${currentUser}/${formattedDate}`)
-            const result = await uploadBytesResumable(fileRef, blob)
-
-            let finalDestination = false
-
-            MediaLibrary.saveToLibraryAsync(photo.uri).then((() => {
-              console.log('success')
-            }))
-
-            const reference = await addfile({
-                name: filename,
-                fileType: 'jpg',
-                size: result.metadata.size,
-                uri: fileUri,
-                thumbnailUri: thumbnailFileUri,
-                user: currentUser,
-                version: 0,
-                timeStamp: `${formattedDate}`
-            }, finalDestination)
-            return reference
-        }))
-
-        console.log('references: ', references)
-
-        
-        const updatedUser = {...userInst, fileRefs: [...userInst.fileRefs, ...references]}
+   
+        const updatedUser = {...userInst, fileRefs: [...userInst.fileRefs, ...que]}
         updateUser(updatedUser)
         toast.show('Upload successful', {
             type: 'success'
@@ -177,6 +105,7 @@ const Main = () => {
 
   console.log(que)
   console.log(screen)
+  console.log(userInst)
   
   return (
     <NavigationContainer

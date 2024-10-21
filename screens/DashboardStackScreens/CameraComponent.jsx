@@ -177,11 +177,7 @@ try {
                 }
     
                 const newPhoto = await cameraRef.current.takePictureAsync(options)
-                if (session) {
-                    setQue(prev => [...prev, newPhoto])
-                } else {
-                    setPhoto(newPhoto)
-                }
+                setPhoto(newPhoto)
             } catch (err) {
                 alert(err)
             }
@@ -218,6 +214,18 @@ try {
         const stopVideo = () => {
             cameraRef.current.stopRecording()
             setRecording(false)
+        }
+
+        function generateRandomString(length) {
+            const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            let result = '';
+            const charactersLength = characters.length;
+        
+            for (let i = 0; i < length; i++) {
+                result += characters.charAt(Math.floor(Math.random() * charactersLength));
+            }
+        
+            return result;
         }
 
         const saveToElephant = async (videoMode) => {
@@ -265,7 +273,7 @@ try {
                                 user: currentUser,
                                 version: 0,
                                 timeStamp: formattedDate
-                            }, finalDestintation)
+                            }, finalDestination)
                         const updatedUser = {...userInst, fileRefs: [...userInst.fileRefs, reference], spaceUsed: userInst.spaceUsed + result.metadata.size}
                         updateUser(updatedUser)
                         toast.show('Upload successful', {
@@ -279,11 +287,10 @@ try {
                     }
                 } else {
                     setPhoto(undefined)
-
-                    console.log(mediaName)
+                    const randomString = generateRandomString(10);
 
                     //create new formatted date for file
-                    const formattedDate = format(new Date(), "yyyy-MM-dd:hh:mm:ss")
+                    const formattedDate = format(new Date(), "yyyy-MM-dd:hh:mm:ss") + randomString
 
                     try {  
 
@@ -347,8 +354,13 @@ try {
                                 version: 0,
                                 timeStamp: `${formattedDate}`
                             }, finalDestination)
-                        const updatedUser = {...userInst, fileRefs: [...userInst.fileRefs, reference], spaceUsed: userInst.spaceUsed + result.metadata.size}
-                        updateUser(updatedUser)
+
+                        if (!session) {
+                            const updatedUser = {...userInst, fileRefs: [...userInst.fileRefs, reference], spaceUsed: userInst.spaceUsed + result.metadata.size}
+                            updateUser(updatedUser)
+                        } else {
+                            setQue(prev => [...prev, reference])
+                        }
                         toast.show('Upload successful', {
                             type: 'success'
                         })
