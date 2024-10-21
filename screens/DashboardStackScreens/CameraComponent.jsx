@@ -171,10 +171,9 @@ try {
         const takePic = async () => {
             try {
                 const options = {
-                    quality: 0.5,
+                    quality: 1,
                     base64: true,
-                    exif: false,
-                    skipProcessing: true
+                    exif: false
                 }
     
                 const newPhoto = await cameraRef.current.takePictureAsync(options)
