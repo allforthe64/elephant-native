@@ -98,7 +98,7 @@ const Main = () => {
 
 
   useEffect(() => {
-      const timer = setTimeout(() => uploadImages(), 5000)
+      const timer = setTimeout(() => uploadImages(), 2000)
 
       return () => clearTimeout(timer)
   }, [que, screen])
