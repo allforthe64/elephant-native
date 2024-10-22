@@ -98,9 +98,9 @@ const Main = () => {
 
 
   useEffect(() => {
-    if (que.length > 0 && screen !== 'Camera') {
-      uploadImages()
-    }
+      const timer = setTimeout(() => uploadImages(), 10000)
+
+      return () => clearTimeout(timer)
   }, [que, screen])
 
   console.log(que)
