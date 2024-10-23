@@ -98,9 +98,11 @@ const Main = () => {
 
 
   useEffect(() => {
+    if (que.length > 0) {
       const timer = setTimeout(() => uploadImages(), 2000)
 
       return () => clearTimeout(timer)
+    }
   }, [que, screen])
 
   console.log(que)
