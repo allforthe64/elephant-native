@@ -485,7 +485,7 @@ try {
   return (
     preAdd ?
         <Modal animationType='slide' presentationStyle='pageSheet'>
-            <View style={{height: '100%', width: '100%', backgroundColor: 'rgb(23 23 23)'}}>
+            <View style={{height: '100%', width: '100%', backgroundColor: '#593060'}}>
                 {/* if the moveFile state is true, display the modal with the file movement code*/}
                 {/* xMark icon for closing out the moveFile modal */}
                 <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', paddingRight: '5%', paddingTop: '10%', width: '100%'}}>
@@ -797,35 +797,37 @@ try {
         }}>
             <Image style={styles.preview} source={{ uri: "data:image/jpg;base64," + photo.base64}}/>
             <View style={{position: 'absolute', top: '8%', right: '2.5%'}} >
-                {/* <Button title='Share' onPress={sharePic} />
-                { hasMediaLibraryPermission ? <Button title='Save to photos' onPress={savePhoto} /> : undefined} 
-                <Button title='Save to elephant storage' onPress={saveToElephant} />
-                <Button title='Discard' onPress={() => setPhoto(undefined)} /> */}
                 <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', paddingRight: '2%'}}>
-                    <Animated.View style={{display: 'flex', flexDirection: 'coloumn', marginRight: 10, paddingTop: 20, opacity: fadeAnim}} onLayout={() => fadeOut()}>
-                        <View style={{backgroundColor: 'rgba(0, 0, 0, .5)',  marginBottom: 25, paddingTop: 2, paddingBottom: 2, borderRadius: 17}}>
-                            <Text style={{fontSize: 18, textAlign: 'center', color: 'white'}}>Share</Text>
+                    <Animated.View style={{display: 'flex', flexDirection: 'coloumn', alignItems: 'flex-end', marginRight: 10, paddingTop: 20, opacity: fadeAnim}} onLayout={() => fadeOut()}>
+                        <View style={{backgroundColor: '#DDCADB',  marginBottom: 25, paddingTop: 2, paddingBottom: 2, borderRadius: 17, width: '50%', marginTop: '2%'}}>
+                            <Text style={{fontSize: 18, textAlign: 'center', color: '#593060', fontWeight: '600'}}>Share</Text>
                         </View>
                         {/* <View style={{backgroundColor: 'rgba(0, 0, 0, .5)',  marginBottom: 25, paddingTop: 2, paddingBottom: 2, borderRadius: 17}}>
                         {hasMediaLibraryPermission ? <Text style={{fontSize: 18, paddingLeft: 10, paddingRight: 10, color: 'white'}}>Save To Photos</Text> : undefined}
                         </View> */}
-                        <View style={{backgroundColor: 'rgba(0, 0, 0, .5)',  marginBottom: 25, paddingTop: 2, paddingBottom: 2, borderRadius: 17}}>
-                            <Text style={{fontSize: 18, textAlign: 'center', color: 'white'}}>Save To Elephant</Text>
+                        <View style={{backgroundColor: '#DDCADB',  marginBottom: 25, paddingTop: 2, paddingBottom: 2, borderRadius: 17, paddingLeft: '4%', paddingRight: '4%', marginTop: '8%'}}>
+                            <Text style={{fontSize: 18, textAlign: 'center', color: '#593060', fontWeight: '600'}}>Save To Elephant</Text>
                         </View>
-                        <View style={{backgroundColor: 'rgba(0, 0, 0, .5)', paddingTop: 2, paddingBottom: 2, borderRadius: 17}}>
-                            <Text style={{fontSize: 18, textAlign: 'center', color: 'white'}}>Delete</Text>
+                        <View style={{backgroundColor: '#DDCADB',  marginBottom: 25, paddingTop: 2, paddingBottom: 2, borderRadius: 17, width: '50%', marginTop: '5%'}}>
+                            <Text style={{fontSize: 18, textAlign: 'center', color: '#593060', fontWeight: '600'}}>Delete</Text>
                         </View>
                         
                     </Animated.View>
                     <View style={{display: 'flex', flexDirection: 'coloumn', backgroundColor: 'rgba(0, 0, 0, .5)', paddingTop: 15, paddingBottom: 15, paddingLeft: 10, paddingRight: 10, borderRadius: 25}}>
-                        <TouchableOpacity style={{marginBottom: 30}} onPress={sharePic}>
-                            <FontAwesomeIcon icon={faEnvelope} size={30} color='white'/>
+                        <TouchableOpacity style={{marginBottom: 20}} onPress={sharePic}>
+                            <View style={styles.iconHolder}>
+                                <FontAwesomeIcon icon={faEnvelope} size={22} color='#9F37B0'/>
+                            </View>
                         </TouchableOpacity>
                         <TouchableOpacity style={{marginBottom: 20}} onPress={() => setPreAdd(true)}>
-                            <FontAwesomeIcon icon={faCloudArrowUp} size={30} color='white'/>
+                            <View style={styles.iconHolder}>
+                                <FontAwesomeIcon icon={faCloudArrowUp} size={22} color='#9F37B0'/>
+                            </View>
                         </TouchableOpacity> 
                         <TouchableOpacity onPress={() => setPhoto(undefined)}>
-                            <FontAwesomeIcon icon={faTrash} size={30} color='white'/>
+                            <View style={styles.iconHolder}>
+                                <FontAwesomeIcon icon={faTrash} size={22} color='red'/>
+                            </View>
                         </TouchableOpacity>
                     </View>
                 </View>
@@ -841,32 +843,37 @@ try {
         }}>
             <Video style={{flex: 1, alignSelf: 'stretch', height: '100%'}} source={{uri: videoObj.uri}} useNativeControls resizeMode='contain' isLooping onError={(error) => alert(error)}/>
             <View style={{position: 'absolute', top: '8%', right: '2.5%'}} >
-                {/* <Button title='Share' onPress={sharePic} />
-                { hasMediaLibraryPermission ? <Button title='Save to photos' onPress={savePhoto} /> : undefined} 
-                <Button title='Save to elephant storage' onPress={saveToElephant} />
-                <Button title='Discard' onPress={() => setPhoto(undefined)} /> */}
                 <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', paddingRight: '2%'}}>
-                    <Animated.View style={{display: 'flex', flexDirection: 'coloumn', marginRight: 10, paddingTop: 20, opacity: fadeAnim}} onLayout={() => fadeOut()}>
-                        <View style={{backgroundColor: 'rgba(0, 0, 0, .5)',  marginBottom: 25, paddingTop: 2, paddingBottom: 2, borderRadius: 17}}>
-                            <Text style={{fontSize: 18, textAlign: 'center', color: 'white'}}>Share</Text>
+                    <Animated.View style={{display: 'flex', flexDirection: 'coloumn', alignItems: 'flex-end', marginRight: 10, paddingTop: 20, opacity: fadeAnim}} onLayout={() => fadeOut()}>
+                        <View style={{backgroundColor: '#DDCADB',  marginBottom: 25, paddingTop: 2, paddingBottom: 2, borderRadius: 17, width: '50%', marginTop: '2%'}}>
+                            <Text style={{fontSize: 18, textAlign: 'center', color: '#593060', fontWeight: '600'}}>Share</Text>
                         </View>
-                        <View style={{backgroundColor: 'rgba(0, 0, 0, .5)',  marginBottom: 25, paddingTop: 2, paddingBottom: 2, borderRadius: 17}}>
-                            <Text style={{fontSize: 18, textAlign: 'center', color: 'white'}}>Add To Staging</Text>
+                        {/* <View style={{backgroundColor: 'rgba(0, 0, 0, .5)',  marginBottom: 25, paddingTop: 2, paddingBottom: 2, borderRadius: 17}}>
+                        {hasMediaLibraryPermission ? <Text style={{fontSize: 18, paddingLeft: 10, paddingRight: 10, color: 'white'}}>Save To Photos</Text> : undefined}
+                        </View> */}
+                        <View style={{backgroundColor: '#DDCADB',  marginBottom: 25, paddingTop: 2, paddingBottom: 2, borderRadius: 17, paddingLeft: '4%', paddingRight: '4%', marginTop: '8%'}}>
+                            <Text style={{fontSize: 18, textAlign: 'center', color: '#593060', fontWeight: '600'}}>Save To Elephant</Text>
                         </View>
-                        <View style={{backgroundColor: 'rgba(0, 0, 0, .5)', paddingTop: 2, paddingBottom: 2, borderRadius: 17}}>
-                            <Text style={{fontSize: 18, textAlign: 'center', color: 'white'}}>Delete</Text>
+                        <View style={{backgroundColor: '#DDCADB',  marginBottom: 25, paddingTop: 2, paddingBottom: 2, borderRadius: 17, width: '50%', marginTop: '5%'}}>
+                            <Text style={{fontSize: 18, textAlign: 'center', color: '#593060', fontWeight: '600'}}>Delete</Text>
                         </View>
                         
                     </Animated.View>
                     <View style={{display: 'flex', flexDirection: 'coloumn', backgroundColor: 'rgba(0, 0, 0, .5)', paddingTop: 15, paddingBottom: 15, paddingLeft: 10, paddingRight: 10, borderRadius: 25}}>
                         <TouchableOpacity style={{marginBottom: 15}} onPress={shareVideo}>
-                            <FontAwesomeIcon icon={faEnvelope} size={30} color='white'/>
+                            <View style={styles.iconHolder}>
+                                <FontAwesomeIcon icon={faEnvelope} size={22} color='#9F37B0'/>
+                            </View>
                         </TouchableOpacity>
                         <TouchableOpacity style={{marginBottom: 20}} onPress={() => setPreAdd(true)}>
-                            <FontAwesomeIcon icon={faCloudArrowUp} size={30} color='white'/>
+                            <View style={styles.iconHolder}>
+                                <FontAwesomeIcon icon={faCloudArrowUp} size={22} color='#9F37B0'/>
+                            </View>
                         </TouchableOpacity> 
                         <TouchableOpacity onPress={() => setVideoObj(undefined)}>
-                            <FontAwesomeIcon icon={faTrash} size={30} color='white'/>
+                            <View style={styles.iconHolder}>
+                                <FontAwesomeIcon icon={faTrash} size={22} color='red'/>
+                            </View>
                         </TouchableOpacity>
                     </View>
                 </View>
@@ -971,6 +978,16 @@ const styles = StyleSheet.create({
     preview: {
         alignSelf: 'stretch',
         flex: 1
-    }
+    },
+    iconHolder: {
+        backgroundColor: 'white', 
+        width: 44, 
+        height: 44, 
+        display: 'flex', 
+        flexDirection: 'row', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        borderRadius: 100
+    },
   
 });
