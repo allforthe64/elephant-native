@@ -932,7 +932,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         width: '45%',
     },
-    yellowButtonxs: {
+    yellowButtonXS: {
         backgroundColor: '#FFE562',
         paddingLeft: 6,
         paddingTop: 6,
@@ -942,6 +942,7 @@ const styles = StyleSheet.create({
         display: 'flex',
         flexDirection: 'row',
         width: '30%',
+        marginLeft: '5%'
     },
     yellowButtonSMDim: {
         backgroundColor: '#FFE562',
