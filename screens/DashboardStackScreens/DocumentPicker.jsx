@@ -14,7 +14,7 @@ import {ref, uploadBytesResumable} from 'firebase/storage'
 
 //fontAwesome imports
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
-import { faFolder, faXmark, faArrowLeft, faFile, faImage, faCloudArrowUp } from '@fortawesome/free-solid-svg-icons'
+import { faFolder, faXmark, faArrowLeft, faFile, faImage, faCloudArrowUp, faPlus } from '@fortawesome/free-solid-svg-icons'
 
 //safe area context import
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
@@ -298,7 +298,7 @@ const DocumentPickerComp = () => {
     <>
         {preAdd ? 
             <Modal animationType='slide' presentationStyle='pageSheet'>
-                <View style={{height: '100%', width: '100%', backgroundColor: 'rgb(23 23 23)'}}>
+                <View style={{height: '100%', width: '100%', backgroundColor: '#593060'}}>
                     {/* if the moveFile state is true, display the modal with the file movement code*/}
                     {/* xMark icon for closing out the moveFile modal */}
                     <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', paddingRight: '5%', paddingTop: '10%', width: '100%'}}>
@@ -387,7 +387,7 @@ const DocumentPickerComp = () => {
                                                 if (focusedFolder) {
                                                     if (f.nestedUnder === focusedFolder) {
                                                             return (
-                                                                <Pressable key={index} style={{display: 'flex', flexDirection: 'row', justifyContent: 'center', marginTop: '5%'}} onPress={() => {
+                                                                <Pressable key={index} style={{display: 'flex', flexDirection: 'row', justifyContent: 'center', marginTop: '1%'}} onPress={() => {
                                                                         if (destination.id === null || f.id !== destination.id) {
                                                                             setDestination({id: f.id, fileName: f.fileName, nestedUnder: f.nestedUnder})
                                                                         } else {
@@ -396,9 +396,11 @@ const DocumentPickerComp = () => {
                                                                         }
                                                                     }
                                                                     }>
-                                                                    <View style={f.id === destination.id ? {borderBottomWidth: 2, width: '85%', backgroundColor: 'white', display: 'flex', flexDirection: 'row', paddingLeft: '2.5%', paddingTop: '2%'} : {borderBottomWidth: 2, width: '85%', borderBottomColor: 'white', display: 'flex', flexDirection: 'row', paddingLeft: '2.5%', paddingTop: '2%'}}>
-                                                                    <FontAwesomeIcon icon={faFolder} size={30} color={f.id === destination.id ? 'black' : 'white'}/>
-                                                                    <Text style={f.id === destination.id ? {color: 'black', fontSize: 30, marginLeft: '5%'} : {color: 'white', fontSize: 30, marginLeft: '5%'}}>{f.fileName}</Text>
+                                                                    <View style={f.id === destination.id ? styles.folderWhite : styles.folder}>
+                                                                    <View style={f.id === destination.id ? styles.iconHolderBlack : styles.iconHolder}>
+                                                                        <FontAwesomeIcon icon={faFolder} size={28} color={f.id === destination.id ? 'white' : '#9F37B0'}/>
+                                                                    </View>
+                                                                    <Text style={f.id === destination.id ? {color: 'black', fontSize: 28, width: '80%', paddingTop: '1%'} : {color: '#9F37B0', fontSize: 28, width: '80%', textAlign: 'left', paddingTop: '1%'}}>{f.fileName}</Text>
                                                                     </View>
                                                                 </Pressable>
                                                             )
@@ -407,7 +409,7 @@ const DocumentPickerComp = () => {
                                                 } else {
                                                     if (f.nestedUnder === '') {
                                                         return (
-                                                            <Pressable key={index} style={{display: 'flex', flexDirection: 'row', justifyContent: 'center', marginTop: '5%'}} onPress={() => {
+                                                            <Pressable key={index} style={{display: 'flex', flexDirection: 'row', justifyContent: 'center', marginTop: '1%'}} onPress={() => {
                                                                     if (destination.id === null || f.id !== destination.id) {
                                                                         setDestination({id: f.id, fileName: f.fileName, nestedUnder: f.nestedUnder})
                                                                     } else {
@@ -416,9 +418,11 @@ const DocumentPickerComp = () => {
                                                                     }
                                                                 }
                                                                 }>
-                                                                <View style={f.id === destination.id ? {borderBottomWidth: 2, width: '85%', backgroundColor: 'white', display: 'flex', flexDirection: 'row', paddingLeft: '2.5%', paddingTop: '2%'} : {borderBottomWidth: 2, width: '85%', borderBottomColor: 'white', display: 'flex', flexDirection: 'row', paddingLeft: '2.5%', paddingTop: '2%'}}>
-                                                                <FontAwesomeIcon icon={faFolder} size={30} color={f.id === destination.id ? 'black' : 'white'}/>
-                                                                <Text style={f.id === destination.id ? {color: 'black', fontSize: 30, marginLeft: '5%'} : {color: 'white', fontSize: 30, marginLeft: '5%'}}>{f.fileName}</Text>
+                                                                <View style={f.id === destination.id ? styles.folderWhite : styles.folder}>
+                                                                <View style={f.id === destination.id ? styles.iconHolderBlack : styles.iconHolder}>
+                                                                    <FontAwesomeIcon icon={faFolder} size={28} color={f.id === destination.id ? 'white' : '#9F37B0'}/>
+                                                                </View>
+                                                                <Text style={f.id === destination.id ? {color: 'black', fontSize: 28, width: '80%', paddingTop: '1%'} : {color: '#9F37B0', fontSize: 28, width: '80%', textAlign: 'left', paddingTop: '1%'}}>{f.fileName}</Text>
                                                                 </View>
                                                             </Pressable>
                                                             )
@@ -441,24 +445,12 @@ const DocumentPickerComp = () => {
                                     </ScrollView>
                             </View>
                             
-                                <View style={{width: '50%',
-                                    borderColor: '#777',
-                                    borderRadius: 25,
-                                    backgroundColor: 'white',
-                                    borderWidth: 1,
-                                    paddingTop: '2%',
-                                    paddingBottom: '2%',
-                                    marginBottom: '10%',
-                                    marginLeft: '2%'}}>
-                                    <TouchableOpacity onPress={() => setAddFolderForm(true)} style={{
-                                    display: 'flex', 
-                                    flexDirection: 'row', 
-                                    width: '100%', 
-                                    justifyContent: 'center',
-                                    }}>
-                                        <Text style={{fontSize: 15, color: 'black', fontWeight: '600'}}>Add New Folder</Text>
+                                    <TouchableOpacity onPress={() => setAddFolderForm(true)} style={styles.addFolderButton}>
+                                        <View style={styles.iconHolderSmall}>
+                                            <FontAwesomeIcon icon={faPlus} color='#9F37B0'/>
+                                        </View>
+                                        <Text style={{fontSize: 18, marginLeft: '5%', paddingTop: '1%', color: '#9F37B0', fontWeight: '600'}}>Add New Folder</Text>
                                     </TouchableOpacity>
-                                </View>
 
                             <View style={{display: 'flex', flexDirection: 'row'}}>
                                 <View style={ destination.id !== null || focusedFolder ? {width: '40%',
@@ -723,5 +715,77 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'space-around',
         width: '50%',
+    },
+    folder: {
+        display: 'flex',
+        justifyContent: 'space-between',
+        paddingRight: '2%',
+        flexDirection: 'row',
+        marginLeft: 'auto',
+        marginRight: 'auto',
+        backgroundColor: '#BCBCBC',
+        width: '90%',
+        paddingTop: '2%',
+        paddingBottom: '2%',
+        paddingLeft: '2%',
+        marginBottom: '2%',
+        borderRadius: 100
+    },
+    folderWhite: {
+        display: 'flex',
+        justifyContent: 'space-between',
+        paddingRight: '2%',
+        flexDirection: 'row',
+        marginLeft: 'auto',
+        marginRight: 'auto',
+        backgroundColor: 'white',
+        width: '90%',
+        paddingTop: '2%',
+        paddingBottom: '2%',
+        paddingLeft: '2%',
+        marginBottom: '2%',
+        borderRadius: 100
+    },
+    iconHolder: {
+        backgroundColor: 'white', 
+        width: 44, 
+        height: 44, 
+        display: 'flex', 
+        flexDirection: 'row', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        borderRadius: 100
+    },
+    iconHolderBlack: {
+        backgroundColor: 'black', 
+        width: 44, 
+        height: 44, 
+        display: 'flex', 
+        flexDirection: 'row', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        borderRadius: 100
+    },
+    addFolderButton: {
+        width: '50%',
+        borderRadius: 25,
+        backgroundColor: '#FFE562',
+        paddingTop: '2%',
+        paddingBottom: '2%',
+        paddingLeft: '2%',
+        marginBottom: '10%',
+        marginLeft: '2%',
+        display: 'flex',
+        flexDirection: 'row'
+    },
+    iconHolderSmall: {
+        backgroundColor: 'white', 
+        width: 28, 
+        height: 28, 
+        display: 'flex', 
+        flexDirection: 'row', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        borderRadius: 100
     },
 })

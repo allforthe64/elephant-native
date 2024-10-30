@@ -475,7 +475,7 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
                                             <View style={focusedFolder && !subFolders ? {width: '100%', height: '55%', marginBottom: '10%', display: 'flex', justifyContent: 'center'} : {width: '100%', height: '55%', marginBottom: '10%'}}>
                                                     {focusedFolder ? 
                                                         <View style={{paddingLeft: '2%'}}>
-                                                            <TouchableOpacity style={styles.yellowButtonSM} onPress={() => {
+                                                            <TouchableOpacity style={styles.yellowButtonXS} onPress={() => {
                                                                 try {
                                                                     const folderInst = folders.filter(folder => folder.id === focusedFolder) 
                                                                     const parentFolderInst = folders.filter(folder => folder.id === folderInst[0].nestedUnder)
@@ -931,6 +931,17 @@ const styles = StyleSheet.create({
         display: 'flex',
         flexDirection: 'row',
         width: '45%',
+    },
+    yellowButtonxs: {
+        backgroundColor: '#FFE562',
+        paddingLeft: 6,
+        paddingTop: 6,
+        paddingBottom: 6,
+        paddingRight: 20,
+        borderRadius: 100,
+        display: 'flex',
+        flexDirection: 'row',
+        width: '30%',
     },
     yellowButtonSMDim: {
         backgroundColor: '#FFE562',
