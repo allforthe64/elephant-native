@@ -104,10 +104,6 @@ const Main = () => {
       return () => clearTimeout(timer)
     }
   }, [que, screen])
-
-  console.log(que)
-  console.log(screen)
-  console.log(userInst)
   
   return (
     <NavigationContainer

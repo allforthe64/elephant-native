@@ -1,5 +1,9 @@
-import { StyleSheet, TextInput, Text, View, Button, TouchableOpacity } from 'react-native'
+import { StyleSheet, TextInput, Text, View, TouchableOpacity } from 'react-native'
 import React, { useEffect, useState } from 'react'
+
+//fontAwesome imports
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
+import { faTrash } from '@fortawesome/free-solid-svg-icons'
 
 const FileRow = ({file, files, index, deleteFunc, setFiles}) => {
 
@@ -27,16 +31,11 @@ const FileRow = ({file, files, index, deleteFunc, setFiles}) => {
 
   return (
     <View key={index} style={styles.fileRow}>
-        <TextInput style={{
-            backgroundColor: 'white',
-            color: 'black',
-            width: '70%',
-            paddingTop: 2,
-            paddingBottom: 2,
-            paddingLeft: 2
-        }} value={fileTitle} numberOfLines={1} placeholder='Enter File Name...' onChangeText={e => setFileTitle(e)}/>
+        <TextInput style={styles.input} value={fileTitle} numberOfLines={1} placeholder='Enter File Name...' onChangeText={e => setFileTitle(e)}/>
         <TouchableOpacity title='Delete' onPress={() => deleteFunc(files, file)}>
-            <Text style={styles.pressable}>Delete</Text>
+            <View style={styles.iconHolderSM}>
+                <FontAwesomeIcon icon={faTrash} size={18} color='red'/>
+            </View>
         </TouchableOpacity>
     </View>
   )
@@ -49,9 +48,14 @@ const styles = StyleSheet.create({
         display: 'flex',
         flexDirection: 'row',
         justifyContent: 'space-between',
-        paddingLeft: '5%',
-        paddingRight: '5%',
-        marginBottom: '7%'
+        width: '100%',
+        paddingBottom: '2%',
+        paddingTop: '2%',
+        paddingLeft: '2%',
+        paddingRight: '2%',
+        marginBottom: '4%',
+        backgroundColor: '#DDCADB',
+        borderRadius: 100
     },
     file: {
         color: 'white',
@@ -59,9 +63,24 @@ const styles = StyleSheet.create({
         fontSize: 15,
         fontWeight: '600',
     },
-    pressable: {
-        color: 'red',
-        fontSize: 15,
-        fontWeight: '500'
-    }
+    input: {
+        backgroundColor: 'white',
+        color: 'black',
+        width: '85%',
+        paddingTop: 2,
+        paddingBottom: 2,
+        paddingLeft: '3%',
+        paddingRight: '3%',
+        borderRadius: 100
+    },
+    iconHolderSM: {
+        backgroundColor: 'white', 
+        height: 36, 
+        width: 36, 
+        borderRadius: 100, 
+        display: 'flex', 
+        flexDirection: 'row', 
+        justifyContent: 'center', 
+        alignItems: 'center'
+    },
 })

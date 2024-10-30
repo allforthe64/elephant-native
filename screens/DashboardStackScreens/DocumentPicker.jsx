@@ -14,7 +14,7 @@ import {ref, uploadBytesResumable} from 'firebase/storage'
 
 //fontAwesome imports
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
-import { faFolder, faXmark, faArrowLeft } from '@fortawesome/free-solid-svg-icons'
+import { faFolder, faXmark, faArrowLeft, faFile, faImage, faCloudArrowUp } from '@fortawesome/free-solid-svg-icons'
 
 //safe area context import
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
@@ -546,7 +546,7 @@ const DocumentPickerComp = () => {
                             <>
                                 {files.length === 0 ? 
                                     <View style={styles.noFileCon}>
-                                        <Text style={styles.bigHeader}>No Files Selected</Text>
+                                        <Text style={styles.noFiles}>No Files Selected</Text>
                                     </View>
                                 :
                                     <View style={styles.scrollCon}>
@@ -559,49 +559,53 @@ const DocumentPickerComp = () => {
                         }
                     <View style={styles.buttonCon}>
 
-                        <View style={styles.buttonWrapperSm}>
-                            <TouchableOpacity onPress={() => selectFile()}>
-                            <Text style={styles.input}>Select File</Text>
-                            </TouchableOpacity>
-                        </View>
+                        <TouchableOpacity style={styles.buttonWrapperSm} onPress={() => selectFile()}>
+                            <View style={styles.iconHolderSM}>
+                              <FontAwesomeIcon icon={faFile} size={18} color='#9F37B0'/>
+                            </View>
+                            <Text style={styles.subheadingMLLarge}>Select File</Text>
+                        </TouchableOpacity>
 
                         
-                        <View style={styles.buttonWrapperSm}>
-                            <TouchableOpacity onPress={() => selectImage()}>
-                            <Text style={styles.input}>Select Photo</Text>
-                            </TouchableOpacity>
-                        </View>
-                        {/* <Button title='Select File' onPress={() => selectFile()}/>
-                        <Button title='Select Photo' onPress={()=> selectImage()}/> */}
+                        
+                        <TouchableOpacity style={styles.buttonWrapperSm} onPress={() => selectImage()}>
+                            <View style={styles.iconHolderSM}>
+                              <FontAwesomeIcon icon={faImage} size={18} color='#9F37B0'/>
+                            </View>
+                            <Text style={styles.subheadingMLLarge}>Select Photo</Text>
+                        </TouchableOpacity>
                     </View>
                     <View style={styles.wrapperContainer}>
-                        <View style={files.length === 0 ? 
+                        <TouchableOpacity style={files.length === 0 ? 
                                 {
                                     width: '60%',
-                                    borderColor: '#777',
                                     borderRadius: 25,
-                                    backgroundColor: 'white',
-                                    borderWidth: 1,
-                                    paddingTop: '2%',
-                                    paddingBottom: '2%',
-                                    opacity: .5
+                                    backgroundColor: '#FFE562',
+                                    paddingLeft: '2%', 
+                                    paddingTop: '2%', 
+                                    paddingBottom: '2%', 
+                                    opacity: .5,
+                                    display: 'flex',
+                                    flexDirection: 'row'
                                 }
                             :                            
 
                                 {
                                     width: '60%',
-                                    borderColor: '#777',
                                     borderRadius: 25,
-                                    backgroundColor: 'white',
-                                    borderWidth: 1,
-                                    paddingTop: '2%',
-                                    paddingBottom: '2%',
+                                    backgroundColor: '#FFE562',
+                                    paddingLeft: '2%', 
+                                    paddingTop: '2%', 
+                                    paddingBottom: '2%', 
+                                    display: 'flex',
+                                    flexDirection: 'row'
                                 }
-                            }>
-                            <TouchableOpacity onPress={() => setPreAdd(true)} disabled={files.length === 0 ? true : false}>
-                            <Text style={styles.input}>Upload Files</Text>
-                            </TouchableOpacity>
-                        </View>
+                            } onPress={() => setPreAdd(true)} disabled={files.length === 0 ? true : false}>
+                            <View style={styles.iconHolderSM}>
+                              <FontAwesomeIcon icon={faCloudArrowUp} size={18} color='#9F37B0'/>
+                            </View>
+                            <Text style={styles.subheadingMLXLarge}>Upload Files</Text>
+                        </TouchableOpacity>
                     </View>
                 </View>
             </View>
@@ -614,74 +618,91 @@ export default DocumentPickerComp
 
 const styles = StyleSheet.create({
     bigHeader: {
-        color: 'white',
+        color: '#593060',
         fontSize: 25,
         textAlign: 'center',
         fontWeight: '700',
         marginBottom: '8%',
-        marginTop: '2%'
+        marginTop: '2%',
+
       },
+    noFiles: {
+        color: '#593060', 
+        marginLeft: 'auto', 
+        marginRight: 'auto', 
+        marginTop: 'auto', 
+        marginBottom: 'auto'
+    },
     container: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: 'rgb(23,23,23)',
+        backgroundColor: '#FFFCF6',
         height: '100%'
-    },
-    bgImg: {
-        objectFit: 'scale-down',
-        opacity: .15,
-        transform: [{scaleX: -1}]
     },
     buttonCon: {
         display: 'flex',
         flexDirection: 'row',
         justifyContent: 'space-around',
-        marginBottom: '12%',
+        marginBottom: '3%',
         width: '100%'
     },
     wrapperContainer: {
         display: 'flex',
         alignItems: 'center',
         width: '100%',
-        marginBottom: '8%'
-    },
-    buttonWrapper: {
-        width: '60%',
-        borderColor: '#777',
-        borderRadius: 25,
-        backgroundColor: 'white',
-        borderWidth: 1,
-        paddingTop: '2%',
-        paddingBottom: '2%',
     },
     buttonWrapperSm: {
-        width: '40%',
-        borderColor: '#777',
-        borderRadius: 25,
-        backgroundColor: 'white',
-        borderWidth: 1,
-        paddingTop: '2%',
-        paddingBottom: '2%',
+        backgroundColor: '#FFE562',
+        paddingLeft: '2%', 
+        paddingTop: '2%', 
+        paddingBottom: '2%', 
+        borderRadius: 100, 
+        width: '45%',
+        display: 'flex',
+        flexDirection: 'row'
     },
-    input: {
+    iconHolderSM: {
+        backgroundColor: 'white', 
+        height: 36, 
+        width: 36, 
+        borderRadius: 100, 
+        display: 'flex', 
+        flexDirection: 'row', 
+        justifyContent: 'center', 
+        alignItems: 'center'
+    },
+    subheadingMLLarge: {
+        color: '#9F37B0',
         textAlign: 'center',
-        fontSize: 15,
-        width: '100%',
+        fontWeight: '600',
+        fontSize: 18,
+        marginTop: 'auto',
+        marginBottom: 'auto',
+        marginLeft: '5%'
+    },
+    subheadingMLXLarge: {
+        color: '#9F37B0',
+        textAlign: 'center',
+        fontWeight: '600',
+        fontSize: 18,
+        marginTop: 'auto',
+        marginBottom: 'auto',
+        marginLeft: '12%'
     },
     scrollCon: {
         height: '60%',
         width: '95%',
         borderBottomWidth: 1,
-        borderColor: 'white',
-        marginBottom: '10%'
+        borderColor: 'black',
+        marginBottom: '5%'
     },
     noFileCon: {
         height: '60%',
         width: '95%',
         borderBottomWidth: 1,
-        borderColor: 'white',
-        marginBottom: '10%',
+        borderColor: 'black',
+        marginBottom: '5%',
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center'
