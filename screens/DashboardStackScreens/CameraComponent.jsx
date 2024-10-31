@@ -683,7 +683,7 @@ try {
                         </TouchableOpacity>
 
                         <View style={{display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'space-around',}}>
-                                 <TouchableOpacity onPress={() => saveFiles()} style={ destination.id !== null || focusedFolder ? styles.yellowButtonSM : styles.yellowButtonSMDim}
+                                 <TouchableOpacity onPress={() => saveToElephant(false)} style={ destination.id !== null || focusedFolder ? styles.yellowButtonSM : styles.yellowButtonSMDim}
                                     disabled={destination.id !== null || focusedFolder ? false : true}
                                 >   
                                     <View style={styles.iconHolderSmall}>

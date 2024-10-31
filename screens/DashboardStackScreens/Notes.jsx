@@ -3,7 +3,7 @@ import { StyleSheet, View, Text, TextInput, TouchableOpacity, Keyboard, Keyboard
 
 //fontAwesome imports
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
-import { faCheck, faPencil, faXmark, faFolder, faArrowLeft, faFile } from '@fortawesome/free-solid-svg-icons'
+import { faCheck, faPencil, faXmark, faFolder, faArrowLeft, faFile, faCloudArrowUp, faFloppyDisk, faStopwatch, faPlus, faBox } from '@fortawesome/free-solid-svg-icons'
 import { ref as refFunction, uploadBytesResumable} from 'firebase/storage'
 
 //import addfile, userListener, updateUser from firestore/import firebaseAuth, storage objects from firebase config
@@ -205,7 +205,7 @@ const Notepad = () => {
       {preAdd ? 
 
         <Modal animationType='slide' presentationStyle='pageSheet'>
-          <View style={{height: '100%', width: '100%', backgroundColor: 'rgb(23 23 23)'}}>
+          <View style={{height: '100%', width: '100%', backgroundColor: '#593060'}}>
               {/* if the moveFile state is true, display the modal with the file movement code*/}
               {/* xMark icon for closing out the moveFile modal */}
               <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', paddingRight: '5%', paddingTop: '10%', width: '100%'}}>
@@ -228,97 +228,72 @@ const Notepad = () => {
               <>
                   <Text style={{color: 'white', fontSize: 35, fontWeight: '700', marginTop: '35%', textAlign: 'center'}}>Name Note:</Text>
                   <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', marginTop: '10%'}}>
-                      <FontAwesomeIcon icon={faFile} size={30} color='white'/>
-                      <TextInput value={noteName} style={{color: 'white', fontSize: 20, fontWeight: 'bold', borderBottomColor: 'white', borderBottomWidth: 2, width: '40%'}} onChangeText={(e) => setNoteName(e)} autoFocus/>
-                      <View style={noteName === '' ? {
-
-                            width: '25%',
-                            borderColor: '#777',
-                            borderRadius: 25,
-                            backgroundColor: 'white',
-                            borderWidth: 1,
-                            paddingTop: '2%',
-                            paddingBottom: '2%',
-                            marginLeft: '2%',
-                            opacity: .5                        
-
-                      } : {width: '25%',
-                              borderColor: '#777',
-                              borderRadius: 25,
-                              backgroundColor: 'white',
-                              borderWidth: 1,
-                              paddingTop: '2%',
-                              paddingBottom: '2%',
-                              marginLeft: '2%'}}>
-                              <TouchableOpacity style={{
-                              display: 'flex', 
-                              flexDirection: 'row', 
-                              width: '100%', 
-                              justifyContent: 'center',
-                              }}
-                              disabled={noteName === '' ? true : false}
-                              onPress={() => {
-                                  setNameGiven(true)
-                              }}
-                              >
-                                  <Text style={{fontSize: 15, color: 'black', fontWeight: '600'}}>Save</Text>
-                              </TouchableOpacity>
-                        </View>
-                    </View>
-                    <Text style={{color: 'white', fontSize: 20, marginTop: '7%', textAlign: 'center'}}>Or</Text>
-                    <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'center', width: '100%', marginTop: '7%'}}>
-                      <View style={{width: '35%',
-                          borderColor: '#777',
-                          borderRadius: 25,
-                          backgroundColor: 'white',
-                          borderWidth: 1,
-                          paddingTop: '2%',
-                          paddingBottom: '2%',
-                          marginLeft: '2%'}}>
-                          <TouchableOpacity style={{
-                          display: 'flex', 
-                          flexDirection: 'row', 
-                          width: '100%', 
-                          justifyContent: 'center',
-                          }}
-                          onPress={() => {
-                              setNameGiven(true)
-                          }}
-                          >
-                              <Text style={{fontSize: 15, color: 'black', fontWeight: '600'}}>Use Timestamp</Text>
-                          </TouchableOpacity>
+                      <View style={styles.iconHolder}>
+                        <FontAwesomeIcon icon={faFile} size={22} color='#9F37B0'/>
                       </View>
+                      <TextInput value={noteName} style={{color: 'white', fontSize: 20, fontWeight: 'bold', borderBottomColor: 'white', borderBottomWidth: 2, width: '70%'}} onChangeText={(e) => setNoteName(e)} autoFocus/>
+                    </View>
+                    <View style={{width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', paddingTop: '5%'}}>
+                        <TouchableOpacity style={noteName === '' ? styles.yellowButtonXSDim : styles.yellowButtonXS}
+                        disabled={noteName === '' ? true : false}
+                        onPress={() => {
+                            setNameGiven(true)
+                        }}
+                        >
+                          <View style={styles.iconHolderSmall}>
+                              <FontAwesomeIcon icon={faFloppyDisk} size={18} color='#9F37B0'/>
+                          </View>
+                          <Text style={{fontSize: 18, color: '#9F37B0', fontWeight: '600', marginLeft: '15%', paddingTop: '1%'}}>Save</Text>
+                        </TouchableOpacity>
+                        <Text style={{color: 'white', fontSize: 20, marginTop: '2%', textAlign: 'center'}}>Or</Text>
+                        <TouchableOpacity style={{width: '50%',
+                        borderRadius: 25,
+                        backgroundColor: 'white',
+                        paddingTop: '2%',
+                        paddingBottom: '2%',
+                        paddingLeft: '2%',
+                        marginLeft: '2%',
+                        marginTop: '2%',
+                        display: 'flex',
+                        flexDirection: 'row',
+                        backgroundColor: '#FFE562'
+                        }}
+                        onPress={() => {
+                            setNameGiven(true)
+                        }}
+                        >   
+                            <View style={styles.iconHolderSmall}>
+                                <FontAwesomeIcon icon={faStopwatch} size={18} color='#9F37B0'/>
+                            </View>
+                            <Text style={{fontSize: 18, color: '#9F37B0', fontWeight: '600', marginLeft: '7%', paddingTop: '1%'}}>Use Timestamp</Text>
+                        </TouchableOpacity>
                     </View>
               </>
               : addFolderForm ? 
                   <>
                       <Text style={{color: 'white', fontSize: 35, fontWeight: '700', marginTop: '40%', textAlign: 'center'}}>Add A New Folder:</Text>
                       <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', marginTop: '10%'}}>
-                          <FontAwesomeIcon icon={faFolder} size={30} color='white'/>
-                          <TextInput value={newFolderName} style={{color: 'white', fontSize: 20, fontWeight: 'bold', borderBottomColor: 'white', borderBottomWidth: 2, width: '40%'}} onChangeText={(e) => setNewFolderName(e)} autoFocus onBlur={() => {if (newFolderName === '') setAddFolderForm(false)}}/>
-                          <View style={{width: '25%',
-                                  borderColor: '#777',
-                                  borderRadius: 25,
-                                  backgroundColor: 'white',
-                                  borderWidth: 1,
-                                  paddingTop: '2%',
-                                  paddingBottom: '2%',
-                                  marginLeft: '2%'}}>
-                                  <TouchableOpacity style={{
-                                  display: 'flex', 
-                                  flexDirection: 'row', 
-                                  width: '100%', 
-                                  justifyContent: 'center',
-                                  }}
-                                  onPress={() => {
-                                      addFolder(newFolderName, focusedFolder ? focusedFolder : '')
-                                      setNewFolderName('')
-                                      setAddFolderForm(false)
-                                  }}
-                                  >
-                                      <Text style={{fontSize: 15, color: 'black', fontWeight: '600'}}>Save</Text>
-                                  </TouchableOpacity>
-                          </View>
+                      <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', marginTop: '10%', width: '100%'}}>
+                            <View style={styles.iconHolder}> 
+                                <FontAwesomeIcon icon={faFolder} size={22} color='#9F37B0'/>
+                            </View>
+                            <TextInput value={newFolderName} style={{color: 'white', fontSize: 20, fontWeight: 'bold', borderBottomColor: 'white', borderBottomWidth: 2, width: '70%'}} onChangeText={(e) => setNewFolderName(e)} autoFocus onBlur={() => {if (newFolderName === '') setAddFolderForm(false)}}/>
+                        </View>
+                          
+                      </View>
+                      <View style={{width: '100%', paddingTop: '10%', display: 'flex', flexDirection: 'row', justifyContent: 'center'}}>
+                          <TouchableOpacity style={styles.yellowButtonSM}
+                          onPress={() => {
+                              addFolder(newFolderName, focusedFolder ? focusedFolder : '')
+                              setNewFolderName('')
+                              setAddFolderForm(false)
+                          }}
+                          >
+                              <View style={styles.iconHolderSmall}>
+                                  <FontAwesomeIcon icon={faFloppyDisk} size={18} color='#9F37B0' />
+                              </View>
+                              <Text style={{fontSize: 18, color: '#9F37B0', fontWeight: '600', marginLeft: '22%'}}>Save</Text>
+                          </TouchableOpacity>
                       </View>
                   </>
 
@@ -327,27 +302,29 @@ const Notepad = () => {
                   <View style={{width: '100%', height: '95%', flex: 1, justifyContent: 'center', alignItems: 'center'}}>
                       <Text style={{fontSize: 40, color: 'white', fontWeight: 'bold', textAlign: 'left', width: '100%', paddingLeft: '5%', marginBottom: '10%'}}>Save Note To...</Text>
 
-                      <View style={focusedFolder && !subFolders ? {width: '100%', height: '50%', marginBottom: '10%', display: 'flex', justifyContent: 'center'} : {width: '100%', height: '50%', marginBottom: '10%'}}>
+                      <View style={focusedFolder && !subFolders ? {width: '100%', height: '55%', marginBottom: '10%', display: 'flex', justifyContent: 'center'} : {width: '100%', height: '55%', marginBottom: '10%'}}>
                               {focusedFolder ? 
                                   <>
-                                      <TouchableOpacity style={{display: 'flex', flexDirection: 'row', marginLeft: '5%', marginTop: '5%'}} onPress={() => {
-                                          const folderInst = folders.filter(folder => folder.id === focusedFolder) 
-                                          
-                                          const parentFolderInst = folders.filter(folder => folder.id === folderInst[0].nestedUnder)
-                                          console.log(parentFolderInst)
-                                          if (parentFolderInst.length > 0) {
-                                              console.log("we're within the first if check")
-                                              setDestination({id: parentFolderInst[0].id, fileName: parentFolderInst[0].fileName, nestedUnder: parentFolderInst[0].nestedUnder})
-                                              setFocusedFolder(folderInst[0].nestedUnder)
-                                          } else {
-                                              console.log("we're within the else check")
-                                              setDestination({id: null, fileName: null, nestedUnder: null})
-                                              setFocusedFolder(null)
-                                          }
-                                      }}>
-                                          <FontAwesomeIcon icon={faArrowLeft} size={40} color='white' /> 
-                                          <Text style={{color: 'white', fontSize: 30, marginLeft: '3%'}}>Back</Text>
-                                      </TouchableOpacity>
+                                      <TouchableOpacity style={styles.yellowButtonBack} onPress={() => {
+                                            const folderInst = folders.filter(folder => folder.id === focusedFolder) 
+                                            
+                                            const parentFolderInst = folders.filter(folder => folder.id === folderInst[0].nestedUnder)
+                                            console.log(parentFolderInst)
+                                            if (parentFolderInst.length > 0) {
+                                                console.log("we're within the first if check")
+                                                setDestination({id: parentFolderInst[0].id, fileName: parentFolderInst[0].fileName, nestedUnder: parentFolderInst[0].nestedUnder})
+                                                setFocusedFolder(folderInst[0].nestedUnder)
+                                            } else {
+                                                console.log("we're within the else check")
+                                                setDestination({id: null, fileName: null, nestedUnder: null})
+                                                setFocusedFolder(null)
+                                            }
+                                        }}>
+                                            <View style={styles.iconHolderSmall}>
+                                                    <FontAwesomeIcon icon={faArrowLeft} size={18} color='#9F37B0' /> 
+                                                </View>
+                                            <Text style={{color: '#9F37B0', fontSize: 20, marginLeft: '10%', fontWeight: '600'}}>Back</Text>
+                                        </TouchableOpacity>
                                   </>
                               :
                                   <></>
@@ -363,27 +340,7 @@ const Notepad = () => {
                                           if (focusedFolder) {
                                               if (f.nestedUnder === focusedFolder) {
                                                       return (
-                                                          <Pressable key={index} style={{display: 'flex', flexDirection: 'row', justifyContent: 'center', marginTop: '5%'}} onPress={() => {
-                                                                  if (destination.id === null || f.id !== destination.id) {
-                                                                      setDestination({id: f.id, fileName: f.fileName, nestedUnder: f.nestedUnder})
-                                                                  } else {
-                                                                      setFocusedFolder(f.id)
-                                                                      setDestination({id: null, fileName: null, nestedUnder: null})
-                                                                  }
-                                                              }
-                                                              }>
-                                                              <View style={f.id === destination.id ? {borderBottomWidth: 2, width: '85%', backgroundColor: 'white', display: 'flex', flexDirection: 'row', paddingLeft: '2.5%', paddingTop: '2%'} : {borderBottomWidth: 2, width: '85%', borderBottomColor: 'white', display: 'flex', flexDirection: 'row', paddingLeft: '2.5%', paddingTop: '2%'}}>
-                                                              <FontAwesomeIcon icon={faFolder} size={30} color={f.id === destination.id ? 'black' : 'white'}/>
-                                                              <Text style={f.id === destination.id ? {color: 'black', fontSize: 30, marginLeft: '5%'} : {color: 'white', fontSize: 30, marginLeft: '5%'}}>{f.fileName}</Text>
-                                                              </View>
-                                                          </Pressable>
-                                                      )
-                                                  
-                                              }
-                                          } else {
-                                              if (f.nestedUnder === '') {
-                                                  return (
-                                                      <Pressable key={index} style={{display: 'flex', flexDirection: 'row', justifyContent: 'center', marginTop: '5%'}} onPress={() => {
+                                                          <Pressable key={index} style={{display: 'flex', flexDirection: 'row', justifyContent: 'center', marginTop: '1%'}} onPress={() => {
                                                               if (destination.id === null || f.id !== destination.id) {
                                                                   setDestination({id: f.id, fileName: f.fileName, nestedUnder: f.nestedUnder})
                                                               } else {
@@ -392,11 +349,35 @@ const Notepad = () => {
                                                               }
                                                           }
                                                           }>
-                                                          <View style={f.id === destination.id ? {borderBottomWidth: 2, width: '85%', backgroundColor: 'white', display: 'flex', flexDirection: 'row', paddingLeft: '2.5%', paddingTop: '2%'} : {borderBottomWidth: 2, width: '85%', borderBottomColor: 'white', display: 'flex', flexDirection: 'row', paddingLeft: '2.5%', paddingTop: '2%'}}>
-                                                          <FontAwesomeIcon icon={faFolder} size={30} color={f.id === destination.id ? 'black' : 'white'}/>
-                                                          <Text style={f.id === destination.id ? {color: 'black', fontSize: 30, marginLeft: '5%'} : {color: 'white', fontSize: 30, marginLeft: '5%'}}>{f.fileName}</Text>
-                                                          </View>
-                                                      </Pressable>
+                                                              <View style={f.id === destination.id ? styles.folderWhite : styles.folder}>
+                                                              <View style={f.id === destination.id ? styles.iconHolderBlack : styles.iconHolder}>
+                                                                  <FontAwesomeIcon icon={faFolder} size={28} color={f.id === destination.id ? 'white' : '#9F37B0'}/>
+                                                              </View>
+                                                              <Text style={f.id === destination.id ? {color: 'black', fontSize: 28, width: '80%', paddingTop: '1%'} : {color: '#9F37B0', fontSize: 28, width: '80%', textAlign: 'left', paddingTop: '1%'}}>{f.fileName}</Text>
+                                                              </View>
+                                                          </Pressable>
+                                                      )
+                                                  
+                                              }
+                                          } else {
+                                              if (f.nestedUnder === '') {
+                                                  return (
+                                                        <Pressable key={index} style={{display: 'flex', flexDirection: 'row', justifyContent: 'center', marginTop: '1%'}} onPress={() => {
+                                                            if (destination.id === null || f.id !== destination.id) {
+                                                                setDestination({id: f.id, fileName: f.fileName, nestedUnder: f.nestedUnder})
+                                                            } else {
+                                                                setFocusedFolder(f.id)
+                                                                setDestination({id: null, fileName: null, nestedUnder: null})
+                                                            }
+                                                        }
+                                                        }>
+                                                            <View style={f.id === destination.id ? styles.folderWhite : styles.folder}>
+                                                            <View style={f.id === destination.id ? styles.iconHolderBlack : styles.iconHolder}>
+                                                                <FontAwesomeIcon icon={faFolder} size={28} color={f.id === destination.id ? 'white' : '#9F37B0'}/>
+                                                            </View>
+                                                            <Text style={f.id === destination.id ? {color: 'black', fontSize: 28, width: '80%', paddingTop: '1%'} : {color: '#9F37B0', fontSize: 28, width: '80%', textAlign: 'left', paddingTop: '1%'}}>{f.fileName}</Text>
+                                                            </View>
+                                                        </Pressable>
                                                       )
                                                   }
                                               }
@@ -416,86 +397,33 @@ const Notepad = () => {
                                   </Pressable> */}
                               </ScrollView>
                       </View>
-                      
-                          <View style={{width: '50%',
-                              borderColor: '#777',
-                              borderRadius: 25,
-                              backgroundColor: 'white',
-                              borderWidth: 1,
-                              paddingTop: '2%',
-                              paddingBottom: '2%',
-                              marginBottom: '10%',
-                              marginLeft: '2%'}}>
-                              <TouchableOpacity onPress={() => setAddFolderForm(true)} style={{
-                              display: 'flex', 
-                              flexDirection: 'row', 
-                              width: '100%', 
-                              justifyContent: 'center',
-                              }}>
-                                  <Text style={{fontSize: 15, color: 'black', fontWeight: '600'}}>Add New Folder</Text>
-                              </TouchableOpacity>
+                      <TouchableOpacity onPress={() => setAddFolderForm(true)} style={styles.addFolderButton}>
+                          <View style={styles.iconHolderSmall}>
+                              <FontAwesomeIcon icon={faPlus} color='#9F37B0'/>
                           </View>
+                          <Text style={{fontSize: 18, marginLeft: '5%', paddingTop: '1%', color: '#9F37B0', fontWeight: '600'}}>Add New Folder</Text>
+                      </TouchableOpacity>
 
-                      <View style={{display: 'flex', flexDirection: 'row'}}>
-                          <View style={ destination.id !== null || focusedFolder ? {width: '40%',
-                              borderColor: '#777',
-                              borderRadius: 25,
-                              backgroundColor: 'white',
-                              borderWidth: 1,
-                              paddingTop: '2%',
-                              paddingBottom: '2%',
-                              marginBottom: '5%',
-                              marginLeft: '2%',
-                              height: '45%'
-                              }
-                              :
-                              {width: '40%',
-                              borderColor: '#777',
-                              borderRadius: 25,
-                              backgroundColor: 'white',
-                              borderWidth: 1,
-                              paddingTop: '2%',
-                              paddingBottom: '2%',
-                              marginBottom: '5%',
-                              marginLeft: '2%',
-                              height: '45%',
-                              opacity: .5
-                              }
-                              }>
-                              <TouchableOpacity onPress={() => addToStorage()} style={{
-                              display: 'flex', 
-                              flexDirection: 'row', 
-                              width: '100%', 
-                              justifyContent: 'center',
-                              }}
+                      <View style={{display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'space-around',}}>
+                              <TouchableOpacity onPress={() => addToStorage()} style={ destination.id !== null || focusedFolder ? styles.yellowButtonSM : styles.yellowButtonSMDim}
                                 disabled={destination.id !== null || focusedFolder ? false : true}
-                              >
-                                  <Text style={{fontSize: 15, color: 'black', fontWeight: '600'}}>Confirm Move</Text>
-                              </TouchableOpacity>
-                          </View>
+                            >   
+                                <View style={styles.iconHolderSmall}>
+                                    <FontAwesomeIcon icon={faCheck} color='#9F37B0'/>
+                                </View>
+                                <Text style={{fontSize: 18, color: '#9F37B0', fontWeight: '600', marginLeft: '8%', paddingTop: '1%'}}>Confirm Move</Text>
+                            </TouchableOpacity>
 
-                          <View style={{width: '40%',
-                              borderColor: '#777',
-                              borderRadius: 25,
-                              backgroundColor: 'white',
-                              borderWidth: 1,
-                              paddingTop: '2%',
-                              paddingBottom: '2%',
-                              marginBottom: '10%',
-                              marginLeft: '2%'}}>
-                              <TouchableOpacity onPress={() => addToStorage()} style={{
-                              display: 'flex', 
-                              flexDirection: 'row', 
-                              width: '100%', 
-                              justifyContent: 'center',
-                              }}>
-                                  <Text style={{fontSize: 15, color: 'black', fontWeight: '600'}}>Save To Staging</Text>
-                              </TouchableOpacity>
-                          </View>
-                      </View>
-
-
-
+                            <TouchableOpacity onPress={() => {
+                                saveToElephant(videoObj ? true : false)
+                                setPreAdd(false)
+                            }} style={styles.yellowButtonSM}>
+                                <View style={styles.iconHolderSmall}>
+                                    <FontAwesomeIcon icon={faBox} color='#9F37B0'/>
+                                </View>
+                                <Text style={{fontSize: 18, color: '#9F37B0', fontWeight: '600', marginLeft: '3%', paddingTop: '1%'}}>Save To Staging</Text>
+                            </TouchableOpacity>
+                    </View>
                   </View>
                   
               }
@@ -541,23 +469,24 @@ const Notepad = () => {
                         />
           <View style={open ? styles.wrapperContainer : styles.wrapperContainerFull}>
             {!open && 
-                <View style={styles.buttonWrapperText}>
-                  <TouchableOpacity onPress={() => setPreAdd(true)}>
-                    <Text style={styles.input}>Add To Storage</Text>
-                  </TouchableOpacity>
-                </View>
+                <TouchableOpacity onPress={() => setPreAdd(true)} style={styles.buttonWrapperText}>
+                  <View style={styles.iconHolderSmall}>
+                    <FontAwesomeIcon icon={faCloudArrowUp} color='#9F37B0'/>
+                  </View>
+                  <Text style={{fontSize: 18, color: '#9F37B0', fontWeight: '600', marginLeft: '10%', paddingTop: '1%'}}>Add To Storage</Text>
+                </TouchableOpacity>
               }
-              <View style={open ? styles.buttonWrapper : styles.buttonWrapperFull}>
-                  <TouchableOpacity onPress={() => {open === false ? startEdit() : saveNote()}}>
+              {/* <View style={open ? styles.buttonWrapper : styles.buttonWrapperFull}> */}
+                  <TouchableOpacity onPress={() => {open === false ? startEdit() : saveNote()}} style={styles.buttonWrapper}>
                     {open ? (
-                        <FontAwesomeIcon icon={faCheck} size={40} color='white'/>
+                        <FontAwesomeIcon icon={faCheck} color='#9F37B0' size={22}/>
                       )
                       : (
-                        <FontAwesomeIcon icon={faPencil} size={40} color='white'/>
+                        <FontAwesomeIcon icon={faPencil} size={22} color='#9F37B0'/>
                       )
                     }
                   </TouchableOpacity>
-              </View>
+              {/* </View> */}
           </View>
         </KeyboardAvoidingView>
         </>
@@ -592,7 +521,7 @@ const styles = StyleSheet.create({
     wrapperContainer: {
       width: '100%',
       position: 'absolute',
-      top: '58%',
+      top: '85%',
       display: 'flex',
       flexDirection: 'row',
       justifyContent: 'flex-end',
@@ -610,40 +539,159 @@ const styles = StyleSheet.create({
       paddingRight: '5%',
     },
     buttonWrapper: {
-      width: '16%',
-      borderColor: '#777',
+      width: 44,
+      height: 44,
+      display: 'flex',
+      flexDirection: 'row',
+      justifyContent: 'center',
+      alignItems: 'center',
       borderRadius: 100,
-      backgroundColor: 'black',
-      borderWidth: 1,
+      backgroundColor: '#FFE562',
       paddingLeft: '2%',
       paddingTop: '2%',
-      paddingBottom: '2%'
-    },
-    buttonWrapperFull: {
-      width: '18%',
-      borderColor: '#777',
-      borderRadius: 100,
-      backgroundColor: 'black',
-      borderWidth: 1,
-      paddingLeft: '3.5%',
-      paddingTop: '3%',
-      paddingBottom: '3%'
+      paddingBottom: '2%',
+      paddingRight: '2%'
     },
     buttonWrapperText: {
-      width: '45%',
-      height: '65%',
-      borderColor: '#777',
+      width: '55%',
       borderRadius: 100,
-      backgroundColor: 'black',
-      borderWidth: 1,
+      backgroundColor: '#FFE562',
+      marginRight: '5%',
+      display: 'flex',
+      flexDirection: 'row',
       paddingTop: '2%',
-      marginRight: '5%'
+      paddingLeft: '2%',
+      paddingBottom: '2%'
     },
-    input: {
-      textAlign: 'center',
-      fontSize: 18,
-      width: '100%',
-      color: 'white'
+    iconHolder: {
+      backgroundColor: 'white', 
+      width: 44, 
+      height: 44, 
+      display: 'flex', 
+      flexDirection: 'row', 
+      justifyContent: 'center', 
+      alignItems: 'center', 
+      borderRadius: 100
+    },
+    iconHolderBlack: {
+      backgroundColor: 'black', 
+      width: 44, 
+      height: 44, 
+      display: 'flex', 
+      flexDirection: 'row', 
+      justifyContent: 'center', 
+      alignItems: 'center', 
+      borderRadius: 100
+  },
+    iconHolderSmall: {
+      backgroundColor: 'white', 
+      width: 28, 
+      height: 28, 
+      display: 'flex', 
+      flexDirection: 'row', 
+      justifyContent: 'center', 
+      alignItems: 'center', 
+      borderRadius: 100
+    },
+    yellowButtonXS: {
+      backgroundColor: '#FFE562',
+      paddingLeft: 6,
+      paddingTop: 6,
+      paddingBottom: 6,
+      paddingRight: 20,
+      borderRadius: 100,
+      display: 'flex',
+      flexDirection: 'row',
+      width: '30%',
+    },
+    yellowButtonXSDim: {
+      backgroundColor: '#FFE562',
+      paddingLeft: 6,
+      paddingTop: 6,
+      paddingBottom: 6,
+      paddingRight: 20,
+      borderRadius: 100,
+      display: 'flex',
+      flexDirection: 'row',
+      width: '30%',
+      opacity: .5
+    },
+    yellowButtonSM: {
+      backgroundColor: '#FFE562',
+      paddingLeft: '2%',
+      paddingTop: '2%',
+      paddingBottom: '2%',
+      paddingRight: 20,
+      borderRadius: 100,
+      display: 'flex',
+      flexDirection: 'row',
+      width: '47%',
+    },
+    yellowButtonSMDim: {
+      backgroundColor: '#FFE562',
+      paddingLeft: '2%',
+      paddingTop: '2%',
+      paddingBottom: '2%',
+      paddingRight: 20,
+      borderRadius: 100,
+      display: 'flex',
+      flexDirection: 'row',
+      width: '47%',
+      opacity: .5
+    },
+    yellowButtonBack: {
+      backgroundColor: '#FFE562',
+      paddingLeft: 6,
+      paddingTop: 6,
+      paddingBottom: 6,
+      paddingRight: 20,
+      borderRadius: 100,
+      display: 'flex',
+      flexDirection: 'row',
+      width: '30%',
+      marginLeft: '5%'
+    },
+    addFolderButton: {
+      width: '50%',
+      borderRadius: 25,
+      backgroundColor: '#FFE562',
+      paddingTop: '2%',
+      paddingBottom: '2%',
+      paddingLeft: '2%',
+      marginBottom: '5%',
+      marginLeft: '2%',
+      display: 'flex',
+      flexDirection: 'row'
+    },
+    folder: {
+      display: 'flex',
+      justifyContent: 'space-between',
+      paddingRight: '2%',
+      flexDirection: 'row',
+      marginLeft: 'auto',
+      marginRight: 'auto',
+      backgroundColor: '#BCBCBC',
+      width: '90%',
+      paddingTop: '2%',
+      paddingBottom: '2%',
+      paddingLeft: '2%',
+      marginBottom: '2%',
+      borderRadius: 100
+  },
+  folderWhite: {
+      display: 'flex',
+      justifyContent: 'space-between',
+      paddingRight: '2%',
+      flexDirection: 'row',
+      marginLeft: 'auto',
+      marginRight: 'auto',
+      backgroundColor: 'white',
+      width: '90%',
+      paddingTop: '2%',
+      paddingBottom: '2%',
+      paddingLeft: '2%',
+      marginBottom: '2%',
+      borderRadius: 100
     },
 })
 
