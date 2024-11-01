@@ -1,5 +1,9 @@
-import { StyleSheet, Text, View, TextInput, TouchableOpacity } from 'react-native'
-import React, {useState, useEffect} from 'react'
+import { StyleSheet, TextInput, Text, View, TouchableOpacity } from 'react-native'
+import React, { useEffect, useState } from 'react'
+
+//fontAwesome imports
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
+import { faTrash } from '@fortawesome/free-solid-svg-icons'
 
 const UrlEditor = ({url, deleteFunc, editUrls, index}) => {
     const [urlTitle, setUrlTitle] = useState(url.title)
@@ -16,14 +20,13 @@ const UrlEditor = ({url, deleteFunc, editUrls, index}) => {
 
 
   return (
-    <View style={styles.bigCon}>
-        <Text style={styles.url} numberOfLines={1}>Url: {url.data}</Text>
-        <View style={styles.container}>
-            <TextInput value={urlTitle} onChangeText={(e) => setUrlTitle(e)} placeholder='Add title for url' placeholderTextColor={'rgb(0, 0, 0)'} style={styles.input} />
-            <TouchableOpacity title='Delete' onPress={() => deleteFunc(url)}>
-                <Text style={styles.pressable}>Delete</Text>
-            </TouchableOpacity>
-        </View>
+    <View key={index} style={styles.fileRow}>
+        <TextInput style={styles.input} value={fileTitle} numberOfLines={1} placeholder='Enter File Name...' onChangeText={e => setFileTitle(e)}/>
+        <TouchableOpacity title='Delete' onPress={() => deleteFunc(files, file)}>
+            <View style={styles.iconHolderSM}>
+                <FontAwesomeIcon icon={faTrash} size={18} color='red'/>
+            </View>
+        </TouchableOpacity>
     </View>
   )
 }
@@ -31,36 +34,43 @@ const UrlEditor = ({url, deleteFunc, editUrls, index}) => {
 export default UrlEditor
 
 const styles = StyleSheet.create({
-    bigCon: {
-        marginBottom: '5%',
-        width: '90%',
-    },
-    container: {
+    fileRow: {
         display: 'flex',
         flexDirection: 'row',
         justifyContent: 'space-between',
         width: '100%',
-        paddingRight: '5%'
+        paddingBottom: '2%',
+        paddingTop: '2%',
+        paddingLeft: '2%',
+        paddingRight: '2%',
+        marginBottom: '4%',
+        backgroundColor: '#DDCADB',
+        borderRadius: 100
+    },
+    file: {
+        color: 'white',
+        width: '65%',
+        fontSize: 15,
+        fontWeight: '600',
     },
     input: {
         backgroundColor: 'white',
-        paddingLeft: '2%',
-        fontSize: 15,
-        borderWidth: 1,
-        width: '60%',
-        marginBottom: '5%'
+        color: 'black',
+        width: '85%',
+        paddingTop: 2,
+        paddingBottom: 2,
+        paddingLeft: '3%',
+        paddingRight: '3%',
+        borderRadius: 100
     },
-    url: {
-        fontSize: 15,
-        fontWeight: '600',
-        width: '100%',
-        color: 'white',
-        overflow: 'hidden',
-        marginBottom: '5%'
+    iconHolderSM: {
+        backgroundColor: 'white', 
+        height: 36, 
+        width: 36, 
+        borderRadius: 100, 
+        display: 'flex', 
+        flexDirection: 'row', 
+        justifyContent: 'center', 
+        alignItems: 'center'
     },
-    pressable: {
-        color: 'red',
-        fontSize: 15,
-        fontWeight: '500'
-    }
 })
