@@ -902,16 +902,6 @@ const styles = StyleSheet.create({
         alignSelf: 'stretch',
         flex: 1
     },
-    iconHolder: {
-        backgroundColor: 'white', 
-        width: 44, 
-        height: 44, 
-        display: 'flex', 
-        flexDirection: 'row', 
-        justifyContent: 'center', 
-        alignItems: 'center', 
-        borderRadius: 100
-    },
     yellowButtonXS: {
         backgroundColor: '#FFE562',
         paddingLeft: 6,

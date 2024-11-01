@@ -22,7 +22,7 @@ import {format} from 'date-fns'
 import { useToast } from 'react-native-toast-notifications'
 
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
-import { faXmark, faFolder, faArrowLeft } from '@fortawesome/free-solid-svg-icons'
+import { faXmark, faFolder, faArrowLeft, faCloudArrowUp, faQrcode } from '@fortawesome/free-solid-svg-icons'
 
 const Scanner = () => {
 
@@ -461,12 +461,11 @@ return (
           {scanData ?
             <>
               <View style={{
-                  backgroundColor: 'rgb(23,23,23)',
+                  backgroundColor: '#FFFCF6',
                   flex: 1,
                   justifyContent: 'center',
                   alignItems: 'center',
               }}>
-                <Image style={styles.bgImg } source={require('../../assets/elephant_bg.jpg')} />
                 {scanData ? 
                     <View style={{
                             width: '100%',
@@ -484,18 +483,20 @@ return (
                             </ScrollView>
                         </View> 
                         <View style={styles.wrapperContainer}>
-                            <View style={styles.buttonWrapper}>
-                                <TouchableOpacity onPress={() => setScanData(undefined)}>
-                                <Text style={styles.input}>Scan Another Code</Text>
-                                </TouchableOpacity>
-                            </View>
+                            <TouchableOpacity onPress={() => setScanData(undefined)} style={styles.buttonWrapper}>
+                                <View style={styles.iconHolderSmall}>
+                                    <FontAwesomeIcon icon={faQrcode} color='#9F37B0' />
+                                </View>
+                                <Text style={{fontSize: 18, width: '100%', fontWeight: '600', color: '#9F37B0', paddingTop: '1%', marginLeft: '5%'}}>Scan Another Code</Text>
+                            </TouchableOpacity>
                         </View>
                         <View style={styles.wrapperContainer}>
-                            <View style={styles.buttonWrapper}>
-                                <TouchableOpacity onPress={() => setPreAdd(true)}>
-                                <Text style={styles.input}>Save All</Text>
-                                </TouchableOpacity>
-                            </View>
+                            <TouchableOpacity onPress={() => setPreAdd(true)} style={styles.buttonWrapper}>
+                                <View style={styles.iconHolderSmall}>
+                                    <FontAwesomeIcon icon={faCloudArrowUp} color='#9F37B0' />
+                                </View>
+                                <Text style={{fontSize: 18, width: '100%', fontWeight: '600', color: '#9F37B0', paddingTop: '1%', marginLeft: '10%'}}>Save All</Text>
+                            </TouchableOpacity>
                         </View>
                     </View>
                 :
@@ -534,7 +535,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
     bigHeader: {
-        color: 'white',
+        color: '#593060',
         fontSize: 25,
         textAlign: 'center',
         fontWeight: '700',
@@ -544,7 +545,7 @@ const styles = StyleSheet.create({
         height: '60%',
         width: '95%',
         borderBottomWidth: 1,
-        borderColor: 'white',
+        borderColor: 'black',
         marginBottom: '10%'
     },
     scroll: {
@@ -560,21 +561,20 @@ const styles = StyleSheet.create({
     },
     buttonWrapper: {
     width: '60%',
-    borderColor: '#777',
     borderRadius: 25,
-    backgroundColor: 'white',
-    borderWidth: 1,
+    backgroundColor: '#FFE562',
     paddingTop: '2%',
     paddingBottom: '2%',
+    paddingLeft: '2%'
     },
-    input: {
-    textAlign: 'center',
-    fontSize: 15,
-    width: '100%',
-    },
-    bgImg: {
-        objectFit: 'scale-down',
-        opacity: .15,
-        transform: [{scaleX: -1}]
+    iconHolderSmall: {
+        backgroundColor: 'white', 
+        width: 28, 
+        height: 28, 
+        display: 'flex', 
+        flexDirection: 'row', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        borderRadius: 100
     },
 })
