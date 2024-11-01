@@ -6,29 +6,33 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
 import { faTrash } from '@fortawesome/free-solid-svg-icons'
 
 const UrlEditor = ({url, deleteFunc, editUrls, index}) => {
-    const [urlTitle, setUrlTitle] = useState(url.title)
+    try {
+        const [urlTitle, setUrlTitle] = useState(url.title)
 
-    useEffect(() => {
-        editUrls(prev => {
-            let arr = [...prev]
-            let targetUrl = arr[index]
-            targetUrl.title = urlTitle
-            arr[index] = targetUrl
-            return arr
-        })
-    }, [urlTitle])
+        useEffect(() => {
+            editUrls(prev => {
+                let arr = [...prev]
+                let targetUrl = arr[index]
+                targetUrl.title = urlTitle
+                arr[index] = targetUrl
+                return arr
+            })
+        }, [urlTitle])
 
 
-  return (
-    <View key={index} style={styles.fileRow}>
-        <TextInput style={styles.input} value={fileTitle} numberOfLines={1} placeholder='Enter File Name...' onChangeText={e => setUrlTitle(e)}/>
-        <TouchableOpacity title='Delete' onPress={() => deleteFunc(files, file)}>
-            <View style={styles.iconHolderSM}>
-                <FontAwesomeIcon icon={faTrash} size={18} color='red'/>
+        return (
+            <View key={index} style={styles.fileRow}>
+                <TextInput style={styles.input} value={urlTitle} numberOfLines={1} placeholder='Enter File Name...' onChangeText={e => setUrlTitle(e)}/>
+                <TouchableOpacity title='Delete' onPress={() => deleteFunc(files, file)}>
+                    <View style={styles.iconHolderSM}>
+                        <FontAwesomeIcon icon={faTrash} size={18} color='red'/>
+                    </View>
+                </TouchableOpacity>
             </View>
-        </TouchableOpacity>
-    </View>
-  )
+        )
+    } catch (err) {
+        alert(err)
+    }
 }
 
 export default UrlEditor
