@@ -56,8 +56,7 @@
     "react-native-svg": "^15.2.0",
     "react-native-toast-notifications": "^3.4.0",
     "react-native-web": "~0.19.10",
-    "react-navigation": "^5.0.0",
-    "undefined": "expo-camera/next"
+    "react-navigation": "^5.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0"
