@@ -21,7 +21,7 @@ const UrlEditor = ({url, deleteFunc, editUrls, index}) => {
 
   return (
     <View key={index} style={styles.fileRow}>
-        <TextInput style={styles.input} value={fileTitle} numberOfLines={1} placeholder='Enter File Name...' onChangeText={e => setFileTitle(e)}/>
+        <TextInput style={styles.input} value={fileTitle} numberOfLines={1} placeholder='Enter File Name...' onChangeText={e => setUrlTitle(e)}/>
         <TouchableOpacity title='Delete' onPress={() => deleteFunc(files, file)}>
             <View style={styles.iconHolderSM}>
                 <FontAwesomeIcon icon={faTrash} size={18} color='red'/>
