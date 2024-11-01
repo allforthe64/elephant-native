@@ -22,7 +22,7 @@ import {format} from 'date-fns'
 import { useToast } from 'react-native-toast-notifications'
 
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
-import { faXmark, faFolder, faArrowLeft, faCloudArrowUp, faQrcode, faPlus, faCheck, faBox } from '@fortawesome/free-solid-svg-icons'
+import { faXmark, faFolder, faArrowLeft, faCloudArrowUp, faQrcode, faPlus, faCheck, faBox, faFloppyDisk } from '@fortawesome/free-solid-svg-icons'
 
 const Scanner = () => {
 
@@ -377,7 +377,7 @@ return (
                                 <Text style={{fontSize: 18, marginLeft: '5%', paddingTop: '1%', color: '#9F37B0', fontWeight: '600'}}>Add New Folder</Text>
                             </TouchableOpacity>
 
-                            <View style={{display: 'flex', flexDirection: 'row'}}>
+                            <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-around'}}>
                                 <TouchableOpacity onPress={() => submit()} style={ destination.id !== null || focusedFolder ? styles.yellowButtonSM : styles.yellowButtonSMDim}
                                     disabled={destination.id !== null || focusedFolder ? false : true}
                                 >
@@ -443,7 +443,7 @@ return (
                                 <View style={styles.iconHolderSmall}>
                                     <FontAwesomeIcon icon={faCloudArrowUp} color='#9F37B0' />
                                 </View>
-                                <Text style={{fontSize: 18, width: '100%', fontWeight: '600', color: '#9F37B0', paddingTop: '1%', marginLeft: '10%'}}>Save All</Text>
+                                <Text style={{fontSize: 18, width: '100%', fontWeight: '600', color: '#9F37B0', paddingTop: '1%', marginLeft: '15%'}}>Save All</Text>
                             </TouchableOpacity>
                         </View>
                     </View>
