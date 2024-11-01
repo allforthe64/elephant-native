@@ -563,6 +563,8 @@ const styles = StyleSheet.create({
     width: '60%',
     borderRadius: 25,
     backgroundColor: '#FFE562',
+    display: 'flex',
+    flexDirection: 'row',
     paddingTop: '2%',
     paddingBottom: '2%',
     paddingLeft: '2%'
