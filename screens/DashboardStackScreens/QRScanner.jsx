@@ -142,6 +142,7 @@ const Scanner = () => {
 
     
     const submit = async () => {
+        setPreAdd(false)
         try {
 
         
@@ -214,7 +215,6 @@ const Scanner = () => {
         setUrls([])
         setDestination({id: null, fileName: null, nestedUnder: null})
         setFocusedFolder(null)
-        setPreAdd(false)
 
         } catch (err) {
             alert(err)
@@ -443,7 +443,7 @@ return (
                                 <View style={styles.iconHolderSmall}>
                                     <FontAwesomeIcon icon={faCloudArrowUp} color='#9F37B0' />
                                 </View>
-                                <Text style={{fontSize: 18, width: '100%', fontWeight: '600', color: '#9F37B0', paddingTop: '1%', marginLeft: '20%'}}>Save All</Text>
+                                <Text style={{fontSize: 18, width: '100%', fontWeight: '600', color: '#9F37B0', paddingTop: '1%', marginLeft: '25%'}}>Save All</Text>
                             </TouchableOpacity>
                         </View>
                     </View>
