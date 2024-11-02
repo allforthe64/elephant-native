@@ -249,7 +249,7 @@ return (
                             <Text style={{color: 'white', fontSize: 35, fontWeight: '700', marginTop: '40%', textAlign: 'center'}}>Add A New Folder:</Text>
                             <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', marginTop: '10%'}}>
                                 <View style={styles.iconHolder}>
-                                    <FontAwesomeIcon icon={faFolder} size={30} color='white'/>
+                                    <FontAwesomeIcon icon={faFolder} size={22} color='#9F37B0'/>
                                 </View>
                                 <TextInput value={newFolderName} style={{color: 'white', fontSize: 20, fontWeight: 'bold', borderBottomColor: 'white', borderBottomWidth: 2, width: '70%'}} onChangeText={(e) => setNewFolderName(e)} autoFocus onBlur={() => {if (newFolderName === '') setAddFolderForm(false)}}/>
                             </View>
@@ -377,7 +377,7 @@ return (
                                 <Text style={{fontSize: 18, marginLeft: '5%', paddingTop: '1%', color: '#9F37B0', fontWeight: '600'}}>Add New Folder</Text>
                             </TouchableOpacity>
 
-                            <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-around'}}>
+                            <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-around', width: '100%'}}>
                                 <TouchableOpacity onPress={() => submit()} style={ destination.id !== null || focusedFolder ? styles.yellowButtonSM : styles.yellowButtonSMDim}
                                     disabled={destination.id !== null || focusedFolder ? false : true}
                                 >
@@ -443,7 +443,7 @@ return (
                                 <View style={styles.iconHolderSmall}>
                                     <FontAwesomeIcon icon={faCloudArrowUp} color='#9F37B0' />
                                 </View>
-                                <Text style={{fontSize: 18, width: '100%', fontWeight: '600', color: '#9F37B0', paddingTop: '1%', marginLeft: '15%'}}>Save All</Text>
+                                <Text style={{fontSize: 18, width: '100%', fontWeight: '600', color: '#9F37B0', paddingTop: '1%', marginLeft: '20%'}}>Save All</Text>
                             </TouchableOpacity>
                         </View>
                     </View>
