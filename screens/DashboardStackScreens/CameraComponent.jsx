@@ -527,17 +527,17 @@ try {
                         </TouchableOpacity>
                         <Text style={{color: 'white', fontSize: 20, marginTop: '2%', textAlign: 'center'}}>Or</Text>
                         <TouchableOpacity style={{width: '50%',
-                        borderRadius: 25,
-                        backgroundColor: 'white',
-                        paddingTop: '2%',
-                        paddingBottom: '2%',
-                        paddingLeft: '2%',
-                        marginLeft: '2%',
-                        marginTop: '2%',
-                        display: 'flex',
-                        flexDirection: 'row',
-                        backgroundColor: '#FFE562'
-                    }}
+                            borderRadius: 25,
+                            backgroundColor: 'white',
+                            paddingTop: '2%',
+                            paddingBottom: '2%',
+                            paddingLeft: '2%',
+                            marginLeft: '2%',
+                            marginTop: '2%',
+                            display: 'flex',
+                            flexDirection: 'row',
+                            backgroundColor: '#FFE562'
+                        }}
                         onPress={() => {
                             setNameGiven(true)
                         }}
@@ -624,14 +624,14 @@ try {
                                                                     setFocusedFolder(f.id)
                                                                     setDestination({id: null, fileName: null, nestedUnder: null})
                                                                 }
-                                                            }
-                                                            }>
-                                                                <View style={f.id === destination.id ? styles.folderWhite : styles.folder}>
-                                                                <View style={f.id === destination.id ? styles.iconHolderBlack : styles.iconHolder}>
-                                                                    <FontAwesomeIcon icon={faFolder} size={28} color={f.id === destination.id ? 'white' : '#9F37B0'}/>
-                                                                </View>
-                                                                <Text style={f.id === destination.id ? {color: 'black', fontSize: 28, width: '80%', paddingTop: '1%'} : {color: '#9F37B0', fontSize: 28, width: '80%', textAlign: 'left', paddingTop: '1%'}}>{f.fileName}</Text>
-                                                                </View>
+                                                                }
+                                                                }>
+                                                                    <View style={f.id === destination.id ? styles.folderWhite : styles.folder}>
+                                                                    <View style={f.id === destination.id ? styles.iconHolderBlack : styles.iconHolder}>
+                                                                        <FontAwesomeIcon icon={faFolder} size={28} color={f.id === destination.id ? 'white' : '#9F37B0'}/>
+                                                                    </View>
+                                                                    <Text style={f.id === destination.id ? {color: 'black', fontSize: 28, width: '80%', paddingTop: '1%'} : {color: '#9F37B0', fontSize: 28, width: '80%', textAlign: 'left', paddingTop: '1%'}}>{f.fileName}</Text>
+                                                                    </View>
                                                             </Pressable>
                                                         )
                                                     
