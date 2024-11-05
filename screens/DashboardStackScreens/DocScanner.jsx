@@ -30,7 +30,7 @@ import { userListener, addfile, updateUser } from '../../firebase/firestore';
 
 //fontAwesome imports
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faCloudArrowUp, faEnvelope, faFolder, faTrash, faRepeat, faVideoCamera, faCamera, faSquare, faXmark, faFile, faArrowLeft, faFloppyDisk, faStopwatch, faPlus, faCheck, faBox } from '@fortawesome/free-solid-svg-icons';
+import { faFolder, faXmark, faFile, faArrowLeft, faFloppyDisk, faStopwatch, faPlus, faCheck, faBox } from '@fortawesome/free-solid-svg-icons';
 
 const DocScanner = () => {
 
