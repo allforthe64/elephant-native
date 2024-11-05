@@ -271,7 +271,7 @@ const DocScanner = () => {
                       <TextInput value={docName} style={{color: 'white', fontSize: 20, fontWeight: 'bold', borderBottomColor: 'white', borderBottomWidth: 2, width: '70%'}} onChangeText={(e) => setDocName(e)} autoFocus/>
                   </View>
                   <View style={{width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', paddingTop: '5%'}}>
-                    <TouchableOpacity style={docName === '' ? yellowButtonXSDim : yellowButtonXS}
+                    <TouchableOpacity style={docName === '' ? styles.yellowButtonXSDim : styles.yellowButtonXS}
                       disabled={docName === '' ? true : false}
                       onPress={() => {
                           setNameGiven(true)
