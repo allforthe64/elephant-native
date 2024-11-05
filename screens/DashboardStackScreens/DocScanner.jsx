@@ -48,6 +48,7 @@ const DocScanner = () => {
   const [docName, setDocName] = useState('')
   const [preAdd, setPreAdd] = useState(false)
   const [destination, setDestination] = useState({id: null, fileName: null, nestedUnder: null})
+  const [PDFPath, setPDFPath] = useState()
 
   const currentUser = firebaseAuth.currentUser.uid
 
@@ -152,7 +153,10 @@ const DocScanner = () => {
       pages: scannedImageArray.map(imagePath => ({imagePath})),
       outputPath: `file://${RNBlobUtil.fs.dirs.DocumentDir}/file.pdf`
     })
-    .then(path => uploadPDF(path))
+    .then(path => {
+      setPDFPath(path)
+      setPreAdd(true)
+    })
     .catch(error => {
       console.log(`Failed to create PDF: ${error}`)
       alert(error)
@@ -438,7 +442,7 @@ const DocScanner = () => {
 
                       <View style={{display: 'flex', flexDirection: 'row'}}>
                           
-                          <TouchableOpacity onPress={() => generatePDF()} style={ destination.id !== null || focusedFolder ? styles.yellowButtonSM : styles.yellowButtonSMDim}
+                          <TouchableOpacity onPress={() => uploadPDF(PDFPath)} style={ destination.id !== null || focusedFolder ? styles.yellowButtonSM : styles.yellowButtonSMDim}
                             disabled={destination.id !== null || focusedFolder ? false : true}
                           >
                             <View style={styles.iconHolderSmall}>
@@ -448,7 +452,7 @@ const DocScanner = () => {
                           </TouchableOpacity>
 
                       
-                          <TouchableOpacity onPress={() => generatePDF()} style={styles.yellowButtonSM}>
+                          <TouchableOpacity onPress={() => uploadPDF(PDFPath)} style={styles.yellowButtonSM}>
                             <View style={styles.iconHolderSmall}>
                                 <FontAwesomeIcon icon={faBox} color='#9F37B0'/>
                             </View>
