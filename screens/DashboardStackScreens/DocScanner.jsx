@@ -30,7 +30,7 @@ import { userListener, addfile, updateUser } from '../../firebase/firestore';
 
 //fontAwesome imports
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faFolder, faXmark, faFile, faArrowLeft, faFloppyDisk, faStopwatch, faPlus, faCheck, faBox } from '@fortawesome/free-solid-svg-icons';
+import { faFolder, faXmark, faFile, faArrowLeft, faFloppyDisk, faStopwatch, faPlus, faCheck, faBox, faCloudArrowUp } from '@fortawesome/free-solid-svg-icons';
 
 const DocScanner = () => {
 
@@ -164,6 +164,7 @@ const DocScanner = () => {
   }
 
   const uploadPDF = async (path) => {
+    setPreAdd(false)
     try {
       console.log('This is the path within the upload function: ', path)
 
@@ -217,7 +218,6 @@ const DocScanner = () => {
       setScannedImageArray([])
       setDestination({id: null, fileName: null, nestedUnder: null})
       setFocusedFolder(null)
-      setPreAdd(false)
       setNameGiven(false)
     } catch (error) {
       console.log('error within pdf upload function: ', error)
@@ -553,7 +553,8 @@ const DocScanner = () => {
             </>
               
             :
-            <>
+            <View style={{backgroundColor: '#FFFCF6',
+              height: '100%', width: '100%'}}>
               <View style={{height: '65%', marginBottom: '10%'}} width={width}>
                 <Image 
                   style={{ width: '100%', height: '100%', objectFit: 'contain' }}
@@ -561,14 +562,29 @@ const DocScanner = () => {
                 />
               </View>  
               <View style={{height: '25%'}}>
-              <View style={{
-                display: 'flex',
-                alignItems: 'center',
-                width: '100%',
-                marginBottom: '8%'
+                <View style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  width: '100%',
                 }}>
-                  <View style={{
-                    width: '60%',
+                  <TouchableOpacity onPress={() => scanDocument()} style={{
+                    width: '70%',
+                    borderColor: '#777',
+                    borderRadius: 25,
+                    backgroundColor: 'white',
+                    borderWidth: 1,
+                    paddingTop: '2%',
+                    paddingBottom: '2%',
+                    marginBottom: '4%'
+                  }}>
+                    <View style={styles.iconHolderSmall}>
+                      <FontAwesomeIcon icon={faFile} color='#9F37B0' size={22}/>
+                    </View>
+                    <Text style={{fontSize: 18, color: '#9F37B0', fontWeight: '600', marginLeft: '15%', paddingTop: '1%'}}>Scan More Documents</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress={() => generatePDF()} style={{
+                    width: '70%',
                     borderColor: '#777',
                     borderRadius: 25,
                     backgroundColor: 'white',
@@ -576,42 +592,14 @@ const DocScanner = () => {
                     paddingTop: '2%',
                     paddingBottom: '2%',
                   }}>
-                      <TouchableOpacity onPress={() => scanDocument()}>
-                      <Text style={{
-                        textAlign: 'center',
-                        fontSize: 15,
-                        width: '100%',
-                      }}>Scan More Documents</Text>
-                      </TouchableOpacity>
-                  </View>
-              </View>
-  
-              <View style={{
-                display: 'flex',
-                alignItems: 'center',
-                width: '100%',
-                marginBottom: '8%'
-                }}>
-                  <View style={{
-                    width: '60%',
-                    borderColor: '#777',
-                    borderRadius: 25,
-                    backgroundColor: 'white',
-                    borderWidth: 1,
-                    paddingTop: '2%',
-                    paddingBottom: '2%',
-                  }}>
-                    <TouchableOpacity onPress={() => generatePDF()}>
-                    <Text style={{
-                      textAlign: 'center',
-                      fontSize: 15,
-                      width: '100%',
-                    }}>Convert To PDF</Text>
-                    </TouchableOpacity>
+                    <View style={styles.iconHolderSmall}>
+                        <FontAwesomeIcon icon={faCloudArrowUp} color='#9F37B0' size={22} />
+                    </View>
+                    <Text style={{fontSize: 18, color: '#9F37B0', fontWeight: '600', marginLeft: '15%', paddingTop: '1%'}}>Convert To PDF/Upload</Text>
+                  </TouchableOpacity>
                 </View>
-              </View>
-            </View>  
-            </>      
+              </View>  
+            </View>      
           }  
 
         </View>
