@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { Image, Platform, PermissionsAndroid, Dimensions, View, TouchableOpacity, Text, Pressable, TextInput, Modal, ScrollView, StyleSheet } from 'react-native'
 
 //import DocumentScanner component from react-native-document-scanner-plugin
@@ -239,6 +239,21 @@ const DocScanner = () => {
     console.log('ScannedImageArray: ', scannedImageArray)
   }, scannedImageArray)
 
+  //carousel
+  const progress = useSharedValue(0);
+  const carouselRef = useRef()
+
+  const onPressPagination = (index) => {
+    ref.current?.scrollTo({
+      /**
+       * Calculate the difference between the current index and the target index
+       * to ensure that the carousel scrolls to the nearest index
+       */
+      count: index - progress.value,
+      animated: true,
+    });
+  };
+
   return (
     <>
       {preAdd ? 
@@ -478,40 +493,48 @@ const DocScanner = () => {
             ?    
             <View style={{backgroundColor: '#FFFCF6',
               height: '100%', width: '100%', borderWidth: 1, borderColor: 'green'}}>
-                <View style={{width: '100%', height: '100%'}}>
-
-                </View>
-                <Carousel
-                    loop
-                    width={width}
-                    style={{height: '65%', paddingRight: '5%', borderWidth: 1, borderColor: 'blue'}}
-                    autoPlay
-                    mode='parallax'
-                    modeConfig={{
-                      parallaxScrollingScale: 0.9,
-                      parallaxScrollingOffset: 50,
-                      parallaxAdjacentItemScale: 0.8,
-                  }}
-                    data={scannedImageArray}
-                    scrollAnimationDuration={1000}
-                    onSnapToItem={(index) => console.log('current index:', index)}
-                    renderItem={({ index }) => (
-                        <View
-                            style={{
-                                flex: 1,
-                                justifyContent: 'center',
-                                width: '100%',
-                                height: '100%',
-                                borderWidth: 1
-                            }}
-                        >
-                            <Image 
-                              style={{ width: '100%', height: '100%', objectFit: 'contain', borderWidth: 1, borderColor: 'red' }}
-                              source={{uri: scannedImageArray[index]}}
-                            />
-                        </View>
-                    )}
+                <View style={{width: '100%', height: '65%'}}>
+                  <Carousel
+                      ref={carouselRef}
+                      loop
+                      width={width}
+                      style={{height: '90%', paddingRight: '5%', borderWidth: 1, borderColor: 'blue'}}
+                      autoPlay
+                      mode='parallax'
+                      onProgressChange={progress}
+                      modeConfig={{
+                        parallaxScrollingScale: 0.9,
+                        parallaxScrollingOffset: 50,
+                        parallaxAdjacentItemScale: 0.8,
+                    }}
+                      data={scannedImageArray}
+                      scrollAnimationDuration={1000}
+                      onSnapToItem={(index) => console.log('current index:', index)}
+                      renderItem={({ index }) => (
+                          <View
+                              style={{
+                                  flex: 1,
+                                  justifyContent: 'center',
+                                  width: '100%',
+                                  height: '100%',
+                                  borderWidth: 1
+                              }}
+                          >
+                              <Image 
+                                style={{ width: '100%', height: '100%', objectFit: 'contain', borderWidth: 1, borderColor: 'red' }}
+                                source={{uri: scannedImageArray[index]}}
+                              />
+                          </View>
+                      )}
+                      />
+                    <Pagination.Basic
+                      progress={progress}
+                      data={scannedImageArray}
+                      dotStyle={{ backgroundColor: "rgba(0,0,0,0.2)", borderRadius: 50 }}
+                      containerStyle={{ gap: 5, marginTop: 10 }}
+                      onPress={onPressPagination}
                     />
+                </View>
                 <View style={{height: '25%', width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', borderWidth: 1, borderColor: 'orange'}}>
                   <View style={{width: '80%', marginBottom: '4%', borderWidth: 2, borderColor: '#593060', borderRadius: 100}}></View>
                   <View style={{
