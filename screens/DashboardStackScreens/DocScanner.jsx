@@ -527,7 +527,7 @@ const DocScanner = () => {
                           </View>
                       )}
                       />
-                    <Pagination.Basic
+                    <Pagination
                       progress={progress}
                       data={scannedImageArray}
                       dotStyle={{ backgroundColor: "rgba(0,0,0,0.2)", borderRadius: 50 }}
