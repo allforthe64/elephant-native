@@ -5,7 +5,9 @@ import { Image, Platform, PermissionsAndroid, Dimensions, View, TouchableOpacity
 import DocumentScanner from 'react-native-document-scanner-plugin'
 
 //import Carousel component from react-native-reanimated-carousel
-import Carousel from 'react-native-reanimated-carousel';
+import Carousel, {Pagination} from 'react-native-reanimated-carousel';
+import { useSharedValue } from "react-native-reanimated";
+
 
 //import useToast for notifications
 import { useToast } from 'react-native-toast-notifications'
@@ -476,10 +478,20 @@ const DocScanner = () => {
             ?    
             <View style={{backgroundColor: '#FFFCF6',
               height: '100%', width: '100%', borderWidth: 1, borderColor: 'green'}}>
+                <View style={{width: '100%', height: '100%'}}>
+
+                </View>
                 <Carousel
                     loop
                     width={width}
                     style={{height: '65%', paddingRight: '5%', borderWidth: 1, borderColor: 'blue'}}
+                    autoPlay
+                    mode='parallax'
+                    modeConfig={{
+                      parallaxScrollingScale: 0.9,
+                      parallaxScrollingOffset: 50,
+                      parallaxAdjacentItemScale: 0.8,
+                  }}
                     data={scannedImageArray}
                     scrollAnimationDuration={1000}
                     onSnapToItem={(index) => console.log('current index:', index)}
