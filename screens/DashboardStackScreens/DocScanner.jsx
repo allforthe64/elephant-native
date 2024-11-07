@@ -479,7 +479,7 @@ const DocScanner = () => {
                 <Carousel
                     loop
                     width={width}
-                    style={{height: '75%', paddingRight: '5%'}}
+                    style={{height: '75%', paddingRight: '5%', borderWidth: 1, borderColor: 'blue'}}
                     data={scannedImageArray}
                     scrollAnimationDuration={1000}
                     onSnapToItem={(index) => console.log('current index:', index)}
@@ -489,40 +489,42 @@ const DocScanner = () => {
                                 flex: 1,
                                 justifyContent: 'center',
                                 width: '100%',
-                                height: '100%'
+                                height: '100%',
+                                borderWidth: 1
                             }}
                         >
                             <Image 
-                              style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                              style={{ width: '100%', height: '100%', objectFit: 'contain', borderWidth: 1, borderColor: 'red' }}
                               source={{uri: scannedImageArray[index]}}
                             />
                         </View>
                     )}
                     />
                 <View style={{height: '25%', width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
-                  <View style={{width: '80%', marginBottom: '4%', borderWidth: 2, backgroundColor: '#593060'}}></View>
+                  <View style={{width: '80%', marginBottom: '4%', borderWidth: 2, borderColor: '#593060', borderRadius: 100}}></View>
                   <View style={{
                     display: 'flex',
                     alignItems: 'center',
                     width: '100%',
                     marginBottom: '8%'
                     }}>
-                      <View style={{
-                        width: '60%',
-                        borderColor: '#777',
-                        borderRadius: 25,
-                        backgroundColor: 'white',
-                        borderWidth: 1,
-                        paddingTop: '2%',
-                        paddingBottom: '2%',
-                      }}>
-                          <TouchableOpacity onPress={() => scanDocument()}>
+                          <TouchableOpacity onPress={() => scanDocument()} style={{
+                          backgroundColor: '#FFE562',
+                          paddingLeft: '2%',
+                          paddingTop: '2%',
+                          paddingBottom: '2%',
+                          paddingRight: 20,
+                          borderRadius: 100,
+                          display: 'flex',
+                          flexDirection: 'row',
+                          width: '70%',
+                          marginBottom: '4%'
+                        }}>
                             <View style={styles.iconHolderSmall}>
                               <FontAwesomeIcon icon={faPlus} color='#9F37B0' size={22}/>
                             </View>
                             <Text style={{fontSize: 18, color: '#9F37B0', fontWeight: '600', marginLeft: '15%', paddingTop: '1%'}}>Scan More Documents</Text>
                           </TouchableOpacity>
-                      </View>
                       
                         <TouchableOpacity onPress={() => setPreAdd(true)} style={styles.yellowButton}>
                           <View style={styles.iconHolderSmall}>
@@ -537,13 +539,13 @@ const DocScanner = () => {
             :
               <View style={{backgroundColor: '#FFFCF6',
                 height: '100%', width: '100%'}}>
-                <View style={{height: '85%', marginBottom: '10%'}} width={width}>
+                <View style={{height: '75%', marginBottom: '10%'}} width={width}>
                   <Image 
                     style={{ width: '100%', height: '100%', objectFit: 'contain' }}
                     source={{uri: scannedImageArray[0]}}
                   />
                 </View>  
-                <View style={{height: '15%'}}>
+                <View style={{height: '25%'}}>
                   <View style={{
                     display: 'flex',
                     flexDirection: 'column',
