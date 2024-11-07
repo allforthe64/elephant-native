@@ -471,10 +471,11 @@ const DocScanner = () => {
       :
       
       scannedImageArray ? 
-        <View>
+        <>
           {scannedImageArray.length > 1
             ?    
-            <>
+            <View style={{backgroundColor: '#FFFCF6',
+              height: '100%', width: '100%'}}>
                 <Carousel
                     loop
                     width={width}
@@ -550,59 +551,42 @@ const DocScanner = () => {
                     </View>
                   </View>
                 </View>
-            </>
+            </View>
               
             :
-            <View style={{backgroundColor: '#FFFCF6',
-              height: '100%', width: '100%'}}>
-              <View style={{height: '65%', marginBottom: '10%'}} width={width}>
-                <Image 
-                  style={{ width: '100%', height: '100%', objectFit: 'contain' }}
-                  source={{uri: scannedImageArray[0]}}
-                />
-              </View>  
-              <View style={{height: '25%'}}>
-                <View style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  width: '100%',
-                }}>
-                  <TouchableOpacity onPress={() => scanDocument()} style={{
-                    width: '70%',
-                    borderColor: '#777',
-                    borderRadius: 25,
-                    backgroundColor: 'white',
-                    borderWidth: 1,
-                    paddingTop: '2%',
-                    paddingBottom: '2%',
-                    marginBottom: '4%'
+              <View style={{backgroundColor: '#FFFCF6',
+                height: '100%', width: '100%'}}>
+                <View style={{height: '75%', marginBottom: '10%'}} width={width}>
+                  <Image 
+                    style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                    source={{uri: scannedImageArray[0]}}
+                  />
+                </View>  
+                <View style={{height: '25%'}}>
+                  <View style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    width: '100%',
                   }}>
-                    <View style={styles.iconHolderSmall}>
-                      <FontAwesomeIcon icon={faFile} color='#9F37B0' size={22}/>
-                    </View>
-                    <Text style={{fontSize: 18, color: '#9F37B0', fontWeight: '600', marginLeft: '15%', paddingTop: '1%'}}>Scan More Documents</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity onPress={() => generatePDF()} style={{
-                    width: '70%',
-                    borderColor: '#777',
-                    borderRadius: 25,
-                    backgroundColor: 'white',
-                    borderWidth: 1,
-                    paddingTop: '2%',
-                    paddingBottom: '2%',
-                  }}>
-                    <View style={styles.iconHolderSmall}>
-                        <FontAwesomeIcon icon={faCloudArrowUp} color='#9F37B0' size={22} />
-                    </View>
-                    <Text style={{fontSize: 18, color: '#9F37B0', fontWeight: '600', marginLeft: '15%', paddingTop: '1%'}}>Convert To PDF/Upload</Text>
-                  </TouchableOpacity>
-                </View>
-              </View>  
-            </View>      
+                    <TouchableOpacity onPress={() => scanDocument()} style={styles.yellowButton}>
+                      <View style={styles.iconHolderSmall}>
+                        <FontAwesomeIcon icon={faFile} color='#9F37B0' size={22}/>
+                      </View>
+                      <Text style={{fontSize: 18, color: '#9F37B0', fontWeight: '600', marginLeft: '15%', paddingTop: '1%'}}>Scan More Documents</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={() => generatePDF()} style={styles.yellowButton}>
+                      <View style={styles.iconHolderSmall}>
+                          <FontAwesomeIcon icon={faCloudArrowUp} color='#9F37B0' size={22} />
+                      </View>
+                      <Text style={{fontSize: 18, color: '#9F37B0', fontWeight: '600', marginLeft: '15%', paddingTop: '1%'}}>Convert To PDF/Upload</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>  
+              </View>      
           }  
 
-        </View>
+        </>
       :
         <></>
       }
@@ -693,6 +677,17 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     width: '30%',
     marginLeft: '5%'
+  },
+  yellowButton: {
+    backgroundColor: '#FFE562',
+    paddingLeft: '2%',
+    paddingTop: '2%',
+    paddingBottom: '2%',
+    paddingRight: 20,
+    borderRadius: 100,
+    display: 'flex',
+    flexDirection: 'row',
+    width: '70%',
   },
   addFolderButton: {
     width: '50%',
