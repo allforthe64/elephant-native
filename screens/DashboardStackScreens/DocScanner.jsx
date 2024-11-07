@@ -475,11 +475,11 @@ const DocScanner = () => {
           {scannedImageArray.length > 1
             ?    
             <View style={{backgroundColor: '#FFFCF6',
-              height: '100%', width: '100%'}}>
+              height: '100%', width: '100%', borderWidth: 1, borderColor: 'green'}}>
                 <Carousel
                     loop
                     width={width}
-                    style={{height: '75%', paddingRight: '5%', borderWidth: 1, borderColor: 'blue'}}
+                    style={{height: '65%', paddingRight: '5%', borderWidth: 1, borderColor: 'blue'}}
                     data={scannedImageArray}
                     scrollAnimationDuration={1000}
                     onSnapToItem={(index) => console.log('current index:', index)}
@@ -500,7 +500,7 @@ const DocScanner = () => {
                         </View>
                     )}
                     />
-                <View style={{height: '25%', width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
+                <View style={{height: '25%', width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', borderWidth: 1, borderColor: 'orange'}}>
                   <View style={{width: '80%', marginBottom: '4%', borderWidth: 2, borderColor: '#593060', borderRadius: 100}}></View>
                   <View style={{
                     display: 'flex',
