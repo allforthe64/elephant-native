@@ -249,7 +249,7 @@ const DocScanner = () => {
        * Calculate the difference between the current index and the target index
        * to ensure that the carousel scrolls to the nearest index
        */
-      count: index - progress.value,
+      count: index - progress,
       animated: true,
     });
   };
@@ -527,6 +527,15 @@ const DocScanner = () => {
                           </View>
                       )}
                       />
+                    <View style={{width: '100%', paddingLeft: '4%', paddingRight: '4%', display: 'flex', flexDirection: 'row', justifyContent: 'space-around'}}>
+                      {scannedImageArray.map((index) => {
+                        return (
+                          <TouchableOpacity>
+                            <Text style={{textDecorationLine: 'underline'}}>{index + 1}</Text>
+                          </TouchableOpacity>
+                        )
+                      })}
+                    </View>
                 </View>
                 <View style={{height: '25%', width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', borderWidth: 1, borderColor: 'orange'}}>
                   <View style={{width: '80%', marginBottom: '4%', borderWidth: 2, borderColor: '#593060', borderRadius: 100}}></View>
