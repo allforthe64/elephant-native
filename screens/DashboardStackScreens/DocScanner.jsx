@@ -5,7 +5,7 @@ import { Image, Platform, PermissionsAndroid, Dimensions, View, TouchableOpacity
 import DocumentScanner from 'react-native-document-scanner-plugin'
 
 //import Carousel component from react-native-reanimated-carousel
-import Carousel, {Pagination} from 'react-native-reanimated-carousel';
+import Carousel from 'react-native-reanimated-carousel';
 import { useSharedValue } from "react-native-reanimated";
 
 
@@ -527,13 +527,6 @@ const DocScanner = () => {
                           </View>
                       )}
                       />
-                    <Pagination
-                      progress={progress}
-                      data={scannedImageArray}
-                      dotStyle={{ backgroundColor: "rgba(0,0,0,0.2)", borderRadius: 50 }}
-                      containerStyle={{ gap: 5, marginTop: 10 }}
-                      onPress={onPressPagination}
-                    />
                 </View>
                 <View style={{height: '25%', width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', borderWidth: 1, borderColor: 'orange'}}>
                   <View style={{width: '80%', marginBottom: '4%', borderWidth: 2, borderColor: '#593060', borderRadius: 100}}></View>
