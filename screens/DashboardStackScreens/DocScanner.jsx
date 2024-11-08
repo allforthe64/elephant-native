@@ -240,7 +240,7 @@ const DocScanner = () => {
   }, scannedImageArray)
 
   //carousel
-  const progress = useSharedValue(0);
+  const [progress, setProgress] = useState(0);
   const carouselRef = useRef()
 
   const onPressPagination = (index) => {
