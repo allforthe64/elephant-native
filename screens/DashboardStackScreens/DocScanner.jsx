@@ -527,10 +527,10 @@ const DocScanner = () => {
                           </View>
                       )}
                       />
-                    <View style={{width: '100%', paddingLeft: '4%', paddingRight: '4%', display: 'flex', flexDirection: 'row', justifyContent: 'space-around'}}>
+                    <View style={{width: '100%', paddingLeft: '4%', paddingRight: '4%', display: 'flex', flexDirection: 'row', justifyContent: 'center'}}>
                       {scannedImageArray.map((index, counter) => {
                         return (
-                          <TouchableOpacity>
+                          <TouchableOpacity style={{marginLeft: '.5rem'}} onPress={() => onPressPagination(counter)}>
                             <Text style={{textDecorationLine: 'underline'}}>{counter + 1}</Text>
                           </TouchableOpacity>
                         )
