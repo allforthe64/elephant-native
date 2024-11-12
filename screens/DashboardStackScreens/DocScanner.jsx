@@ -507,7 +507,7 @@ const DocScanner = () => {
                       style={{height: '90%', paddingRight: '5%', borderWidth: 1, borderColor: 'blue'}}
                       /* autoPlay */
                       mode='parallax'
-                      onProgressChange={progress}
+                      onProgressChange={(val) => setProgress(val)}
                       modeConfig={{
                         parallaxScrollingScale: 0.9,
                         parallaxScrollingOffset: 50,
@@ -535,6 +535,7 @@ const DocScanner = () => {
                       />
                     <View style={{width: '100%', paddingLeft: '4%', paddingRight: '4%', display: 'flex', flexDirection: 'row', justifyContent: 'center'}}>
                       {scannedImageArray.map((index, counter) => {
+                        alert(counter)
                         return (
                           <TouchableOpacity style={{marginLeft: '5%'}} onPress={() => onPressPagination(counter)}>
                             <Text style={{textDecorationLine: 'underline', fontSize: 20}}>{counter + 1}</Text>
