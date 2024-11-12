@@ -504,7 +504,7 @@ const DocScanner = () => {
                       loop
                       width={width}
                       style={{height: '90%', paddingRight: '5%', borderWidth: 1, borderColor: 'blue'}}
-                      autoPlay
+                      /* autoPlay */
                       mode='parallax'
                       onProgressChange={progress}
                       modeConfig={{
