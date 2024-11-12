@@ -246,18 +246,14 @@ const DocScanner = () => {
   const onPressPagination = (index) => {
     alert(index)
     alert(progress)
-    try {
-      carouselRef.current?.scrollTo({
-        /**
-         * Calculate the difference between the current index and the target index
-         * to ensure that the carousel scrolls to the nearest index
-         */
-        count: index - progress,
-        animated: true,
-      });
-    } catch (err) {
-      alert(err)
-    }
+    carouselRef.current?.scrollTo({
+      /**
+       * Calculate the difference between the current index and the target index
+       * to ensure that the carousel scrolls to the nearest index
+       */
+      count: index + progress,
+      animated: true,
+    });
   };
 
   return (
@@ -535,7 +531,6 @@ const DocScanner = () => {
                       />
                     <View style={{width: '100%', paddingLeft: '4%', paddingRight: '4%', display: 'flex', flexDirection: 'row', justifyContent: 'center'}}>
                       {scannedImageArray.map((index, counter) => {
-                        alert(counter)
                         return (
                           <TouchableOpacity style={{marginLeft: '5%'}} onPress={() => onPressPagination(counter)}>
                             <Text style={{textDecorationLine: 'underline', fontSize: 20}}>{counter + 1}</Text>
