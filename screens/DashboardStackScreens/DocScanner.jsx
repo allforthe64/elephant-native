@@ -503,7 +503,11 @@ const DocScanner = () => {
                       style={{height: '90%', paddingRight: '5%', borderWidth: 1, borderColor: 'blue'}}
                       /* autoPlay */
                       mode='parallax'
-                      onProgressChange={(offSet, abs) => setProgress(abs)}
+                      onProgressChange={(offSet, abs) => {
+                        alert(offSet)
+                        alert(abs)
+                        setProgress(abs)
+                      }}
                       modeConfig={{
                         parallaxScrollingScale: 0.9,
                         parallaxScrollingOffset: 50,
