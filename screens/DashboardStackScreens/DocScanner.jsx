@@ -245,6 +245,7 @@ const DocScanner = () => {
 
   const onPressPagination = (index) => {
     alert(index)
+    alert(progress)
     try {
       carouselRef.current?.scrollTo({
         /**
