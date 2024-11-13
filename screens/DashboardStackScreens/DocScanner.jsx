@@ -493,7 +493,7 @@ const DocScanner = () => {
             ?    
             <View style={{backgroundColor: '#FFFCF6',
               height: '100%', width: '100%', borderWidth: 1, borderColor: 'green'}}>
-                <View style={{width: '100%', height: '65%'}}>
+                <View style={{width: '100%', height: '60%'}}>
                   <Carousel
                       ref={carouselRef}
                       loop
@@ -506,6 +506,15 @@ const DocScanner = () => {
                         parallaxScrollingOffset: 50,
                         parallaxAdjacentItemScale: 0.8,
                     }}
+                      onProgressChange={(val) => {
+                        if (val > 0) {
+                          if (progress + 1 > scannedImageArray.length) setProgress(0)
+                          else setProgress(prev => prev + 1) 
+                        } else {
+                          if (progress - 1 < 0) setProgress(scannedImageArray.length - 1) 
+                          else setProgress(prev => prev - 1) 
+                        }
+                      }}
                       data={scannedImageArray}
                       scrollAnimationDuration={1000}
                       renderItem={({ index }) => (
@@ -525,17 +534,20 @@ const DocScanner = () => {
                           </View>
                       )}
                       />
-                    <View style={{width: '100%', paddingLeft: '4%', paddingRight: '4%', display: 'flex', flexDirection: 'row', justifyContent: 'center'}}>
+                    <View style={{width: '100%', paddingLeft: '5%', paddingRight: '5%', display: 'flex', flexDirection: 'row', justifyContent: 'center', flexWrap: 'wrap'}}>
                       {scannedImageArray.map((index, counter) => {
                         return (
-                          <TouchableOpacity style={{marginLeft: '5%'}} onPress={() => onPressPagination(counter)}>
+                          <TouchableOpacity style={counter === progress ? {marginLeft: '5%', width: '18%', height: '18%', borderRadius: 100, backgroundColor: '#9F37B0', borderWidth: 2, borderColor: '#9F37B0', marginBottom: '5%'} : {marginLeft: '5%', width: '15%', height: '15%', borderRadius: 100, backgroundColor: '#FFFCF6', borderWidth: 2, borderColor: '#9F37B0', marginBottom: '5%'}} onPress={() => {
+                            setProgress(counter)
+                            onPressPagination(counter)
+                          }}>
                             <Text style={{textDecorationLine: 'underline', fontSize: 20}}>{counter + 1}</Text>
                           </TouchableOpacity>
                         )
                       })}
                     </View>
                 </View>
-                <View style={{height: '25%', width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', borderWidth: 1, borderColor: 'orange'}}>
+                <View style={{height: '20%', width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', borderWidth: 1, borderColor: 'orange'}}>
                   <View style={{width: '80%', marginBottom: '4%', borderWidth: 2, borderColor: '#593060', borderRadius: 100}}></View>
                   <View style={{
                     display: 'flex',
