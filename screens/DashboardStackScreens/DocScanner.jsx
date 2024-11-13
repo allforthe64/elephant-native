@@ -244,6 +244,7 @@ const DocScanner = () => {
   const carouselRef = useRef()
 
   const onPressPagination = (index) => {
+    alert(index)
     carouselRef.current?.scrollTo({
       /**
        * Calculate the difference between the current index and the target index
@@ -508,7 +509,6 @@ const DocScanner = () => {
                     }}
                       data={scannedImageArray}
                       scrollAnimationDuration={1000}
-                      onSnapToItem={(index) => alert('current index:', index)}
                       renderItem={({ index }) => (
                           <View
                               style={{
