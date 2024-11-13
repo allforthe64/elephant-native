@@ -243,17 +243,13 @@ const DocScanner = () => {
   const [progress, setProgress] = useState(0);
   const carouselRef = useRef()
 
-  if (carouselRef) alert(carouselRef.current.count)
-
   const onPressPagination = (index) => {
-    alert(index)
-    alert(progress)
     carouselRef.current?.scrollTo({
       /**
        * Calculate the difference between the current index and the target index
        * to ensure that the carousel scrolls to the nearest index
        */
-      count: index - progress,
+      count: index,
       animated: true,
     });
   };
@@ -512,7 +508,7 @@ const DocScanner = () => {
                     }}
                       data={scannedImageArray}
                       scrollAnimationDuration={1000}
-                      onSnapToItem={(index) => console.log('current index:', index)}
+                      onSnapToItem={(index) => alert('current index:', index)}
                       renderItem={({ index }) => (
                           <View
                               style={{
@@ -533,7 +529,7 @@ const DocScanner = () => {
                     <View style={{width: '100%', paddingLeft: '4%', paddingRight: '4%', display: 'flex', flexDirection: 'row', justifyContent: 'center'}}>
                       {scannedImageArray.map((index, counter) => {
                         return (
-                          <TouchableOpacity style={{marginLeft: '5%'}} onPress={() => onPressPagination()}>
+                          <TouchableOpacity style={{marginLeft: '5%'}} onPress={() => onPressPagination(counter)}>
                             <Text style={{textDecorationLine: 'underline', fontSize: 20}}>{counter + 1}</Text>
                           </TouchableOpacity>
                         )
