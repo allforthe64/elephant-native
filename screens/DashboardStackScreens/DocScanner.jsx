@@ -243,14 +243,13 @@ const DocScanner = () => {
   const [progress, setProgress] = useState(0);
   const carouselRef = useRef()
 
-  const onPressPagination = (index) => {
-    alert(index)
+  const onPressPagination = (targetIndex) => {
     carouselRef.current?.scrollTo({
       /**
        * Calculate the difference between the current index and the target index
        * to ensure that the carousel scrolls to the nearest index
        */
-      count: index,
+      index: targetIndex,
       animated: true,
     });
   };
