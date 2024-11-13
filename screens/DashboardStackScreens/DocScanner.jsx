@@ -243,7 +243,7 @@ const DocScanner = () => {
   const [progress, setProgress] = useState(0);
   const carouselRef = useRef()
 
-  alert(carouselRef.current.count)
+  if (carouselRef) alert(carouselRef.current.count)
 
   const onPressPagination = (index) => {
     alert(index)
