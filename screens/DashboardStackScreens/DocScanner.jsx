@@ -492,13 +492,13 @@ const DocScanner = () => {
           {scannedImageArray.length > 1
             ?    
             <View style={{backgroundColor: '#FFFCF6',
-              height: '100%', width: '100%', borderWidth: 1, borderColor: 'green'}}>
+              height: '100%', width: '100%'}}>
                 <View style={{width: '100%', height: '60%'}}>
                   <Carousel
                       ref={carouselRef}
                       loop
                       width={width}
-                      style={{height: '90%', paddingRight: '5%', borderWidth: 1, borderColor: 'blue'}}
+                      style={{height: '90%', paddingRight: '5%'}}
                       /* autoPlay */
                       mode='parallax'
                       modeConfig={{
@@ -524,12 +524,11 @@ const DocScanner = () => {
                                   flex: 1,
                                   justifyContent: 'center',
                                   width: '100%',
-                                  height: '100%',
-                                  borderWidth: 1
+                                  height: '100%'
                               }}
                           >
                               <Image 
-                                style={{ width: '100%', height: '100%', objectFit: 'contain', borderWidth: 1, borderColor: 'red' }}
+                                style={{ width: '100%', height: '100%', objectFit: 'contain'}}
                                 source={{uri: scannedImageArray[index]}}
                               />
                           </View>
@@ -547,7 +546,7 @@ const DocScanner = () => {
                       })}
                     </View>
                 </View>
-                <View style={{height: '20%', width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', borderWidth: 1, borderColor: 'orange'}}>
+                <View style={{height: '20%', width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
                   <View style={{width: '80%', marginBottom: '4%', borderWidth: 2, borderColor: '#593060', borderRadius: 100}}></View>
                   <View style={{
                     display: 'flex',
