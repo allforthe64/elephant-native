@@ -518,7 +518,6 @@ const DocScanner = () => {
                       data={scannedImageArray}
                       scrollAnimationDuration={1000}
                       renderItem={({ index }) => {
-                        setProgress(index)
                         return (
                           <View
                               style={{
@@ -539,11 +538,10 @@ const DocScanner = () => {
                     <View style={{width: '100%', paddingLeft: '5%', paddingRight: '5%', display: 'flex', flexDirection: 'row', justifyContent: 'center', flexWrap: 'wrap'}}>
                       {scannedImageArray.map((index, counter) => {
                         return (
-                          <TouchableOpacity style={counter === progress ? {marginLeft: '5%', width: 56, height: 56, borderRadius: 100, backgroundColor: '#9F37B0', borderWidth: 2, borderColor: '#9F37B0', marginBottom: '5%'} : {marginLeft: '5%', width: 44, height: 44, borderRadius: 100, backgroundColor: '#FFFCF6', borderWidth: 2, borderColor: '#9F37B0', marginBottom: '5%'}} onPress={() => {
+                          <TouchableOpacity  style={{marginLeft: '5%', width: 22, height: 22, borderRadius: 100, backgroundColor: '#FFFCF6', borderWidth: 2, borderColor: '#9F37B0', marginBottom: '5%'}} onPress={() => {
                             setProgress(counter)
                             onPressPagination(counter)
                           }}>
-                            <Text style={{textDecorationLine: 'underline', fontSize: 20}}>{counter + 1}</Text>
                           </TouchableOpacity>
                         )
                       })}
