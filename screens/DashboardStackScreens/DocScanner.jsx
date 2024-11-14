@@ -519,7 +519,7 @@ const DocScanner = () => {
                       scrollAnimationDuration={1000}
                       renderItem={({ index }) => {
                         setProgress(index)
-                        (
+                        return (
                           <View
                               style={{
                                   flex: 1,
