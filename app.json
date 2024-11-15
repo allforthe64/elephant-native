@@ -32,8 +32,6 @@
     },
     "plugins": [
       "react-native-document-scanner-plugin",
-      "@react-native-firebase/app",
-      "@react-native-firebase/auth",
       [
         "expo-camera",
         {
