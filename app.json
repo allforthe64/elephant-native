@@ -39,18 +39,7 @@
           "recordAudioAndroid": true
         }
       ],
-      "react-native-document-scanner-plugin",
-      
-      "expo-build-properties",
-      "@react-native-firebase/app",
-        [
-          "expo-build-properties",
-          {
-            "ios": {
-              "useFrameworks": "static"
-            }
-          }
-        ]     
+      "react-native-document-scanner-plugin"    
     ]
   }
 }
