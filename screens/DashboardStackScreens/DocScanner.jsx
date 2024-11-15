@@ -499,7 +499,8 @@ const DocScanner = () => {
                       loop
                       width={width}
                       style={{height: '90%', paddingRight: '5%'}}
-                      /* autoPlay */
+                      autoPlay
+                      /* autoPlayInterval={2000} */
                       mode='parallax'
                       modeConfig={{
                         parallaxScrollingScale: 0.9,
