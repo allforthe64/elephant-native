@@ -165,8 +165,6 @@ const DocScanner = () => {
 
   const uploadPDF = async (path) => {
     setPreAdd(false)
-    try {
-      console.log('This is the path within the upload function: ', path)
 
       const modifiedPath = `file://${path}`
 
@@ -187,10 +185,6 @@ const DocScanner = () => {
           xhr.open('GET', modifiedPath, true)
           xhr.send(null)
       })
-    } catch (error) {
-      console.log('error within pdf upload function: ', error)
-      alert('Error within pdf upload function: ', error)
-    }
       
       const filename = `${currentUser}/${formattedDate}`
       const fileRef = ref(storage, filename)
