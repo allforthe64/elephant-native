@@ -37,16 +37,15 @@
           "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera",
           "microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone",
           "recordAudioAndroid": true
-        },
-        "expo-build-properties",
+        }
+      ],
+      "react-native-document-scanner-plugin",
+      "expo-build-properties",
         {
           "ios": {
             "useFrameworks": "static"
           }
         }
-      ],
-      "react-native-document-scanner-plugin",
-      "expo-build-properties"
     ]
   }
 }
