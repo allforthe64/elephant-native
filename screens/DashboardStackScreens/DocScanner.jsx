@@ -6,8 +6,6 @@ import DocumentScanner from 'react-native-document-scanner-plugin'
 
 //import Carousel component from react-native-reanimated-carousel
 import Carousel from 'react-native-reanimated-carousel';
-import { useSharedValue } from "react-native-reanimated";
-
 
 //import useToast for notifications
 import { useToast } from 'react-native-toast-notifications'
@@ -189,6 +187,10 @@ const DocScanner = () => {
           xhr.open('GET', modifiedPath, true)
           xhr.send(null)
       })
+    } catch (error) {
+      console.log('error within pdf upload function: ', error)
+      alert('Error within pdf upload function: ', error)
+    }
       
       const filename = `${currentUser}/${formattedDate}`
       const fileRef = ref(storage, filename)
@@ -221,10 +223,6 @@ const DocScanner = () => {
       setDestination({id: null, fileName: null, nestedUnder: null})
       setFocusedFolder(null)
       setNameGiven(false)
-    } catch (error) {
-      console.log('error within pdf upload function: ', error)
-      alert('Error within pdf upload function: ', error)
-    }
 
   }
 
