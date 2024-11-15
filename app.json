@@ -13,9 +13,7 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.elephantdev.elephantnative",
-      "deploymentTarget" : "13.4",
-      "useFrameworks" : "static"
+      "bundleIdentifier": "com.elephantdev.elephantnative"
     },
     "android": {
       "adaptiveIcon": {
@@ -41,7 +39,18 @@
           "recordAudioAndroid": true
         }
       ],
-      "react-native-document-scanner-plugin"
+      "react-native-document-scanner-plugin",
+      
+      "expo-build-properties",
+      "@react-native-firebase/app",
+        [
+          "expo-build-properties",
+          {
+            "ios": {
+              "useFrameworks": "static"
+            }
+          }
+        ]     
     ]
   }
 }
