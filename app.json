@@ -31,21 +31,23 @@
       }
     },
     "plugins": [
+      "react-native-document-scanner-plugin",
+      "@react-native-firebase/app",
+      "@react-native-firebase/auth",
       [
+        "expo-build-properties",
+        {
+          "ios": {
+            "useFrameworks": "static"
+          }
+        },
         "expo-camera",
         {
           "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera",
           "microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone",
           "recordAudioAndroid": true
         }
-      ],
-      "react-native-document-scanner-plugin",
-      "expo-build-properties",
-        {
-          "ios": {
-            "useFrameworks": "static"
-          }
-        }
+      ]
     ]
   }
 }
