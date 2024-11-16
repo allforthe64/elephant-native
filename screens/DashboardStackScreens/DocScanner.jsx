@@ -168,6 +168,8 @@ const DocScanner = () => {
 
       const modifiedPath = `file://${path}`
 
+      alert(modifiedPath)
+
     //generate formatted date for file name
     const formattedDate = format(new Date(), `yyyy-MM-dd:hh:mm:ss::${Date.now()}`)
 
@@ -186,7 +188,7 @@ const DocScanner = () => {
           xhr.send(null)
       })
       
-      const filename = `${currentUser}/${formattedDate}`
+      /* const filename = `${currentUser}/${formattedDate}`
       const fileRef = ref(storage, filename)
       const result = await uploadBytesResumable(fileRef, blob)
 
@@ -216,7 +218,7 @@ const DocScanner = () => {
       setScannedImageArray([])
       setDestination({id: null, fileName: null, nestedUnder: null})
       setFocusedFolder(null)
-      setNameGiven(false)
+      setNameGiven(false) */
 
   }
 
