@@ -164,12 +164,9 @@ const DocScanner = () => {
   }
 
   const uploadPDF = async (path) => {
-    try {
       setPreAdd(false)
 
       const modifiedPath = `file://${path}`
-
-      alert(modifiedPath)
 
     //generate formatted date for file name
     const formattedDate = format(new Date(), `yyyy-MM-dd:hh:mm:ss::${Date.now()}`)
@@ -188,16 +185,12 @@ const DocScanner = () => {
           xhr.open('GET', modifiedPath, true)
           xhr.send(null)
       })
-    } catch (err) {
-      alert(err)
-    }
-    
       
-      /* const filename = `${currentUser}/${formattedDate}`
+      const filename = `${currentUser}/${formattedDate}`
       const fileRef = ref(storage, filename)
       const result = await uploadBytesResumable(fileRef, blob)
 
-      console.log('this is the result object: ', result)
+      /* console.log('this is the result object: ', result)
 
       let finalDestintation 
        if (destination.id !== null) finalDestintation = destination.id
