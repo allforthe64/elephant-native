@@ -163,6 +163,8 @@ const DocScanner = () => {
     });
   }
 
+  alert(PDFPath)
+
   const uploadPDF = async (path) => {
       setPreAdd(false)
 
@@ -173,6 +175,7 @@ const DocScanner = () => {
 
     //create blob and upload it into firebase storage
     try {
+        alert(modifiedPath)
         const blob = await new Promise((resolve, reject) => {
           const xhr = new XMLHttpRequest()
           xhr.onload = () => {
@@ -190,8 +193,9 @@ const DocScanner = () => {
       const filename = `${currentUser}/${formattedDate}`
       const fileRef = ref(storage, filename)
       const result = await uploadBytesResumable(fileRef, blob)
-    } catch (err) {
-      alert(err.message)
+    } catch ({name, message}) {
+      alert(message)
+      throw new Error(message)
     }
 
       /* console.log('this is the result object: ', result)
