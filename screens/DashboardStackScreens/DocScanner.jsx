@@ -172,7 +172,8 @@ const DocScanner = () => {
     const formattedDate = format(new Date(), `yyyy-MM-dd:hh:mm:ss::${Date.now()}`)
 
     //create blob and upload it into firebase storage
-      const blob = await new Promise((resolve, reject) => {
+    try {
+        const blob = await new Promise((resolve, reject) => {
           const xhr = new XMLHttpRequest()
           xhr.onload = () => {
               resolve(xhr.response) 
@@ -189,6 +190,9 @@ const DocScanner = () => {
       const filename = `${currentUser}/${formattedDate}`
       const fileRef = ref(storage, filename)
       const result = await uploadBytesResumable(fileRef, blob)
+    } catch (err) {
+      alert(err)
+    }
 
       /* console.log('this is the result object: ', result)
 
