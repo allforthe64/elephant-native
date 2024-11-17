@@ -154,6 +154,7 @@ const DocScanner = () => {
       outputPath: `file://${RNBlobUtil.fs.dirs.DocumentDir}/file.pdf`
     })
     .then(path => {
+      alert(path)
       setPDFPath(path)
       setPreAdd(true)
     })
