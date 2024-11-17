@@ -191,7 +191,7 @@ const DocScanner = () => {
       const fileRef = ref(storage, filename)
       const result = await uploadBytesResumable(fileRef, blob)
     } catch (err) {
-      alert(err)
+      alert(err.message)
     }
 
       /* console.log('this is the result object: ', result)
