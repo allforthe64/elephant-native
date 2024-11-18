@@ -156,7 +156,7 @@ const DocScanner = () => {
     .then(path => {
       alert(path)
       setPDFPath(path)
-      /* setPreAdd(true) */
+      setPreAdd(true)
     })
     .catch(error => {
       console.log(`Failed to create PDF: ${error}`)
@@ -574,7 +574,7 @@ const DocScanner = () => {
                             <Text style={{fontSize: 18, color: '#9F37B0', fontWeight: '600', marginLeft: '15%', paddingTop: '1%'}}>Scan More Documents</Text>
                           </TouchableOpacity>
                       
-                        <TouchableOpacity onPress={() => setPreAdd(true)} style={styles.yellowButton}>
+                        <TouchableOpacity onPress={() => generatePDF()} style={styles.yellowButton}>
                           <View style={styles.iconHolderSmall}>
                             <FontAwesomeIcon icon={faCloudArrowUp} color='#9F37B0' size={22} />
                           </View>
