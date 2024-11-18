@@ -453,7 +453,7 @@ const DocScanner = () => {
                           <Text style={{fontSize: 18, marginLeft: '5%', paddingTop: '1%', color: '#9F37B0', fontWeight: '600'}}>Add New Folder</Text>
                       </TouchableOpacity>
 
-                      <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-around'}}>
+                      <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-around', width: '100%'}}>
                           
                           <TouchableOpacity onPress={() => generatePDF()} style={ destination.id !== null || focusedFolder ? styles.yellowButtonSM : styles.yellowButtonSMDim}
                             disabled={destination.id !== null || focusedFolder ? false : true}
@@ -524,7 +524,11 @@ const DocScanner = () => {
                                   height: '100%',
                                   borderWidth: 2,
                                   borderColor: '#593060',
-                                  borderRadius: 20
+                                  borderRadius: 20,
+                                  paddingTop: 4,
+                                  paddingRight: 4,
+                                  paddingBottom: 4,
+                                  paddingLeft: 4
                               }}
                           >
                               <Image 
@@ -534,7 +538,7 @@ const DocScanner = () => {
                           </View>
                       )}}
                       />
-                    <View style={{width: '100%', paddingLeft: '5%', paddingRight: '5%', display: 'flex', flexDirection: 'row', justifyContent: 'center', flexWrap: 'wrap'}}>
+                    {/* <View style={{width: '100%', paddingLeft: '5%', paddingRight: '5%', display: 'flex', flexDirection: 'row', justifyContent: 'center', flexWrap: 'wrap'}}>
                       {scannedImageArray.map((index, counter) => {
                         return (
                           <TouchableOpacity  style={{marginLeft: '5%', width: 22, height: 22, borderRadius: 100, backgroundColor: '#FFFCF6', borderWidth: 2, borderColor: '#9F37B0', marginBottom: '5%'}} onPress={() => {
@@ -544,7 +548,7 @@ const DocScanner = () => {
                           </TouchableOpacity>
                         )
                       })}
-                    </View>
+                    </View> */}
                 </View>
                 <View style={{height: '20%', width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
                   <View style={{width: '80%', marginBottom: '4%', borderWidth: 2, borderColor: '#593060', borderRadius: 100}}></View>
