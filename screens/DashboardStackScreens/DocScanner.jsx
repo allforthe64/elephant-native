@@ -157,12 +157,9 @@ const DocScanner = () => {
       uploadPDF(path)
     })
     .catch(error => {
-      console.log(`Failed to create PDF: ${error}`)
-      alert(error)
+      alert(`Failed to create PDF: ${error}`)
     });
   }
-
-  alert(PDFPath)
 
   const uploadPDF = async (path) => {
       setPreAdd(false)
@@ -174,7 +171,6 @@ const DocScanner = () => {
 
     //create blob and upload it into firebase storage
     try {
-        alert(modifiedPath)
         const blob = await new Promise((resolve, reject) => {
           const xhr = new XMLHttpRequest()
           xhr.onload = () => {
@@ -457,7 +453,7 @@ const DocScanner = () => {
                           <Text style={{fontSize: 18, marginLeft: '5%', paddingTop: '1%', color: '#9F37B0', fontWeight: '600'}}>Add New Folder</Text>
                       </TouchableOpacity>
 
-                      <View style={{display: 'flex', flexDirection: 'row'}}>
+                      <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-around'}}>
                           
                           <TouchableOpacity onPress={() => generatePDF()} style={ destination.id !== null || focusedFolder ? styles.yellowButtonSM : styles.yellowButtonSMDim}
                             disabled={destination.id !== null || focusedFolder ? false : true}
@@ -618,7 +614,7 @@ const DocScanner = () => {
                       </View>
                       <Text style={{fontSize: 18, color: '#9F37B0', fontWeight: '600', marginLeft: '15%', paddingTop: '1%'}}>Scan More Documents</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={() => generatePDF()} style={styles.yellowButton}>
+                    <TouchableOpacity onPress={() => setPreAdd(true)} style={styles.yellowButton}>
                       <View style={styles.iconHolderSmall}>
                           <FontAwesomeIcon icon={faCloudArrowUp} color='#9F37B0' size={22} />
                       </View>
