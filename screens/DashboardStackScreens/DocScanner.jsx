@@ -146,7 +146,6 @@ const DocScanner = () => {
 
   //generate a pdf using the scanned images
   const generatePDF = async () => {
-    setPreAdd(true)
 
     const formattedDate = format(new Date(), `yyyy-MM-dd:hh:mm:ss::${Date.now()}`)
 
@@ -155,8 +154,7 @@ const DocScanner = () => {
       outputPath: `file://${RNBlobUtil.fs.dirs.DocumentDir}/file.pdf`
     })
     .then(path => {
-      alert(path)
-      setPDFPath(path)
+      uploadPDF(path)
     })
     .catch(error => {
       console.log(`Failed to create PDF: ${error}`)
@@ -461,7 +459,7 @@ const DocScanner = () => {
 
                       <View style={{display: 'flex', flexDirection: 'row'}}>
                           
-                          <TouchableOpacity onPress={() => uploadPDF(PDFPath)} style={ destination.id !== null || focusedFolder ? styles.yellowButtonSM : styles.yellowButtonSMDim}
+                          <TouchableOpacity onPress={() => generatePDF()} style={ destination.id !== null || focusedFolder ? styles.yellowButtonSM : styles.yellowButtonSMDim}
                             disabled={destination.id !== null || focusedFolder ? false : true}
                           >
                             <View style={styles.iconHolderSmall}>
@@ -471,7 +469,7 @@ const DocScanner = () => {
                           </TouchableOpacity>
 
                       
-                          <TouchableOpacity onPress={() => uploadPDF(PDFPath)} style={styles.yellowButtonSM}>
+                          <TouchableOpacity onPress={() => generatePDF()} style={styles.yellowButtonSM}>
                             <View style={styles.iconHolderSmall}>
                                 <FontAwesomeIcon icon={faBox} color='#9F37B0'/>
                             </View>
@@ -527,7 +525,10 @@ const DocScanner = () => {
                                   flex: 1,
                                   justifyContent: 'center',
                                   width: '100%',
-                                  height: '100%'
+                                  height: '100%',
+                                  borderWidth: 2,
+                                  borderColor: '#593060',
+                                  borderRadius: 20
                               }}
                           >
                               <Image 
@@ -575,7 +576,7 @@ const DocScanner = () => {
                             <Text style={{fontSize: 18, color: '#9F37B0', fontWeight: '600', marginLeft: '15%', paddingTop: '1%'}}>Scan More Documents</Text>
                           </TouchableOpacity>
                       
-                        <TouchableOpacity onPress={() => generatePDF()} style={styles.yellowButton}>
+                        <TouchableOpacity onPress={() => setPreAdd(true)} style={styles.yellowButton}>
                           <View style={styles.iconHolderSmall}>
                             <FontAwesomeIcon icon={faCloudArrowUp} color='#9F37B0' size={22} />
                           </View>
