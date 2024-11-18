@@ -146,6 +146,7 @@ const DocScanner = () => {
 
   //generate a pdf using the scanned images
   const generatePDF = async () => {
+    setPreAdd(true)
 
     const formattedDate = format(new Date(), `yyyy-MM-dd:hh:mm:ss::${Date.now()}`)
 
@@ -156,7 +157,6 @@ const DocScanner = () => {
     .then(path => {
       alert(path)
       setPDFPath(path)
-      setPreAdd(true)
     })
     .catch(error => {
       console.log(`Failed to create PDF: ${error}`)
@@ -194,12 +194,9 @@ const DocScanner = () => {
       const filename = `${currentUser}/${formattedDate}`
       const fileRef = ref(storage, filename)
       const result = await uploadBytesResumable(fileRef, blob)
-    } catch ({name, message}) {
-      alert(message)
-      throw new Error(message)
-    }
+    
 
-      /* console.log('this is the result object: ', result)
+      console.log('this is the result object: ', result)
 
       let finalDestintation 
        if (destination.id !== null) finalDestintation = destination.id
@@ -225,7 +222,11 @@ const DocScanner = () => {
       setScannedImageArray([])
       setDestination({id: null, fileName: null, nestedUnder: null})
       setFocusedFolder(null)
-      setNameGiven(false) */
+      setNameGiven(false)
+    } catch ({name, message}) {
+      alert(message)
+      throw new Error(message)
+    }
 
   }
 
