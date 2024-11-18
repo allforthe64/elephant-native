@@ -156,7 +156,7 @@ const DocScanner = () => {
     .then(path => {
       alert(path)
       setPDFPath(path)
-      setPreAdd(true)
+      /* setPreAdd(true) */
     })
     .catch(error => {
       console.log(`Failed to create PDF: ${error}`)
