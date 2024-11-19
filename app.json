@@ -13,7 +13,7 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.elephantdev.elephantnative"
+      "bundleIdentifier": "com.billiam.elephantapp"
     },
     "android": {
       "adaptiveIcon": {
