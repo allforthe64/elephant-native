@@ -147,8 +147,6 @@ const DocScanner = () => {
   //generate a pdf using the scanned images
   const generatePDF = async () => {
 
-    const formattedDate = format(new Date(), `yyyy-MM-dd:hh:mm:ss::${Date.now()}`)
-
     return createPdf({
       pages: scannedImageArray.map(imagePath => ({imagePath})),
       outputPath: `file://${RNBlobUtil.fs.dirs.DocumentDir}/file.pdf`
