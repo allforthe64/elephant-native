@@ -24,7 +24,8 @@ import { useToast } from 'react-native-toast-notifications'
 
 //date-fns format function import for formatting dates for timestamps
 import { format } from 'date-fns'
-import { PinchGestureHandler } from 'react-native-gesture-handler'
+
+import { GestureHandlerRootView, PinchGestureHandler } from 'react-native-gesture-handler'
 
 
 const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFileMove}) => {
@@ -381,7 +382,6 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
     }
 
     const handlePinch = Animated.event([ { nativeEvent: {scale} } ], {useNativeDriver: false})
-    console.log(handlePinch)
 
     return (
         <>
@@ -745,11 +745,11 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
                                                                 <FontAwesomeIcon icon={faXmark} color={'white'} size={30}/>
                                                             </Pressable>
                                                         </View>
-                                                        <View style={{height: '60%', marginTop: '20%'}}>
-                                                            <PinchGestureHandler onGestureEvent={handlePinch}>
+                                                        <GestureHandlerRootView>
+                                                            <PinchGestureHandler onGestureEvent={handlePinch} /* onGestureEvent={() => alert('running')} */ style={{height: '60%', marginTop: '20%'}}>
                                                                 <Animated.Image source={{uri: `${fileURL}`}} style={{width: '100%', height: '100%', objectFit: 'contain', transform: [{ scale }]}}/>
                                                             </PinchGestureHandler>
-                                                        </View>
+                                                        </GestureHandlerRootView>
                                                     </View>
                                                 </Modal>
 
