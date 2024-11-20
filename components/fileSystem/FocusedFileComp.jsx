@@ -381,6 +381,7 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
     }
 
     const handlePinch = Animated.event([ { nativeEvent: {scale} } ], {useNativeDriver: false})
+    console.log(handlePinch)
 
     return (
         <>
