@@ -25,7 +25,8 @@ import { useToast } from 'react-native-toast-notifications'
 //date-fns format function import for formatting dates for timestamps
 import { format } from 'date-fns'
 
-import { GestureHandlerRootView, PinchGestureHandler } from 'react-native-gesture-handler'
+//gesture handler imports
+import { GestureHandlerRootView, PinchGestureHandler, PanGestureHandler } from 'react-native-gesture-handler'
 
 
 const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFileMove}) => {
@@ -54,7 +55,11 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
     const [editNote, setEditNote] = useState(false)
     const [noteText, setNoteText] = useState('')
     const [editingMode, setEditingMode] = useState(false)
+
+    //gesture values
     const scale = useRef(new Animated.Value(1)).current
+    const translateX = useRef(new Animated.Value(0)).current
+    const translateY = useRef(new Animated.Value(0)).current
 
     //consume toast context for notifications
     const toast = useToast()
@@ -381,7 +386,17 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
         }
     }
 
+    //gesture handlers
     const handlePinch = Animated.event([ { nativeEvent: {scale} } ], {useNativeDriver: false})
+    const handlePan = Animated.event([ {nativeEvent: {
+            translationX: translateX,
+            translationY: translateY
+        }
+        } ],
+        {
+            useNativeDriver: true
+        },
+    )
 
     return (
         <>
@@ -746,9 +761,17 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
                                                             </Pressable>
                                                         </View>
                                                         <GestureHandlerRootView>
-                                                            <PinchGestureHandler onGestureEvent={handlePinch} /* onGestureEvent={() => alert('running')} */ style={{height: '60%', marginTop: '20%'}}>
-                                                                <Animated.Image source={{uri: `${fileURL}`}} style={{width: '100%', height: '100%', objectFit: 'contain', transform: [{ scale }]}}/>
-                                                            </PinchGestureHandler>
+                                                            <PanGestureHandler onGestureEvent={handlePan}
+                                                                minPointers={1}
+                                                                maxPointers={1}
+                                                            >
+                                                                <Animated.View style={{height: '60%', marginTop: '20%'}}>
+                                                                    <PinchGestureHandler onGestureEvent={handlePinch} /* onGestureEvent={() => alert('running')} */ minPointers={2}
+                                                                    maxPointers={2} style={{width: '100%', height: '100%'}}>
+                                                                        <Animated.Image source={{uri: `${fileURL}`}} style={{width: '100%', height: '100%', objectFit: 'contain', transform: [{ scale }, {translateX}, {translateY}]}}/>
+                                                                    </PinchGestureHandler>
+                                                                </Animated.View>
+                                                            </PanGestureHandler>
                                                         </GestureHandlerRootView>
                                                     </View>
                                                 </Modal>
