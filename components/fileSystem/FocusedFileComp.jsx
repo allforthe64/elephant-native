@@ -1,4 +1,4 @@
-import { View, Text, Modal, TouchableOpacity, Pressable, TextInput, ScrollView, Keyboard, Image, Linking, StyleSheet} from 'react-native'
+import { View, Text, Modal, TouchableOpacity, Pressable, TextInput, ScrollView, Keyboard, Image, Linking, StyleSheet, Animated} from 'react-native'
 import React, {useEffect, useState, useRef} from 'react'
 
 //fontAwesome imports
@@ -24,6 +24,7 @@ import { useToast } from 'react-native-toast-notifications'
 
 //date-fns format function import for formatting dates for timestamps
 import { format } from 'date-fns'
+import { PinchGestureHandler } from 'react-native-gesture-handler'
 
 
 const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFileMove}) => {
@@ -52,6 +53,7 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
     const [editNote, setEditNote] = useState(false)
     const [noteText, setNoteText] = useState('')
     const [editingMode, setEditingMode] = useState(false)
+    const scale = useRef(new Animated.Value(1)).current
 
     //consume toast context for notifications
     const toast = useToast()
@@ -377,6 +379,8 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
         alert('Please enter a folder name')
         }
     }
+
+    const handlePinch = Animated.event([ { nativeEvent: {scale} } ], {useNativeDriver: false})
 
     return (
         <>
@@ -734,14 +738,16 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
                                                 : expanded ? 
                                                 <Modal animationType='slide' presentationStyle='pageSheet'>
                                                     {/* code to render expanded images */}
-                                                    <View style={{ paddingTop: '10%', backgroundColor: 'rgb(23 23 23)', height: '100%', width: '100%'}}>
+                                                    <View style={{ paddingTop: '10%', backgroundColor: '#593060', height: '100%', width: '100%'}}>
                                                         <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', paddingRight: '5%', paddingTop: '5%', width: '100%'}}>
                                                             <Pressable onPress={() => setExpanded(false)}>
                                                                 <FontAwesomeIcon icon={faXmark} color={'white'} size={30}/>
                                                             </Pressable>
                                                         </View>
                                                         <View style={{height: '60%', marginTop: '20%'}}>
-                                                            <Image source={{uri: `${fileURL}`}} style={{width: '100%', height: '100%', objectFit: 'contain'}}/>
+                                                            <PinchGestureHandler onGestureEvent={handlePinch}>
+                                                                <Animated.Image source={{uri: `${fileURL}`}} style={{width: '100%', height: '100%', objectFit: 'contain', transform: [{ scale }]}}/>
+                                                            </PinchGestureHandler>
                                                         </View>
                                                     </View>
                                                 </Modal>
