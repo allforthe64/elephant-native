@@ -26,7 +26,8 @@ import { useToast } from 'react-native-toast-notifications'
 import { format } from 'date-fns'
 
 //gesture handler imports
-import { GestureHandlerRootView, PinchGestureHandler, PanGestureHandler } from 'react-native-gesture-handler'
+/* import { GestureHandlerRootView, PinchGestureHandler, PanGestureHandler } from 'react-native-gesture-handler' */
+import { ReactNativeZoomableView } from '@openspacelabs/react-native-zoomable-view'
 
 
 const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFileMove}) => {
@@ -57,9 +58,9 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
     const [editingMode, setEditingMode] = useState(false)
 
     //gesture values
-    const scale = useRef(new Animated.Value(1)).current
+    /* const scale = useRef(new Animated.Value(1)).current
     const translateX = useRef(new Animated.Value(0)).current
-    const translateY = useRef(new Animated.Value(0)).current
+    const translateY = useRef(new Animated.Value(0)).current */
 
     //consume toast context for notifications
     const toast = useToast()
@@ -387,7 +388,7 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
     }
 
     //gesture handlers
-    const handlePinch = Animated.event([ { nativeEvent: {scale} } ], {useNativeDriver: false})
+    /* const handlePinch = Animated.event([ { nativeEvent: {scale} } ], {useNativeDriver: false})
     const handlePan = Animated.event([ {nativeEvent: {
             translationX: translateX,
             translationY: translateY
@@ -396,7 +397,7 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
         {
             useNativeDriver: true
         },
-    )
+    ) */
 
     return (
         <>
@@ -760,19 +761,31 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
                                                                 <FontAwesomeIcon icon={faXmark} color={'white'} size={30}/>
                                                             </Pressable>
                                                         </View>
-                                                        <GestureHandlerRootView>
+                                                        {/* <GestureHandlerRootView>
                                                             <PanGestureHandler onGestureEvent={handlePan}
                                                                 minPointers={1}
                                                                 maxPointers={1}
                                                             >
                                                                 <Animated.View style={{height: '60%', marginTop: '20%'}}>
-                                                                    <PinchGestureHandler onGestureEvent={handlePinch} /* onGestureEvent={() => alert('running')} */ minPointers={2}
+                                                                    <PinchGestureHandler onGestureEvent={handlePinch} minPointers={2}
                                                                     maxPointers={2} style={{width: '100%', height: '100%'}}>
                                                                         <Animated.Image source={{uri: `${fileURL}`}} style={{width: '100%', height: '100%', objectFit: 'contain', transform: [{ scale }, {translateX}, {translateY}]}}/>
                                                                     </PinchGestureHandler>
                                                                 </Animated.View>
                                                             </PanGestureHandler>
-                                                        </GestureHandlerRootView>
+                                                        </GestureHandlerRootView> */}
+                                                        <View style={{height: '80%', marginTop: '10%'}}>
+                                                            <ReactNativeZoomableView
+                                                                maxZoom={10}
+                                                                minZoom={1}
+                                                                zoomStep={.5}
+                                                                initialZoom={1}
+                                                                bindToBorders={true}
+                                                                captureEvent={true}
+                                                            >
+                                                                <Image source={{uri: `${fileURL}`}} style={{width: '100%', height: '100%', objectFit: 'contain'}}/>
+                                                            </ReactNativeZoomableView>
+                                                        </View>     
                                                     </View>
                                                 </Modal>
 
