@@ -28,7 +28,7 @@ import { format } from 'date-fns'
 //import ImageManipulator object from expo
 import { manipulateAsync, SaveFormat } from 'expo-image-manipulator';
 
-import DocumentPicker from 'react-native-document-picker'
+/* import DocumentPicker from 'react-native-document-picker' */
 
 const DocumentPickerComp = () => {
 
@@ -82,6 +82,8 @@ const DocumentPickerComp = () => {
             
             DocumentPicker.pick({ allowMultiSelection: true }).then((result => {
                 console.log(result)
+                result.forEach(file => updatedFiles.push({name: file.name, uri: file.uri, size: file.size, fileType: file.name.split('.')[1]}))
+                setFiles(updatedFiles)
             }))
               
         } catch (err) {alert(err)}
@@ -507,6 +509,20 @@ const DocumentPickerComp = () => {
                                 {files.length === 0 ? 
                                     <View style={styles.noFileCon}>
                                         <Text style={styles.noFiles}>No Files Selected</Text>
+                                        <Text style={{
+                                            color: '#593060', 
+                                            marginLeft: 'auto', 
+                                            marginRight: 'auto',
+                                            marginTop: '5%',
+                                            fontSize: 15
+                                        }}>Note: press and hold a document to select multiple</Text>
+                                        <Text style={{
+                                            color: '#593060', 
+                                            marginLeft: 'auto', 
+                                            marginRight: 'auto',
+                                            marginTop: '5%',
+                                            fontSize: 15
+                                        }}>Note: tap desired images to select mutliple</Text>
                                     </View>
                                 :
                                     <View style={styles.scrollCon}>
@@ -588,10 +604,7 @@ const styles = StyleSheet.create({
       },
     noFiles: {
         color: '#593060', 
-        marginLeft: 'auto', 
-        marginRight: 'auto', 
-        marginTop: 'auto', 
-        marginBottom: 'auto'
+        fontSize: 20
     },
     container: {
         flex: 1,
