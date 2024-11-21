@@ -4,7 +4,7 @@ import {View, Text, StyleSheet, ScrollView, TouchableOpacity, Modal, Pressable, 
 //FileRow component import
 import FileRow from '../../components/documentPicker/FileRow'
 
-import * as DocumentPicker from 'expo-document-picker'
+/* import * as DocumentPicker from 'expo-document-picker' */
 import * as ImagePicker from 'expo-image-picker'
 
 
@@ -27,6 +27,8 @@ import { format } from 'date-fns'
 
 //import ImageManipulator object from expo
 import { manipulateAsync, SaveFormat } from 'expo-image-manipulator';
+
+import DocumentPicker from 'react-native-document-picker'
 
 const DocumentPickerComp = () => {
 
@@ -77,14 +79,21 @@ const DocumentPickerComp = () => {
     const selectFile = async () => {
         let updatedFiles = [...files]
         try {
+            
+            DocumentPicker.pick({ allowMultiSelection: true }).then((result => {
+                console.log(result)
+            }))
+              
+        } catch (err) {alert(err)}
+        /* try {
             const files = await DocumentPicker.getDocumentAsync({copyToCacheDirectory: false, multiple: true})
 
             //map over incoming files and push them all into the file arr
-            files.assets.map(file => /* console.log(file) */updatedFiles.push({name: file.name, uri: file.uri, size: file.size, fileType: file.name.split('.')[1]}))
+            files.assets.forEach(file => updatedFiles.push({name: file.name, uri: file.uri, size: file.size, fileType: file.name.split('.')[1]}))
             setFiles(updatedFiles)
         } catch (err) {
             console.log(err)
-        }
+        } */
         
     }
 
