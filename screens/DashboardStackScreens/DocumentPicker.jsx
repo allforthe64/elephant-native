@@ -89,19 +89,28 @@ const DocumentPickerComp = () => {
     }
 
     const selectImage = async () => {
+        try {
         let updatedFiles = [...files]
         // No permissions request is necessary for launching the image library
-        let img = await ImagePicker.launchImageLibraryAsync({
+        const imgs = await ImagePicker.launchImageLibraryAsync({
           mediaTypes: ImagePicker.MediaTypeOptions.All,
           aspect: [4, 3],
           quality: 1,
+          allowsMultipleSelection: true
         });
+        if (!imgs.canceled) {
+            imgs.assets.forEach(img => {
+                const fileName = img.uri.substring(img.uri.lastIndexOf('/') + 1, img.uri.length)
+    
+                updatedFiles.push({name: fileName, uri: img.uri, fileType: fileName.split('.')[1]})
+            })
+            
+            console.log(updatedFiles)
+    
+            setFiles(updatedFiles)
+        }
         
-
-        const fileName = img.assets[0].uri.substring(img.assets[0].uri.lastIndexOf('/') + 1, img.assets[0].uri.length)
-
-        updatedFiles.push({name: fileName, uri: img.assets[0].uri, fileType: fileName.split('.')[1]})
-        setFiles(updatedFiles)
+        } catch (err) {console.log(err)}
 
     };
 
