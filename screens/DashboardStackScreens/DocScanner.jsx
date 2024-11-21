@@ -50,6 +50,9 @@ const DocScanner = () => {
   const [destination, setDestination] = useState({id: null, fileName: null, nestedUnder: null})
   const [PDFPath, setPDFPath] = useState()
 
+  //initialize ref for name
+  const nameRef = useRef()
+
   const currentUser = firebaseAuth.currentUser.uid
 
   const toast = useToast()
@@ -252,7 +255,9 @@ const DocScanner = () => {
     <>
       {preAdd ? 
 
-        <Modal animationType='slide' presentationStyle='pageSheet'>
+        <Modal animationType='slide' presentationStyle='pageSheet' onShow={() => setTimeout(()=>{
+          nameRef.current.focus()
+      }, 200)}>
           <View style={{height: '100%', width: '100%', backgroundColor: '#593060'}}>
               {/* if the moveFile state is true, display the modal with the file movement code*/}
               {/* xMark icon for closing out the moveFile modal */}
@@ -279,7 +284,7 @@ const DocScanner = () => {
                       <View style={styles.iconHolder}>
                         <FontAwesomeIcon icon={faFile} size={22} color='#9F37B0'/>
                       </View>
-                      <TextInput value={docName} style={{color: 'white', fontSize: 20, fontWeight: 'bold', borderBottomColor: 'white', borderBottomWidth: 2, width: '70%'}} onChangeText={(e) => setDocName(e)} autoFocus/>
+                      <TextInput value={docName} style={{color: 'white', fontSize: 20, fontWeight: 'bold', borderBottomColor: 'white', borderBottomWidth: 2, width: '70%'}} onChangeText={(e) => setDocName(e)} ref={nameRef}/>
                   </View>
                   <View style={{width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', paddingTop: '5%'}}>
                     <TouchableOpacity style={docName === '' ? styles.yellowButtonXSDim : styles.yellowButtonXS}

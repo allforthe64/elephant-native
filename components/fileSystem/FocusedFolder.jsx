@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View, Keyboard, Modal, Pressable } from 'react-native'
-import React, {useEffect, useState} from 'react'
+import React, {useEffect, useState, useRef} from 'react'
 import { ScrollView, TouchableOpacity, TextInput } from 'react-native-gesture-handler'
 
 //fontAwesome imports
@@ -24,6 +24,9 @@ const FocusedFolder = ({folder, folders, clear, getTargetFolder, addFolder, rena
     const [focusedFile, setFocusedFile] = useState()
     const [keybaordClosed, setKeyboardClosed] = useState(true)
     const [nestedFiles, setNestedFiles] = useState([])
+
+    //initialize ref for addFolder form
+    const folderRef = useRef()
     
 
 
@@ -132,7 +135,9 @@ const FocusedFolder = ({folder, folders, clear, getTargetFolder, addFolder, rena
                         </ScrollView> 
                     </View>
                     {add ? 
-                        <Modal presentationStyle='pageSheet' animationType='slide'>
+                        <Modal presentationStyle='pageSheet' animationType='slide' onShow={() => setTimeout(()=>{
+                            folderRef.current.focus()
+                        }, 200)}>
                             <View style={{height: '100%', width: '100%', backgroundColor: '#593060'}}>
                                 <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', paddingRight: '5%', paddingTop: '10%',width: '100%'}}>
                                     <Pressable onPress={() => {
@@ -149,7 +154,7 @@ const FocusedFolder = ({folder, folders, clear, getTargetFolder, addFolder, rena
                                         <View style={styles.iconHolder}>
                                         <FontAwesomeIcon icon={faFolder} size={22} color='#9F37B0'/>
                                         </View>
-                                        <TextInput value={newFolderName} style={{color: 'white', fontSize: 22, fontWeight: 'bold', borderBottomColor: 'white', borderBottomWidth: 2, width: '70%', marginLeft: '5%'}} onChangeText={(e) => setNewFolderName(e)} autoFocus onFocus={() => setKeyboardClosed(false)} onBlur={() => {if (newFolderName === '') setAdd(false)}}/>
+                                        <TextInput value={newFolderName} style={{color: 'white', fontSize: 22, fontWeight: 'bold', borderBottomColor: 'white', borderBottomWidth: 2, width: '70%', marginLeft: '5%'}} onChangeText={(e) => setNewFolderName(e)} onFocus={() => setKeyboardClosed(false)} ref={folderRef} onBlur={() => {if (newFolderName === '') setAdd(false)}}/>
                                     </View>
                                     <Pressable style={styles.nonFolderButtonSM}
                                         onPress={() => {

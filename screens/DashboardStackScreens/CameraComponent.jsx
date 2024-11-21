@@ -63,6 +63,7 @@ try {
     const [mediaName, setMediaName] = useState('')
     const [destination, setDestination] = useState({id: null, fileName: null, nestedUnder: null})
     const cameraRef = useRef()
+    const nameRef = useRef()
 
         const currentUser = firebaseAuth.currentUser.uid
 
@@ -484,7 +485,9 @@ try {
 
   return (
     preAdd ?
-        <Modal animationType='slide' presentationStyle='pageSheet'>
+        <Modal animationType='slide' presentationStyle='pageSheet' onShow={() => setTimeout(()=>{
+            nameRef.current.focus()
+        }, 200)}>
             <View style={{height: '100%', width: '100%', backgroundColor: '#593060'}}>
                 {/* if the moveFile state is true, display the modal with the file movement code*/}
                 {/* xMark icon for closing out the moveFile modal */}
@@ -506,12 +509,12 @@ try {
 
                 !nameGiven ?
                 <>
-                    <Text style={{color: 'white', fontSize: 35, fontWeight: '700', marginTop: '35%', textAlign: 'center'}}>{photo ? 'Name Photo' : 'Name Video: '}</Text>
+                    <Text style={{color: 'white', fontSize: 35, fontWeight: '700', marginTop: '30%', textAlign: 'center'}}>{photo ? 'Name Photo' : 'Name Video: '}</Text>
                     <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', marginTop: '10%'}}>
                         <View style={styles.iconHolder}>
                             <FontAwesomeIcon icon={faFile} size={22} color='#9F37B0'/>
                         </View>
-                        <TextInput value={mediaName} style={{color: 'white', fontSize: 20, fontWeight: 'bold', borderBottomColor: 'white', borderBottomWidth: 2, width: '70%'}} onChangeText={(e) => setMediaName(e)} autoFocus/>
+                        <TextInput value={mediaName} style={{color: 'white', fontSize: 20, fontWeight: 'bold', borderBottomColor: 'white', borderBottomWidth: 2, width: '70%'}} onChangeText={(e) => setMediaName(e)} ref={nameRef}/>
                     </View>
                     <View style={{width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', paddingTop: '5%'}}>
                         <TouchableOpacity style={mediaName === '' ? styles.yellowButtonXSDim : styles.yellowButtonXS}

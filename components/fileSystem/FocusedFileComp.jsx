@@ -1,4 +1,4 @@
-import { View, Text, Modal, TouchableOpacity, Pressable, TextInput, ScrollView, Keyboard, Image, Linking, StyleSheet, Animated} from 'react-native'
+import { View, Text, Modal, TouchableOpacity, Pressable, TextInput, ScrollView, Keyboard, Image, Linking, StyleSheet} from 'react-native'
 import React, {useEffect, useState, useRef} from 'react'
 
 //fontAwesome imports
@@ -26,7 +26,6 @@ import { useToast } from 'react-native-toast-notifications'
 import { format } from 'date-fns'
 
 //gesture handler imports
-/* import { GestureHandlerRootView, PinchGestureHandler, PanGestureHandler } from 'react-native-gesture-handler' */
 import { ReactNativeZoomableView } from '@openspacelabs/react-native-zoomable-view'
 
 
@@ -130,10 +129,11 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
     useEffect(() => {
         if (fileURL && fileObj && fileObj.documentType === 'txt' && !file.fileName.includes('URL for:')) {
             setEditNote(true)
+            
             fetch(fileURL).then(result => result.text())
             .then(text => {
                 setNoteText(text)
-            })
+            }) 
         }
     }, [fileURL, fileObj])
 
@@ -656,7 +656,9 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
                         )
                         : editNote ?
                             (
-                                <Modal animationType='slide' presentationStyle='pageSheet' >
+                                <Modal animationType='slide' presentationStyle='pageSheet' onShow={() => setTimeout(()=>{
+                                    ref.current.focus()
+                                }, 200)}>
                                     <View style={{height: '100%', width: '100%', backgroundColor: '#593060'}}>
                                         {/* if the moveFile state is true, display the modal with the file movement code*/}
                                         {/* xMark icon for closing out the moveFile modal */}
@@ -682,7 +684,6 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
                                                 padding: '3%'
                                             }}
                                             onChangeText={(text) => setNoteText(text)}
-                                            autoFocus={true}
                                             onFocus={() => setEditingMode(true)}
                                             ref={ref}
                                             />

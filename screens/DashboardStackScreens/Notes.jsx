@@ -36,6 +36,9 @@ const Notepad = () => {
     const [nameGiven, setNameGiven] = useState(false)
     const [noteName, setNoteName] = useState('')
 
+    //initialize name ref
+    const nameRef = useRef()
+
     const toast = useToast()
 
     //get the auth user context object
@@ -204,7 +207,9 @@ const Notepad = () => {
     <>
       {preAdd ? 
 
-        <Modal animationType='slide' presentationStyle='pageSheet'>
+        <Modal animationType='slide' presentationStyle='pageSheet' onShow={() => setTimeout(()=>{
+          nameRef.current.focus()
+        }, 200)}>
           <View style={{height: '100%', width: '100%', backgroundColor: '#593060'}}>
               {/* if the moveFile state is true, display the modal with the file movement code*/}
               {/* xMark icon for closing out the moveFile modal */}
@@ -231,7 +236,7 @@ const Notepad = () => {
                       <View style={styles.iconHolder}>
                         <FontAwesomeIcon icon={faFile} size={22} color='#9F37B0'/>
                       </View>
-                      <TextInput value={noteName} style={{color: 'white', fontSize: 20, fontWeight: 'bold', borderBottomColor: 'white', borderBottomWidth: 2, width: '70%'}} onChangeText={(e) => setNoteName(e)} autoFocus/>
+                      <TextInput value={noteName} style={{color: 'white', fontSize: 20, fontWeight: 'bold', borderBottomColor: 'white', borderBottomWidth: 2, width: '70%'}} onChangeText={(e) => setNoteName(e)} ref={nameRef}/>
                     </View>
                     <View style={{width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', paddingTop: '5%'}}>
                         <TouchableOpacity style={noteName === '' ? styles.yellowButtonXSDim : styles.yellowButtonXS}
