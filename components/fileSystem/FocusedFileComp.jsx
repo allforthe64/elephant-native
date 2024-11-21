@@ -128,7 +128,8 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
     }, [focusedFolder, addFolderForm])
 
     useEffect(() => {
-        if (fileURL && fileObj && fileObj.documentType === 'txt') {
+        if (fileURL && fileObj && fileObj.documentType === 'txt' && !file.fileName.includes('URL for:')) {
+            setEditNote(true)
             fetch(fileURL).then(result => result.text())
             .then(text => {
                 setNoteText(text)
@@ -700,7 +701,7 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
                                                     <View style={styles.iconHolderSmall}>
                                                         <FontAwesomeIcon icon={faCheck} size={18} color='#9F37B0' />
                                                     </View>
-                                                    <Text style={editingMode ? {fontSize: 18, color: '#9F37B0', fontWeight: '600', marginLeft: '15%', paddingTop: '.5%'} : {fontSize: 18, color: '#9F37B0', fontWeight: '600', marginLeft: '25%', paddingTop: '.5%'}}>{editingMode ? 'Finished Editing' : 'Save Note'}</Text>
+                                                    <Text style={editingMode ? {fontSize: 18, color: '#9F37B0', fontWeight: '600', marginLeft: '18%', paddingTop: '.5%'} : {fontSize: 18, color: '#9F37B0', fontWeight: '600', marginLeft: '25%', paddingTop: '.5%'}}>{editingMode ? 'Finished Editing' : 'Save Note'}</Text>
                                                 </TouchableOpacity>
                                             </View>
                                         </View>
@@ -849,7 +850,7 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
                                                                             <View style={styles.iconHolder}>
                                                                                 {fileURL ? <FontAwesomeIcon icon={faArrowUpRightFromSquare} size={22} style={{marginTop: '2%'}} color='#9F37B0'/> : <></>}
                                                                             </View>
-                                                                            <Text style={{fontSize: 22, color: '#9F37B0', fontWeight: '600'}}>Go To URL</Text>
+                                                                            <Text style={{fontSize: 22, color: '#9F37B0', fontWeight: '600', marginTop: '2%', marginLeft: '20%'}}>Go To URL</Text>
                                                                         </TouchableOpacity>
                                                                     : fileObj.documentType === 'm4a' || fileObj.documentType === 'mp3' ? 
                                                                         <TouchableOpacity style={styles.yellowButton}
@@ -872,7 +873,7 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
                                                                             <View style={styles.iconHolder}>
                                                                                 <FontAwesomeIcon icon={faPencil} color='#9F37B0' size={22}/>
                                                                             </View>
-                                                                            <Text style={{fontSize: 22, color: '#9F37B0', fontWeight: '600', marginLeft: '22%', paddingTop: '1.5%'}}>Edit Note</Text>
+                                                                            <Text style={{fontSize: 22, color: '#9F37B0', fontWeight: '600', marginLeft: '14%', paddingTop: '2%'}}>View/Edit Note</Text>
                                                                         </TouchableOpacity>
                                                                         :
                                                                         <></>}
