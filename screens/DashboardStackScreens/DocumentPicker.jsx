@@ -28,7 +28,7 @@ import { format } from 'date-fns'
 //import ImageManipulator object from expo
 import { manipulateAsync, SaveFormat } from 'expo-image-manipulator';
 
-/* import DocumentPicker from 'react-native-document-picker' */
+import DocumentPicker from 'react-native-document-picker'
 
 const DocumentPickerComp = () => {
 
