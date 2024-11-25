@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, ActivityIndicator, StyleSheet } from 'react-native';
 import PDFReader from 'react-native-pdf';
-import storage from '@react-native-firebase/storage';
 import * as FileSystem from 'expo-file-system';
 
 const PDFViewer = ({ fileURL }) => {
