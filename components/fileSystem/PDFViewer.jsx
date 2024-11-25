@@ -24,22 +24,24 @@ const PDFViewer = ({ fileURL }) => {
   };
 
   useEffect(() => {
-    const fetchAndDisplayPDF = async () => {
-      try {
-        setLoading(true);
-
-        // Download the PDF file to local storage
-        const localUri = await downloadPDF(fileURL);
-        setPdfUri(localUri);
-      } catch (error) {
-        console.error('Error loading PDF:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchAndDisplayPDF();
-  }, [filePath]);
+    if (fileURL) {
+        const fetchAndDisplayPDF = async () => {
+            try {
+              setLoading(true);
+      
+              // Download the PDF file to local storage
+              const localUri = await downloadPDF(fileURL);
+              setPdfUri(localUri);
+            } catch (error) {
+              console.error('Error loading PDF:', error);
+            } finally {
+              setLoading(false);
+            }
+          };
+      
+          fetchAndDisplayPDF();
+    }
+  }, [fileURL]);
 
   if (loading) {
     return (
