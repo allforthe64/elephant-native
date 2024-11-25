@@ -813,9 +813,11 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
                                                         : file.fileName.split('.')[1] === 'pdf' ?
                                                                 <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'center', marginTop: '10%', marginBottom: '10%'}}>
                                                                     {fileURL ? 
-                                                                        <Pressable width={300} height={150} onPress={() => setExpanded(true)}>
-                                                                            <PDFViewer fileURL={fileURL}/>
-                                                                        </Pressable>
+                                                                        <View width={300} height={300} /* onPress={() => setExpanded(true)} */>
+                                                                            <ScrollView>
+                                                                                <PDFViewer fileURL={fileURL}/>
+                                                                            </ScrollView>
+                                                                        </View>
                                                                     : 
                                                                         <View style={{height: 150}}>
                                                                             <FontAwesomeIcon icon={faImage} color='white' size={125}/>
