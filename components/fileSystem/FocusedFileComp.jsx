@@ -814,9 +814,9 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
                                                                 <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'center', marginTop: '10%', marginBottom: '10%'}}>
                                                                     {fileURL ? 
                                                                         <View width={300} height={300} /* onPress={() => setExpanded(true)} */>
-                                                                            <ScrollView>
+                                                                            {/* <ScrollView> */}
                                                                                 <PDFViewer fileURL={fileURL}/>
-                                                                            </ScrollView>
+                                                                            {/* </ScrollView> */}
                                                                         </View>
                                                                     : 
                                                                         <View style={{height: 150}}>
