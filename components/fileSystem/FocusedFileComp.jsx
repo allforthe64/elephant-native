@@ -28,6 +28,8 @@ import { format } from 'date-fns'
 //gesture handler imports
 import { ReactNativeZoomableView } from '@openspacelabs/react-native-zoomable-view'
 
+import PDFViewer from './PDFViewer'
+
 
 const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFileMove}) => {
 
@@ -808,7 +810,21 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
                                                                     </View>
                                                                 }
                                                             </View>
-                                                        :(file.fileName.split('.')[1] === 'mp4' || file.fileName.split('.')[1] === 'mov') ? 
+                                                        : file.fileName.split('.')[1] === 'pdf' ?
+                                                                <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'center', marginTop: '10%', marginBottom: '10%'}}>
+                                                                    {fileURL ? 
+                                                                        <Pressable width={300} height={150} onPress={() => setExpanded(true)}>
+                                                                            <PDFViewer fileURL={fileURL}/>
+                                                                        </Pressable>
+                                                                    : 
+                                                                        <View style={{height: 150}}>
+                                                                            <FontAwesomeIcon icon={faImage} color='white' size={125}/>
+                                                                            <Text style={{color: 'white', textAlign: 'center', marginTop: 15, fontSize: 10}}>Fetching PDF...</Text>
+                                                                        </View>
+                                                                    }
+                                                                </View>
+                                                        :
+                                                        (file.fileName.split('.')[1] === 'mp4' || file.fileName.split('.')[1] === 'mov') ? 
                                                             <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'center', marginTop: '10%', marginBottom: '10%', height: 200, width: 340, width: '100%', backgroundColor: 'black'}}>
                                                                 {fileURL ? 
                                                                     <Video style={{flex: 1, alignSelf: 'stretch', height: '100%'}} source={{uri: `${fileURL}`}} useNativeControls resizeMode ='contain' isLooping onError={(error) => alert(error)}/>
