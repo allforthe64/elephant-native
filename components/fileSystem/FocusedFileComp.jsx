@@ -779,16 +779,20 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
                                                             </PanGestureHandler>
                                                         </GestureHandlerRootView> */}
                                                         <View style={{height: '80%', marginTop: '10%'}}>
-                                                            <ReactNativeZoomableView
-                                                                maxZoom={10}
-                                                                minZoom={1}
-                                                                zoomStep={.5}
-                                                                initialZoom={1}
-                                                                bindToBorders={true}
-                                                                captureEvent={true}
-                                                            >
-                                                                <Image source={{uri: `${fileURL}`}} style={{width: '100%', height: '100%', objectFit: 'contain'}}/>
-                                                            </ReactNativeZoomableView>
+                                                            {expanded === 'img' ?
+                                                                <ReactNativeZoomableView
+                                                                    maxZoom={10}
+                                                                    minZoom={1}
+                                                                    zoomStep={.5}
+                                                                    initialZoom={1}
+                                                                    bindToBorders={true}
+                                                                    captureEvent={true}
+                                                                >
+                                                                    <Image source={{uri: `${fileURL}`}} style={{width: '100%', height: '100%', objectFit: 'contain'}}/>
+                                                                </ReactNativeZoomableView>
+                                                            :
+                                                                <PDFViewer fileURL={fileURL}/>
+                                                            }
                                                         </View>     
                                                     </View>
                                                 </Modal>
@@ -800,7 +804,7 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
                                                         {((file.fileName.split('.')[1] === 'jpg' || file.fileName.split('.')[1] === 'png' || file.fileName.split('.')[1] === 'JPG' || file.fileName.split('.')[1] === 'PNG' || file.fileName.split('.')[1] === 'jpeg' || file.fileName.split('.')[1] === 'JPEG')) ? 
                                                             <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'center', marginTop: '10%', marginBottom: '10%'}}>
                                                                 {fileURL ? 
-                                                                    <Pressable width={300} height={150} onPress={() => setExpanded(true)}>
+                                                                    <Pressable width={300} height={150} onPress={() => setExpanded('img')}>
                                                                         <Image source={{uri: `${fileURL}`}} style={{width: '100%', height: '100%', objectFit: 'contain'}}/>
                                                                     </Pressable>
                                                                 : 
@@ -814,9 +818,9 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
                                                                 <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'center', marginTop: '10%', marginBottom: '10%'}}>
                                                                     {fileURL ? 
                                                                         <View width={300} height={300} /* onPress={() => setExpanded(true)} */>
-                                                                            {/* <ScrollView> */}
+                                                                            <Pressable style={{width: '100%', height: '100%'}} onPress={() => setExpanded('pdf')}>
                                                                                 <PDFViewer fileURL={fileURL}/>
-                                                                            {/* </ScrollView> */}
+                                                                            </Pressable>
                                                                         </View>
                                                                     : 
                                                                         <View style={{height: 150}}>

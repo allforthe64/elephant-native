@@ -38,6 +38,8 @@ export default function Files({navigation: { navigate }, route}) {
   const [newFolderName, setNewFolderName] = useState('')
   const [keyBoardClosed, setKeyboardClosed] = useState(true)
 
+  const inputRef = useRef()
+
   //consume toast context for notifications
   const toast = useToast()
 
@@ -283,7 +285,9 @@ export default function Files({navigation: { navigate }, route}) {
                       </ScrollView>
                     </View>
                     {add ? 
-                    <Modal animationType='slide' presentationStyle='pageSheet'>
+                    <Modal animationType='slide' presentationStyle='pageSheet' onShow={() => setTimeout(()=>{
+                        inputRef.current.focus()
+                      }, 200)}>
                       <View style={{height: '100%', width: '100%', backgroundColor: '#593060'}}>
                         <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', paddingRight: '5%', paddingTop: '10%',width: '100%'}}>
                             <Pressable onPress={() => {
@@ -300,7 +304,7 @@ export default function Files({navigation: { navigate }, route}) {
                             <View style={styles.iconHolder}>
                               <FontAwesomeIcon icon={faFolder} size={22} color='#9F37B0'/>
                             </View>
-                            <TextInput value={newFolderName} style={{color: 'white', fontSize: 22, fontWeight: 'bold', borderBottomColor: 'white', borderBottomWidth: 2, width: '70%', marginLeft: '5%'}} onChangeText={(e) => setNewFolderName(e)} autoFocus onFocus={() => setKeyboardClosed(false)} onBlur={() => {if (newFolderName === '') setAdd(false)}}/>
+                            <TextInput value={newFolderName} style={{color: 'white', fontSize: 22, fontWeight: 'bold', borderBottomColor: 'white', borderBottomWidth: 2, width: '70%', marginLeft: '5%'}} onChangeText={(e) => setNewFolderName(e)} onFocus={() => setKeyboardClosed(false)} onBlur={() => {if (newFolderName === '') setAdd(false)}} ref={inputRef}/>
                           </View>
                           <TouchableOpacity style={styles.nonFolderButtonSM}
                             onPress={() => addFolder(newFolderName, '')}
