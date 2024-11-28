@@ -357,36 +357,39 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
     const addFolder = async (folderName, targetNest) => {
         //if the incoming targetNest is empty string, create the new folder under the home directory
         if (folderName.length > 0) {
-        if (targetNest === '') {
-            const newFile = {
-            id: Math.random().toString(20).toString().split('.')[1] + Math.random().toString(20).toString().split('.')[1],
-            fileName: folderName,
-            nestedUnder: ''
-            }
-    
-            const newFiles = [...userInst.files, newFile]
-            const updatedUser = {...userInst, files: newFiles}
-            await updateUser(updatedUser)
-            setNewFolderName('')
-            setFolders(newFiles)
-            
-        } else {           //if the incoming targetNest has a value, create the new folder with the nestedUnder property set to targetNest
-            const newFile = {
-            id: Math.random().toString(20).toString().split('.')[1] + Math.random().toString(20).toString().split('.')[1],
-            fileName: folderName,
-            nestedUnder: targetNest
-            }
+            const folderId = Math.random().toString(20).toString().split('.')[1] + Math.random().toString(20).toString().split('.')[1]
+            if (targetNest === '') { 
+                const newFile = {
+                id: folderId,
+                fileName: folderName,
+                nestedUnder: ''
+                }
+        
+                const newFiles = [...userInst.files, newFile]
+                const updatedUser = {...userInst, files: newFiles}
+                await updateUser(updatedUser)
+                setNewFolderName('')
+                setFolders(newFiles)
+                setFocusedFolder(folderId)
+                
+            } else {           //if the incoming targetNest has a value, create the new folder with the nestedUnder property set to targetNest
+                const newFile = {
+                id: folderId,
+                fileName: folderName,
+                nestedUnder: targetNest
+                }
 
-            const newFiles = [...userInst.files, newFile]
-            const updatedUser = {...userInst, files: newFiles}
-    
-            updateUser(updatedUser)
-            setAddFolderForm(false)
-            setFolders(newFiles)
-            setNewFolderName('')
-        }
+                const newFiles = [...userInst.files, newFile]
+                const updatedUser = {...userInst, files: newFiles}
+        
+                updateUser(updatedUser)
+                setAddFolderForm(false)
+                setFolders(newFiles)
+                setNewFolderName('')
+                setFocusedFolder(folderId)
+            }
         } else {
-        alert('Please enter a folder name')
+            alert('Please enter a folder name')
         }
     }
 

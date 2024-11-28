@@ -86,9 +86,10 @@ const Notepad = () => {
   const addFolder = async (folderName, targetNest) => {
     //if the incoming targetNest is empty string, create the new folder under the home directory
     if (folderName.length > 0) {
+      const folderId = Math.random().toString(20).toString().split('.')[1] + Math.random().toString(20).toString().split('.')[1]
       if (targetNest === '') {
         const newFile = {
-          id: Math.random().toString(20).toString().split('.')[1] + Math.random().toString(20).toString().split('.')[1],
+          id: folderId,
           fileName: folderName,
           nestedUnder: ''
         }
@@ -98,10 +99,11 @@ const Notepad = () => {
         await updateUser(updatedUser)
         setNewFolderName('')
         setFolders(newFiles)
+        setFocusedFolder(folderId)
         
       } else {           //if the incoming targetNest has a value, create the new folder with the nestedUnder property set to targetNest
         const newFile = {
-          id: Math.random().toString(20).toString().split('.')[1] + Math.random().toString(20).toString().split('.')[1],
+          id: folderId,
           fileName: folderName,
           nestedUnder: targetNest
         }
@@ -112,6 +114,7 @@ const Notepad = () => {
         updateUser(updatedUser)
         setAddFolderForm(false)
         setFolders(newFiles)
+        setFocusedFolder(folderId)
       }
     } else {
       alert('Please enter a folder name')

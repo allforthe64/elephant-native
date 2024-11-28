@@ -105,32 +105,35 @@ const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolder
   const addFolder = async (folderName, targetNest) => {
     //if the incoming targetNest is empty string, create the new folder under the home directory
     if (folderName.length > 0) {
-    if (targetNest === '') {
-        const newFile = {
-        id: Math.random().toString(20).toString().split('.')[1] + Math.random().toString(20).toString().split('.')[1],
-        fileName: folderName,
-        nestedUnder: ''
-        }
+    const folderId = Math.random().toString(20).toString().split('.')[1] + Math.random().toString(20).toString().split('.')[1]
+      if (targetNest === '') {
+          const newFile = {
+          id: folderId,
+          fileName: folderName,
+          nestedUnder: ''
+          }
 
-        const newFiles = [...userInst.files, newFile]
-        const updatedUser = {...userInst, files: newFiles}
-        await updateUser(updatedUser)
-        setNewFolderName('')
-        setAddFolderForm(false)
-    } else {           //if the incoming targetNest has a value, create the new folder with the nestedUnder property set to targetNest
-        const newFile = {
-        id: Math.random().toString(20).toString().split('.')[1] + Math.random().toString(20).toString().split('.')[1],
-        fileName: folderName,
-        nestedUnder: targetNest
-        }
+          const newFiles = [...userInst.files, newFile]
+          const updatedUser = {...userInst, files: newFiles}
+          await updateUser(updatedUser)
+          setNewFolderName('')
+          setAddFolderForm(false)
+          setFocusedFolder(folderId)
+      } else {           //if the incoming targetNest has a value, create the new folder with the nestedUnder property set to targetNest
+          const newFile = {
+          id: folderId,
+          fileName: folderName,
+          nestedUnder: targetNest
+          }
 
-        const newFiles = [...userInst.files, newFile]
-        const updatedUser = {...userInst, files: newFiles}
+          const newFiles = [...userInst.files, newFile]
+          const updatedUser = {...userInst, files: newFiles}
 
-        await updateUser(updatedUser)
-        setNewFolderName('')
-        setAddFolderForm(false)
-    }
+          await updateUser(updatedUser)
+          setNewFolderName('')
+          setAddFolderForm(false)
+          setFocusedFolder(folderId)
+      }
     } else {
     alert('Please enter a folder name')
     }
