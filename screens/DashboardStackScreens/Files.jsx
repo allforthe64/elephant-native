@@ -204,11 +204,10 @@ export default function Files({navigation: { navigate }, route}) {
             fileName: folderName,
             nestedUnder: ''
           }
-    
           editUser('folder', newFile, 'add')
           setNewFolderName('')
           setAdd(false)
-          setFocusedFolder(folderId)
+          
         } else {           //if the incoming targetNest has a value, create the new folder with the nestedUnder property set to targetNest
           const newFile = {
             id: folderId,
@@ -217,7 +216,6 @@ export default function Files({navigation: { navigate }, route}) {
           }
     
           editUser('folder', newFile, 'add')
-          setFocusedFolder(folderId)
         }
       } catch (err) {
         alert(err)

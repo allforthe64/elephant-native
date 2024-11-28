@@ -127,8 +127,8 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
             return value.nestedUnder === focusedFolder
         })
         setSubFolders(exists)
-
-        setFocusedFolderInst(folders.filter(folder => folder.id === focusedFolder)[0])
+        
+        /* setFocusedFolderInst(folders.filter(folder => folder.id === focusedFolder)[0]) */
     }, [focusedFolder, addFolderForm])
 
     useEffect(() => {
