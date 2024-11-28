@@ -42,6 +42,7 @@ const DocumentPickerComp = () => {
     const [folders, setFolders] = useState([])
     const [newFolderName, setNewFolderName] = useState('')
     const [destination, setDestination] = useState({id: null, fileName: null, nestedUnder: null})
+    const [focusedFolderInst, setFocusedFolderInst] = useState()
 
     const currentUser = firebaseAuth.currentUser.uid
     const auth = firebaseAuth
@@ -74,6 +75,7 @@ const DocumentPickerComp = () => {
             return value.nestedUnder === focusedFolder
         })
         setSubFolders(exists)
+        setFocusedFolderInst(folders.filter(folder => folder.id === focusedFolder)[0])
     }, [focusedFolder, addFolderForm])
 
     const selectFile = async () => {
@@ -363,7 +365,8 @@ const DocumentPickerComp = () => {
                     :
 
                         <View style={{width: '100%', height: '95%', flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-                            <Text style={{fontSize: 40, color: 'white', fontWeight: 'bold', textAlign: 'left', width: '100%', paddingLeft: '5%', marginBottom: '10%'}}>Save Files To...</Text>
+                            <Text style={{fontSize: 40, color: 'white', fontWeight: 'bold', textAlign: 'left', width: '100%', paddingLeft: '5%', marginBottom: '5%'}}>Save Files To...</Text>
+                            <Text style={{fontSize: 20, color: 'white', fontWeight: 'bold', textAlign: 'left', width: '100%', paddingLeft: '5%', marginBottom: '5%'}}>Viewing: {focusedFolderInst.fileName}</Text>
 
                             <View style={focusedFolder && !subFolders ? {width: '100%', height: '55%', marginBottom: '5%', display: 'flex', justifyContent: 'center'} : {width: '100%', height: '55%', marginBottom: '5%'}}>
                                     {focusedFolder ? 

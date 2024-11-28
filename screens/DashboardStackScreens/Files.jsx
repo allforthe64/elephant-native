@@ -197,9 +197,10 @@ export default function Files({navigation: { navigate }, route}) {
     //if the incoming targetNest is empty string, create the new folder under the home directory
     if (folderName.length > 0) {
       try {
+        const folderId = Math.random().toString(20).toString().split('.')[1] + Math.random().toString(20).toString().split('.')[1]
         if (targetNest === '') {
           const newFile = {
-            id: Math.random().toString(20).toString().split('.')[1] + Math.random().toString(20).toString().split('.')[1],
+            id: folderId,
             fileName: folderName,
             nestedUnder: ''
           }
@@ -207,14 +208,16 @@ export default function Files({navigation: { navigate }, route}) {
           editUser('folder', newFile, 'add')
           setNewFolderName('')
           setAdd(false)
+          setFocusedFolder(folderId)
         } else {           //if the incoming targetNest has a value, create the new folder with the nestedUnder property set to targetNest
           const newFile = {
-            id: Math.random().toString(20).toString().split('.')[1] + Math.random().toString(20).toString().split('.')[1],
+            id: folderId,
             fileName: folderName,
             nestedUnder: targetNest
           }
     
           editUser('folder', newFile, 'add')
+          setFocusedFolder(folderId)
         }
       } catch (err) {
         alert(err)

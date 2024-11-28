@@ -49,6 +49,7 @@ const DocScanner = () => {
   const [preAdd, setPreAdd] = useState(false)
   const [destination, setDestination] = useState({id: null, fileName: null, nestedUnder: null})
   const [PDFPath, setPDFPath] = useState()
+  const [focusedFolderInst, setFocusedFolderInst] = useState()
 
   //initialize ref for name
   const nameRef = useRef()
@@ -79,6 +80,10 @@ const DocScanner = () => {
     if(userInst)
     setFolders(userInst.files)
   }, [userInst, addFolderForm])
+
+  useEffect(() => {
+    setFocusedFolderInst(folders.filter(folder => folder.id === focusedFolder)[0])
+  }, [focusedFolder])
 
   //add a folder
   const addFolder = async (folderName, targetNest) => {
@@ -353,7 +358,8 @@ const DocScanner = () => {
               :
 
                   <View style={{width: '100%', height: '95%', flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-                      <Text style={{fontSize: 40, color: 'white', fontWeight: 'bold', textAlign: 'left', width: '100%', paddingLeft: '5%', marginBottom: '10%'}}>Save PDF To...</Text>
+                      <Text style={{fontSize: 40, color: 'white', fontWeight: 'bold', textAlign: 'left', width: '100%', paddingLeft: '5%', marginBottom: '5%'}}>Save PDF To...</Text>
+                      <Text style={{fontSize: 20, color: 'white', fontWeight: 'bold', textAlign: 'left', width: '100%', paddingLeft: '5%', marginBottom: '5%'}}>Viewing: {focusedFolderInst.fileName}</Text>
 
                       <View style={focusedFolder && !subFolders ? {width: '100%', height: '55%', marginBottom: '10%', display: 'flex', justifyContent: 'center'} : {width: '100%', height: '55%', marginBottom: '10%'}}>
                               {focusedFolder ? 

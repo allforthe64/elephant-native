@@ -35,6 +35,7 @@ const Notepad = () => {
     const [newFolderName, setNewFolderName] = useState('')
     const [nameGiven, setNameGiven] = useState(false)
     const [noteName, setNoteName] = useState('')
+    const [focusedFolderInst, setFocusedFolderInst] = useState()
 
     //initialize name ref
     const nameRef = useRef()
@@ -80,6 +81,7 @@ const Notepad = () => {
     useEffect(() => {
       console.log(destination.id)
       console.log(focusedFolder)
+      setFocusedFolderInst(folders.filter(folder => folder.id === focusedFolder)[0])
     }, [destination, focusedFolder])
 
     //add a folder
@@ -308,7 +310,8 @@ const Notepad = () => {
               :
 
                   <View style={{width: '100%', height: '95%', flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-                      <Text style={{fontSize: 40, color: 'white', fontWeight: 'bold', textAlign: 'left', width: '100%', paddingLeft: '5%', marginBottom: '10%'}}>Save Note To...</Text>
+                      <Text style={{fontSize: 40, color: 'white', fontWeight: 'bold', textAlign: 'left', width: '100%', paddingLeft: '5%', marginBottom: '5%'}}>Save Note To...</Text>
+                      <Text style={{fontSize: 20, color: 'white', fontWeight: 'bold', textAlign: 'left', width: '100%', paddingLeft: '5%', marginBottom: '5%'}}>Viewing: {focusedFolderInst.fileName}</Text>
 
                       <View style={focusedFolder && !subFolders ? {width: '100%', height: '55%', marginBottom: '10%', display: 'flex', justifyContent: 'center'} : {width: '100%', height: '55%', marginBottom: '10%'}}>
                               {focusedFolder ? 
