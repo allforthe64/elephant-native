@@ -72,8 +72,8 @@ export default function Files({navigation: { navigate }, route}) {
 
   //get the files and folders nested under a particular folder
   const getTargetFolder = (input) => {
-    const targetFiles = currentUser.fileRefs.filter(file => {if(file.flag === input.id) return file})
-    const targetFolders = currentUser.files.filter(file => {if(file.nestedUnder === input.id) return file})
+    const targetFiles = currentUser.fileRefs.filter(file => {if (file.flag === input.id) return file})
+    const targetFolders = currentUser.files.filter(file => {if (file.nestedUnder === input.id) return file})
     setFocusedFolder({folder: input, files: targetFiles, folders: targetFolders})
   }
 
@@ -207,6 +207,7 @@ export default function Files({navigation: { navigate }, route}) {
           editUser('folder', newFile, 'add')
           setNewFolderName('')
           setAdd(false)
+          setFocusedFolder({folder: newFile, files: [], folders: []})
           
         } else {           //if the incoming targetNest has a value, create the new folder with the nestedUnder property set to targetNest
           const newFile = {
@@ -216,6 +217,9 @@ export default function Files({navigation: { navigate }, route}) {
           }
     
           editUser('folder', newFile, 'add')
+          setNewFolderName('')
+          setAdd(false)
+          setFocusedFolder({folder: newFile, files: [], folders: []})
         }
       } catch (err) {
         alert(err)

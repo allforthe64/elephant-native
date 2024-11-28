@@ -127,7 +127,7 @@ try {
 
         useEffect(() => {
             if (folders && focusedFolder) {
-                setFocusedFolderInst(folders => folders.filter(folder => folder.id === focusedFolder)[0])
+                setFocusedFolderInst(folders.filter(folder => folder.id === focusedFolder)[0])
             }
         }, [folders, focusedFolder])
 
