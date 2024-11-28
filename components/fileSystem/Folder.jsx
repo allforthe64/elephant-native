@@ -9,7 +9,7 @@ import { faArrowRight, faEllipsisVertical, faFloppyDisk, faFolder, faPencil, faT
 import { firebaseAuth } from '../../firebaseConfig';
 import { userListener } from '../../firebase/firestore';
 
-const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolderFunc, folders, updateUser}) => {
+const Folder = ({folder, focusedFolder, getTargetFolder, deleteFolder, renameFolder, moveFolderFunc, folders, updateUser}) => {
 
   const [visible, setVisible] = useState(false)
   const [preDelete, setPreDelete] = useState(false)
@@ -23,6 +23,7 @@ const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolder
   const [addFolderForm, setAddFolderForm] = useState(false)
   const [newFolderName, setNewFolderName] = useState('')
   const [userInst, setUserInst] = useState()
+  const [focusedFolderInst, setFocusedFolderInst] = useState()
 
   const auth = firebaseAuth
 
@@ -35,6 +36,13 @@ const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolder
     }
     else setValidFolders(folders)
   }, [folders, addFolderForm])
+
+  useEffect(() => {
+    if (focusedFolder && folders) {
+      const focusedFolderId = focusedFolder.id ? focusedFolder.id : focusedFolder
+      setFocusedFolderInst(folders.filter(folder => folder.id === focusedFolderId)[0])
+    }
+  }, [folders, focusedFolder])
 
   //get the current user 
   useEffect(() => {
@@ -249,7 +257,13 @@ const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolder
                             </View>
                           <View style={{width: '100%', height: '95%', flex: 1, justifyContent: 'center', alignItems: 'center'}}>
                             {!addFolderForm &&
-                              <Text style={{fontSize: 40, color: 'white', fontWeight: 'bold', textAlign: 'left', width: '100%', paddingLeft: '5%', marginBottom: '10%'}}>Move To...</Text>
+                              <>
+                                <Text style={{fontSize: 40, color: 'white', fontWeight: 'bold', textAlign: 'left', width: '100%', paddingLeft: '5%', marginBottom: '5%'}}>Move To...</Text>
+                                {focusedFolderInst &&
+
+                                  <Text style={{fontSize: 20, color: 'white', fontWeight: 'bold', textAlign: 'left', width: '100%', paddingLeft: '5%', marginBottom: '5%'}}>Move To...</Text>
+                                }
+                              </>
                             }
                             {addFolderForm ? 
                               <View style={{width: '100%', height: '100%', display: 'flex', flexDirection:'column', alignItems: 'center'}}>

@@ -130,7 +130,7 @@ const FocusedFolder = ({folder, folders, clear, getTargetFolder, addFolder, rena
                     </View>
                     <View style={add ? {height: 250} : {height: 365, marginBottom: '10%'}}>
                         <ScrollView style={{height: '100%'}}>
-                            {folder.folders.map((f, i) => {return <Folder key={f + i} getTargetFolder={getTargetFolder} folders={folders} renameFolder={renameFolder} moveFolderFunc={moveFolder} folder={f} deleteFolder={deleteFolder} updateUser={updateUser}/>})}
+                            {folder.folders.map((f, i) => {return <Folder key={f + i} focusedFolder={folder} getTargetFolder={getTargetFolder} folders={folders} renameFolder={renameFolder} moveFolderFunc={moveFolder} folder={f} deleteFolder={deleteFolder} updateUser={updateUser}/>})}
                             {nestedFiles.map((file, i) => {return <File key={file + i} focus={setFocusedFile} file={file} />})}
                         </ScrollView> 
                     </View>
