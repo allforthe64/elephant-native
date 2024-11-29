@@ -9,7 +9,7 @@ import { faArrowRight, faEllipsisVertical, faFloppyDisk, faFolder, faPencil, faT
 import { firebaseAuth } from '../../firebaseConfig';
 import { userListener } from '../../firebase/firestore';
 
-const Folder = ({folder, focusedFolder, getTargetFolder, deleteFolder, renameFolder, moveFolderFunc, folders, updateUser}) => {
+const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolderFunc, folders, updateUser}) => {
 
   const [visible, setVisible] = useState(false)
   const [preDelete, setPreDelete] = useState(false)
@@ -39,8 +39,8 @@ const Folder = ({folder, focusedFolder, getTargetFolder, deleteFolder, renameFol
 
   useEffect(() => {
     if (focusedFolder && folders) {
-      const focusedFolderId = focusedFolder.id ? focusedFolder.id : focusedFolder
-      setFocusedFolderInst(folders.filter(folder => folder.id === focusedFolderId)[0])
+      
+      setFocusedFolderInst(folders.filter(folder => folder.id === focusedFolder)[0])
     }
   }, [folders, focusedFolder])
 
