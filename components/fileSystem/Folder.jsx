@@ -261,7 +261,7 @@ const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolder
                                 <Text style={{fontSize: 40, color: 'white', fontWeight: 'bold', textAlign: 'left', width: '100%', paddingLeft: '5%', marginBottom: '5%'}}>Move To...</Text>
                                 {focusedFolderInst &&
 
-                                  <Text style={{fontSize: 20, color: 'white', fontWeight: 'bold', textAlign: 'left', width: '100%', paddingLeft: '5%', marginBottom: '5%'}}>Move To...</Text>
+                                  <Text style={{fontSize: 20, color: 'white', fontWeight: 'bold', textAlign: 'left', width: '100%', paddingLeft: '5%', marginBottom: '5%'}}>Viewing: {focusedFolderInst.fileName}</Text>
                                 }
                               </>
                             }
@@ -323,9 +323,35 @@ const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolder
                                           <Text style={{fontSize: 30, color: 'white', fontWeight: 'bold', marginTop: '30%', textAlign: 'center'}}>No Subfolders...</Text>
                                       :
                                         <>
-                                          {validFolders.map((f, index) => {
-                                              if (focusedFolder) {
-                                                  if (f.nestedUnder === focusedFolder) {
+                                          {validFolders === 0 ?
+                                            <Text style={{fontSize: 30, color: 'white', fontWeight: 'bold', marginTop: '30%', textAlign: 'center'}}>No subfolders (Cannot move a home folder to subfolder of a home folder to prevent infinite nesting)</Text>
+                                          :
+                                            <>
+                                              {validFolders.map((f, index) => {
+                                                  if (focusedFolder) {
+                                                      if (f.nestedUnder === focusedFolder) {
+                                                              return (
+                                                                  <Pressable key={index} style={{display: 'flex', flexDirection: 'row', justifyContent: 'center', marginTop: '1%'}} onPress={() => {
+                                                                          if (destination.id === null || f.id !== destination.id) {
+                                                                              setDestination({id: f.id, fileName: f.fileName, nestedUnder: f.nestedUnder})
+                                                                          } else {
+                                                                              setFocusedFolder(f.id)
+                                                                              setDestination({id: null, fileName: null, nestedUnder: null})
+                                                                          }
+                                                                      }
+                                                                      }>
+                                                                      <View style={f.id === destination.id ? styles.moveFolderWhite : styles.moveFolder}>
+                                                                      <View style={f.id === destination.id ? styles.iconHolderBlack : styles.iconHolderWhite}>
+                                                                          <FontAwesomeIcon icon={faFolder} size={28} color={f.id === destination.id ? 'white' : '#9F37B0'}/>
+                                                                      </View>
+                                                                      <Text style={f.id === destination.id ? {color: 'black', fontSize: 28, width: '80%', paddingTop: '1%'} : {color: '#9F37B0', fontSize: 28, width: '80%', textAlign: 'left', paddingTop: '1%'}}>{f.fileName}</Text>
+                                                                      </View>
+                                                                  </Pressable>
+                                                              )
+                                                          
+                                                      }
+                                                  } else {
+                                                      if (f.id !== folder.nestedUnder && f.nestedUnder === '') {
                                                           return (
                                                               <Pressable key={index} style={{display: 'flex', flexDirection: 'row', justifyContent: 'center', marginTop: '1%'}} onPress={() => {
                                                                       if (destination.id === null || f.id !== destination.id) {
@@ -343,33 +369,13 @@ const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolder
                                                                   <Text style={f.id === destination.id ? {color: 'black', fontSize: 28, width: '80%', paddingTop: '1%'} : {color: '#9F37B0', fontSize: 28, width: '80%', textAlign: 'left', paddingTop: '1%'}}>{f.fileName}</Text>
                                                                   </View>
                                                               </Pressable>
-                                                          )
-                                                      
-                                                  }
-                                              } else {
-                                                  if (f.id !== folder.nestedUnder && f.nestedUnder === '') {
-                                                      return (
-                                                          <Pressable key={index} style={{display: 'flex', flexDirection: 'row', justifyContent: 'center', marginTop: '1%'}} onPress={() => {
-                                                                  if (destination.id === null || f.id !== destination.id) {
-                                                                      setDestination({id: f.id, fileName: f.fileName, nestedUnder: f.nestedUnder})
-                                                                  } else {
-                                                                      setFocusedFolder(f.id)
-                                                                      setDestination({id: null, fileName: null, nestedUnder: null})
-                                                                  }
-                                                              }
-                                                              }>
-                                                              <View style={f.id === destination.id ? styles.moveFolderWhite : styles.moveFolder}>
-                                                              <View style={f.id === destination.id ? styles.iconHolderBlack : styles.iconHolderWhite}>
-                                                                  <FontAwesomeIcon icon={faFolder} size={28} color={f.id === destination.id ? 'white' : '#9F37B0'}/>
-                                                              </View>
-                                                              <Text style={f.id === destination.id ? {color: 'black', fontSize: 28, width: '80%', paddingTop: '1%'} : {color: '#9F37B0', fontSize: 28, width: '80%', textAlign: 'left', paddingTop: '1%'}}>{f.fileName}</Text>
-                                                              </View>
-                                                          </Pressable>
-                                                          )
+                                                              )
+                                                          }
                                                       }
                                                   }
-                                              }
-                                          )}   
+                                              )}   
+                                            </>
+                                          }
                                         </>
                                       }
                                     </ScrollView>

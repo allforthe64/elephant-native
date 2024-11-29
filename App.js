@@ -27,15 +27,15 @@ Sentry.init({
 
 
 //set a handler to take care of all native errors
-setNativeExceptionHandler((errorString) => {
+/* setNativeExceptionHandler((errorString) => {
   Sentry.captureException(new Error(errorString))
 });
-
+ */
 
 //set a handler to take care of all JS errors
-setJSExceptionHandler((error, isFatal) => {
+/* setJSExceptionHandler((error, isFatal) => {
   const sentryId = Sentry.captureException(new Error(error.name));
-})
+}) */
 
 export default function App() {
   return (
