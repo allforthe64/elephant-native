@@ -323,8 +323,8 @@ const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolder
                                           <Text style={{fontSize: 30, color: 'white', fontWeight: 'bold', marginTop: '30%', textAlign: 'center'}}>No Subfolders...</Text>
                                       :
                                         <>
-                                          {folder.nestedUnder === '' ?
-                                            <Text style={{fontSize: 30, color: 'white', fontWeight: 'bold', marginTop: '30%', textAlign: 'center'}}>No subfolders (Cannot move a home folder to subfolder of a home folder to prevent infinite nesting)</Text>
+                                          {focusedFolder && folder.nestedUnder === '' ?
+                                            <Text style={{fontSize: 14, color: 'white', fontWeight: 'bold', marginTop: '30%', textAlign: 'center'}}>No subfolders (Cannot move a home folder to subfolder of a home folder to prevent infinite nesting)</Text>
                                           :
                                             <>
                                               {validFolders.map((f, index) => {
