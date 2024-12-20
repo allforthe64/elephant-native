@@ -47,6 +47,7 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
     const [folders, setFolders] = useState({})
 
     const [fileURL, setFileURL] = useState()
+    const [wordDocPDFURL, setWordDocPDFURL] = useState('')
     const [fileObj, setFileObj] = useState()
     const [mediaPermissions, setMediaPermissions] = useState()
     const [navigateURL, setNavigateURL] = useState()
@@ -144,6 +145,23 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
             .then(text => {
                 setNoteText(text)
             }) 
+        } else if (fileURL && fileObj && fileObj.documentType === 'docx' || fileObj.documentType === 'doc' || fileObj.documentType === 'docm' || fileObj.documentType === 'dot' || fileObj.documentType === 'dotx' || fileObj.documentType === 'dotm') {
+            const convertToPDF = async (docUrl) => {
+                const response = await fetch('https://api.cloudmersive.com/convert/pdf/docx', {
+                  method: 'POST',
+                  headers: {
+                    'Apikey': 'your-cloudmersive-api-key',
+                    'Content-Type': 'application/json',
+                  },
+                  body: JSON.stringify({
+                    url: docUrl,
+                  }),
+                });
+              
+                const data = await response.json();
+                setWordDocPDFURL(data)
+              };
+            convertToPDF()
         }
     }, [fileURL, fileObj])
 
@@ -778,19 +796,6 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
                                                                 <FontAwesomeIcon icon={faXmark} color={'white'} size={30}/>
                                                             </Pressable>
                                                         </View>
-                                                        {/* <GestureHandlerRootView>
-                                                            <PanGestureHandler onGestureEvent={handlePan}
-                                                                minPointers={1}
-                                                                maxPointers={1}
-                                                            >
-                                                                <Animated.View style={{height: '60%', marginTop: '20%'}}>
-                                                                    <PinchGestureHandler onGestureEvent={handlePinch} minPointers={2}
-                                                                    maxPointers={2} style={{width: '100%', height: '100%'}}>
-                                                                        <Animated.Image source={{uri: `${fileURL}`}} style={{width: '100%', height: '100%', objectFit: 'contain', transform: [{ scale }, {translateX}, {translateY}]}}/>
-                                                                    </PinchGestureHandler>
-                                                                </Animated.View>
-                                                            </PanGestureHandler>
-                                                        </GestureHandlerRootView> */}
                                                         <View style={{height: '80%', marginTop: '10%'}}>
                                                             {expanded === 'img' ?
                                                                 <ReactNativeZoomableView
@@ -804,7 +809,7 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
                                                                     <Image source={{uri: `${fileURL}`}} style={{width: '100%', height: '100%', objectFit: 'contain'}}/>
                                                                 </ReactNativeZoomableView>
                                                             :
-                                                                <PDFViewer fileURL={fileURL}/>
+                                                                <PDFViewer fileURL={wordDocPDFURL !== '' ? wordDocPDFURL : fileURL}/>
                                                             }
                                                         </View>     
                                                     </View>
@@ -842,6 +847,21 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
                                                                         </View>
                                                                     }
                                                                 </View>
+                                                        : fileURL && fileObj && fileObj.documentType === 'docx' || fileObj.documentType === 'doc' || fileObj.documentType === 'docm' || fileObj.documentType === 'dot' || fileObj.documentType === 'dotx' || fileObj.documentType === 'dotm' && wordDocPDFURL !== '' ?
+                                                            <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'center', marginTop: '10%', marginBottom: '10%'}}>
+                                                                {wordDocPDFURL !== '' ? 
+                                                                    <View width={300} height={300} /* onPress={() => setExpanded(true)} */>
+                                                                        <Pressable style={{width: '100%', height: '100%'}} onPress={() => setExpanded('pdf')}>
+                                                                            <PDFViewer fileURL={wordDocPDFURL}/>
+                                                                        </Pressable>
+                                                                    </View>
+                                                                : 
+                                                                    <View style={{height: 150}}>
+                                                                        <FontAwesomeIcon icon={faImage} color='white' size={125}/>
+                                                                        <Text style={{color: 'white', textAlign: 'center', marginTop: 15, fontSize: 10}}>Fetching PDF...</Text>
+                                                                    </View>
+                                                                }
+                                                            </View>     
                                                         :
                                                         (file.fileName.split('.')[1] === 'mp4' || file.fileName.split('.')[1] === 'mov') ? 
                                                             <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'center', marginTop: '10%', marginBottom: '10%', height: 200, width: 340, width: '100%', backgroundColor: 'black'}}>

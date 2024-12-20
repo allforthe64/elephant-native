@@ -49,6 +49,8 @@ const File = ({file, focus}) => {
       setThumbnailURL(false)
     }
 
+    
+
   }, [file])
 
   return (
