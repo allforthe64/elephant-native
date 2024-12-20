@@ -137,6 +137,8 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
         }
     }, [folders, focusedFolder])
 
+    console.log(process.env.EXPO_CLOUDMERSIVE_KEY)
+
     useEffect(() => {
         if (fileURL && fileObj && fileObj.documentType === 'txt' && !file.fileName.includes('URL for:')) {
             setEditNote(true)
@@ -150,7 +152,7 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
                 const response = await fetch('https://api.cloudmersive.com/convert/pdf/docx', {
                   method: 'POST',
                   headers: {
-                    'Apikey': 'your-cloudmersive-api-key',
+                    'Apikey': process.env.EXPO_CLOUDMERSIVE_KEY,
                     'Content-Type': 'application/json',
                   },
                   body: JSON.stringify({
