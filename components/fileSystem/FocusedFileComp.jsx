@@ -149,7 +149,7 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
             .then(text => {
                 setNoteText(text)
             }) 
-        } else if (fileURL && file && file.fileName.split('.')[1] === 'docx' || file.fileName.split('.')[1] === 'doc' || file.fileName.split('.')[1] === 'docm' || file.fileName.split('.')[1] === 'dot' || file.fileName.split('.')[1] === 'dotx' || file.fileName.split('.')[1] === 'dotm') {
+        } else if (file && file.fileName.split('.')[1] === 'docx' || file.fileName.split('.')[1] === 'doc' || file.fileName.split('.')[1] === 'docm' || file.fileName.split('.')[1] === 'dot' || file.fileName.split('.')[1] === 'dotx' || file.fileName.split('.')[1] === 'dotm') {
             alert('running convert')
             try {
                 const convertToPDF = async (docUrl) => {
