@@ -140,6 +140,7 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
     }, [folders, focusedFolder])
 
     console.log('wordDocPDFURL: ', wordDocPDFURL)
+    console.log('fileURL: ', fileURL)
 
     useEffect(() => {
         if (fileURL && fileObj && fileObj.documentType === 'txt' && !file.fileName.includes('URL for:')) {
