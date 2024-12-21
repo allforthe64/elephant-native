@@ -139,6 +139,7 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
         }
     }, [folders, focusedFolder])
 
+    console.log('wordDocPDFURL: ', wordDocPDFURL)
 
     useEffect(() => {
         if (fileURL && fileObj && fileObj.documentType === 'txt' && !file.fileName.includes('URL for:')) {
@@ -149,22 +150,27 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
                 setNoteText(text)
             }) 
         } else if (fileURL && file && file.fileName.split('.')[1] === 'docx' || file.fileName.split('.')[1] === 'doc' || file.fileName.split('.')[1] === 'docm' || file.fileName.split('.')[1] === 'dot' || file.fileName.split('.')[1] === 'dotx' || file.fileName.split('.')[1] === 'dotm') {
-            const convertToPDF = async (docUrl) => {
-                const response = await fetch('https://api.cloudmersive.com/convert/pdf/docx', {
-                  method: 'POST',
-                  headers: {
-                    'Apikey': Constants.expoConfig.extra.EXPO_PUBLIC_EMAIL_JS_SERVICE_ID,
-                    'Content-Type': 'application/json',
-                  },
-                  body: JSON.stringify({
-                    url: docUrl,
-                  }),
-                });
-              
-                const data = await response.json();
-                setWordDocPDFURL(data)
-              };
-            convertToPDF()
+            alert('running convert')
+            try {
+                const convertToPDF = async (docUrl) => {
+                    const response = await fetch('https://api.cloudmersive.com/convert/pdf/docx', {
+                      method: 'POST',
+                      headers: {
+                        'Apikey': Constants.expoConfig.extra.EXPO_PUBLIC_EMAIL_JS_SERVICE_ID,
+                        'Content-Type': 'application/json',
+                      },
+                      body: JSON.stringify({
+                        url: docUrl,
+                      }),
+                    });
+                  
+                    const data = await response.json();
+                    setWordDocPDFURL(data)
+                  };
+                convertToPDF()
+            } catch (err) {
+                console.log(err)
+            }
         }
     }, [fileURL, fileObj])
 
