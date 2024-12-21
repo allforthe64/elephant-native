@@ -26,6 +26,7 @@
       "favicon": "./assets/favicon.png"
     },
     "extra": {
+      "EXPO_CLOUDMERSIVE": "aff46c84-15ba-4bb7-b6c2-b827cec256fb",
       "eas": {
         "projectId": "6cba667c-768f-4494-9aa8-519d41c92917"
       }

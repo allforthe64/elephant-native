@@ -30,6 +30,8 @@ import { ReactNativeZoomableView } from '@openspacelabs/react-native-zoomable-vi
 
 import PDFViewer from './PDFViewer'
 
+import Constants from 'expo-constants';
+
 
 const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFileMove}) => {
 
@@ -137,7 +139,6 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
         }
     }, [folders, focusedFolder])
 
-    console.log(process.env.EXPO_CLOUDMERSIVE_KEY)
 
     useEffect(() => {
         if (fileURL && fileObj && fileObj.documentType === 'txt' && !file.fileName.includes('URL for:')) {
@@ -147,12 +148,12 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
             .then(text => {
                 setNoteText(text)
             }) 
-        } else if (fileURL && fileObj && fileObj.documentType === 'docx' || fileObj.documentType === 'doc' || fileObj.documentType === 'docm' || fileObj.documentType === 'dot' || fileObj.documentType === 'dotx' || fileObj.documentType === 'dotm') {
+        } else if (fileURL && file && file.fileName.split('.')[1] === 'docx' || file.fileName.split('.')[1] === 'doc' || file.fileName.split('.')[1] === 'docm' || file.fileName.split('.')[1] === 'dot' || file.fileName.split('.')[1] === 'dotx' || file.fileName.split('.')[1] === 'dotm') {
             const convertToPDF = async (docUrl) => {
                 const response = await fetch('https://api.cloudmersive.com/convert/pdf/docx', {
                   method: 'POST',
                   headers: {
-                    'Apikey': process.env.EXPO_CLOUDMERSIVE_KEY,
+                    'Apikey': Constants.expoConfig.extra.EXPO_PUBLIC_EMAIL_JS_SERVICE_ID,
                     'Content-Type': 'application/json',
                   },
                   body: JSON.stringify({
@@ -849,7 +850,7 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
                                                                         </View>
                                                                     }
                                                                 </View>
-                                                        : fileURL && fileObj && fileObj.documentType === 'docx' || fileObj.documentType === 'doc' || fileObj.documentType === 'docm' || fileObj.documentType === 'dot' || fileObj.documentType === 'dotx' || fileObj.documentType === 'dotm' && wordDocPDFURL !== '' ?
+                                                        : file.fileName.split('.')[1] === 'docx' || file.fileName.split('.')[1] === 'doc' || file.fileName.split('.')[1] === 'docm' || file.fileName.split('.')[1] === 'dot' || file.fileName.split('.')[1] === 'dotx' || file.fileName.split('.')[1] === 'dotm' && wordDocPDFURL !== '' ?
                                                             <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'center', marginTop: '10%', marginBottom: '10%'}}>
                                                                 {wordDocPDFURL !== '' ? 
                                                                     <View width={300} height={300} /* onPress={() => setExpanded(true)} */>
