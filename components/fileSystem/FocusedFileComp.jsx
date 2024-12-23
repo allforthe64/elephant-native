@@ -146,7 +146,7 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
         console.log('file: ', file)
         console.log('fileURL: ', fileURL)
         if (file) {
-            console.log('file ext: ', file.fileName.split['.'][0])
+            console.log('file ext: ', file.fileName.split('.')[0])
         }
         if (file && fileURL && file.fileName.split('.')[1] === 'docx' || file.fileName.split('.')[1] === 'doc' || file.fileName.split('.')[1] === 'docm' || file.fileName.split('.')[1] === 'dot' || file.fileName.split('.')[1] === 'dotx' || file.fileName.split('.')[1] === 'dotm') {
             alert('running convert')
