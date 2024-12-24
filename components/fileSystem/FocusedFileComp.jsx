@@ -143,12 +143,7 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
     console.log('fileURL: ', fileURL)
 
     useEffect(() => {
-        console.log('file: ', file)
-        console.log('fileURL: ', fileURL)
-        if (file) {
-            console.log('file ext: ', file.fileName.split('.')[1])
-        }
-        if (fileURL && file.fileName.split('.')[1] === 'docx' || file.fileName.split('.')[1] === 'doc' || file.fileName.split('.')[1] === 'docm' || file.fileName.split('.')[1] === 'dot' || file.fileName.split('.')[1] === 'dotx' || file.fileName.split('.')[1] === 'dotm') {
+        if (fileURL && (file.fileName.split('.')[1] === 'docx' || file.fileName.split('.')[1] === 'doc' || file.fileName.split('.')[1] === 'docm' || file.fileName.split('.')[1] === 'dot' || file.fileName.split('.')[1] === 'dotx' || file.fileName.split('.')[1] === 'dotm')) {
             alert('running convert')
             try {
                 const convertToPDF = async (docUrl) => {
@@ -171,7 +166,7 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
                 console.log(err)
             }
         }
-    }, [file, fileURL])
+    }, [fileURL])
 
     useEffect(() => {
         if (fileURL && fileObj && fileObj.documentType === 'txt' && !file.fileName.includes('URL for:')) {
