@@ -104,27 +104,19 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
             const url = await getFileDownloadURL(fileInst.uri)
             setFileURL(url)
 
-            try {
-                alert('running')
-                const convertToPDF = async (docUrl) => {
-                    const response = await fetch('https://api.cloudmersive.com/convert/pdf/docx', {
-                      method: 'POST',
-                      headers: {
-                        'Apikey': Constants.expoConfig.extra.EXPO_PUBLIC_EMAIL_JS_SERVICE_ID,
-                        'Content-Type': 'application/json',
-                      },
-                      body: JSON.stringify({
-                        url: docUrl,
-                      }),
-                    });
-                  
-                    const data = await response.json();
-                    setWordDocPDFURL(data)
-                  };
-                convertToPDF(url)
-            } catch (err) {
-                console.log(err)
-            }
+            const response = await fetch('https://api.cloudmersive.com/convert/pdf/docx', {
+                method: 'POST',
+                headers: {
+                'Apikey': Constants.expoConfig.extra.EXPO_PUBLIC_EMAIL_JS_SERVICE_ID,
+                'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                url: url,
+                }),
+            });
+            
+            const data = await response.json();
+            setWordDocPDFURL(data)
 
             setFileObj(fileInst)
             setNavigateURL(fileInst.linksTo)
