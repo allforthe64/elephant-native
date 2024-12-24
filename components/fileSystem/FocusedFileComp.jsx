@@ -111,12 +111,13 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
                 'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                url: url,
+                    url: url,
                 }),
             });
             
-            const data = await response.json();
-            setWordDocPDFURL(data)
+            console.log(response)
+            /* const data = await response.json();
+            setWordDocPDFURL(data) */
 
             setFileObj(fileInst)
             setNavigateURL(fileInst.linksTo)
