@@ -103,6 +103,29 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
             const fileInst = await getFile(file.fileId)
             const url = await getFileDownloadURL(fileInst.uri)
             setFileURL(url)
+
+            try {
+                alert('running')
+                const convertToPDF = async (docUrl) => {
+                    const response = await fetch('https://api.cloudmersive.com/convert/pdf/docx', {
+                      method: 'POST',
+                      headers: {
+                        'Apikey': Constants.expoConfig.extra.EXPO_PUBLIC_EMAIL_JS_SERVICE_ID,
+                        'Content-Type': 'application/json',
+                      },
+                      body: JSON.stringify({
+                        url: docUrl,
+                      }),
+                    });
+                  
+                    const data = await response.json();
+                    setWordDocPDFURL(data)
+                  };
+                convertToPDF(url)
+            } catch (err) {
+                console.log(err)
+            }
+
             setFileObj(fileInst)
             setNavigateURL(fileInst.linksTo)
         }
@@ -144,8 +167,8 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
 
     useEffect(() => {
         if (fileURL /* && (file.fileName.split('.')[1] === 'docx' || file.fileName.split('.')[1] === 'doc' || file.fileName.split('.')[1] === 'docm' || file.fileName.split('.')[1] === 'dot' || file.fileName.split('.')[1] === 'dotx' || file.fileName.split('.')[1] === 'dotm') */) {
-            alert('running convert')
-            try {
+            /* alert('running convert') */
+            /* try {
                 const convertToPDF = async (docUrl) => {
                     const response = await fetch('https://api.cloudmersive.com/convert/pdf/docx', {
                       method: 'POST',
@@ -164,7 +187,7 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
                 convertToPDF(fileURL)
             } catch (err) {
                 console.log(err)
-            }
+            } */
         }
     }, [fileURL])
 
