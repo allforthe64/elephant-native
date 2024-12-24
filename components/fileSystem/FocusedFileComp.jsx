@@ -104,7 +104,7 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
             const url = await getFileDownloadURL(fileInst.uri)
             setFileURL(url)
 
-            const response = await fetch('https://api.cloudmersive.com/convert/pdf/docx', {
+            const response = await fetch('https://api.cloudmersive.com/convert/docx/to/pdf', {
                 method: 'POST',
                 headers: {
                 'Apikey': Constants.expoConfig.extra.EXPO_PUBLIC_EMAIL_JS_SERVICE_ID,
