@@ -31,6 +31,7 @@ import { ReactNativeZoomableView } from '@openspacelabs/react-native-zoomable-vi
 import PDFViewer from './PDFViewer'
 
 import Constants from 'expo-constants';
+import WebView from 'react-native-webview'
 
 
 const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFileMove}) => {
@@ -49,7 +50,6 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
     const [folders, setFolders] = useState({})
 
     const [fileURL, setFileURL] = useState()
-    const [wordDocPDFURL, setWordDocPDFURL] = useState('')
     const [fileObj, setFileObj] = useState()
     const [mediaPermissions, setMediaPermissions] = useState()
     const [navigateURL, setNavigateURL] = useState()
@@ -104,21 +104,6 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
             const url = await getFileDownloadURL(fileInst.uri)
             setFileURL(url)
 
-            const response = await fetch('https://api.cloudmersive.com/convert/docx/to/pdf', {
-                method: 'POST',
-                headers: {
-                'Apikey': Constants.expoConfig.extra.EXPO_PUBLIC_EMAIL_JS_SERVICE_ID,
-                'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    url: url,
-                }),
-            });
-            
-            console.log(response)
-            /* const data = await response.json();
-            setWordDocPDFURL(data) */
-
             setFileObj(fileInst)
             setNavigateURL(fileInst.linksTo)
         }
@@ -154,35 +139,6 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
             setFocusedFolderInst(folders.filter(folder => folder.id === focusedFolder)[0])
         }
     }, [folders, focusedFolder])
-
-    console.log('wordDocPDFURL: ', wordDocPDFURL)
-    console.log('fileURL: ', fileURL)
-
-    useEffect(() => {
-        if (fileURL /* && (file.fileName.split('.')[1] === 'docx' || file.fileName.split('.')[1] === 'doc' || file.fileName.split('.')[1] === 'docm' || file.fileName.split('.')[1] === 'dot' || file.fileName.split('.')[1] === 'dotx' || file.fileName.split('.')[1] === 'dotm') */) {
-            /* alert('running convert') */
-            /* try {
-                const convertToPDF = async (docUrl) => {
-                    const response = await fetch('https://api.cloudmersive.com/convert/pdf/docx', {
-                      method: 'POST',
-                      headers: {
-                        'Apikey': Constants.expoConfig.extra.EXPO_PUBLIC_EMAIL_JS_SERVICE_ID,
-                        'Content-Type': 'application/json',
-                      },
-                      body: JSON.stringify({
-                        url: docUrl,
-                      }),
-                    });
-                  
-                    const data = await response.json();
-                    setWordDocPDFURL(data)
-                  };
-                convertToPDF(fileURL)
-            } catch (err) {
-                console.log(err)
-            } */
-        }
-    }, [fileURL])
 
     useEffect(() => {
         if (fileURL && fileObj && fileObj.documentType === 'txt' && !file.fileName.includes('URL for:')) {
@@ -877,18 +833,19 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
                                                                         </View>
                                                                     }
                                                                 </View>
-                                                        : file.fileName.split('.')[1] === 'docx' || file.fileName.split('.')[1] === 'doc' || file.fileName.split('.')[1] === 'docm' || file.fileName.split('.')[1] === 'dot' || file.fileName.split('.')[1] === 'dotx' || file.fileName.split('.')[1] === 'dotm' && wordDocPDFURL !== '' ?
+                                                        : file.fileName.split('.')[1] === 'docx' || file.fileName.split('.')[1] === 'doc' || file.fileName.split('.')[1] === 'docm' || file.fileName.split('.')[1] === 'dot' || file.fileName.split('.')[1] === 'dotx' || file.fileName.split('.')[1] === 'dotm' && fileURL ?
                                                             <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'center', marginTop: '10%', marginBottom: '10%'}}>
-                                                                {wordDocPDFURL !== '' ? 
+                                                                {fileURL !== '' ? 
                                                                     <View width={300} height={300} /* onPress={() => setExpanded(true)} */>
                                                                         <Pressable style={{width: '100%', height: '100%'}} onPress={() => setExpanded('pdf')}>
-                                                                            <PDFViewer fileURL={wordDocPDFURL}/>
+                                                                            <WebView source={{ uri: `https://docs.google.com/gview?url=&${fileURL}embedded=true` }}
+                                                                            style={{ flex: 1 }} />
                                                                         </Pressable>
                                                                     </View>
                                                                 : 
                                                                     <View style={{height: 150}}>
                                                                         <FontAwesomeIcon icon={faImage} color='white' size={125}/>
-                                                                        <Text style={{color: 'white', textAlign: 'center', marginTop: 15, fontSize: 10}}>Fetching PDF...</Text>
+                                                                        <Text style={{color: 'white', textAlign: 'center', marginTop: 15, fontSize: 10}}>Fetching Document...</Text>
                                                                     </View>
                                                                 }
                                                             </View>     
