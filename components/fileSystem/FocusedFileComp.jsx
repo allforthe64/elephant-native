@@ -838,7 +838,7 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
                                                                 {fileURL !== '' ? 
                                                                     <View width={300} height={300} /* onPress={() => setExpanded(true)} */>
                                                                         <Pressable style={{width: '100%', height: '100%'}} onPress={() => setExpanded('pdf')}>
-                                                                            <WebView source={{ uri: `https://docs.google.com/gview?url=&${fileURL}embedded=true` }}
+                                                                            <WebView source={{ uri: `https://drive.google.com/viewerng/viewer?embedded=true&url=${fileURL}` }}
                                                                             style={{ flex: 1 }} />
                                                                         </Pressable>
                                                                     </View>
