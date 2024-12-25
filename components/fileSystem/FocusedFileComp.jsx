@@ -794,6 +794,9 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
                                                                 >
                                                                     <Image source={{uri: `${fileURL}`}} style={{width: '100%', height: '100%', objectFit: 'contain'}}/>
                                                                 </ReactNativeZoomableView>
+                                                            : expanded === 'wordDoc' ?
+                                                                <WebView source={{ uri: `https://drive.google.com/viewerng/viewer?embedded=true&url=${fileURL}` }}
+                                                                style={{ flex: 1 }} />
                                                             :
                                                                 <PDFViewer fileURL={wordDocPDFURL !== '' ? wordDocPDFURL : fileURL}/>
                                                             }
@@ -837,7 +840,7 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
                                                             <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'center', marginTop: '10%', marginBottom: '10%'}}>
                                                                 {fileURL !== '' ? 
                                                                     <View width={300} height={300} /* onPress={() => setExpanded(true)} */>
-                                                                        <Pressable style={{width: '100%', height: '100%'}} onPress={() => setExpanded('pdf')}>
+                                                                        <Pressable style={{width: '100%', height: '100%'}} onPress={() => setExpanded('wordDoc')}>
                                                                             <WebView source={{ uri: `https://drive.google.com/viewerng/viewer?embedded=true&url=${fileURL}` }}
                                                                             style={{ flex: 1 }} />
                                                                         </Pressable>
