@@ -623,7 +623,7 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
                                                             renameAndMove()
                                                         }} 
                                                         disabled={destination ? false : true}
-                                                        style={destination.id !== null ? styles.yellowButtonSM : styles.yellowButtonSMDim
+                                                        style={destination.id !== null && focusedFolder !== null && focusedFolder !== undefined ? styles.yellowButtonSM : styles.yellowButtonSMDim
                                                         }>
                                                             <View style={styles.iconHolderSmall}>
                                                                 <FontAwesomeIcon icon={faArrowRight} color='#9F37B0' size={18} />
@@ -886,7 +886,7 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
                                                         </View>
                                                         <View style={{width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', paddingTop: '10%'}}>
                                                             {/* button that links to a non jpg or png file */}
-                                                            {(file.fileName.split('.')[1] !== 'jpg' && file.fileName.split('.')[1] !== 'png' && file.fileName.split('.')[1] !== 'PNG' && file.fileName.split('.')[1] !== 'JPG' && file.fileName.split('.')[1] !== 'jpeg' && file.fileName.split('.')[1] !== 'JPEG') ? 
+                                                            {(file.fileName.split('.')[1] !== 'jpg' && file.fileName.split('.')[1] !== 'png' && file.fileName.split('.')[1] !== 'PNG' && file.fileName.split('.')[1] !== 'JPG' && file.fileName.split('.')[1] !== 'jpeg' && file.fileName.split('.')[1] !== 'JPEG' && file.fileName.split('.')[1] === 'docx' && file.fileName.split('.')[1] === 'doc' && file.fileName.split('.')[1] === 'docm' && file.fileName.split('.')[1] === 'dot' && file.fileName.split('.')[1] === 'dotx' && file.fileName.split('.')[1] === 'dotm')  ? 
                                                                 <>  
                                                                     {file.fileName.includes('URL for:') ?    
                                                                         <TouchableOpacity style={styles.yellowButton}
