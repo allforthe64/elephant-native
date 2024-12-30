@@ -622,9 +622,7 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
                                                         <TouchableOpacity onPress={() => {
                                                             renameAndMove()
                                                         }} 
-                                                        disabled={destination ? false : true}
-                                                        style={destination.id !== null && focusedFolder !== null && focusedFolder !== undefined ? styles.yellowButtonSM : styles.yellowButtonSMDim
-                                                        }>
+                                                        style={styles.yellowButtonSM}>
                                                             <View style={styles.iconHolderSmall}>
                                                                 <FontAwesomeIcon icon={faArrowRight} color='#9F37B0' size={18} />
                                                             </View>
