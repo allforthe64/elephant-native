@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "572276226266",
+    "project_id": "elephantapp-21e34",
+    "storage_bucket": "elephantapp-21e34.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:572276226266:android:5660015065e0d5b4bd8de3",
+        "android_client_info": {
+          "package_name": "com.billiam.elephantapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "572276226266-muogsqis96iqedhj1ovjq3bncgdt1qgn.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDSt6Bg4XJznF8JtiQYpGFjWhOCEDn576M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "572276226266-muogsqis96iqedhj1ovjq3bncgdt1qgn.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
