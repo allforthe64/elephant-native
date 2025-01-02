@@ -213,7 +213,7 @@ export default function Files({navigation: { navigate }, route}) {
           const newFile = {
             id: folderId,
             fileName: folderName,
-            nestedUnder: targetNest
+            nestedUnder: Number(targetNest)
           }
     
           editUser('folder', newFile, 'add')
