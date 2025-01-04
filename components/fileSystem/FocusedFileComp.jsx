@@ -417,12 +417,12 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
         },
     ) */
 
-    if (fileObj) {
+    /* if (fileObj) {
         alert(fileObj.linksTo)
     }
     if (navigateURL) {
         alert(navigateURL)
-    }
+    } */
 
     return (
         <>
