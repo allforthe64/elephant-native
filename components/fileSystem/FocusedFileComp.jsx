@@ -886,7 +886,7 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
                                                             {/* button that links to a non jpg or png file */}
                                                             {(file.fileName.split('.')[1] !== 'jpg' && file.fileName.split('.')[1] !== 'png' && file.fileName.split('.')[1] !== 'PNG' && file.fileName.split('.')[1] !== 'JPG' && file.fileName.split('.')[1] !== 'jpeg' && file.fileName.split('.')[1] !== 'JPEG' && file.fileName.split('.')[1] === 'docx' && file.fileName.split('.')[1] === 'doc' && file.fileName.split('.')[1] === 'docm' && file.fileName.split('.')[1] === 'dot' && file.fileName.split('.')[1] === 'dotx' && file.fileName.split('.')[1] === 'dotm')  ? 
                                                                 <>  
-                                                                    {file.fileName.includes('URL for:') ?    
+                                                                    {navigateURL ?    
                                                                         <TouchableOpacity style={styles.yellowButton}
                                                                         disabled={fileURL ? false : true}
                                                                         onPress={() => Linking.openURL(navigateURL)}
