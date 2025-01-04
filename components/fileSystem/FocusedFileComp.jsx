@@ -141,7 +141,7 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
     }, [folders, focusedFolder])
 
     useEffect(() => {
-        if (fileURL && fileObj && fileObj.documentType === 'txt' && !file.fileName.includes('URL for:')) {
+        if (fileURL && fileObj && fileObj.documentType === 'txt' && !fileObj.linksTo) {
             setEditNote(true)
             
             fetch(fileURL).then(result => result.text())
@@ -886,17 +886,7 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
                                                             {/* button that links to a non jpg or png file */}
                                                             {(file.fileName.split('.')[1] !== 'jpg' && file.fileName.split('.')[1] !== 'png' && file.fileName.split('.')[1] !== 'PNG' && file.fileName.split('.')[1] !== 'JPG' && file.fileName.split('.')[1] !== 'jpeg' && file.fileName.split('.')[1] !== 'JPEG' && file.fileName.split('.')[1] === 'docx' && file.fileName.split('.')[1] === 'doc' && file.fileName.split('.')[1] === 'docm' && file.fileName.split('.')[1] === 'dot' && file.fileName.split('.')[1] === 'dotx' && file.fileName.split('.')[1] === 'dotm')  ? 
                                                                 <>  
-                                                                    {navigateURL ?    
-                                                                        <TouchableOpacity style={styles.yellowButton}
-                                                                        disabled={fileURL ? false : true}
-                                                                        onPress={() => Linking.openURL(navigateURL)}
-                                                                        >
-                                                                            <View style={styles.iconHolder}>
-                                                                                {fileURL ? <FontAwesomeIcon icon={faArrowUpRightFromSquare} size={22} style={{marginTop: '2%'}} color='#9F37B0'/> : <></>}
-                                                                            </View>
-                                                                            <Text style={{fontSize: 22, color: '#9F37B0', fontWeight: '600', marginTop: '2%', marginLeft: '20%'}}>Go To URL</Text>
-                                                                        </TouchableOpacity>
-                                                                    : fileObj.documentType === 'm4a' || fileObj.documentType === 'mp3' ? 
+                                                                    {fileObj.documentType === 'm4a' || fileObj.documentType === 'mp3' ? 
                                                                         <TouchableOpacity style={styles.yellowButton}
                                                                         disabled={fileURL ? false : true}
                                                                         onPress={() => {
@@ -935,7 +925,18 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
 
                                                             : 
                                                                 <></>
-                                                            }                       
+                                                            }    
+                                                            {fileObj.linksTo &&    
+                                                                        <TouchableOpacity style={styles.yellowButton}
+                                                                        disabled={fileURL ? false : true}
+                                                                        onPress={() => Linking.openURL(navigateURL)}
+                                                                        >
+                                                                            <View style={styles.iconHolder}>
+                                                                                {fileURL ? <FontAwesomeIcon icon={faArrowUpRightFromSquare} size={22} style={{marginTop: '2%'}} color='#9F37B0'/> : <></>}
+                                                                            </View>
+                                                                            <Text style={{fontSize: 22, color: '#9F37B0', fontWeight: '600', marginTop: '2%', marginLeft: '20%'}}>Go To URL</Text>
+                                                                        </TouchableOpacity>
+                                                            }                   
                                                             <TouchableOpacity style={styles.yellowButton}
                                                             onPress={downloadFileFunction}
                                                             >   
