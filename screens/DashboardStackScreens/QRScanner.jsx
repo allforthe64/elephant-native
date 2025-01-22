@@ -212,7 +212,7 @@ const Scanner = () => {
                 type: 'success'
                 })
         } else if (focusedFolder) {
-            const fileInst = userInst.files.filter(file => file.id === focusedFolder)
+            const fileInst = userInst.files.filter(file => file.id.toString() === focusedFolder.toString())
             toast.show(`File upload to ${fileInst[0].fileName} successful`, {
                 type: 'success'
                 })
@@ -290,9 +290,9 @@ return (
                                     {focusedFolder ? 
                                         <>
                                             <TouchableOpacity style={styles.yellowButtonBack} onPress={() => {
-                                            const folderInst = folders.filter(folder => folder.id === focusedFolder) 
+                                            const folderInst = folders.filter(folder => folder.id.toString() === focusedFolder.toString()) 
                                             
-                                                const parentFolderInst = folders.filter(folder => folder.id === folderInst[0].nestedUnder)
+                                                const parentFolderInst = folders.filter(folder => folder.id.toString() === folderInst[0].nestedUnder.toString())
                                                 console.log(parentFolderInst)
                                                 if (parentFolderInst.length > 0) {
                                                     console.log("we're within the first if check")
@@ -325,7 +325,7 @@ return (
                                                     if (f.nestedUnder === focusedFolder) {
                                                             return (
                                                                 <Pressable key={index} style={{display: 'flex', flexDirection: 'row', justifyContent: 'center', marginTop: '1%'}} onPress={() => {
-                                                                    if (destination.id === null || f.id !== destination.id) {
+                                                                    if (destination.id === null || f.id.toString() !== destination.id.toString()) {
                                                                         setDestination({id: f.id, fileName: f.fileName, nestedUnder: f.nestedUnder})
                                                                     } else {
                                                                         setFocusedFolder(f.id)
@@ -333,11 +333,11 @@ return (
                                                                     }
                                                                 }
                                                                 }>
-                                                                    <View style={f.id === destination.id ? styles.folderWhite : styles.folder}>
-                                                                    <View style={f.id === destination.id ? styles.iconHolderBlack : styles.iconHolder}>
-                                                                        <FontAwesomeIcon icon={faFolder} size={28} color={f.id === destination.id ? 'white' : '#9F37B0'}/>
+                                                                    <View style={f.id.toString() === destination.id.toString() ? styles.folderWhite : styles.folder}>
+                                                                    <View style={f.id.toString() === destination.id.toString() ? styles.iconHolderBlack : styles.iconHolder}>
+                                                                        <FontAwesomeIcon icon={faFolder} size={28} color={f.id.toString() === destination.id.toString() ? 'white' : '#9F37B0'}/>
                                                                     </View>
-                                                                    <Text style={f.id === destination.id ? {color: 'black', fontSize: 28, width: '80%', paddingTop: '1%'} : {color: '#9F37B0', fontSize: 28, width: '80%', textAlign: 'left', paddingTop: '1%'}}>{f.fileName}</Text>
+                                                                    <Text style={f.id.toString() === destination.id.toString() ? {color: 'black', fontSize: 28, width: '80%', paddingTop: '1%'} : {color: '#9F37B0', fontSize: 28, width: '80%', textAlign: 'left', paddingTop: '1%'}}>{f.fileName}</Text>
                                                                     </View>
                                                                 </Pressable>
                                                             )
@@ -347,7 +347,7 @@ return (
                                                     if (f.nestedUnder === '') {
                                                         return (
                                                             <Pressable key={index} style={{display: 'flex', flexDirection: 'row', justifyContent: 'center', marginTop: '1%'}} onPress={() => {
-                                                                if (destination.id === null || f.id !== destination.id) {
+                                                                if (destination.id === null || f.id.toString() !== destination.id.toString()) {
                                                                     setDestination({id: f.id, fileName: f.fileName, nestedUnder: f.nestedUnder})
                                                                 } else {
                                                                     setFocusedFolder(f.id)
@@ -355,11 +355,11 @@ return (
                                                                 }
                                                             }
                                                             }>
-                                                                <View style={f.id === destination.id ? styles.folderWhite : styles.folder}>
-                                                                <View style={f.id === destination.id ? styles.iconHolderBlack : styles.iconHolder}>
-                                                                    <FontAwesomeIcon icon={faFolder} size={28} color={f.id === destination.id ? 'white' : '#9F37B0'}/>
+                                                                <View style={f.id.toString() === destination.id.toString() ? styles.folderWhite : styles.folder}>
+                                                                <View style={f.id.toString() === destination.id.toString() ? styles.iconHolderBlack : styles.iconHolder}>
+                                                                    <FontAwesomeIcon icon={faFolder} size={28} color={f.id.toString() === destination.id.toString() ? 'white' : '#9F37B0'}/>
                                                                 </View>
-                                                                <Text style={f.id === destination.id ? {color: 'black', fontSize: 28, width: '80%', paddingTop: '1%'} : {color: '#9F37B0', fontSize: 28, width: '80%', textAlign: 'left', paddingTop: '1%'}}>{f.fileName}</Text>
+                                                                <Text style={f.id.toString() === destination.id.toString() ? {color: 'black', fontSize: 28, width: '80%', paddingTop: '1%'} : {color: '#9F37B0', fontSize: 28, width: '80%', textAlign: 'left', paddingTop: '1%'}}>{f.fileName}</Text>
                                                                 </View>
                                                             </Pressable>
                                                             )

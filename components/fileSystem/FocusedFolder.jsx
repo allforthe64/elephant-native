@@ -43,7 +43,7 @@ const FocusedFolder = ({folder, folders, clear, getTargetFolder, addFolder, rena
     useEffect(() => {
         const getNestedFolder = () => {
             const targetFolder = folders.filter(f => {
-            if(f.id === folder.folder.nestedUnder) return f})
+            if(f.id.toString() === folder.folder.nestedUnder.toString()) return f})
             return targetFolder
         }   
         const targetFolder = getNestedFolder()
