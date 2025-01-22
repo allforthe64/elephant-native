@@ -10,13 +10,24 @@ import { Platform } from 'react-native'
 import { initializeAppCheck, CustomProvider, getToken } from 'firebase/app-check';
 
 //configure firebase
-const firebaseConfig = {
+/* const firebaseConfig = {
   apiKey: "AIzaSyC8DpSdkz3VSvDh6xUbyA83xtFoUaa6HUQ",
   authDomain: "elephantapp-21e34.firebaseapp.com",
   projectId: "elephantapp-21e34",
   storageBucket: "elephantapp-21e34.appspot.com",
   messagingSenderId: "572276226266",
   appId: Platform.OS = 'android' ? "1:572276226266:android:5660015065e0d5b4bd8de3" : "1:572276226266:ios:c8422618b2f9d710bd8de3",
+  measurementId: "G-V18K1CK9N5"
+}; */
+
+//dev config
+const firebaseConfig = {
+  apiKey: "AIzaSyC4vDa5yD6s0iV360IQLNtqC3MNqCK7cc8",
+  authDomain: "elephant-dev-mode.firebaseapp.com",
+  projectId: "elephant-dev-mode",
+  storageBucket: "elephant-dev-mode.firebasestorage.app",
+  messagingSenderId: "746078858340",
+  appId: Platform.OS = 'android' ? "1:746078858340:android:8c34f4724261e909f28371" : "1:746078858340:ios:ed7059d8c7b51b02f28371",
   measurementId: "G-V18K1CK9N5"
 };
   

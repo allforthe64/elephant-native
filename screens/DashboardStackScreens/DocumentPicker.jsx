@@ -234,14 +234,18 @@ const DocumentPickerComp = () => {
                 else finalDestination = false
 
                 //increase the upload size
-                uploadSize += result.metadata.size
+                if (thumbnailResult) {
+                    uploadSize += result.metadata.size + thumbnailResult.metadata.size
+                } else {
+                    uploadSize += result.metadata.size
+                }
 
                 let reference
                 if (el.fileType === 'jpg' || el.fileType === 'jpeg' || el.fileType === 'png' || el.fileType === 'JPG' || el.fileType === 'JPEG' || el.fileType === 'PNG') {
                     reference = await addfile({
                         name: el.name,
                         fileType: el.fileType,
-                        size: result.metadata.size,
+                        size: uploadSize,
                         user: currentUser,
                         version: 0,
                         timeStamp: `${formattedDate}`
@@ -252,7 +256,7 @@ const DocumentPickerComp = () => {
                         ...el, 
                         name: el.name, 
                         user: currentUser, 
-                        size: result.metadata.size, 
+                        size: uploadSize, 
                         timeStamp: formattedDate, 
                         version: versionNo}, finalDestination)
                 }

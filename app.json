@@ -14,7 +14,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.billiam.elephantapp",
-      "googleServicesFile": "./GoogleService-Info.plist"
+      "googleServicesFile": "./test_firebase_app_config_files/GoogleService-Info.plist"
     },
     "android": {
       "adaptiveIcon": {
@@ -22,7 +22,7 @@
         "backgroundColor": "#ffffff"
       },
       "package": "com.elephantdev.elephantnative",
-      "googleServicesFile": "./google-services.json"
+      "googleServicesFile": "./test_firebase_app_config_files/google-services.json"
     },
     "web": {
       "favicon": "./assets/favicon.png"

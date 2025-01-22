@@ -150,9 +150,9 @@ const Notepad = () => {
        });
         const fileUri = `${currentUser.uid}/${noteName !== '' ? noteName : formattedDate}`
         const fileRef = refFunction(storage, `${currentUser.uid}/${formattedDate}`)
-        uploadBytesResumable(fileRef, textFile)
+        const result = uploadBytesResumable(fileRef, textFile)
 
-        uploadSize += textFile.size
+        uploadSize += result.metadata.size
 
        let finalDestintation 
        if (destination.id !== null) finalDestintation = destination.id
@@ -163,7 +163,7 @@ const Notepad = () => {
         const reference = await addfile({
           name: fileName,
           fileType: 'txt',
-          size: textFile.size,
+          size: result.metadata.size,
           uri: `${fileUri}`,
           user: currentUser.uid,
           timeStamp: formattedDate,

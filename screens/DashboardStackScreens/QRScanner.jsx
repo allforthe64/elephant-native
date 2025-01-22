@@ -182,7 +182,7 @@ const Scanner = () => {
             const fileUri = `${currentUser}/${formattedDate}`
             const fileRef = ref(storage, fileUri)
 
-            await uploadBytesResumable(fileRef, textFile)
+            const result = await uploadBytesResumable(fileRef, textFile)
 
             let finalDestination 
             if (destination.id !== null) finalDestination = destination.id
@@ -193,12 +193,12 @@ const Scanner = () => {
                 name: fileName,
                 linksTo: el.data,
                 fileType: 'txt',
-                size: textFile.size,
+                size: result.metadata.size,
                 user: currentUser, timeStamp: formattedDate, version: versionNo
             }, finalDestination)
 
             //increase the size of the upload
-            uploadSize += textFile.size
+            uploadSize += result.metadata.size
 
             return reference   
         }))

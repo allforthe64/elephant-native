@@ -355,10 +355,12 @@ try {
                         else if (focusedFolder) finalDestination = focusedFolder 
                         else finalDestination = false
 
+                        const uploadSize = thumbnailResult ? result.metadata.size + thumbnailResult.metadata.size : result.metadata.size
+
                         const reference = await addfile({
                                 name: filename,
                                 fileType: 'jpg',
-                                size: result.metadata.size,
+                                size: uploadSize,
                                 uri: fileUri,
                                 thumbnailUri: thumbnailFileUri,
                                 user: currentUser,
@@ -367,7 +369,7 @@ try {
                             }, finalDestination)
 
                         if (!session) {
-                            const updatedUser = {...userInst, fileRefs: [...userInst.fileRefs, reference], spaceUsed: userInst.spaceUsed + result.metadata.size}
+                            const updatedUser = {...userInst, fileRefs: [...userInst.fileRefs, reference], spaceUsed: userInst.spaceUsed + uploadSize}
                             updateUser(updatedUser)
                         } else {
                             setQue(prev => [...prev, reference])
