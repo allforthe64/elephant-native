@@ -229,7 +229,7 @@ const DocumentPickerComp = () => {
                 const result = await uploadBytesResumable(fileRef, blob)
 
                 let finalDestination 
-                if (destination.id !== null) finalDestination.toString() = destination.id.toString()
+                if (destination.id !== null) finalDestination = destination.id
                 else if (focusedFolder) finalDestination = focusedFolder 
                 else finalDestination = false
 

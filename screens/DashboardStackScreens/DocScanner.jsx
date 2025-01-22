@@ -204,7 +204,7 @@ const DocScanner = () => {
       console.log('this is the result object: ', result)
 
       let finalDestintation 
-       if (destination.id !== null) finalDestintation.toString() = destination.id.toString()
+       if (destination.id !== null) finalDestintation = destination.id
        else if (focusedFolder) finalDestintation = focusedFolder 
        else finalDestintation = false
       
