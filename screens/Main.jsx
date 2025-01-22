@@ -78,8 +78,11 @@ const Main = () => {
   }, [currentUser])
 
   const uploadImages = async () => {
-   
-        const updatedUser = {...userInst, fileRefs: [...userInst.fileRefs, ...que]}
+        let massUploadSize
+        que.forEach(queElement => {
+            massUploadSize += queElement.size
+        });
+        const updatedUser = {...userInst, spaceUsed: userInst.spaceUsed + massUploadSize, fileRefs: [...userInst.fileRefs, ...que]}
         updateUser(updatedUser)
         toast.show('Upload successful', {
             type: 'success'

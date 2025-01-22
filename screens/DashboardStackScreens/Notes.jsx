@@ -433,7 +433,7 @@ const Notepad = () => {
                             </TouchableOpacity>
 
                             <TouchableOpacity onPress={() => {
-                                saveToElephant(videoObj ? true : false)
+                                addToStorage()
                                 setPreAdd(false)
                             }} style={styles.yellowButtonSM}>
                                 <View style={styles.iconHolderSmall}>

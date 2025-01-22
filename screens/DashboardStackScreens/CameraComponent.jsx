@@ -356,7 +356,7 @@ try {
                         else finalDestination = false
 
                         const uploadSize = thumbnailResult ? result.metadata.size + thumbnailResult.metadata.size : result.metadata.size
-
+                        
                         const reference = await addfile({
                                 name: filename,
                                 fileType: 'jpg',

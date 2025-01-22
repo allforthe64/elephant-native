@@ -148,7 +148,7 @@ export default function Files({navigation: { navigate }, route}) {
   //filter for all files that don't match the incoming file id
   const deleteFile = (target) => {
     let targetFile
-    const newFiles = currentUser.fileRefs.filter(file => {if (file.fileId !== target) { return file } else targetFile = file})
+    const newFiles = currentUser.fileRefs.filter(file => {if (file.fileId.toString() !== target.toString) { return file } else targetFile = file})
     editUser('file', {newFiles: newFiles, targetFile: targetFile}, 'delete')
   }
 
@@ -175,9 +175,23 @@ export default function Files({navigation: { navigate }, route}) {
   //filter for all fileRefs that don't have a flag matching the target
   //delete the physical files
   const deleteFolder = (target) => {
-    const refsToKeep = currentUser.fileRefs.filter(ref => ref.flag !== target.id)
-    const newFolders = currentUser.files.filter(file => file.id !== target.id)
-    const refsToDelete = currentUser.fileRefs.filter(ref => {if (ref.flag === target.id) return ref})
+
+    let searchFor = [target.id.toString()]
+
+    currentUser.files.forEach(folder => {
+      if (searchFor.includes(folder.nestedUnder.toString())) {
+        searchFor.push(folder.id.toString())
+      }
+    })
+
+    const refsToKeep = currentUser.fileRefs.filter(ref => {
+      if (!searchFor.includes(ref.flag.toString())) return ref
+    })
+    const newFolders = currentUser.files.filter(file => {if (!searchFor.includes(file.id.toString())) return file})
+    const refsToDelete = currentUser.fileRefs.filter(ref => {
+      if (searchFor.includes(ref.flag.toString())) return ref
+    })
+
     editUser('folder', {refsToKeep: refsToKeep, newFolders: newFolders, target: target.folderName, refsToDelete: refsToDelete}, 'delete')
   }
 
