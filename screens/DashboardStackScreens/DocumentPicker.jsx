@@ -382,9 +382,9 @@ const DocumentPickerComp = () => {
                                     {focusedFolder ? 
                                         <>
                                             <TouchableOpacity style={styles.yellowButtonXS} onPress={() => {
-                                                const folderInst = folders.filter(folder => folder.id.toString() === focusedFolder.toString()) 
+                                                const folderInst = folders.filter(folder => folder.id === focusedFolder) 
                                                 
-                                                const parentFolderInst = folders.filter(folder => folder.id.toString() === folderInst[0].nestedUnder.toString())
+                                                const parentFolderInst = folders.filter(folder => folder.id === folderInst[0].nestedUnder)
                                                 console.log(parentFolderInst)
                                                 if (parentFolderInst.length > 0) {
                                                     console.log("we're within the first if check")
@@ -417,7 +417,7 @@ const DocumentPickerComp = () => {
                                                     if (f.nestedUnder === focusedFolder) {
                                                             return (
                                                                 <Pressable key={index} style={{display: 'flex', flexDirection: 'row', justifyContent: 'center', marginTop: '1%'}} onPress={() => {
-                                                                        if (destination.id === null || f.id.toString() !== destination.id.toString()) {
+                                                                        if (destination.id === null || f.id !== destination.id) {
                                                                             setDestination({id: f.id, fileName: f.fileName, nestedUnder: f.nestedUnder})
                                                                         } else {
                                                                             setFocusedFolder(f.id)
@@ -425,11 +425,11 @@ const DocumentPickerComp = () => {
                                                                         }
                                                                     }
                                                                     }>
-                                                                    <View style={f.id.toString() === destination.id.toString() ? styles.folderWhite : styles.folder}>
-                                                                    <View style={f.id.toString() === destination.id.toString() ? styles.iconHolderBlack : styles.iconHolder}>
-                                                                        <FontAwesomeIcon icon={faFolder} size={28} color={f.id.toString() === destination.id.toString() ? 'white' : '#9F37B0'}/>
+                                                                    <View style={f.id === destination.id ? styles.folderWhite : styles.folder}>
+                                                                    <View style={f.id === destination.id ? styles.iconHolderBlack : styles.iconHolder}>
+                                                                        <FontAwesomeIcon icon={faFolder} size={28} color={f.id === destination.id ? 'white' : '#9F37B0'}/>
                                                                     </View>
-                                                                    <Text style={f.id.toString() === destination.id.toString() ? {color: 'black', fontSize: 28, width: '80%', paddingTop: '1%'} : {color: '#9F37B0', fontSize: 28, width: '80%', textAlign: 'left', paddingTop: '1%'}}>{f.fileName}</Text>
+                                                                    <Text style={f.id === destination.id ? {color: 'black', fontSize: 28, width: '80%', paddingTop: '1%'} : {color: '#9F37B0', fontSize: 28, width: '80%', textAlign: 'left', paddingTop: '1%'}}>{f.fileName}</Text>
                                                                     </View>
                                                                 </Pressable>
                                                             )
@@ -439,7 +439,7 @@ const DocumentPickerComp = () => {
                                                     if (f.nestedUnder === '') {
                                                         return (
                                                             <Pressable key={index} style={{display: 'flex', flexDirection: 'row', justifyContent: 'center', marginTop: '1%'}} onPress={() => {
-                                                                    if (destination.id === null || f.id.toString() !== destination.id.toString()) {
+                                                                    if (destination.id === null || f.id !== destination.id) {
                                                                         setDestination({id: f.id, fileName: f.fileName, nestedUnder: f.nestedUnder})
                                                                     } else {
                                                                         setFocusedFolder(f.id)
@@ -447,11 +447,11 @@ const DocumentPickerComp = () => {
                                                                     }
                                                                 }
                                                                 }>
-                                                                <View style={f.id.toString() === destination.id.toString() ? styles.folderWhite : styles.folder}>
-                                                                <View style={f.id.toString() === destination.id.toString() ? styles.iconHolderBlack : styles.iconHolder}>
+                                                                <View style={f.id === destination.id ? styles.folderWhite : styles.folder}>
+                                                                <View style={f.id === destination.id ? styles.iconHolderBlack : styles.iconHolder}>
                                                                     <FontAwesomeIcon icon={faFolder} size={28} color={f.id === destination.id ? 'white' : '#9F37B0'}/>
                                                                 </View>
-                                                                <Text style={f.id.toString() === destination.id.toString() ? {color: 'black', fontSize: 28, width: '80%', paddingTop: '1%'} : {color: '#9F37B0', fontSize: 28, width: '80%', textAlign: 'left', paddingTop: '1%'}}>{f.fileName}</Text>
+                                                                <Text style={f.id === destination.id ? {color: 'black', fontSize: 28, width: '80%', paddingTop: '1%'} : {color: '#9F37B0', fontSize: 28, width: '80%', textAlign: 'left', paddingTop: '1%'}}>{f.fileName}</Text>
                                                                 </View>
                                                             </Pressable>
                                                             )

@@ -148,7 +148,7 @@ export default function Files({navigation: { navigate }, route}) {
   //filter for all files that don't match the incoming file id
   const deleteFile = (target) => {
     let targetFile
-    const newFiles = currentUser.fileRefs.filter(file => {if (file.fileId.toString() !== target.toString) { return file } else targetFile = file})
+    const newFiles = currentUser.fileRefs.filter(file => {if (file.fileId.toString() !== target.toString()) { return file } else targetFile = file})
     editUser('file', {newFiles: newFiles, targetFile: targetFile}, 'delete')
   }
 

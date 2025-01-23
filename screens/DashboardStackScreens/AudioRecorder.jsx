@@ -66,14 +66,14 @@ const AudioRecorder = () => {
 
         useEffect(() => {
             const exists = Object.values(folders).some((value) => {
-                return value.nestedUnder.toString() === focusedFolder.toString()
+                return value.nestedUnder === focusedFolder
             })
             setSubFolders(exists)
         }, [focusedFolder, addFolderForm])
 
         useEffect(() => {
             if (folders && focusedFolder) {
-                setFocusedFolderInst(folders.filter(folder => folder.id.toString() === focusedFolder.toString())[0])
+                setFocusedFolderInst(folders.filter(folder => folder.id === focusedFolder)[0])
             }
         }, [focusedFolder, folders])
 
@@ -265,7 +265,7 @@ const AudioRecorder = () => {
                 type: 'success'
                 })
         } else if (focusedFolder) {
-            const fileInst = userInst.files.filter(file => file.id.toString() === focusedFolder.toString())
+            const fileInst = userInst.files.filter(file => file.id === focusedFolder)
             toast.show(`File upload to ${fileInst[0].fileName} successful`, {
                 type: 'success'
                 })
@@ -349,9 +349,9 @@ const AudioRecorder = () => {
                                     {focusedFolder ? 
                                         <>
                                             <TouchableOpacity style={{display: 'flex', flexDirection: 'row', marginLeft: '5%', marginTop: '5%'}} onPress={() => {
-                                                const folderInst = folders.filter(folder => folder.id.toString() === focusedFolder.toString()) 
+                                                const folderInst = folders.filter(folder => folder.id === focusedFolder) 
                                                 
-                                                const parentFolderInst = folders.filter(folder => folder.id.toString() === folderInst[0].nestedUnder.toString())
+                                                const parentFolderInst = folders.filter(folder => folder.id === folderInst[0].nestedUnder)
                                                 console.log(parentFolderInst)
                                                 if (parentFolderInst.length > 0) {
                                                     console.log("we're within the first if check")
@@ -382,7 +382,7 @@ const AudioRecorder = () => {
                                                     if (f.nestedUnder === focusedFolder) {
                                                             return (
                                                                 <Pressable key={index} style={{display: 'flex', flexDirection: 'row', justifyContent: 'center', marginTop: '5%'}} onPress={() => {
-                                                                        if (destination.id === null || f.id.toString() !== destination.id.toString()) {
+                                                                        if (destination.id === null || f.id !== destination.id) {
                                                                             setDestination({id: f.id, fileName: f.fileName, nestedUnder: f.nestedUnder})
                                                                         } else {
                                                                             setFocusedFolder(f.id)
@@ -390,9 +390,9 @@ const AudioRecorder = () => {
                                                                         }
                                                                     }
                                                                     }>
-                                                                    <View style={f.id.toString() === destination.id.toString() ? {borderBottomWidth: 2, width: '85%', backgroundColor: 'white', display: 'flex', flexDirection: 'row', paddingLeft: '2.5%', paddingTop: '2%'} : {borderBottomWidth: 2, width: '85%', borderBottomColor: 'white', display: 'flex', flexDirection: 'row', paddingLeft: '2.5%', paddingTop: '2%'}}>
-                                                                    <FontAwesomeIcon icon={faFolder} size={30} color={f.id.toString() === destination.id.toString() ? 'black' : 'white'}/>
-                                                                    <Text style={f.id.toString() === destination.id.toString() ? {color: 'black', fontSize: 30, marginLeft: '5%'} : {color: 'white', fontSize: 30, marginLeft: '5%'}}>{f.fileName}</Text>
+                                                                    <View style={f.id === destination.id ? {borderBottomWidth: 2, width: '85%', backgroundColor: 'white', display: 'flex', flexDirection: 'row', paddingLeft: '2.5%', paddingTop: '2%'} : {borderBottomWidth: 2, width: '85%', borderBottomColor: 'white', display: 'flex', flexDirection: 'row', paddingLeft: '2.5%', paddingTop: '2%'}}>
+                                                                    <FontAwesomeIcon icon={faFolder} size={30} color={f.id === destination.id ? 'black' : 'white'}/>
+                                                                    <Text style={f.id === destination.id ? {color: 'black', fontSize: 30, marginLeft: '5%'} : {color: 'white', fontSize: 30, marginLeft: '5%'}}>{f.fileName}</Text>
                                                                     </View>
                                                                 </Pressable>
                                                             )
@@ -402,7 +402,7 @@ const AudioRecorder = () => {
                                                     if (f.nestedUnder === '') {
                                                         return (
                                                             <Pressable key={index} style={{display: 'flex', flexDirection: 'row', justifyContent: 'center', marginTop: '5%'}} onPress={() => {
-                                                                    if (destination.id === null || f.id.toString() !== destination.id.toString()) {
+                                                                    if (destination.id === null || f.id !== destination.id) {
                                                                         setDestination({id: f.id, fileName: f.fileName, nestedUnder: f.nestedUnder})
                                                                     } else {
                                                                         setFocusedFolder(f.id)
@@ -410,9 +410,9 @@ const AudioRecorder = () => {
                                                                     }
                                                                 }
                                                                 }>
-                                                                <View style={f.id.toString() === destination.id.toString() ? {borderBottomWidth: 2, width: '85%', backgroundColor: 'white', display: 'flex', flexDirection: 'row', paddingLeft: '2.5%', paddingTop: '2%'} : {borderBottomWidth: 2, width: '85%', borderBottomColor: 'white', display: 'flex', flexDirection: 'row', paddingLeft: '2.5%', paddingTop: '2%'}}>
-                                                                <FontAwesomeIcon icon={faFolder} size={30} color={f.id.toString() === destination.id.toString() ? 'black' : 'white'}/>
-                                                                <Text style={f.id.toString() === destination.id.toString() ? {color: 'black', fontSize: 30, marginLeft: '5%'} : {color: 'white', fontSize: 30, marginLeft: '5%'}}>{f.fileName}</Text>
+                                                                <View style={f.id === destination.id ? {borderBottomWidth: 2, width: '85%', backgroundColor: 'white', display: 'flex', flexDirection: 'row', paddingLeft: '2.5%', paddingTop: '2%'} : {borderBottomWidth: 2, width: '85%', borderBottomColor: 'white', display: 'flex', flexDirection: 'row', paddingLeft: '2.5%', paddingTop: '2%'}}>
+                                                                <FontAwesomeIcon icon={faFolder} size={30} color={f.id === destination.id ? 'black' : 'white'}/>
+                                                                <Text style={f.id === destination.id ? {color: 'black', fontSize: 30, marginLeft: '5%'} : {color: 'white', fontSize: 30, marginLeft: '5%'}}>{f.fileName}</Text>
                                                                 </View>
                                                             </Pressable>
                                                             )
