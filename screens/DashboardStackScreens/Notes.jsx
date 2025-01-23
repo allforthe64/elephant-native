@@ -150,7 +150,7 @@ const Notepad = () => {
        });
         const fileUri = `${currentUser.uid}/${noteName !== '' ? noteName : formattedDate}`
         const fileRef = refFunction(storage, `${currentUser.uid}/${formattedDate}`)
-        const result = uploadBytesResumable(fileRef, textFile)
+        const result = await uploadBytesResumable(fileRef, textFile)
 
         uploadSize += result.metadata.size
 
