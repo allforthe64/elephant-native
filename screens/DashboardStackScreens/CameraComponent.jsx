@@ -135,7 +135,7 @@ try {
         const addFolder = async (folderName, targetNest) => {
             //if the incoming targetNest is empty string, create the new folder under the home directory
             if (folderName.length > 0) {
-                const folderId = Math.random().toString(20).toString().split('.')[1] + Math.random().toString(20).toString().split('.')[1]
+                const folderId = Math.floor(Math.random() * 9e11) + 1e11
                 if (targetNest === '') {
                     const newFile = {
                     id: folderId,
@@ -152,7 +152,7 @@ try {
                     
                 } else {           //if the incoming targetNest has a value, create the new folder with the nestedUnder property set to targetNest
                     const newFile = {
-                    id: Math.random().toString(20).toString().split('.')[1] + Math.random().toString(20).toString().split('.')[1],
+                    id: folderId,
                     fileName: folderName,
                     nestedUnder: targetNest
                     }

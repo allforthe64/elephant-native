@@ -211,7 +211,7 @@ export default function Files({navigation: { navigate }, route}) {
     //if the incoming targetNest is empty string, create the new folder under the home directory
     if (folderName.length > 0) {
       try {
-        const folderId = Math.random().toString(20).toString().split('.')[1] + Math.random().toString(20).toString().split('.')[1]
+        const folderId = Math.floor(Math.random() * 9e11) + 1e11
         if (targetNest === '') {
           const newFile = {
             id: folderId,

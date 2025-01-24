@@ -35,6 +35,18 @@ export async function getUser(user) {
     }
 }
 
+export async function addUser(user) {
+    const userRef = setDoc(doc(db, 'users', user.uid), {
+        email: user.email,
+        displayName: user.email,
+        files: [{id: Math.floor(Math.random() * 9e11) + 1e11, fileName: 'My House', nestedUnder: ''}, {id: Math.floor(Math.random() * 9e11) + 1e11, fileName: 'Financial', nestedUnder: ''}, {id: Math.floor(Math.random() * 9e11) + 1e11, fileName: 'Personal/Medical', nestedUnder: ''}, {id: Math.floor(Math.random() * 9e11) + 1e11, fileName: 'Pictures/Videos', nestedUnder: ''}, {id: Math.floor(Math.random() * 9e11) + 1e11, fileName: 'Work', nestedUnder: ''}, {id: Math.floor(Math.random() * 9e11) + 1e11, fileName: 'Hobbies', nestedUnder: ''}, {id: Math.floor(Math.random() * 9e11) + 1e11, fileName: 'Basement/Mech', nestedUnder: 1}, {id: Math.floor(Math.random() * 9e11) + 1e11, fileName: 'Garage', nestedUnder: 1}, {id: Math.floor(Math.random() * 9e11) + 1e11, fileName: 'Kitchen', nestedUnder: 1}, {id: Math.floor(Math.random() * 9e11) + 1e11, fileName: 'Main Floor', nestedUnder: 1}, {id: Math.floor(Math.random() * 9e11) + 1e11, fileName: 'Second Floor', nestedUnder: 1}, {id: Math.floor(Math.random() * 9e11) + 1e11, fileName: 'Structure', nestedUnder: 1}, {id: Math.floor(Math.random() * 9e11) + 1e11, fileName: 'Mortgage', nestedUnder: 2}, {id: Math.floor(Math.random() * 9e11) + 1e11, fileName: 'Insurance', nestedUnder: 2}, {id: Math.floor(Math.random() * 9e11) + 1e11, fileName: 'Tax Info', nestedUnder: 2}, {id: Math.floor(Math.random() * 9e11) + 1e11, fileName: 'Banking', nestedUnder: 2}, {id: Math.floor(Math.random() * 9e11) + 1e11, fileName: 'Friends', nestedUnder: 4}, {id: Math.floor(Math.random() * 9e11) + 1e11, fileName: 'Family', nestedUnder: 4}, {id: Math.floor(Math.random() * 9e11) + 1e11, fileName: 'Pets', nestedUnder: 4}, {id: Math.floor(Math.random() * 9e11) + 1e11, fileName: 'Vacations', nestedUnder: 4}, {id: Math.floor(Math.random() * 9e11) + 1e11, fileName: 'Events', nestedUnder: 4}, {id: Math.floor(Math.random() * 9e11) + 1e11, fileName: 'Receipts', nestedUnder: 15}, {id: Math.floor(Math.random() * 9e11) + 1e11, fileName: 'Returns', nestedUnder: 15}],
+        fileRefs: [],
+        sharedWith: {},
+        passcodeAuthenticated: false,
+        spaceUsed: 0
+    })
+}
+
 //get a user document using a uid, setup snapshot listener to monitor changes
 export async function userListener(setCurrentUser, setStaging, user) {
     const unsub = onSnapshot(doc(db, 'users', user), (doc) => {
