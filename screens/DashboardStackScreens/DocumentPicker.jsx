@@ -245,7 +245,7 @@ const DocumentPickerComp = () => {
                     reference = await addfile({
                         name: el.name,
                         fileType: el.fileType,
-                        size: uploadSize,
+                        size: thumbnailResult ? result.metadata.size + thumbnailResult.metadata.size : result.metadata.size,
                         user: currentUser,
                         version: 0,
                         timeStamp: `${formattedDate}`
@@ -256,7 +256,7 @@ const DocumentPickerComp = () => {
                         ...el, 
                         name: el.name, 
                         user: currentUser, 
-                        size: uploadSize, 
+                        size: result.metadata.size, 
                         timeStamp: formattedDate, 
                         version: versionNo}, finalDestination)
                 }
