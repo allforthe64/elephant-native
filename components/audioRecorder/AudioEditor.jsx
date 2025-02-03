@@ -3,7 +3,7 @@ import React, {useEffect, useState} from 'react'
 
 //fontAwesome imports
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
-import { faPlay } from '@fortawesome/free-solid-svg-icons'
+import { faPlay, faTrash } from '@fortawesome/free-solid-svg-icons'
 
 const AudioEditor = ({recordingLine, index, deleteFunc, editRecordings, recordings}) => {
     const [recordingTitle, setRecordingTitle] = useState(recordingLine.name)
@@ -19,7 +19,7 @@ const AudioEditor = ({recordingLine, index, deleteFunc, editRecordings, recordin
     }, [recordingTitle])
 
   return (
-    <View key={index} style={styles.bigCon}>
+    /* <View key={index} style={styles.bigCon}>
         <View style={styles.container}>
             <Text style={styles.fill}>{recordingTitle} - {recordingLine.duration}</Text>
             <View style={styles.wrapperContainer}>
@@ -34,6 +34,18 @@ const AudioEditor = ({recordingLine, index, deleteFunc, editRecordings, recordin
                 <Text style={styles.pressable}>Delete</Text>
             </TouchableOpacity>
         </View>
+    </View> */
+    <View key={index} style={styles.fileRow}>
+        <TouchableOpacity onPress={() => {recordingLine.sound.replayAsync()}}>
+            <FontAwesomeIcon icon={faPlay} style={{color: 'white', marginTop: '2%'}} size={18}/>
+        </TouchableOpacity>
+        <TextInput style={styles.input} value={recordingTitle} numberOfLines={1} placeholder='Enter Recording Name...' onChangeText={e => setRecordingTitle(e)}/>
+        <Text style={styles.fill}>{recordingLine.duration}</Text>
+        <TouchableOpacity title='Delete' onPress={() => deleteFunc(recordings, recordingLine)}>
+            <View style={styles.iconHolderSM}>
+                <FontAwesomeIcon icon={faTrash} size={18} color='red'/>
+            </View>
+        </TouchableOpacity>
     </View>
   )
 }
@@ -41,70 +53,43 @@ const AudioEditor = ({recordingLine, index, deleteFunc, editRecordings, recordin
 export default AudioEditor
 
 const styles = StyleSheet.create({
-    bigCon: {
-        marginBottom: '5%',
-        width: '90%',
-    },
-    container: {
+    fileRow: {
         display: 'flex',
         flexDirection: 'row',
+        justifyContent: 'space-between',
         width: '100%',
-        paddingRight: '5%'
-    },
-    input: {
-        backgroundColor: 'white',
+        paddingBottom: '2%',
+        paddingTop: '2%',
         paddingLeft: '2%',
-        fontSize: 15,
-        borderWidth: 1,
-        width: '60%',
-        marginBottom: '5%'
+        paddingRight: '2%',
+        marginBottom: '4%',
+        backgroundColor: '#DDCADB',
+        borderRadius: 100
     },
-    url: {
+    file: {
+        color: 'white',
+        width: '65%',
         fontSize: 15,
         fontWeight: '600',
-        width: '100%',
-        color: 'white',
-        overflow: 'hidden',
-        marginBottom: '5%'
-    },
-    pressable: {
-        color: 'red',
-        fontSize: 15,
-        fontWeight: '500',
-        marginLeft: '25%'
-    },
-    row: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center'
-    },
-    fill: {
-        margin: 16,
-        color: 'white'
-    },
-    wrapperContainer: {
-        display: 'flex',
-        alignItems: 'center',
-        width: '10%',
-        marginTop: '4.5%'
-    },
-    buttonWrapper: {
-    width: '100%',
-    borderColor: '#777',
-    borderRadius: 25,
-    backgroundColor: 'white',
-    borderWidth: 1,
-    paddingTop: '2%',
-    paddingBottom: '2%',
     },
     input: {
         backgroundColor: 'white',
-        paddingLeft: '2%',
-        paddingBottom: '1%',
-        fontSize: 15,
-        borderWidth: 1,
-        width: '60%',
-        marginBottom: '5%',
-        marginLeft: '5%'
+        color: 'black',
+        width: '85%',
+        paddingTop: 2,
+        paddingBottom: 2,
+        paddingLeft: '3%',
+        paddingRight: '3%',
+        borderRadius: 100
+    },
+    iconHolderSM: {
+        backgroundColor: 'white', 
+        height: 36, 
+        width: 36, 
+        borderRadius: 100, 
+        display: 'flex', 
+        flexDirection: 'row', 
+        justifyContent: 'center', 
+        alignItems: 'center'
     },
 })
