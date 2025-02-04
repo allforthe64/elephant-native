@@ -3,7 +3,7 @@ import { Text, View , TouchableOpacity, ScrollView, StyleSheet, Image, TextInput
 
 //fontAwesome imports
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
-import { faMicrophone, faSquare, faXmark, faFolder, faArrowLeft } from '@fortawesome/free-solid-svg-icons'
+import { faMicrophone, faSquare, faXmark, faFolder, faArrowLeft, faCloudArrowUp } from '@fortawesome/free-solid-svg-icons'
 
 //AudioEditor component import
 import AudioEditor from '../../components/audioRecorder/AudioEditor'
