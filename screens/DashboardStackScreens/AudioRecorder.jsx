@@ -522,67 +522,64 @@ const AudioRecorder = () => {
             </Modal>
         :
             <View style={{
-                backgroundColor: 'rgb(23,23,23)',
-                height: '100%'}}>
-                <Image style={styles.bgImg } source={require('../../assets/elephant_bg.jpg')} />
-                <View style={{
-                    width: '100%',
-                    height: '100%',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    position: 'absolute',
-                    paddingBottom: '10%',
-                    paddingTop: insets.top,
-                    paddingBottom: insets.bottom}}>
-                    <Text style={styles.bigHeader}>Audio Recordings:</Text>
+                backgroundColor: '#FFFCF6',
+                flex: 1,
+                justifyContent: 'center',
+                alignItems: 'center',
+            }}>
+                <Text style={styles.bigHeader}>Audio Recordings:</Text>
 
-                    {loading ? 
-                        <View style={styles.noRecCon}>
-                            <Text style={styles.bigHeader}>Uploading Recordings...</Text>
-                        </View>
-                    :
-                        <>
-                            {recordings.length === 0 ? 
-                                <View style={styles.noRecCon}>
-                                    <Text style={styles.bigHeader}>No Recordings Yet</Text>
-                                </View>
-                            :
-                                <View style={styles.scrollCon}>
-                                    <ScrollView>
-                                        {getRecordingLines()}
-                                    </ScrollView>
-                                </View>
-                            }
-                        </>
-                    }
-                    <View style={styles.wrapperContainer}>
-                        <View style={recording ? styles.buttonWrapperIcon : styles.buttonWrapperRed}>
-                            <TouchableOpacity onPress={recording ? stopRecording : startRecording}>
-                            {recording ? <FontAwesomeIcon icon={faSquare} size={46} style={{color: 'red', marginLeft: '13%'}}/> : <FontAwesomeIcon icon={faMicrophone} size={50} style={{marginLeft: '12%'}}/>}
-                            </TouchableOpacity>
-                        </View>
+                {loading ? 
+                    <View style={styles.noRecCon}>
+                        <Text style={styles.bigHeader}>Uploading Recordings...</Text>
                     </View>
-                    <View style={styles.wrapperContainer}>
-                        <View style={recordings.length > 0 ? styles.buttonWrapper : {
-                            width: '60%',
-                            borderColor: '#777',
-                            borderRadius: 25,
-                            backgroundColor: 'white',
-                            borderWidth: 1,
-                            paddingTop: '2%',
-                            paddingBottom: '2%',
-                            opacity: .5
-                        }}>
-                            <TouchableOpacity onPress={() => {
-                                if (recordings.length > 0) {
-                                    setPreAdd(true)
-                                }
-                               
+                :
+                    <>
+                        {recordings.length === 0 ? 
+                            <View style={styles.noRecCon}>
+                                <Text style={styles.bigHeader}>No Recordings Yet</Text>
+                            </View>
+                        :
+                            <View style={{
+                                width: '100%',
+                                height: '100%',
+                                display: 'flex',
+                                alignItems: 'center',
+                                position: 'absolute',
+                                paddingTop: insets.top,
+                                paddingBottom: insets.bottom
                             }}>
-                            <Text style={styles.input}>Save All</Text>
-                            </TouchableOpacity>
-                        </View>
+                                <ScrollView>
+                                    {getRecordingLines()}
+                                </ScrollView>
+                            </View>
+                        }
+                    </>
+                }
+                <View style={styles.wrapperContainer}>
+                        <TouchableOpacity onPress={recording ? stopRecording : startRecording}>
+                        {recording ? <FontAwesomeIcon icon={faSquare} size={46} style={{color: 'red', marginLeft: '13%'}}/> : <FontAwesomeIcon icon={faMicrophone} size={50} style={{marginLeft: '12%'}}/>}
+                        </TouchableOpacity>
+                </View>
+                <View style={styles.wrapperContainer}>
+                    <View style={recordings.length > 0 ? styles.buttonWrapper : {
+                        width: '60%',
+                        borderColor: '#777',
+                        borderRadius: 25,
+                        backgroundColor: 'white',
+                        borderWidth: 1,
+                        paddingTop: '2%',
+                        paddingBottom: '2%',
+                        opacity: .5
+                    }}>
+                        <TouchableOpacity onPress={() => {
+                            if (recordings.length > 0) {
+                                setPreAdd(true)
+                            }
+                            
+                        }}>
+                        <Text style={styles.input}>Save All</Text>
+                        </TouchableOpacity>
                     </View>
                 </View>
             </View>
