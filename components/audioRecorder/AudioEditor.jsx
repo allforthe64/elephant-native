@@ -57,7 +57,7 @@ const styles = StyleSheet.create({
         display: 'flex',
         flexDirection: 'row',
         justifyContent: 'space-between',
-        width: '100%',
+        width: '90%',
         paddingBottom: '2%',
         paddingTop: '2%',
         paddingLeft: '2%',
@@ -75,7 +75,7 @@ const styles = StyleSheet.create({
     input: {
         backgroundColor: 'white',
         color: 'black',
-        width: '85%',
+        width: '75%',
         paddingTop: 2,
         paddingBottom: 2,
         paddingLeft: '3%',

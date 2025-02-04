@@ -522,10 +522,12 @@ const AudioRecorder = () => {
             </Modal>
         :
             <View style={{
-                backgroundColor: '#FFFCF6',
-                flex: 1,
-                justifyContent: 'center',
+                width: '100%',
+                height: '100%',
+                display: 'flex',
                 alignItems: 'center',
+                paddingTop: insets.top,
+                paddingBottom: insets.bottom
             }}>
                 <Text style={styles.bigHeader}>Audio Recordings:</Text>
 
@@ -540,15 +542,7 @@ const AudioRecorder = () => {
                                 <Text style={styles.bigHeader}>No Recordings Yet</Text>
                             </View>
                         :
-                            <View style={{
-                                width: '100%',
-                                height: '100%',
-                                display: 'flex',
-                                alignItems: 'center',
-                                position: 'absolute',
-                                paddingTop: insets.top,
-                                paddingBottom: insets.bottom
-                            }}>
+                            <View style={styles.scrollCon}>
                                 <ScrollView>
                                     {getRecordingLines()}
                                 </ScrollView>
@@ -558,29 +552,16 @@ const AudioRecorder = () => {
                 }
                 <View style={styles.wrapperContainer}>
                         <TouchableOpacity onPress={recording ? stopRecording : startRecording}>
-                        {recording ? <FontAwesomeIcon icon={faSquare} size={46} style={{color: 'red', marginLeft: '13%'}}/> : <FontAwesomeIcon icon={faMicrophone} size={50} style={{marginLeft: '12%'}}/>}
+                        {recording ? <FontAwesomeIcon icon={faSquare} size={20} style={{color: 'red', marginLeft: '13%'}}/> : <FontAwesomeIcon icon={faMicrophone} size={50} style={{marginLeft: '12%'}}/>}
                         </TouchableOpacity>
                 </View>
                 <View style={styles.wrapperContainer}>
-                    <View style={recordings.length > 0 ? styles.buttonWrapper : {
-                        width: '60%',
-                        borderColor: '#777',
-                        borderRadius: 25,
-                        backgroundColor: 'white',
-                        borderWidth: 1,
-                        paddingTop: '2%',
-                        paddingBottom: '2%',
-                        opacity: .5
-                    }}>
-                        <TouchableOpacity onPress={() => {
-                            if (recordings.length > 0) {
-                                setPreAdd(true)
-                            }
-                            
-                        }}>
-                        <Text style={styles.input}>Save All</Text>
-                        </TouchableOpacity>
-                    </View>
+                    <TouchableOpacity onPress={() => setPreAdd(true)} style={styles.buttonWrapper}>
+                        <View style={styles.iconHolderSmall}>
+                            <FontAwesomeIcon icon={faCloudArrowUp} color='#9F37B0' />
+                        </View>
+                        <Text style={{fontSize: 18, width: '100%', fontWeight: '600', color: '#9F37B0', paddingTop: '1%', marginLeft: '25%'}}>Save All</Text>
+                    </TouchableOpacity>
                 </View>
             </View>
         }    
