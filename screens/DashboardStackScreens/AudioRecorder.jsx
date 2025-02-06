@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { Text, View , TouchableOpacity, ScrollView, StyleSheet, Image, TextInput, Modal, Pressable} from 'react-native'
 
 //fontAwesome imports
@@ -43,6 +43,7 @@ const AudioRecorder = () => {
 
         const currentUser = firebaseAuth.currentUser.uid
         const toast = useToast()
+        const nameRef = useRef()
 
         //get the current user 
         useEffect(() => {
