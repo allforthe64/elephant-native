@@ -311,52 +311,7 @@ const AudioRecorder = () => {
                     
                     { 
     
-                    !nameGiven ?
-                    <>
-                        <Text style={{color: 'white', fontSize: 35, fontWeight: '700', marginTop: '30%', textAlign: 'center'}}>{photo ? 'Name Photo' : 'Name Video: '}</Text>
-                        <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', marginTop: '10%'}}>
-                            <View style={styles.iconHolder}>
-                                <FontAwesomeIcon icon={faFile} size={22} color='#9F37B0'/>
-                            </View>
-                            <TextInput value={mediaName} style={{color: 'white', fontSize: 20, fontWeight: 'bold', borderBottomColor: 'white', borderBottomWidth: 2, width: '70%'}} onChangeText={(e) => setMediaName(e)} ref={nameRef}/>
-                        </View>
-                        <View style={{width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', paddingTop: '5%'}}>
-                            <TouchableOpacity style={mediaName === '' ? styles.yellowButtonXSDim : styles.yellowButtonXS}
-                                disabled={mediaName === '' ? true : false}
-                                onPress={() => {
-                                    setNameGiven(true)
-                                }}
-                            >   
-                                <View style={styles.iconHolderSmall}>
-                                    <FontAwesomeIcon icon={faFloppyDisk} size={18} color='#9F37B0'/>
-                                </View>
-                                <Text style={{fontSize: 18, color: '#9F37B0', fontWeight: '600', marginLeft: '15%', paddingTop: '1%'}}>Save</Text>
-                            </TouchableOpacity>
-                            <Text style={{color: 'white', fontSize: 20, marginTop: '2%', textAlign: 'center'}}>Or</Text>
-                            <TouchableOpacity style={{width: '50%',
-                                borderRadius: 25,
-                                backgroundColor: 'white',
-                                paddingTop: '2%',
-                                paddingBottom: '2%',
-                                paddingLeft: '2%',
-                                marginLeft: '2%',
-                                marginTop: '2%',
-                                display: 'flex',
-                                flexDirection: 'row',
-                                backgroundColor: '#FFE562'
-                            }}
-                            onPress={() => {
-                                setNameGiven(true)
-                            }}
-                            >   
-                                <View style={styles.iconHolderSmall}>
-                                    <FontAwesomeIcon icon={faStopwatch} size={18} color='#9F37B0'/>
-                                </View>
-                                <Text style={{fontSize: 18, color: '#9F37B0', fontWeight: '600', marginLeft: '7%', paddingTop: '1%'}}>Use Timestamp</Text>
-                            </TouchableOpacity>
-                        </View>
-                    </>
-                    : addFolderForm ? 
+                    addFolderForm ? 
                         <View style={{width: '100%', height: '100', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center'}}>
                             <Text style={{color: 'white', fontSize: 35, fontWeight: '700', marginTop: '40%', textAlign: 'center'}}>Add A New Folder:</Text>
                             <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', marginTop: '10%', width: '100%'}}>
@@ -535,20 +490,16 @@ const AudioRecorder = () => {
                     <View style={styles.noRecCon}>
                         <Text style={styles.bigHeader}>Uploading Recordings...</Text>
                     </View>
-                :
-                    <>
+                :      
+                    <View style={styles.scrollCon}>
                         {recordings.length === 0 ? 
-                            <View style={styles.noRecCon}>
-                                <Text style={styles.bigHeader}>No Recordings Yet</Text>
-                            </View>
+                            <Text style={styles.bigHeader}>No Recordings Yet</Text>
                         :
-                            <View style={styles.scrollCon}>
-                                <ScrollView>
-                                    {getRecordingLines()}
-                                </ScrollView>
-                            </View>
+                            <ScrollView>
+                                {getRecordingLines()}
+                            </ScrollView>
                         }
-                    </>
+                    </View>
                 }
                 <View style={styles.wrapperContainer}>
                         <TouchableOpacity onPress={recording ? stopRecording : startRecording}>
