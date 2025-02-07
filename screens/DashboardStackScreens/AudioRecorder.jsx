@@ -43,8 +43,7 @@ const AudioRecorder = () => {
 
         const currentUser = firebaseAuth.currentUser.uid
         const toast = useToast()
-        const nameRef = useRef()
-
+        
         //get the current user 
         useEffect(() => {
             if (firebaseAuth) {
@@ -290,9 +289,7 @@ const AudioRecorder = () => {
   return (
     <>
         {preAdd ? 
-            <Modal animationType='slide' presentationStyle='pageSheet' onShow={() => setTimeout(()=>{
-                nameRef.current.focus()
-            }, 200)}>
+            <Modal animationType='slide' presentationStyle='pageSheet'>
                 <View style={{height: '100%', width: '100%', backgroundColor: '#593060'}}>
                     {/* if the moveFile state is true, display the modal with the file movement code*/}
                     {/* xMark icon for closing out the moveFile modal */}
