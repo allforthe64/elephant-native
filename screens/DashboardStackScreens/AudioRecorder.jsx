@@ -445,7 +445,7 @@ const AudioRecorder = () => {
                             </TouchableOpacity>
     
                             <View style={{display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'space-around',}}>
-                                        <TouchableOpacity onPress={() => saveToElephant(false)} style={ destination.id !== null || focusedFolder ? styles.yellowButtonSM : styles.yellowButtonSMDim}
+                                        <TouchableOpacity onPress={() => saveFiles()} style={ destination.id !== null || focusedFolder ? styles.yellowButtonSM : styles.yellowButtonSMDim}
                                         disabled={destination.id !== null || focusedFolder ? false : true}
                                     >   
                                         <View style={styles.iconHolderSmall}>
@@ -455,7 +455,7 @@ const AudioRecorder = () => {
                                     </TouchableOpacity>
     
                                     <TouchableOpacity onPress={() => {
-                                        saveToElephant(videoObj ? true : false)
+                                        saveFiles()
                                         setPreAdd(false)
                                     }} style={styles.yellowButtonSM}>
                                         <View style={styles.iconHolderSmall}>
