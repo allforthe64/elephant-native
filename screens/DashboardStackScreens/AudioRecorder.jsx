@@ -479,6 +479,7 @@ const AudioRecorder = () => {
                 height: '100%',
                 display: 'flex',
                 alignItems: 'center',
+                justifyContent: 'center',
                 paddingTop: insets.top,
                 paddingBottom: insets.bottom
             }}>
@@ -491,7 +492,7 @@ const AudioRecorder = () => {
                 :      
                     <View style={styles.scrollCon}>
                         {recordings.length === 0 ? 
-                            <Text style={styles.bigHeader}>No Recordings Yet</Text>
+                            <Text style={styles.smallHeader}>No Recordings Yet</Text>
                         :
                             <ScrollView>
                                 {getRecordingLines()}
@@ -500,8 +501,8 @@ const AudioRecorder = () => {
                     </View>
                 }
                 <View style={styles.wrapperContainer}>
-                        <TouchableOpacity onPress={recording ? stopRecording : startRecording}>
-                        {recording ? <FontAwesomeIcon icon={faSquare} size={20} style={{color: 'red', marginLeft: '13%'}}/> : <FontAwesomeIcon icon={faMicrophone} size={50} style={{marginLeft: '12%'}}/>}
+                        <TouchableOpacity onPress={recording ? stopRecording : startRecording} style={{marginRight: '17%', backgroundColor: 'transparent', borderWidth: 8, borderColor: 'white', borderRadius: 1000, width: '24%', height: 90, display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
+                            {recording ? <FontAwesomeIcon icon={faSquare} size={55} style={{color: 'red', marginLeft: '13%'}}/> : <FontAwesomeIcon icon={faMicrophone} size={55} style={{marginLeft: '12%'}}/>}
                         </TouchableOpacity>
                 </View>
                 <View style={styles.wrapperContainer}>
@@ -527,148 +528,157 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
       },
-        bigHeader: {
-            color: '#593060',
-            fontSize: 25,
+    bigHeader: {
+        color: '#593060',
+        fontSize: 25,
+        textAlign: 'center',
+        fontWeight: '700',
+        marginBottom: '8%'
+        },
+    smallHeader: {
+        color: '#593060',
+            fontSize: 16,
             textAlign: 'center',
             fontWeight: '700',
             marginBottom: '8%'
-          },
-        scrollCon: {
-            height: '60%',
-            width: '95%',
-            borderBottomWidth: 1,
-            borderColor: 'black',
-            marginBottom: '10%'
-        },
-        scroll: {
-            paddingTop: '2%',
-            display: 'flex',
-            alignItems: 'center'
-        },
-        wrapperContainer: {
-            display: 'flex',
-            alignItems: 'center',
-            width: '100%',
-            marginBottom: '8%'
-        },
-        buttonWrapper: {
-        width: '60%',
-        borderRadius: 25,
-        backgroundColor: '#FFE562',
+    },
+    scrollCon: {
+        height: '60%',
+        width: '95%',
+        borderBottomWidth: 1,
+        borderColor: 'black',
+        marginBottom: '10%',
         display: 'flex',
+        justifyContent: 'center'
+    },
+    scroll: {
+        paddingTop: '2%',
+        display: 'flex',
+        alignItems: 'center'
+    },
+    wrapperContainer: {
+        display: 'flex',
+        alignItems: 'center',
+        width: '100%',
+        marginBottom: '8%'
+    },
+    buttonWrapper: {
+    width: '60%',
+    borderRadius: 25,
+    backgroundColor: '#FFE562',
+    display: 'flex',
+    flexDirection: 'row',
+    paddingTop: '2%',
+    paddingBottom: '2%',
+    paddingLeft: '2%'
+    },
+    iconHolderSmall: {
+        backgroundColor: 'white', 
+        width: 28, 
+        height: 28, 
+        display: 'flex', 
+        flexDirection: 'row', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        borderRadius: 100
+    },
+    iconHolder: {
+        backgroundColor: 'white', 
+        width: 44, 
+        height: 44, 
+        display: 'flex', 
+        flexDirection: 'row', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        borderRadius: 100
+    },
+    iconHolderBlack: {
+        backgroundColor: 'black', 
+        width: 44, 
+        height: 44, 
+        display: 'flex', 
+        flexDirection: 'row', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        borderRadius: 100
+    },
+    folder: {
+        display: 'flex',
+        justifyContent: 'space-between',
+        paddingRight: '2%',
         flexDirection: 'row',
+        marginLeft: 'auto',
+        marginRight: 'auto',
+        backgroundColor: '#BCBCBC',
+        width: '90%',
         paddingTop: '2%',
         paddingBottom: '2%',
-        paddingLeft: '2%'
-        },
-        iconHolderSmall: {
-            backgroundColor: 'white', 
-            width: 28, 
-            height: 28, 
-            display: 'flex', 
-            flexDirection: 'row', 
-            justifyContent: 'center', 
-            alignItems: 'center', 
-            borderRadius: 100
-        },
-        iconHolder: {
-            backgroundColor: 'white', 
-            width: 44, 
-            height: 44, 
-            display: 'flex', 
-            flexDirection: 'row', 
-            justifyContent: 'center', 
-            alignItems: 'center', 
-            borderRadius: 100
-        },
-        iconHolderBlack: {
-            backgroundColor: 'black', 
-            width: 44, 
-            height: 44, 
-            display: 'flex', 
-            flexDirection: 'row', 
-            justifyContent: 'center', 
-            alignItems: 'center', 
-            borderRadius: 100
-        },
-        folder: {
-            display: 'flex',
-            justifyContent: 'space-between',
-            paddingRight: '2%',
-            flexDirection: 'row',
-            marginLeft: 'auto',
-            marginRight: 'auto',
-            backgroundColor: '#BCBCBC',
-            width: '90%',
-            paddingTop: '2%',
-            paddingBottom: '2%',
-            paddingLeft: '2%',
-            marginBottom: '2%',
-            borderRadius: 100
-        },
-        folderWhite: {
-            display: 'flex',
-            justifyContent: 'space-between',
-            paddingRight: '2%',
-            flexDirection: 'row',
-            marginLeft: 'auto',
-            marginRight: 'auto',
-            backgroundColor: 'white',
-            width: '90%',
-            paddingTop: '2%',
-            paddingBottom: '2%',
-            paddingLeft: '2%',
-            marginBottom: '2%',
-            borderRadius: 100
-        },
-        yellowButtonBack: {
-            backgroundColor: '#FFE562',
-            paddingLeft: 6,
-            paddingTop: 6,
-            paddingBottom: 6,
-            paddingRight: 20,
-            borderRadius: 100,
-            display: 'flex',
-            flexDirection: 'row',
-            width: '30%',
-            marginLeft: '5%'
-        },
-        addFolderButton: {
-            width: '50%',
-            borderRadius: 25,
-            backgroundColor: '#FFE562',
-            paddingTop: '2%',
-            paddingBottom: '2%',
-            paddingLeft: '2%',
-            marginBottom: '5%',
-            marginLeft: '2%',
-            display: 'flex',
-            flexDirection: 'row'
-        },
-        yellowButtonSM: {
-            backgroundColor: '#FFE562',
-            paddingLeft: '2%',
-            paddingTop: '2%',
-            paddingBottom: '2%',
-            paddingRight: 20,
-            borderRadius: 100,
-            display: 'flex',
-            flexDirection: 'row',
-            width: '47%',
-        },
-        yellowButtonSMDim: {
-            backgroundColor: '#FFE562',
-            paddingLeft: '2%',
-            paddingTop: '2%',
-            paddingBottom: '2%',
-            paddingRight: 20,
-            borderRadius: 100,
-            display: 'flex',
-            flexDirection: 'row',
-            width: '47%',
-            opacity: .5
-        },
+        paddingLeft: '2%',
+        marginBottom: '2%',
+        borderRadius: 100
+    },
+    folderWhite: {
+        display: 'flex',
+        justifyContent: 'space-between',
+        paddingRight: '2%',
+        flexDirection: 'row',
+        marginLeft: 'auto',
+        marginRight: 'auto',
+        backgroundColor: 'white',
+        width: '90%',
+        paddingTop: '2%',
+        paddingBottom: '2%',
+        paddingLeft: '2%',
+        marginBottom: '2%',
+        borderRadius: 100
+    },
+    yellowButtonBack: {
+        backgroundColor: '#FFE562',
+        paddingLeft: 6,
+        paddingTop: 6,
+        paddingBottom: 6,
+        paddingRight: 20,
+        borderRadius: 100,
+        display: 'flex',
+        flexDirection: 'row',
+        width: '30%',
+        marginLeft: '5%'
+    },
+    addFolderButton: {
+        width: '50%',
+        borderRadius: 25,
+        backgroundColor: '#FFE562',
+        paddingTop: '2%',
+        paddingBottom: '2%',
+        paddingLeft: '2%',
+        marginBottom: '5%',
+        marginLeft: '2%',
+        display: 'flex',
+        flexDirection: 'row'
+    },
+    yellowButtonSM: {
+        backgroundColor: '#FFE562',
+        paddingLeft: '2%',
+        paddingTop: '2%',
+        paddingBottom: '2%',
+        paddingRight: 20,
+        borderRadius: 100,
+        display: 'flex',
+        flexDirection: 'row',
+        width: '47%',
+    },
+    yellowButtonSMDim: {
+        backgroundColor: '#FFE562',
+        paddingLeft: '2%',
+        paddingTop: '2%',
+        paddingBottom: '2%',
+        paddingRight: 20,
+        borderRadius: 100,
+        display: 'flex',
+        flexDirection: 'row',
+        width: '47%',
+        opacity: .5
+    },
     
 })
 
