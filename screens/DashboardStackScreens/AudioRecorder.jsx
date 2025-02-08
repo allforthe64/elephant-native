@@ -533,7 +533,8 @@ const styles = StyleSheet.create({
         fontSize: 25,
         textAlign: 'center',
         fontWeight: '700',
-        marginBottom: '8%'
+        marginBottom: '8%',
+        marginTop: '5%'
         },
     smallHeader: {
         color: '#593060',
@@ -547,7 +548,7 @@ const styles = StyleSheet.create({
         width: '95%',
         borderBottomWidth: 1,
         borderColor: 'black',
-        marginBottom: '10%',
+        marginBottom: '5%',
         display: 'flex',
         justifyContent: 'center'
     },
@@ -560,7 +561,7 @@ const styles = StyleSheet.create({
         display: 'flex',
         alignItems: 'center',
         width: '100%',
-        marginBottom: '8%'
+        marginBottom: '5%'
     },
     buttonWrapper: {
     width: '60%',
