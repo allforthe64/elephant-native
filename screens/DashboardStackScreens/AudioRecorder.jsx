@@ -501,8 +501,8 @@ const AudioRecorder = () => {
                     </View>
                 }
                 <View style={styles.wrapperContainer}>
-                        <TouchableOpacity onPress={recording ? stopRecording : startRecording} style={{backgroundColor: 'transparent', borderWidth: 8, borderColor: 'white', borderRadius: 1000, width: '24%', height: 90, display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
-                            {recording ? <FontAwesomeIcon icon={faSquare} size={40} color='red'/> : <FontAwesomeIcon icon={faMicrophone} size={40} color='red'/>}
+                        <TouchableOpacity onPress={recording ? stopRecording : startRecording} style={{backgroundColor: 'transparent', borderWidth: 8, borderColor: 'white', borderRadius: 1000, width: '20%', height: 70, display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
+                            {recording ? <FontAwesomeIcon icon={faSquare} size={30} color='red'/> : <FontAwesomeIcon icon={faMicrophone} size={30} color='red'/>}
                         </TouchableOpacity>
                 </View>
                 <View style={styles.wrapperContainer}>
