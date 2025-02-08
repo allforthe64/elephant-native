@@ -486,8 +486,8 @@ const AudioRecorder = () => {
                 <Text style={styles.bigHeader}>Audio Recordings:</Text>
 
                 {loading ? 
-                    <View style={styles.noRecCon}>
-                        <Text style={styles.bigHeader}>Uploading Recordings...</Text>
+                    <View style={styles.scrollCon}>
+                        <Text style={styles.smallHeader}>Uploading Recordings...</Text>
                     </View>
                 :      
                     <View style={styles.scrollCon}>
@@ -502,7 +502,7 @@ const AudioRecorder = () => {
                 }
                 <View style={styles.wrapperContainer}>
                         <TouchableOpacity onPress={recording ? stopRecording : startRecording} style={{backgroundColor: 'transparent', borderWidth: 8, borderColor: 'white', borderRadius: 1000, width: '24%', height: 90, display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
-                            {recording ? <FontAwesomeIcon icon={faSquare} size={55}/> : <FontAwesomeIcon icon={faMicrophone} size={55}/>}
+                            {recording ? <FontAwesomeIcon icon={faSquare} size={40} color='red'/> : <FontAwesomeIcon icon={faMicrophone} size={40} color='red'/>}
                         </TouchableOpacity>
                 </View>
                 <View style={styles.wrapperContainer}>
