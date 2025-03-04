@@ -1,5 +1,11 @@
 const functions = require('firebase-functions/v2');
 const { logger } = require('firebase-functions');
+const admin = require("firebase-admin");
+
+if (!admin.apps.length) {
+  admin.initializeApp(); // Only initialize if the app isn't already initialized
+}
+
 
 exports.helloWorldV2 = functions.https.onRequest((request, response) => {
     if (request.method === 'GET') {
