@@ -1,19 +1,19 @@
-const functions = require('firebase-functions/v2');
-const { onRequest } = require('firebase-functions/v2/https')
-const { logger } = require('firebase-functions');
-const admin = require("firebase-admin");
+/**
+ * Import function triggers from their respective submodules:
+ *
+ * const {onCall} = require("firebase-functions/v2/https");
+ * const {onDocumentWritten} = require("firebase-functions/v2/firestore");
+ *
+ * See a full list of supported triggers at https://firebase.google.com/docs/functions
+ */
 
-if (!admin.apps.length) {
-  admin.initializeApp(); // Only initialize if the app isn't already initialized
-}
+const {onRequest} = require("firebase-functions/v2/https");
+const logger = require("firebase-functions/logger");
 
+// Create and deploy your first functions
+// https://firebase.google.com/docs/functions/get-started
 
-exports.helloWorldV2 = onRequest((request, response) => {
-    if (request.method === 'GET') {
-        logger.info('GET request received!');
-        return response.json({ message: 'hello, world!' });
-    } else {
-        logger.warn('Unsupported request method!');
-        return response.status(405).json({ error: 'Method Not Allowed' });
-    }
+exports.helloWorld = onRequest((request, response) => {
+    logger.info("Hello logs!", {structuredData: true});
+    response.send("Hello from Firebase!");
 });
