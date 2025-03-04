@@ -1,4 +1,5 @@
 const functions = require('firebase-functions/v2');
+const { onRequest } = require('firebase-functions/v2/https')
 const { logger } = require('firebase-functions');
 const admin = require("firebase-admin");
 
@@ -7,7 +8,7 @@ if (!admin.apps.length) {
 }
 
 
-exports.helloWorldV2 = functions.https.onRequest((request, response) => {
+exports.helloWorldV2 = onRequest((request, response) => {
     if (request.method === 'GET') {
         logger.info('GET request received!');
         return response.json({ message: 'hello, world!' });
