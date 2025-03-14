@@ -38,6 +38,9 @@ import { manipulateAsync, SaveFormat } from 'expo-image-manipulator';
 //import useToast for notifications
 import { useToast } from 'react-native-toast-notifications'
 
+//import AsyncStorage object
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 const Main = () => {
 
   //instantiate auth object
@@ -53,6 +56,9 @@ const Main = () => {
   const [userInst, setUserInst] = useState()
   const [currentUser, setCurrentUser] = useState()
   const [screen, setScreen] = useState('')
+
+  const MAX_CONCURRENT_UPLOADS = 1
+  let activeUploads = 0
 
   const navigationRef = useRef(null);
 
@@ -77,7 +83,148 @@ const Main = () => {
       
   }, [currentUser])
 
-  const uploadImages = async () => {
+  //generate a random 10 character alpha numeric string
+  function generateRandomString(length) {
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let result = '';
+    const charactersLength = characters.length;
+
+    for (let i = 0; i < length; i++) {
+        result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    }
+
+    return result;
+  }
+
+  const removeFromQueue = async (file) => {
+    try {
+      const queue = JSON.parse(await AsyncStorage.getItem('uploadQueue')) || [];
+      const updatedQueue = queue.filter((exstFile) => exstFile.uri !== file.uri);
+      await AsyncStorage.setItem('uploadQueue', JSON.stringify(updatedQueue));
+    } catch (error) {
+      console.error('Error removing from queue:', error);
+    }
+  }
+
+  const uploadFile = async (file) => {
+
+    //generate a new randomString
+    const randomString = generateRandomString(10);
+
+    //create new formatted date for file
+    const formattedDate = format(new Date(), "yyyy-MM-dd:hh:mm:ss") + randomString
+
+    const fileUriArray = file.uri.split('.')
+    const fileType = fileUriArray[fileUriArray.length - 1]
+
+    let manipResult
+    if (fileType === 'jpg' || fileType === 'JPG' || fileType === 'jpeg' || fileType === 'JPEG' || fileType === 'png' || fileType === 'PNG') {
+      manipResult = await manipulateAsync(
+        file.uri,
+        [{ resize: {height: metaDate.height * .1, width: metaData.width * .1} }],
+        { compress: 1, format: SaveFormat.PNG }
+      )
+    }
+    if (manipResult) {
+      //upload thumbnail version
+      const thumbNailBlob = await new Promise(async (resolve, reject) => {
+        const xhr = new XMLHttpRequest()
+        xhr.onload = () => {
+            resolve(xhr.response)
+        }
+        xhr.onerror = (e) => {
+            reject(new TypeError('Network request failed'))
+        }
+        xhr.responseType = 'blob'
+        xhr.open('GET', manipResult.uri, true)
+        xhr.send(null)
+      })
+      
+      const thumbnailFileRef = ref(storage, `${currentUser}/thumbnail&${formattedDate}`)
+      const thumbnailFileUri = `${currentUser}/${mediaName !== '' ? `thumbnail&${mediaName}` : `thumbnail&${formattedDate}`}`
+      const thumbNailResult = await uploadBytesResumable(thumbnailFileRef, thumbNailBlob)
+
+      //create a blob for the file
+      const blob = await new Promise(async (resolve, reject) => {
+        const xhr = new XMLHttpRequest()
+        xhr.onload = () => {
+        resolve(xhr.response) 
+        }
+        xhr.onerror = (e) => {
+            reject(new TypeError('Network request failed'))
+        }
+        xhr.responseType = 'blob'
+        xhr.open('GET', file.uri, true)
+        xhr.send(null)
+      })
+      const fileUri = `${currentUser}/${file.fileName}`
+      const fileRef = ref(storage, `${currentUser}/${formattedDate}`)
+      const result = await uploadBytesResumable(fileRef, blob)
+
+      let uploadSize
+      if (thumbNailResult) uploadSize = result.metadata.size + thumbNailResult.metadata.size
+      else uploadSize = result.metadata.size
+
+      const reference = await addfile({
+            name: file.filename,
+            fileType: 'jpg',
+            size: uploadSize,
+            uri: fileUri,
+            thumbnailUri: thumbnailFileUri,
+            user: currentUser,
+            version: 0,
+            timeStamp: `${formattedDate}`
+          }, file.finalDestination)
+
+      const updatedUser = {...userInst, fileRefs: [...userInst.fileRefs, reference], spaceUsed: userInst.spaceUsed + uploadSize}
+      updateUser(updatedUser)
+
+      toast.show('Upload successful', {
+        type: 'success'
+      })
+    }
+
+  }
+
+  const processUploadQueue = async () => {
+    try {
+      let queue = JSON.parse(await AsyncStorage.getItem('uploadQueue')) || []
+
+      if (queue.length === 0 || activeUploads >= MAX_CONCURRENT_UPLOADS) {
+        console.log('No uploads to process or max uploads reached.')
+        return
+      }
+
+      while (queue.length > 0 && activeUploads < MAX_CONCURRENT_UPLOADS){
+        const file = queue.shift()
+        activeUploads ++
+
+        uploadFile(file)
+          .then(() => {
+            activeUploads--
+            removeFromQueue(file)
+            processUploadQueue()
+          })
+          .catch((error) => {
+            console.log('Upload failed: ', error)
+            activeUploads--
+            processUploadQueue()
+          })
+      }
+    } catch (error) {
+      console.error('Error processing upload queue:', error)
+    }
+  }
+
+  useEffect(() => {
+    if (userInst) {
+      const resumeUploadsOnRestart = async () => {
+        processUploadQueue()
+      }
+    }
+  }, [userInst])
+
+  /* const uploadImages = async () => {
         let massUploadSize = 0
         que.forEach(queElement => {
             massUploadSize += queElement.size
@@ -89,24 +236,21 @@ const Main = () => {
         })
         setQue([])
   }
-
-  //when the auth state changes, pass the user object from firbaseAuth object into AuthContext
-  useEffect(() => {
-    onAuthStateChanged(auth, (user) => {
-        setAuthUser(user)
-      })
-    
-  }, [])
-
-
-
   useEffect(() => {
     if (que.length > 0) {
       const timer = setTimeout(() => uploadImages(), 2000)
 
       return () => clearTimeout(timer)
     }
-  }, [que, screen])
+  }, [que, screen]) */
+
+  //when the auth state changes, pass the user object from firbaseAuth object into AuthContext
+  useEffect(() => {
+    onAuthStateChanged(auth, (user) => {
+        setAuthUser(user)
+    })
+    
+  }, [])
   
   return (
     <NavigationContainer

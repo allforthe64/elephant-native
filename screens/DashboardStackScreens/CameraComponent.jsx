@@ -307,6 +307,21 @@ try {
 
                     try {  
 
+                        //generate a fileName and finalDestination
+                        const filename = mediaName !== '' ? `${mediaName}.jpg` : `${formattedDate}.jpg`
+
+                        let finalDestination 
+                        if (destination.id !== null) finalDestination = destination.id
+                        else if (focusedFolder) finalDestination = focusedFolder 
+                        else finalDestination = false
+
+                        //add an image into the file queue
+                        let queue = JSON.parse(await AsyncStorage.getItem('uploadQueue')) || []
+                        queue.push({uri: photo.uri, filename: filename, finalDestination: finalDestination, metadata: {height: photo.height, width: photo.width}})
+                        await AsyncStorage.setItem('uploadQueue', JSON.stringify(queue))
+                        
+                        /* 
+
                         //generate a resized version of the image for thumbnails
                         const manipResult = await manipulateAsync(
                             photo.uri,
@@ -327,8 +342,7 @@ try {
                             xhr.open('GET', manipResult.uri, true)
                             xhr.send(null)
                         })
-                        const thumbnailFilename = mediaName !== '' ? `${mediaName}&thumbnail.jpg` : `${formattedDate}&thumbnail.jpg`
-                        const thumbnailFileUri = `${currentUser}/${mediaName !== '' ? `thumbnail&${mediaName}` : `thumbnail&${formattedDate}`}`
+                        
                         const thumbnailFileRef = ref(storage, `${currentUser}/thumbnail&${formattedDate}`)
                         const thumbnailResult = await uploadBytesResumable(thumbnailFileRef, thumbNailBlob) 
 
@@ -347,16 +361,6 @@ try {
                             xhr.send(null)
                         })
 
-                        const filename = mediaName !== '' ? `${mediaName}.jpg` : `${formattedDate}.jpg`
-                        const fileUri = `${currentUser}/${mediaName !== '' ? mediaName : formattedDate}`
-                        const fileRef = ref(storage, `${currentUser}/${formattedDate}`)
-                        const result = await uploadBytesResumable(fileRef, blob)
-
-                        let finalDestination 
-                        if (destination.id !== null) finalDestination = destination.id
-                        else if (focusedFolder) finalDestination = focusedFolder 
-                        else finalDestination = false
-
                         const uploadSize = thumbnailResult ? result.metadata.size + thumbnailResult.metadata.size : result.metadata.size
                         
                         const reference = await addfile({
@@ -368,7 +372,7 @@ try {
                                 user: currentUser,
                                 version: 0,
                                 timeStamp: `${formattedDate}`
-                            }, finalDestination)
+                        }, finalDestination)
 
                         if (!session) {
                             const updatedUser = {...userInst, fileRefs: [...userInst.fileRefs, reference], spaceUsed: userInst.spaceUsed + uploadSize}
@@ -380,7 +384,7 @@ try {
                             type: 'success'
                         })
 
-                        savePhoto()
+                        savePhoto() */
 
                     } catch (err) {
                         alert(err)
