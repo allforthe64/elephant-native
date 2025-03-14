@@ -36,6 +36,8 @@ import { useToast } from 'react-native-toast-notifications'
 import { manipulateAsync, SaveFormat } from 'expo-image-manipulator';
 import { QueContext } from '../../context/QueContext';
 
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 export default function CameraComponent() {
 try {
@@ -310,7 +312,7 @@ try {
                             photo.uri,
                             [{ resize: {height: photo.height * .1, width: photo.width * .1} }],
                             { compress: 1, format: SaveFormat.PNG }
-                          );
+                        );
 
                         //upload thumbnail version
                         const thumbNailBlob = await new Promise(async (resolve, reject) => {
