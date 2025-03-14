@@ -44,7 +44,6 @@
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-native": "^0.74.5",
-    "react-native-background-upload": "^6.6.0",
     "react-native-blob-util": "^0.19.11",
     "react-native-collapsible": "^1.6.1",
     "react-native-document-picker": "^9.3.1",
