@@ -41,7 +41,7 @@ import { useToast } from 'react-native-toast-notifications'
 //import AsyncStorage object
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import { EventEmitter } from 'expo-modules-core';
+/* import { EventEmitter } from 'expo-modules-core'; */
 
 const Main = () => {
 
@@ -229,7 +229,7 @@ const Main = () => {
     }
   }, [userInst])
 
-  const uploadEmitter = new EventEmitter(); // Event system for the queue
+  /* const uploadEmitter = new EventEmitter(); // Event system for the queue
 
   const QUEUE_UPDATED_EVENT = 'uploadQueueUpdated';
 
@@ -237,7 +237,7 @@ const Main = () => {
   uploadEmitter.addListener(QUEUE_UPDATED_EVENT, async () => {
     console.log('Queue updated! Checking for uploads...');
     processUploadQueue();
-  });
+  }); */
 
   /* const uploadImages = async () => {
         let massUploadSize = 0
