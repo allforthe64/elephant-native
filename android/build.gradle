@@ -18,8 +18,8 @@ buildscript {
         classpath('com.android.tools.build:gradle')
         classpath('com.facebook.react:react-native-gradle-plugin')
         classpath('org.jetbrains.kotlin:kotlin-gradle-plugin')
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion")
-        classpath("androidx.compose.compiler:compiler:$composeCompilerVersion")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.22")
+        classpath("androidx.compose.compiler:compiler:1.5.3")
     }
 }
 

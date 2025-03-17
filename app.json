@@ -22,7 +22,12 @@
         "backgroundColor": "#ffffff"
       },
       "package": "com.elephantdev.elephantnative",
-      "googleServicesFile": "./test_firebase_app_config_files/google-services.json"
+      "googleServicesFile": "./test_firebase_app_config_files/google-services.json",
+      "buildProperties": {
+        "gradleProperties": {
+          "androidx.compose.compiler.version": "1.5.3"
+        }
+      }
     },
     "web": {
       "favicon": "./assets/favicon.png"
