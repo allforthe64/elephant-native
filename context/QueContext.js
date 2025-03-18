@@ -4,6 +4,9 @@ const QueContext = createContext()
 
 const QueContextProvider = ({children}) => {
 
+    console.log('createContext: ', createContext)
+    console.log('useState: ', useState)
+
     const [que, setQue] = useState([])
 
     return (

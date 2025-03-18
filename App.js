@@ -30,7 +30,7 @@ Sentry.init({
 /* setNativeExceptionHandler((errorString) => {
   Sentry.captureException(new Error(errorString))
 });
- */
+*/
 
 //set a handler to take care of all JS errors
 /* setJSExceptionHandler((error, isFatal) => {

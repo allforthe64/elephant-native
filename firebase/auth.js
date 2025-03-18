@@ -4,6 +4,9 @@ const AuthContext = createContext()
 
 const AuthContextProvider = ({children}) => {
 
+    console.log('createContext: ', createContext)
+    console.log('useState: ', useState)
+
     const [authUser, setAuthUser] = useState(false)
 
     return (
