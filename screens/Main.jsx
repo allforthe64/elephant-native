@@ -41,7 +41,6 @@ import { useToast } from 'react-native-toast-notifications'
 //import AsyncStorage object
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-/* import { EventEmitter } from 'expo-modules-core'; */
 
 const Main = () => {
 
