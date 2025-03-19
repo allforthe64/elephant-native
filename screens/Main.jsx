@@ -121,7 +121,9 @@ const Main = () => {
     const fileUriArray = file.uri.split('.')
     const fileType = fileUriArray[fileUriArray.length - 1]
 
-    let manipResult
+    console.log(fileType)
+
+    /* let manipResult
     if (fileType === 'jpg' || fileType === 'JPG' || fileType === 'jpeg' || fileType === 'JPEG' || fileType === 'png' || fileType === 'PNG') {
       manipResult = await manipulateAsync(
         file.uri,
@@ -186,7 +188,7 @@ const Main = () => {
       toast.show('Upload successful', {
         type: 'success'
       })
-    }
+    } */
 
   }
 
@@ -199,12 +201,11 @@ const Main = () => {
         return
       }
 
-      console.log(queue)
-      /* while (queue.length > 0 && activeUploads < MAX_CONCURRENT_UPLOADS){
+/*       while (queue.length > 0 && activeUploads < MAX_CONCURRENT_UPLOADS){
         const file = queue.shift()
-        activeUploads ++
+        activeUploads ++ */
 
-        uploadFile(file)
+        uploadFile(queue[0])
           .then(() => {
             activeUploads--
             removeFromQueue(file)
@@ -215,7 +216,7 @@ const Main = () => {
             activeUploads--
             processUploadQueue()
           })
-      } */
+      /* } */
     } catch (error) {
       console.error('Error processing upload queue:', error)
     }
