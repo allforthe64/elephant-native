@@ -121,9 +121,7 @@ const Main = () => {
     const fileUriArray = file.uri.split('.')
     const fileType = fileUriArray[fileUriArray.length - 1]
 
-    console.log(fileType)
-
-    /* let manipResult
+    let manipResult
     if (fileType === 'jpg' || fileType === 'JPG' || fileType === 'jpeg' || fileType === 'JPEG' || fileType === 'png' || fileType === 'PNG') {
       manipResult = await manipulateAsync(
         file.uri,
@@ -188,7 +186,7 @@ const Main = () => {
       toast.show('Upload successful', {
         type: 'success'
       })
-    } */
+    }
 
   }
 
@@ -208,13 +206,13 @@ const Main = () => {
         uploadFile(queue[0])
           .then(() => {
             activeUploads--
-            removeFromQueue(file)
-            processUploadQueue()
+            removeFromQueue(queue[0])
+            /* processUploadQueue() */
           })
           .catch((error) => {
             console.log('Upload failed: ', error)
             activeUploads--
-            processUploadQueue()
+            /* processUploadQueue() */
           })
       /* } */
     } catch (error) {
