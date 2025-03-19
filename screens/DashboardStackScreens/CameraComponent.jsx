@@ -36,7 +36,9 @@ import { useToast } from 'react-native-toast-notifications'
 import { manipulateAsync, SaveFormat } from 'expo-image-manipulator';
 import { QueContext } from '../../context/QueContext';
 
+//import stuff for the Queue
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { UploadQueueEmitter } from '../../hooks/QueueEventEmitter';
 
 
 export default function CameraComponent() {
@@ -319,6 +321,8 @@ try {
                         let queue = JSON.parse(await AsyncStorage.getItem('uploadQueue')) || []
                         queue.push({uri: photo.uri, filename: filename, finalDestination: finalDestination, metadata: {height: photo.height, width: photo.width}})
                         await AsyncStorage.setItem('uploadQueue', JSON.stringify(queue))
+
+                        UploadQueueEmitter.emit('uploadQueueUpdated', queue)
                         
                         /* 
 

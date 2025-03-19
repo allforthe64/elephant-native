@@ -40,6 +40,7 @@ import { useToast } from 'react-native-toast-notifications'
 
 //import AsyncStorage object
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { UploadQueueEmitter } from '../hooks/QueueEventEmitter';
 
 
 const Main = () => {
@@ -221,10 +222,23 @@ const Main = () => {
 
   useEffect(() => {
     if (userInst) {
+
+      //run any of the uploads in the queue when the app restarts
       const resumeUploadsOnRestart = async () => {
         processUploadQueue()
       }
       resumeUploadsOnRestart()
+
+      //listen for uploads being added to the queue
+      const uploadListener = () => {
+        processUploadQueue()
+      }
+
+      UploadQueueEmitter.on('uploadQueueUpdated', uploadListener)
+
+      return () => {
+        UploadQueueEmitter.off('uploadQueueUpdated', uploadListener)
+      }
     }
   }, [userInst])
 
