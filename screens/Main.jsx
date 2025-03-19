@@ -199,7 +199,8 @@ const Main = () => {
         return
       }
 
-      while (queue.length > 0 && activeUploads < MAX_CONCURRENT_UPLOADS){
+      console.log(queue)
+      /* while (queue.length > 0 && activeUploads < MAX_CONCURRENT_UPLOADS){
         const file = queue.shift()
         activeUploads ++
 
@@ -214,7 +215,7 @@ const Main = () => {
             activeUploads--
             processUploadQueue()
           })
-      }
+      } */
     } catch (error) {
       console.error('Error processing upload queue:', error)
     }
