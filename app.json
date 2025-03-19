@@ -27,7 +27,11 @@
         "gradleProperties": {
           "androidx.compose.compiler.version": "1.5.3"
         }
-      }
+      },
+      "permissions": [
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -35,7 +39,7 @@
     "extra": {
       "EXPO_CLOUDMERSIVE": "aff46c84-15ba-4bb7-b6c2-b827cec256fb",
       "eas": {
-        "projectId": "6cba667c-768f-4494-9aa8-519d41c92917"
+        "projectId": "80101e5c-fa58-4995-8377-557df0002a8b"
       }
     },
     "plugins": [
@@ -56,6 +60,7 @@
           }
         }
       ]
-    ]
+    ],
+    "owner": "bisforbilliam"
   }
 }
