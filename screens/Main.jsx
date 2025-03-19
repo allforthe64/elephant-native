@@ -145,7 +145,7 @@ const Main = () => {
       })
       
       const thumbnailFileRef = ref(storage, `${currentUser}/thumbnail&${formattedDate}`)
-      const thumbnailFileUri = `${currentUser}/${mediaName !== '' ? `thumbnail&${mediaName}` : `thumbnail&${formattedDate}`}`
+      const thumbnailFileUri = `${currentUser}/thumbnail&${file.filename}`
       const thumbNailResult = await uploadBytesResumable(thumbnailFileRef, thumbNailBlob)
 
       //create a blob for the file
