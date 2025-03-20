@@ -199,22 +199,15 @@ const Main = () => {
         return
       }
 
-/*       while (queue.length > 0 && activeUploads < MAX_CONCURRENT_UPLOADS){
-        const file = queue.shift()
-        activeUploads ++ */
-
-        uploadFile(queue[0])
+      for (const file of queue) {
+        uploadFile(file)
           .then(() => {
-            activeUploads--
-            removeFromQueue(queue[0])
-            /* processUploadQueue() */
+            removeFromQueue(file)
           })
           .catch((error) => {
-            console.log('Upload failed: ', error)
-            activeUploads--
-            /* processUploadQueue() */
+            alert('Upload failed: ', error)
           })
-      /* } */
+      }
     } catch (error) {
       console.error('Error processing upload queue:', error)
     }
