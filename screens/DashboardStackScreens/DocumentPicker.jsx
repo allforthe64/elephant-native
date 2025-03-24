@@ -30,6 +30,10 @@ import { manipulateAsync, SaveFormat } from 'expo-image-manipulator';
 
 import DocumentPicker from 'react-native-document-picker'
 
+//import stuff for QueueUpload
+import { UploadQueueEmitter } from '../../hooks/QueueEventEmitter'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+
 const DocumentPickerComp = () => {
 
     const [files, setFiles] = useState([])
@@ -156,9 +160,29 @@ const DocumentPickerComp = () => {
         setLoading(true)
         setPreAdd(false)
         setFiles([])
-        let uploadSize = 0
 
-        const references =  await Promise.all(files.map(async (el) => {
+        const filesToAddToQueue = files.map(file => {
+
+            let finalDestination 
+            if (destination.id !== null) finalDestination = destination.id
+            else if (focusedFolder) finalDestination = focusedFolder 
+            else finalDestination = false
+
+            return { uri: file.uri, fileName: file.name, finalDestination: finalDestination }
+        })
+
+        let queue = JSON.parse(await AsyncStorage.getItem('uploadQueue')) || []
+        const newQueue = [...queue, ...filesToAddToQueue]
+        await AsyncStorage.setItem('uploadQueue', JSON.stringify(newQueue))
+
+        UploadQueueEmitter.emit('uploadQueueUpdated', newQueue)
+
+        //reset the form
+        setLoading(false)
+        setDestination({id: null, fileName: null, nestedUnder: null})
+        setFocusedFolder(null)
+
+        /* const references =  await Promise.all(files.map(async (el) => {
 
             //check for files with the same name and increase the version number
             let versionNo = 0
@@ -276,15 +300,12 @@ const DocumentPickerComp = () => {
             const newUser = {...userInst, spaceUsed: newSpaceUsed, fileRefs: [...userInst.fileRefs, ...references]}
             await updateUser(newUser)
 
-            //reset the form
-            setLoading(false)
-            setDestination({id: null, fileName: null, nestedUnder: null})
-            setFocusedFolder(null)
+            
             toast.show('File upload successful', {
                 type: 'success'
             }) 
         } catch (error) {console.log(error)}
-          
+           */
     }
 
     //add a folder

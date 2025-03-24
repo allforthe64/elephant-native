@@ -32,6 +32,9 @@ import { userListener, addfile, updateUser } from '../../firebase/firestore';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faFolder, faXmark, faFile, faArrowLeft, faFloppyDisk, faStopwatch, faPlus, faCheck, faBox, faCloudArrowUp } from '@fortawesome/free-solid-svg-icons';
 
+//upload queue emitter function import 
+import { UploadQueueEmitter } from '../../hooks/QueueEventEmitter';
+
 const DocScanner = () => {
 
   try {
@@ -173,16 +176,34 @@ const DocScanner = () => {
   }
 
   const uploadPDF = async (path) => {
-      setPreAdd(false)
+    setPreAdd(false)
 
-      const modifiedPath = `file://${path}`
+    const modifiedPath = `file://${path}`
 
-    //generate formatted date for file name
-    const formattedDate = format(new Date(), `yyyy-MM-dd:hh:mm:ss::${Date.now()}`)
+    //create new formatted date for file
+    const randomString = generateRandomString(10);
+    const formattedDate = format(new Date(), "yyyy-MM-dd:hh:mm:ss") + randomString
+
+    let finalDestination 
+    if (destination.id !== null) finalDestination = destination.id
+    else if (focusedFolder) finalDestination = focusedFolder 
+    else finalDestination = false
+
+    //generate a fileName and finalDestination
+    const filename = docName !== '' ? `${docName}.pdf` : `${formattedDate}.pdf`
+
+    //add an image into the file queue
+    let queue = JSON.parse(await AsyncStorage.getItem('uploadQueue')) || []
+    queue.push({uri: modifiedPath, filename: filename, finalDestination: finalDestination})
+    await AsyncStorage.setItem('uploadQueue', JSON.stringify(queue))
+
+    UploadQueueEmitter.emit('uploadQueueUpdated', queue)
+
+
 
     //create blob and upload it into firebase storage
     try {
-        const blob = await new Promise((resolve, reject) => {
+        /*const blob = await new Promise((resolve, reject) => {
           const xhr = new XMLHttpRequest()
           xhr.onload = () => {
               resolve(xhr.response) 
@@ -223,7 +244,7 @@ const DocScanner = () => {
       updateUser(updatedUser)
       toast.show('Upload successful', {
           type: 'success'
-      })
+      }) */
       setScannedImageArray([])
       setDestination({id: null, fileName: null, nestedUnder: null})
       setFocusedFolder(null)

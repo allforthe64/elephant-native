@@ -19,6 +19,9 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 //import useToast for notifications
 import { useToast } from 'react-native-toast-notifications'
 
+//import upload queue emitter obj
+import { UploadQueueEmitter } from '../../hooks/QueueEventEmitter'
+
 const Notepad = () => {
 
     const [open, setOpen] = useState(true)
@@ -132,32 +135,40 @@ const Notepad = () => {
 
       //generate formatted date, fileName, and upload size
       const formattedDate = format(new Date(), "yyyy-MM-dd:hh:mm:ss")
-      const fileName = noteName !== '' ? `${noteName}.txt` : `Note from: ${formattedDate}.txt`
-      let uploadSize = 0
+      const filename = noteName !== '' ? `${noteName}.txt` : `Note from: ${formattedDate}.txt`
+
+      let finalDestination 
+      if (destination.id !== null) finalDestination = destination.id
+      else if (focusedFolder) finalDestination = focusedFolder 
+      else finalDestination = false
+
+      //add an image into the file queue
+      let queue = JSON.parse(await AsyncStorage.getItem('uploadQueue')) || []
+      queue.push({uri: ['txt'], filename: filename, finalDestination: finalDestination, noteBody: body})
+      await AsyncStorage.setItem('uploadQueue', JSON.stringify(queue))
+
+      UploadQueueEmitter.emit('uploadQueueUpdated', queue)
 
       //increase version number if other files exist with the same name
-      let versionNo = 0
+      /* let versionNo = 0
       currentUser.fileRefs.forEach(fileRef => {
         if (fileRef.fileName === fileName && fileRef.fileName.split('.')[1] === fileName.split('.')[1]) {
           versionNo ++
       }
-      })
+      }) */
 
       //create textFile and upload to firebase storage/increase the upload size variable by the size of the textFile
-      try {
+      /* try {
         const textFile = new Blob([`${body}`], {
           type: "text/plain;charset=utf-8",
-       });
+        });
         const fileUri = `${currentUser.uid}/${noteName !== '' ? noteName : formattedDate}`
         const fileRef = refFunction(storage, `${currentUser.uid}/${formattedDate}`)
         const result = await uploadBytesResumable(fileRef, textFile)
 
         uploadSize += result.metadata.size
 
-       let finalDestintation 
-       if (destination.id !== null) finalDestintation = destination.id
-       else if (focusedFolder) finalDestintation = focusedFolder 
-       else finalDestintation = false
+       
 
         //create a reference
         const reference = await addfile({
@@ -188,15 +199,15 @@ const Notepad = () => {
           type: 'success'
          })
       }
-
+ */
       setBody(null)
       setDestination({id: null, fileName: null, nestedUnder: null})
       setFocusedFolder(null)
       setPreAdd(false)
       setNameGiven(false)
-      } catch (err) {
+     /*  } catch (err) {
         console.log(err)
-      }
+      } */
     }
 
     useEffect(() => {

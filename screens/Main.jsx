@@ -165,20 +165,118 @@ const Main = () => {
       const fileRef = ref(storage, `${currentUser}/${formattedDate}`)
       const result = await uploadBytesResumable(fileRef, blob)
 
-      let uploadSize
-      if (thumbNailResult) uploadSize = result.metadata.size + thumbNailResult.metadata.size
-      else uploadSize = result.metadata.size
+      const uploadSize = result.metadata.size + thumbNailResult.metadata.size
 
       const reference = await addfile({
-            name: file.filename,
-            fileType: 'jpg',
-            size: uploadSize,
-            uri: fileUri,
-            thumbnailUri: thumbnailFileUri,
-            user: currentUser,
-            version: 0,
-            timeStamp: `${formattedDate}`
-          }, file.finalDestination)
+        name: file.filename,
+        fileType: fileType,
+        size: uploadSize,
+        uri: fileUri,
+        thumbnailUri: thumbnailFileUri,
+        user: currentUser,
+        version: 0,
+        timeStamp: `${formattedDate}`
+      }, file.finalDestination)
+
+      const updatedUser = {...userInst, fileRefs: [...userInst.fileRefs, reference], spaceUsed: userInst.spaceUsed + uploadSize}
+      updateUser(updatedUser)
+
+      toast.show('Upload successful', {
+        type: 'success'
+      })
+    }
+
+    else if (fileType === 'txt') {
+
+      //upload noteBody as blob
+      const textFile = new Blob([`${file.noteBody}`], {
+        type: "text/plain;charset=utf-8",
+      });
+      const fileUri = `${currentUser.uid}/${file.filename}`
+      const fileRef = refFunction(storage, `${currentUser.uid}/${formattedDate}`)
+      const result = await uploadBytesResumable(fileRef, textFile)
+
+      const uploadSize = result.metadata.size
+
+      const reference = await addfile({
+        name: file.filename,
+        fileType: 'txt',
+        size: uploadSize,
+        uri: fileUri,
+        user: currentUser,
+        version: 0,
+        timeStamp: `${formattedDate}`
+      }, file.finalDestination)
+
+      const updatedUser = {...userInst, fileRefs: [...userInst.fileRefs, reference], spaceUsed: userInst.spaceUsed + uploadSize}
+      updateUser(updatedUser)
+
+      toast.show('Upload successful', {
+        type: 'success'
+      })
+    }
+
+    else if (fileType === 'doc' || fileType === 'docx') {
+      const blob = await new Promise(async (resolve, reject) => {
+        const xhr = new XMLHttpRequest()
+        xhr.onload = () => {
+        resolve(xhr.response) 
+        }
+        xhr.onerror = (e) => {
+            reject(new TypeError('Network request failed'))
+        }
+        xhr.responseType = 'blob'
+        xhr.open('GET', file.uri, true)
+        xhr.send(null)
+      })
+      const fileUri = `${formattedDate}^&${currentUser}`
+      const fileRef = ref(storage, `${formattedDate}^&${currentUser}`)
+      const result = await uploadBytesResumable(fileRef, blob)
+      const uploadSize = result.metadata.size
+
+      const reference = await addfile({
+        name: file.filename,
+        fileType: fileType,
+        size: uploadSize,
+        uri: fileUri,
+        user: currentUser,
+        version: 0,
+        timeStamp: `${formattedDate}`
+      }, file.finalDestination)
+
+      const updatedUser = {...userInst, fileRefs: [...userInst.fileRefs, reference], spaceUsed: userInst.spaceUsed + uploadSize}
+      updateUser(updatedUser)
+
+      toast.show('Upload successful', {
+        type: 'success'
+      })
+    } else {
+      const blob = await new Promise(async (resolve, reject) => {
+        const xhr = new XMLHttpRequest()
+        xhr.onload = () => {
+        resolve(xhr.response) 
+        }
+        xhr.onerror = (e) => {
+            reject(new TypeError('Network request failed'))
+        }
+        xhr.responseType = 'blob'
+        xhr.open('GET', file.uri, true)
+        xhr.send(null)
+      })
+      const fileUri = `${currentUser.uid}/${file.filename}`
+      const fileRef = refFunction(storage, `${currentUser.uid}/${formattedDate}`)
+      const result = await uploadBytesResumable(fileRef, blob)
+      const uploadSize = result.metadata.size
+      
+      const reference = await addfile({
+        name: file.filename,
+        fileType: fileType,
+        size: uploadSize,
+        uri: fileUri,
+        user: currentUser,
+        version: 0,
+        timeStamp: `${formattedDate}`
+      }, file.finalDestination)
 
       const updatedUser = {...userInst, fileRefs: [...userInst.fileRefs, reference], spaceUsed: userInst.spaceUsed + uploadSize}
       updateUser(updatedUser)

@@ -25,6 +25,10 @@ import { format } from 'date-fns'
 //import useToast for notifications
 import { useToast } from 'react-native-toast-notifications'
 
+//import stuff for the UploadQueue
+import { UploadQueueEmitter } from '../../hooks/QueueEventEmitter'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+
 const AudioRecorder = () => {
 
     try {
@@ -190,9 +194,25 @@ const AudioRecorder = () => {
     const saveFiles = async () => {
 
         setLoading(true)
-        let uploadSize = 0
 
-        const references = await Promise.all(recordings.map(async (el) => {
+        const filesToAddToQueue = recordings.map(recording => {
+
+            let finalDestination 
+            if (destination.id !== null) finalDestination = destination.id
+            else if (focusedFolder) finalDestination = focusedFolder 
+            else finalDestination = false
+
+            return {uri: recording.file, filename: `${recording.name}.mp3`, finalDestination: finalDestination}
+        })
+
+        let queue = JSON.parse(await AsyncStorage.getItem('uploadQueue')) || []
+        const newQueue = [...queue, ...filesToAddToQueue]
+        await AsyncStorage.setItem('uploadQueue', JSON.stringify(newQueue))
+
+        UploadQueueEmitter.emit('uploadQueueUpdated', newQueue)
+
+
+        /* const references = await Promise.all(recordings.map(async (el) => {
 
             try {
 
@@ -275,8 +295,8 @@ const AudioRecorder = () => {
                 })
         }
 
-        const empty = []
-        setRecordings(empty)
+        const empty = [] */
+        setRecordings([])
         setLoading(false)
         setDestination({id: null, fileName: null, nestedUnder: null})
         setFocusedFolder(null)
