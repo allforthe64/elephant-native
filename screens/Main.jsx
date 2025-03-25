@@ -303,7 +303,7 @@ const Main = () => {
             removeFromQueue(file)
           })
           .catch((error) => {
-            alert('Upload failed: ', error)
+            console.log('Upload failed: ', error)
           })
       }
     } catch (error) {
