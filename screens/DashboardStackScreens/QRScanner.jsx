@@ -155,9 +155,33 @@ const Scanner = () => {
         setPreAdd(false)
         try {
 
+        //generate formatted date, fileName, and upload size
+        const formattedDate = format(new Date(), "yyyy-MM-dd:hh:mm:ss")
+        const filename = noteName !== '' ? `${noteName}.txt` : `Note from: ${formattedDate}.txt`
+
+        const filesToAddToQueue = urls.map(url => {
+
+            //generate filename
+            const filename = el.title ? `URL for: ${el.title}.txt` : `URL for: ${el.data}.txt`
+
+            let finalDestination 
+            if (destination.id !== null) finalDestination = destination.id
+            else if (focusedFolder) finalDestination = focusedFolder 
+            else finalDestination = false
+
+            return {uri: ['.txt'], filename: filename, finalDestination: finalDestination, noteBody: uri.data}
+
+        })
         
 
-        let uploadSize = 0
+        //add an image into the file queue
+        const queue = JSON.parse(await AsyncStorage.getItem('uploadQueue')) || []
+        const newQueue = [...queue, ...filesToAddToQueue]
+        await AsyncStorage.setItem('uploadQueue', JSON.stringify(queue))
+
+        UploadQueueEmitter.emit('uploadQueueUpdated', newQueue)
+
+        /* let uploadSize = 0
         
         const references = await Promise.all(urls.map(async (el) => {
 
@@ -220,7 +244,7 @@ const Scanner = () => {
             toast.show(`File upload to staging successful`, {
                 type: 'success'
                 })
-        }
+        } */
 
         setUrls([])
         setDestination({id: null, fileName: null, nestedUnder: null})
