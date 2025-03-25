@@ -193,7 +193,7 @@ const Main = () => {
         type: "text/plain;charset=utf-8",
       });
       const fileUri = `${currentUser.uid}/${file.filename}`
-      const fileRef = refFunction(storage, `${currentUser.uid}/${formattedDate}`)
+      const fileRef = ref(storage, `${currentUser.uid}/${formattedDate}`)
       const result = await uploadBytesResumable(fileRef, textFile)
 
       const uploadSize = result.metadata.size
@@ -264,7 +264,7 @@ const Main = () => {
         xhr.send(null)
       })
       const fileUri = `${currentUser.uid}/${file.filename}`
-      const fileRef = refFunction(storage, `${currentUser.uid}/${formattedDate}`)
+      const fileRef = ref(storage, `${currentUser.uid}/${formattedDate}`)
       const result = await uploadBytesResumable(fileRef, blob)
       const uploadSize = result.metadata.size
       
