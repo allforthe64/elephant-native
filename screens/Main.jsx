@@ -187,13 +187,13 @@ const Main = () => {
     }
 
     else if (fileType === 'txt') {
-
+      alert('running text upload')
       //upload noteBody as blob
       const textFile = new Blob([`${file.noteBody}`], {
         type: "text/plain;charset=utf-8",
       });
-      const fileUri = `${currentUser.uid}/${file.filename}`
-      const fileRef = ref(storage, `${currentUser.uid}/${formattedDate}`)
+      const fileUri = `${currentUser}/${file.filename}`
+      const fileRef = ref(storage, `${currentUser}/${formattedDate}`)
       const result = await uploadBytesResumable(fileRef, textFile)
 
       const uploadSize = result.metadata.size
@@ -252,7 +252,6 @@ const Main = () => {
       })
     } else {
       try {
-        alert(file.uri)
         const blob = await new Promise(async (resolve, reject) => {
           const xhr = new XMLHttpRequest()
           xhr.onload = () => {
@@ -265,8 +264,8 @@ const Main = () => {
           xhr.open('GET', file.uri, true)
           xhr.send(null)
         })
-        const fileUri = `${currentUser.uid}/${file.filename}`
-        const fileRef = ref(storage, `${currentUser.uid}/${formattedDate}`)
+        const fileUri = `${currentUser}/${file.filename}`
+        const fileRef = ref(storage, `${currentUser}/${formattedDate}`)
         const result = await uploadBytesResumable(fileRef, blob)
         const uploadSize = result.metadata.size
         

@@ -161,7 +161,7 @@ const Scanner = () => {
         const filesToAddToQueue = urls.map(url => {
 
             //generate filename
-            const filename = el.title ? `URL for: ${el.title}.txt` : `URL for: ${el.data}.txt`
+            const filename = url.title ? `URL for: ${url.title}.txt` : `URL for: ${url.data}.txt`
 
             let finalDestination 
             if (destination.id !== null) finalDestination = destination.id
