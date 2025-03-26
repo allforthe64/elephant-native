@@ -196,7 +196,7 @@ const DocScanner = () => {
     let queue = JSON.parse(await AsyncStorage.getItem('uploadQueue')) || []
     queue.push({uri: modifiedPath, filename: filename, finalDestination: finalDestination})
     await AsyncStorage.setItem('uploadQueue', JSON.stringify(queue))
-
+    alert('the queue has been updated in AsyncStorage')
     UploadQueueEmitter.emit('uploadQueueUpdated', queue)
 
 
