@@ -162,7 +162,7 @@ const DocumentPickerComp = () => {
         setFiles([])
 
         const filesToAddToQueue = files.map(file => {
-
+            console.log(file)
             let finalDestination 
             if (destination.id !== null) finalDestination = destination.id
             else if (focusedFolder) finalDestination = focusedFolder 
