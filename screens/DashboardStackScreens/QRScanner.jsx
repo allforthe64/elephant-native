@@ -168,7 +168,7 @@ const Scanner = () => {
             else if (focusedFolder) finalDestination = focusedFolder 
             else finalDestination = false
 
-            return {uri: ['.txt'], filename: filename, finalDestination: finalDestination, noteBody: uri.data}
+            return {uri: '.txt', filename: filename, finalDestination: finalDestination, noteBody: uri.data}
 
         })
         

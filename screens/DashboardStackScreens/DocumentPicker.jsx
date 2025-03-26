@@ -124,7 +124,7 @@ const DocumentPickerComp = () => {
             imgs.assets.forEach(img => {
                 const fileName = img.uri.substring(img.uri.lastIndexOf('/') + 1, img.uri.length)
     
-                updatedFiles.push({name: fileName, uri: img.uri, fileType: fileName.split('.')[1]})
+                updatedFiles.push({name: fileName, uri: img.uri, fileType: fileName.split('.')[1], height: img.height, width: img.width})
             })
             
             console.log(updatedFiles)
@@ -168,7 +168,9 @@ const DocumentPickerComp = () => {
             else if (focusedFolder) finalDestination = focusedFolder 
             else finalDestination = false
 
-            return { uri: file.uri, fileName: file.name, finalDestination: finalDestination }
+            if (['jpg', 'JPG', 'jpeg', 'JPEG', 'png', 'PNG'].includes(file.fileType)) {
+                return { uri: file.uri, fileName: file.name, finalDestination: finalDestination, width: file.width, height: file.height}
+            } else return { uri: file.uri, fileName: file.name, finalDestination: finalDestination }
         })
 
         let queue = JSON.parse(await AsyncStorage.getItem('uploadQueue')) || []

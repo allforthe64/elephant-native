@@ -121,6 +121,8 @@ const Main = () => {
     const fileUriArray = file.uri.split('.')
     const fileType = fileUriArray[fileUriArray.length - 1]
 
+    alert(fileType)
+
     let manipResult
     if (fileType === 'jpg' || fileType === 'JPG' || fileType === 'jpeg' || fileType === 'JPEG' || fileType === 'png' || fileType === 'PNG') {
       manipResult = await manipulateAsync(

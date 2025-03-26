@@ -133,21 +133,25 @@ const Notepad = () => {
 
     const addToStorage = async () => {
 
-      //generate formatted date, fileName, and upload size
-      const formattedDate = format(new Date(), "yyyy-MM-dd:hh:mm:ss")
-      const filename = noteName !== '' ? `${noteName}.txt` : `Note from: ${formattedDate}.txt`
+      try {
+        //generate formatted date, fileName, and upload size
+        const formattedDate = format(new Date(), "yyyy-MM-dd:hh:mm:ss")
+        const filename = noteName !== '' ? `${noteName}.txt` : `Note from: ${formattedDate}.txt`
 
-      let finalDestination 
-      if (destination.id !== null) finalDestination = destination.id
-      else if (focusedFolder) finalDestination = focusedFolder 
-      else finalDestination = false
+        let finalDestination 
+        if (destination.id !== null) finalDestination = destination.id
+        else if (focusedFolder) finalDestination = focusedFolder 
+        else finalDestination = false
 
-      //add an image into the file queue
-      let queue = JSON.parse(await AsyncStorage.getItem('uploadQueue')) || []
-      queue.push({uri: ['.txt'], filename: filename, finalDestination: finalDestination, noteBody: body})
-      await AsyncStorage.setItem('uploadQueue', JSON.stringify(queue))
+        //add an image into the file queue
+        let queue = JSON.parse(await AsyncStorage.getItem('uploadQueue')) || []
+        queue.push({uri: ['.txt'], filename: filename, finalDestination: finalDestination, noteBody: body})
+        await AsyncStorage.setItem('uploadQueue', JSON.stringify(queue))
 
-      UploadQueueEmitter.emit('uploadQueueUpdated', queue)
+        UploadQueueEmitter.emit('uploadQueueUpdated', queue)
+      } catch (err) {
+        alert(err)
+      }
 
       //increase version number if other files exist with the same name
       /* let versionNo = 0
