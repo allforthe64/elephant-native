@@ -252,6 +252,7 @@ const Main = () => {
       })
     } else {
       try {
+        alert(file.uri)
         const blob = await new Promise(async (resolve, reject) => {
           const xhr = new XMLHttpRequest()
           xhr.onload = () => {

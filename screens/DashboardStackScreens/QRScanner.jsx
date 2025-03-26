@@ -157,7 +157,6 @@ const Scanner = () => {
 
         //generate formatted date, fileName, and upload size
         const formattedDate = format(new Date(), "yyyy-MM-dd:hh:mm:ss")
-        const filename = noteName !== '' ? `${noteName}.txt` : `Note from: ${formattedDate}.txt`
 
         const filesToAddToQueue = urls.map(url => {
 
