@@ -280,7 +280,8 @@ const Main = () => {
           version: 0,
           timeStamp: `${formattedDate}`
         }, file.finalDestination)
-  
+        
+        alert(reference)
         const updatedUser = {...userInst, fileRefs: [...userInst.fileRefs, reference], spaceUsed: userInst.spaceUsed + uploadSize}
         updateUser(updatedUser)
   
