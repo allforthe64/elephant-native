@@ -803,7 +803,7 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
                                                                 <WebView source={{ uri: `https://drive.google.com/viewerng/viewer?embedded=true&url=${fileURL}` }}
                                                                 style={{ flex: 1 }} />
                                                             :
-                                                                <PDFViewer fileURL={wordDocPDFURL !== '' ? wordDocPDFURL : fileURL}/>
+                                                                <PDFViewer fileURL={/* wordDocPDFURL !== '' ? wordDocPDFURL : */ fileURL}/>
                                                             }
                                                         </View>     
                                                     </View>
