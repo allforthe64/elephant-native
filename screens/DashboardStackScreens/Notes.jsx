@@ -21,6 +21,7 @@ import { useToast } from 'react-native-toast-notifications'
 
 //import upload queue emitter obj
 import { UploadQueueEmitter } from '../../hooks/QueueEventEmitter'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 const Notepad = () => {
 
