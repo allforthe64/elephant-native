@@ -132,60 +132,65 @@ const Main = () => {
       )
     }
     if (manipResult) {
-      //upload thumbnail version
-      const thumbNailBlob = await new Promise(async (resolve, reject) => {
-        const xhr = new XMLHttpRequest()
-        xhr.onload = () => {
-            resolve(xhr.response)
-        }
-        xhr.onerror = (e) => {
-            reject(new TypeError('Network request failed'))
-        }
-        xhr.responseType = 'blob'
-        xhr.open('GET', manipResult.uri, true)
-        xhr.send(null)
-      })
-      
-      const thumbnailFileRef = ref(storage, `${currentUser}/thumbnail&${formattedDate}`)
-      const thumbnailFileUri = `${currentUser}/thumbnail&${file.filename}`
-      const thumbNailResult = await uploadBytesResumable(thumbnailFileRef, thumbNailBlob)
+      alert('in manipResult loop')
+      try {
+        //upload thumbnail version
+        const thumbNailBlob = await new Promise(async (resolve, reject) => {
+          const xhr = new XMLHttpRequest()
+          xhr.onload = () => {
+              resolve(xhr.response)
+          }
+          xhr.onerror = (e) => {
+              reject(new TypeError('Network request failed'))
+          }
+          xhr.responseType = 'blob'
+          xhr.open('GET', manipResult.uri, true)
+          xhr.send(null)
+        })
+        
+        const thumbnailFileRef = ref(storage, `${currentUser}/thumbnail&${formattedDate}`)
+        const thumbnailFileUri = `${currentUser}/thumbnail&${file.filename}`
+        const thumbNailResult = await uploadBytesResumable(thumbnailFileRef, thumbNailBlob)
 
-      //create a blob for the file
-      const blob = await new Promise(async (resolve, reject) => {
-        const xhr = new XMLHttpRequest()
-        xhr.onload = () => {
-        resolve(xhr.response) 
-        }
-        xhr.onerror = (e) => {
-            reject(new TypeError('Network request failed'))
-        }
-        xhr.responseType = 'blob'
-        xhr.open('GET', file.uri, true)
-        xhr.send(null)
-      })
-      const fileUri = `${currentUser}/${file.fileName}`
-      const fileRef = ref(storage, `${currentUser}/${formattedDate}`)
-      const result = await uploadBytesResumable(fileRef, blob)
+        //create a blob for the file
+        const blob = await new Promise(async (resolve, reject) => {
+          const xhr = new XMLHttpRequest()
+          xhr.onload = () => {
+          resolve(xhr.response) 
+          }
+          xhr.onerror = (e) => {
+              reject(new TypeError('Network request failed'))
+          }
+          xhr.responseType = 'blob'
+          xhr.open('GET', file.uri, true)
+          xhr.send(null)
+        })
+        const fileUri = `${currentUser}/${file.fileName}`
+        const fileRef = ref(storage, `${currentUser}/${formattedDate}`)
+        const result = await uploadBytesResumable(fileRef, blob)
 
-      const uploadSize = result.metadata.size + thumbNailResult.metadata.size
+        const uploadSize = result.metadata.size + thumbNailResult.metadata.size
 
-      const reference = await addfile({
-        name: file.filename,
-        fileType: fileType,
-        size: uploadSize,
-        uri: fileUri,
-        thumbnailUri: thumbnailFileUri,
-        user: currentUser,
-        version: 0,
-        timeStamp: `${formattedDate}`
-      }, file.finalDestination)
+        const reference = await addfile({
+          name: file.filename,
+          fileType: fileType,
+          size: uploadSize,
+          uri: fileUri,
+          thumbnailUri: thumbnailFileUri,
+          user: currentUser,
+          version: 0,
+          timeStamp: `${formattedDate}`
+        }, file.finalDestination)
 
-      const updatedUser = {...userInst, fileRefs: [...userInst.fileRefs, reference], spaceUsed: userInst.spaceUsed + uploadSize}
-      updateUser(updatedUser)
+        const updatedUser = {...userInst, fileRefs: [...userInst.fileRefs, reference], spaceUsed: userInst.spaceUsed + uploadSize}
+        updateUser(updatedUser)
 
-      toast.show('Upload successful', {
-        type: 'success'
-      })
+        toast.show('Upload successful', {
+          type: 'success'
+        })
+      } catch (error) {
+        console.log('error from manipResult: ', error)
+      }
     }
 
     else if (fileType === 'txt') {

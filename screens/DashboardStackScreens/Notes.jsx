@@ -27,7 +27,6 @@ const Notepad = () => {
 
     const [open, setOpen] = useState(true)
     const [body, setBody] = useState('')
-    const ref = useRef(null)
     const [preAdd, setPreAdd] = useState(false)
     const [destination, setDestination] = useState({id: null, fileName: null, nestedUnder: null})
     const [currentUser, setCurrentUser] = useState()
@@ -43,6 +42,7 @@ const Notepad = () => {
 
     //initialize name ref
     const nameRef = useRef()
+    const ref = useRef(null)
 
     const toast = useToast()
 
@@ -228,6 +228,9 @@ const Notepad = () => {
       })
       setSubFolders(exists)
   }, [focusedFolder, addFolderForm])
+
+  console.log('folders: ', folders)
+  console.log('plain ref: ', ref)
 
   return (
     <>

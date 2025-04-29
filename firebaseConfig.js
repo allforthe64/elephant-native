@@ -46,8 +46,10 @@ const generateCustomToken = async () => {
   });
   const data = await response.json();
   if (data.appCheckToken) {
+    console.log('appcheck token recieved')
     return data.appCheckToken.token;
   } else {
+    console.log('no appcheck token recieved')
     throw new Error("Token not received from backend");
   }
 };
