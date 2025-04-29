@@ -170,7 +170,7 @@ const DocumentPickerComp = () => {
 
             if (['jpg', 'JPG', 'jpeg', 'JPEG', 'png', 'PNG'].includes(file.fileType)) {
                 console.log(file)
-                return { uri: file.uri, fileName: file.name, finalDestination: finalDestination, width: file.width, height: file.height}
+                return { uri: file.uri, fileName: file.name, finalDestination: finalDestination, metaData: {width: file.width, height: file.height}}
             } else return { uri: file.uri, fileName: file.name, finalDestination: finalDestination }
         })
 

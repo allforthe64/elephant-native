@@ -131,6 +131,7 @@ const Main = () => {
         { compress: 1, format: SaveFormat.PNG }
       )
     }
+
     if (manipResult) {
       alert('in manipResult loop')
       try {
@@ -224,40 +225,45 @@ const Main = () => {
     }
 
     else if (fileType === 'doc' || fileType === 'docx') {
-      const blob = await new Promise(async (resolve, reject) => {
-        const xhr = new XMLHttpRequest()
-        xhr.onload = () => {
-        resolve(xhr.response) 
-        }
-        xhr.onerror = (e) => {
-            reject(new TypeError('Network request failed'))
-        }
-        xhr.responseType = 'blob'
-        xhr.open('GET', file.uri, true)
-        xhr.send(null)
-      })
-      const fileUri = `${formattedDate}^&${currentUser}`
-      const fileRef = ref(storage, `${formattedDate}^&${currentUser}`)
-      const result = await uploadBytesResumable(fileRef, blob)
-      const uploadSize = result.metadata.size
-
-      const reference = await addfile({
-        name: file.filename,
-        fileType: fileType,
-        size: uploadSize,
-        uri: fileUri,
-        user: currentUser,
-        version: 0,
-        timeStamp: `${formattedDate}`
-      }, file.finalDestination)
-
-      const updatedUser = {...userInst, fileRefs: [...userInst.fileRefs, reference], spaceUsed: userInst.spaceUsed + uploadSize}
-      updateUser(updatedUser)
-
-      toast.show('Upload successful', {
-        type: 'success'
-      })
+      try {
+        const blob = await new Promise(async (resolve, reject) => {
+          const xhr = new XMLHttpRequest()
+          xhr.onload = () => {
+          resolve(xhr.response) 
+          }
+          xhr.onerror = (e) => {
+              reject(new TypeError('Network request failed'))
+          }
+          xhr.responseType = 'blob'
+          xhr.open('GET', file.uri, true)
+          xhr.send(null)
+        })
+        const fileUri = `${formattedDate}^&${currentUser}`
+        const fileRef = ref(storage, `${formattedDate}^&${currentUser}`)
+        const result = await uploadBytesResumable(fileRef, blob)
+        const uploadSize = result.metadata.size
+  
+        const reference = await addfile({
+          name: file.filename,
+          fileType: fileType,
+          size: uploadSize,
+          uri: fileUri,
+          user: currentUser,
+          version: 0,
+          timeStamp: `${formattedDate}`
+        }, file.finalDestination)
+  
+        const updatedUser = {...userInst, fileRefs: [...userInst.fileRefs, reference], spaceUsed: userInst.spaceUsed + uploadSize}
+        updateUser(updatedUser)
+  
+        toast.show('Upload successful', {
+          type: 'success'
+        })
+      } catch (error) {
+        alert('error within docx upload: ', error)
+      }
     } else {
+      alert('within correct loop')
       try {
         const blob = await new Promise(async (resolve, reject) => {
           const xhr = new XMLHttpRequest()
