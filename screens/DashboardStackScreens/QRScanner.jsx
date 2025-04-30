@@ -24,6 +24,10 @@ import { useToast } from 'react-native-toast-notifications'
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
 import { faXmark, faFolder, faArrowLeft, faCloudArrowUp, faQrcode, faPlus, faCheck, faBox, faFloppyDisk } from '@fortawesome/free-solid-svg-icons'
 
+//import stuff for QueueUpload
+import { UploadQueueEmitter } from '../../hooks/QueueEventEmitter'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+
 const Scanner = () => {
 
   try {

@@ -188,29 +188,38 @@ const DocScanner = () => {
   }
 
   const uploadPDF = async (path) => {
-    setPreAdd(false)
+    try {
+      setPreAdd(false)
 
-    const modifiedPath = `file://${path}`
+      const modifiedPath = `file://${path}`
 
 
-    //create new formatted date for file
-    const randomString = generateRandomString(10);
-    const formattedDate = format(new Date(), "yyyy-MM-dd:hh:mm:ss") + randomString
+      //create new formatted date for file
+      const randomString = generateRandomString(10);
+      const formattedDate = format(new Date(), "yyyy-MM-dd:hh:mm:ss") + randomString
 
-    let finalDestination 
-    if (destination.id !== null) finalDestination = destination.id
-    else if (focusedFolder) finalDestination = focusedFolder 
-    else finalDestination = false
+      let finalDestination 
+      if (destination.id !== null) finalDestination = destination.id
+      else if (focusedFolder) finalDestination = focusedFolder 
+      else finalDestination = false
 
-    //generate a fileName and finalDestination
-    const filename = docName !== '' ? `${docName}.pdf` : `${formattedDate}.pdf`
+      //generate a fileName and finalDestination
+      const filename = docName !== '' ? `${docName}.pdf` : `${formattedDate}.pdf`
 
-    //add an image into the file queue
-    let queue = JSON.parse(await AsyncStorage.getItem('uploadQueue')) || []
-    queue.push({uri: modifiedPath, filename: filename, finalDestination: finalDestination})
-    await AsyncStorage.setItem('uploadQueue', JSON.stringify(queue))
-    alert('the queue has been updated in AsyncStorage')
-    UploadQueueEmitter.emit('uploadQueueUpdated', queue)
+      //add an image into the file queue
+      let queue = JSON.parse(await AsyncStorage.getItem('uploadQueue')) || []
+      queue.push({uri: modifiedPath, filename: filename, finalDestination: finalDestination})
+      await AsyncStorage.setItem('uploadQueue', JSON.stringify(queue))
+      alert('the queue has been updated in AsyncStorage')
+      UploadQueueEmitter.emit('uploadQueueUpdated', queue)
+
+      setScannedImageArray([])
+      setDestination({id: null, fileName: null, nestedUnder: null})
+      setFocusedFolder(null)
+      setNameGiven(false)
+    } catch (error) {
+      alert('docScanner error: ', error)
+    }
 
 
 
@@ -258,10 +267,7 @@ const DocScanner = () => {
       toast.show('Upload successful', {
           type: 'success'
       }) */
-      setScannedImageArray([])
-      setDestination({id: null, fileName: null, nestedUnder: null})
-      setFocusedFolder(null)
-      setNameGiven(false)
+      
     } catch ({name, message}) {
       alert(message)
       throw new Error(message)
