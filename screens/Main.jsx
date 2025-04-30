@@ -121,10 +121,10 @@ const Main = () => {
     const fileUriArray = file.uri.split('.')
     const fileType = fileUriArray[fileUriArray.length - 1]
 
-    alert('fileType: ', fileType)
-
     let manipResult
     if (fileType === 'jpg' || fileType === 'JPG' || fileType === 'jpeg' || fileType === 'JPEG' || fileType === 'png' || fileType === 'PNG') {
+      console.log('resizing image')
+      console.log(file)
       manipResult = await manipulateAsync(
         file.uri,
         [{ resize: {height: file.metadata.height * .1, width: file.metadata.width * .1} }],
