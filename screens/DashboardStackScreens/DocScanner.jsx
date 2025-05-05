@@ -218,7 +218,7 @@ const DocScanner = () => {
       setFocusedFolder(null)
       setNameGiven(false)
     } catch (error) {
-      alert('docScanner error: ', error)
+      alert('docScanner error: ' + error.message)
     }
 
 
