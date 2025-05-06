@@ -35,6 +35,10 @@ import { faFolder, faXmark, faFile, faArrowLeft, faFloppyDisk, faStopwatch, faPl
 //upload queue emitter function import 
 import { UploadQueueEmitter } from '../../hooks/QueueEventEmitter';
 
+//import stuff for QueueUpload
+import { UploadQueueEmitter } from '../../hooks/QueueEventEmitter'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+
 const DocScanner = () => {
 
   try {

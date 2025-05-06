@@ -110,8 +110,6 @@ const Main = () => {
 
   const uploadFile = async (file) => {
 
-    console.log('file: ', file)
-
     //generate a new randomString
     const randomString = generateRandomString(10);
 
@@ -121,10 +119,12 @@ const Main = () => {
     const fileUriArray = file.uri.split('.')
     const fileType = fileUriArray[fileUriArray.length - 1]
 
+    alert(fileType)
+    alert(file.uri)
+
     let manipResult
     if (fileType === 'jpg' || fileType === 'JPG' || fileType === 'jpeg' || fileType === 'JPEG' || fileType === 'png' || fileType === 'PNG') {
-      console.log('resizing image')
-      console.log(file)
+      alert('resizing image')
       manipResult = await manipulateAsync(
         file.uri,
         [{ resize: {height: file.metadata.height * .1, width: file.metadata.width * .1} }],
