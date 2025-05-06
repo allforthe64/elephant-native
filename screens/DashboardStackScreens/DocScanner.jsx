@@ -32,8 +32,6 @@ import { userListener, addfile, updateUser } from '../../firebase/firestore';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faFolder, faXmark, faFile, faArrowLeft, faFloppyDisk, faStopwatch, faPlus, faCheck, faBox, faCloudArrowUp } from '@fortawesome/free-solid-svg-icons';
 
-//upload queue emitter function import 
-import { UploadQueueEmitter } from '../../hooks/QueueEventEmitter';
 
 //import stuff for QueueUpload
 import { UploadQueueEmitter } from '../../hooks/QueueEventEmitter'
