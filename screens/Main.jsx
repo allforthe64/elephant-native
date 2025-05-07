@@ -315,7 +315,7 @@ const Main = () => {
         return
       }
 
-      for (const file of queue) {
+      /* for (const file of queue) {
         uploadFile(file)
           .then(() => {
             removeFromQueue(file)
@@ -323,7 +323,8 @@ const Main = () => {
           .catch((error) => {
             alert('Upload failed: ' + error.message)
           })
-      }
+      } */
+     await AsyncStorage.setItem('uploadQueue', [])
     } catch (error) {
       console.error('Error processing upload queue:', error)
     }
