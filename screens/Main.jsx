@@ -110,26 +110,30 @@ const Main = () => {
 
   const uploadFile = async (file) => {
 
-    //generate a new randomString
-    const randomString = generateRandomString(10);
+    try {
+      //generate a new randomString
+      const randomString = generateRandomString(10);
 
-    //create new formatted date for file
-    const formattedDate = format(new Date(), "yyyy-MM-dd:hh:mm:ss") + randomString
+      //create new formatted date for file
+      const formattedDate = format(new Date(), "yyyy-MM-dd:hh:mm:ss") + randomString
 
-    const fileUriArray = file.uri.split('.')
-    const fileType = fileUriArray[fileUriArray.length - 1]
+      const fileUriArray = file.uri.split('.')
+      const fileType = fileUriArray[fileUriArray.length - 1]
 
-    alert(fileType)
-    alert(file.uri)
+      alert(fileType)
+      alert(file.uri)
 
-    let manipResult
-    if (fileType === 'jpg' || fileType === 'JPG' || fileType === 'jpeg' || fileType === 'JPEG' || fileType === 'png' || fileType === 'PNG') {
-      alert('resizing image')
-      manipResult = await manipulateAsync(
-        file.uri,
-        [{ resize: {height: file.metadata.height * .1, width: file.metadata.width * .1} }],
-        { compress: 1, format: SaveFormat.PNG }
-      )
+      let manipResult
+      if (fileType === 'jpg' || fileType === 'JPG' || fileType === 'jpeg' || fileType === 'JPEG' || fileType === 'png' || fileType === 'PNG') {
+        alert('resizing image')
+        manipResult = await manipulateAsync(
+          file.uri,
+          [{ resize: {height: file.metadata.height * .1, width: file.metadata.width * .1} }],
+          { compress: 1, format: SaveFormat.PNG }
+        )
+      }
+    } catch (error) {
+      alert('Error from top section of upload: ' + error.message)
     }
 
     if (manipResult) {
