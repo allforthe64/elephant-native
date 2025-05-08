@@ -320,6 +320,7 @@ const Main = () => {
       }
 
       for (const file of queue) {
+        alert(file.uri)
         uploadFile(file)
           .then(() => {
             removeFromQueue(file)
