@@ -326,7 +326,6 @@ const Main = () => {
           })
           .catch((error) => {
             alert('Upload failed: ' + error.message)
-            removeFromQueue(file)
           })
       }
 
