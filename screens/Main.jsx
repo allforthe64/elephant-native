@@ -315,7 +315,7 @@ const Main = () => {
       let queue = JSON.parse(await AsyncStorage.getItem('uploadQueue')) || []
 
       if (queue.length === 0 || activeUploads >= MAX_CONCURRENT_UPLOADS) {
-        console.log('No uploads to process or max uploads reached.')
+        alert('No uploads to process or max uploads reached.')
         return
       }
 
@@ -331,7 +331,7 @@ const Main = () => {
       }
 
     } catch (error) {
-      console.error('Error processing upload queue:', error)
+      alert('Error processing upload queue:' + error.message)
     }
   }
 
