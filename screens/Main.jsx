@@ -59,8 +59,7 @@ const Main = () => {
   const [currentUser, setCurrentUser] = useState()
   const [screen, setScreen] = useState('')
 
-  const MAX_CONCURRENT_UPLOADS = 1
-  let activeUploads = 0
+  const uploadingFiles = new Set()
 
   const navigationRef = useRef(null);
 
@@ -310,28 +309,37 @@ const Main = () => {
 
   }
 
+  const uploadFileWithLock = async (file) => {
+    if (uploadingFiles.has(file.uri)) return
+
+    uploadingFiles.add(file.uri)
+
+    try {
+      await uploadFile(file)
+      await removeFromQueue(file)
+    } catch (error) {
+      alert('uploadFileWithLock error: ' + error.message)
+    } finally {
+      uploadingFiles.delete(file.uri)
+    }
+  }
+
   const processUploadQueue = async () => {
     try {
       let queue = JSON.parse(await AsyncStorage.getItem('uploadQueue')) || []
 
-      if (queue.length === 0 || activeUploads >= MAX_CONCURRENT_UPLOADS) {
+      if (queue.length === 0) {
         alert('No uploads to process or max uploads reached.')
         return
       }
 
       for (const file of queue) {
-        alert(file.uri)
-        uploadFile(file)
-          .then(() => {
-            removeFromQueue(file)
-          })
-          .catch((error) => {
-            alert('Upload failed: ' + error.message)
-          })
+        /* await uploadFileWithLock(file) */
+        await removeFromQueue(file)
       }
-
+  
     } catch (error) {
-      alert('Error processing upload queue:' + error.message)
+      alert('Error processing upload queue: ' + error.message)
     }
   }
 
