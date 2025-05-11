@@ -334,7 +334,7 @@ const Main = () => {
       }
 
       for (const file of queue) {
-        /* await uploadFileWithLock(file) */
+        await uploadFileWithLock(file)
         await removeFromQueue(file)
       }
   
