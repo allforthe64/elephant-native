@@ -122,7 +122,7 @@ const Main = () => {
       alert(fileType)
       alert(file.uri)
 
-      let manipResult
+      let manipResult = null
       if (fileType === 'jpg' || fileType === 'JPG' || fileType === 'jpeg' || fileType === 'JPEG' || fileType === 'png' || fileType === 'PNG') {
         alert('resizing image')
         manipResult = await manipulateAsync(
@@ -298,7 +298,9 @@ const Main = () => {
         alert(reference)
         const updatedUser = {...userInst, fileRefs: [...userInst.fileRefs, reference], spaceUsed: userInst.spaceUsed + uploadSize}
         updateUser(updatedUser)
-  
+        
+        await removeFromQueue(file)
+
         toast.show('Upload successful', {
           type: 'success'
         })
@@ -316,7 +318,6 @@ const Main = () => {
 
     try {
       await uploadFile(file)
-      await removeFromQueue(file)
     } catch (error) {
       alert('uploadFileWithLock error: ' + error.message)
     } finally {
