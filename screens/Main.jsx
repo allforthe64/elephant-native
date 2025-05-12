@@ -109,7 +109,6 @@ const Main = () => {
 
   const uploadFile = async (file) => {
 
-    try {
       //generate a new randomString
       const randomString = generateRandomString(10);
 
@@ -131,9 +130,6 @@ const Main = () => {
           { compress: 1, format: SaveFormat.PNG }
         )
       }
-    } catch (error) {
-      alert('Error from top section of upload: ' + error.message)
-    }
 
     if (manipResult) {
       alert('in manipResult loop')
