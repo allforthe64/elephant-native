@@ -169,6 +169,7 @@ const Scanner = () => {
             else if (focusedFolder) finalDestination = focusedFolder 
             else finalDestination = false
 
+            alert('creating a reference')
             return {uri: 'qrcode.txt', filename: filename, finalDestination: finalDestination, noteBody: url.data}
 
         })
