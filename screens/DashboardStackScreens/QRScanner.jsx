@@ -172,12 +172,14 @@ const Scanner = () => {
             return {uri: 'qrcode.txt', filename: filename, finalDestination: finalDestination, noteBody: url.data}
 
         })
+
+        alert('filesToAddToQueue length: ', filesToAddToQueue.length)
         
 
         //add an image into the file queue
         const queue = JSON.parse(await AsyncStorage.getItem('uploadQueue')) || []
         const newQueue = [...queue, ...filesToAddToQueue]
-        alert(newQueue.length)
+        alert('newQueue.length: ', newQueue.length)
         await AsyncStorage.setItem('uploadQueue', JSON.stringify(queue))
 
         UploadQueueEmitter.emit('uploadQueueUpdated', newQueue)
