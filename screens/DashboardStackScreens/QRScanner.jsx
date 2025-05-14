@@ -169,7 +169,6 @@ const Scanner = () => {
             else if (focusedFolder) finalDestination = focusedFolder 
             else finalDestination = false
 
-            alert('creating a reference')
             return {uri: 'qrcode.txt', filename: filename, finalDestination: finalDestination, noteBody: url.data}
 
         })
@@ -182,7 +181,6 @@ const Scanner = () => {
         //add an image into the file queue
         const queue = JSON.parse(await AsyncStorage.getItem('uploadQueue')) || []
         const newQueue = [...queue, ...filesToAddToQueue]
-        alert('newQueue.length: ', newQueue.length)
         /* await AsyncStorage.setItem('uploadQueue', JSON.stringify(queue))
 
         UploadQueueEmitter.emit('uploadQueueUpdated', newQueue) */
