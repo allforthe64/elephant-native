@@ -109,6 +109,8 @@ const Main = () => {
 
   const uploadFile = async (file) => {
 
+      alert(file.uri)
+
       //generate a new randomString
       const randomString = generateRandomString(10);
 
@@ -119,7 +121,7 @@ const Main = () => {
       const fileType = fileUriArray[fileUriArray.length - 1]
 
       alert(fileType)
-      alert(file.uri)
+      
 
       let manipResult = null
       if (fileType === 'jpg' || fileType === 'JPG' || fileType === 'jpeg' || fileType === 'JPEG' || fileType === 'png' || fileType === 'PNG') {
@@ -132,7 +134,6 @@ const Main = () => {
       }
 
     if (manipResult) {
-      alert('in manipResult loop')
       try {
         //upload thumbnail version
         const thumbNailBlob = await new Promise(async (resolve, reject) => {

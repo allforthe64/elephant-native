@@ -159,9 +159,6 @@ const Scanner = () => {
         setPreAdd(false)
         try {
 
-        //generate formatted date, fileName, and upload size
-        const formattedDate = format(new Date(), "yyyy-MM-dd:hh:mm:ss")
-
         const filesToAddToQueue = urls.map(url => {
 
             //generate filename

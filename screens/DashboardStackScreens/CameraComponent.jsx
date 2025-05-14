@@ -256,8 +256,23 @@ try {
 
                     try {  
 
+                        //generate a fileName and finalDestination
+                        const filename = mediaName !== '' ? `${mediaName}.${Platform.OS === 'ios' ? 'mov' : 'mp4'}` : `${formattedDate}.${Platform.OS === 'ios' ? 'mov' : 'mp4'}`
+
+                        let finalDestination 
+                        if (destination.id !== null) finalDestination = destination.id
+                        else if (focusedFolder) finalDestination = focusedFolder 
+                        else finalDestination = false
+
+                        //add an image into the file queue
+                        let queue = JSON.parse(await AsyncStorage.getItem('uploadQueue')) || []
+                        queue.push({uri: videoObj.uri, filename: filename, finalDestination: finalDestination})
+                        await AsyncStorage.setItem('uploadQueue', JSON.stringify(queue))
+
+                        UploadQueueEmitter.emit('uploadQueueUpdated', queue)
+
                         //create blob using the photo from state and save it to elephant staging
-                        const blob = await new Promise(async (resolve, reject) => {
+                        /* const blob = await new Promise(async (resolve, reject) => {
                             const xhr = new XMLHttpRequest()
                             xhr.onload = () => {
                             resolve(xhr.response) 
@@ -293,7 +308,7 @@ try {
                         updateUser(updatedUser)
                         toast.show('Upload successful', {
                             type: 'success'
-                        })
+                        }) */
 
                         saveVideo()
 
@@ -323,77 +338,12 @@ try {
                         await AsyncStorage.setItem('uploadQueue', JSON.stringify(queue))
 
                         UploadQueueEmitter.emit('uploadQueueUpdated', queue)
-                        
-                        /* 
-
-                        //generate a resized version of the image for thumbnails
-                        const manipResult = await manipulateAsync(
-                            photo.uri,
-                            [{ resize: {height: photo.height * .1, width: photo.width * .1} }],
-                            { compress: 1, format: SaveFormat.PNG }
-                        );
-
-                        //upload thumbnail version
-                        const thumbNailBlob = await new Promise(async (resolve, reject) => {
-                            const xhr = new XMLHttpRequest()
-                            xhr.onload = () => {
-                                resolve(xhr.response)
-                            }
-                            xhr.onerror = (e) => {
-                                reject(new TypeError('Network request failed'))
-                            }
-                            xhr.responseType = 'blob'
-                            xhr.open('GET', manipResult.uri, true)
-                            xhr.send(null)
-                        })
-                        
-                        const thumbnailFileRef = ref(storage, `${currentUser}/thumbnail&${formattedDate}`)
-                        const thumbnailResult = await uploadBytesResumable(thumbnailFileRef, thumbNailBlob) 
-
-                        //upload regular version
-                        //create blob using the photo from state and save it to elephant staging
-                        const blob = await new Promise(async (resolve, reject) => {
-                            const xhr = new XMLHttpRequest()
-                            xhr.onload = () => {
-                            resolve(xhr.response) 
-                            }
-                            xhr.onerror = (e) => {
-                                reject(new TypeError('Network request failed'))
-                            }
-                            xhr.responseType = 'blob'
-                            xhr.open('GET', photo.uri, true)
-                            xhr.send(null)
-                        })
-
-                        const uploadSize = thumbnailResult ? result.metadata.size + thumbnailResult.metadata.size : result.metadata.size
-                        
-                        const reference = await addfile({
-                                name: filename,
-                                fileType: 'jpg',
-                                size: uploadSize,
-                                uri: fileUri,
-                                thumbnailUri: thumbnailFileUri,
-                                user: currentUser,
-                                version: 0,
-                                timeStamp: `${formattedDate}`
-                        }, finalDestination)
-
-                        if (!session) {
-                            const updatedUser = {...userInst, fileRefs: [...userInst.fileRefs, reference], spaceUsed: userInst.spaceUsed + uploadSize}
-                            updateUser(updatedUser)
-                        } else {
-                            setQue(prev => [...prev, reference])
-                        }
-                        toast.show('Upload successful', {
-                            type: 'success'
-                        })
-
-                        savePhoto() */
 
                     } catch (err) {
                         alert(err)
                     }
                 }
+                savePhoto()
                 setMediaName('')
                 setDestination({id: null, fileName: null, nestedUnder: null})
                 setFocusedFolder(null)
