@@ -257,7 +257,7 @@ const Scanner = () => {
         setFocusedFolder(null)
 
         } catch (err) {
-            alert(err)
+            alert('errL ', err.message)
         }
     }
 
