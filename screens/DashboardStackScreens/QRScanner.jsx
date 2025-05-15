@@ -179,7 +179,7 @@ const Scanner = () => {
         const queue = JSON.parse(await AsyncStorage.getItem('uploadQueue')) || []
         const newQueue = [...queue, ...filesToAddToQueue]
 
-        await AsyncStorage.setItem('uploadQueue', JSON.stringify(queue))
+        await AsyncStorage.setItem('uploadQueue', JSON.stringify(newQueue))
 
         UploadQueueEmitter.emit('uploadQueueUpdated', newQueue)
 
