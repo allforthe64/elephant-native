@@ -109,29 +109,24 @@ const Main = () => {
 
   const uploadFile = async (file) => {
 
-      alert(file.uri)
+    //generate a new randomString
+    const randomString = generateRandomString(10);
 
-      //generate a new randomString
-      const randomString = generateRandomString(10);
+    //create new formatted date for file
+    const formattedDate = format(new Date(), "yyyy-MM-dd:hh:mm:ss") + randomString
 
-      //create new formatted date for file
-      const formattedDate = format(new Date(), "yyyy-MM-dd:hh:mm:ss") + randomString
+    const fileUriArray = file.uri.split('.')
+    const fileType = fileUriArray[fileUriArray.length - 1]
+    
 
-      const fileUriArray = file.uri.split('.')
-      const fileType = fileUriArray[fileUriArray.length - 1]
-
-      alert(fileType)
-      
-
-      let manipResult = null
-      if (fileType === 'jpg' || fileType === 'JPG' || fileType === 'jpeg' || fileType === 'JPEG' || fileType === 'png' || fileType === 'PNG') {
-        alert('resizing image')
-        manipResult = await manipulateAsync(
-          file.uri,
-          [{ resize: {height: file.metadata.height * .1, width: file.metadata.width * .1} }],
-          { compress: 1, format: SaveFormat.PNG }
-        )
-      }
+    let manipResult = null
+    if (fileType === 'jpg' || fileType === 'JPG' || fileType === 'jpeg' || fileType === 'JPEG' || fileType === 'png' || fileType === 'PNG') {
+      manipResult = await manipulateAsync(
+        file.uri,
+        [{ resize: {height: file.metadata.height * .1, width: file.metadata.width * .1} }],
+        { compress: 1, format: SaveFormat.PNG }
+      )
+    }
 
     if (manipResult) {
       try {
@@ -195,7 +190,6 @@ const Main = () => {
     }
 
     else if (fileType === 'txt') {
-      alert('running text upload')
       //upload noteBody as blob
       const textFile = new Blob([`${file.noteBody}`], {
         type: "text/plain;charset=utf-8",
@@ -263,7 +257,6 @@ const Main = () => {
         alert('error within docx upload: ', error)
       }
     } else {
-      alert('within correct loop')
       try {
         const blob = await new Promise(async (resolve, reject) => {
           const xhr = new XMLHttpRequest()
@@ -292,11 +285,8 @@ const Main = () => {
           timeStamp: `${formattedDate}`
         }, file.finalDestination)
         
-        alert(reference)
         const updatedUser = {...userInst, fileRefs: [...userInst.fileRefs, reference], spaceUsed: userInst.spaceUsed + uploadSize}
         updateUser(updatedUser)
-        
-        await removeFromQueue(file)
 
         toast.show('Upload successful', {
           type: 'success'
@@ -309,23 +299,26 @@ const Main = () => {
   }
 
   const uploadFileWithLock = async (file) => {
-    if (uploadingFiles.has(file.uri)) return
+    if (uploadingFiles.has(file.uri)) {
+      alert('file is already in queue')
+      return
+    } else {
+      uploadingFiles.add(file.uri)
 
-    uploadingFiles.add(file.uri)
-
-    try {
-      await uploadFile(file)
-    } catch (error) {
-      alert('uploadFileWithLock error: ' + error.message)
-    } finally {
-      uploadingFiles.delete(file.uri)
+      try {
+        await uploadFile(file)
+        await removeFromQueue(file)
+      } catch (error) {
+        alert('uploadFileWithLock error: ' + error.message)
+      } finally {
+        uploadingFiles.delete(file.uri)
+      }
     }
   }
 
   const processUploadQueue = async () => {
     try {
       let queue = JSON.parse(await AsyncStorage.getItem('uploadQueue')) || []
-      alert(queue[0].uri)
 
       if (queue.length === 0) {
         alert('No uploads to process or max uploads reached.')
@@ -334,7 +327,6 @@ const Main = () => {
 
       for (const file of queue) {
         await uploadFileWithLock(file)
-        await removeFromQueue(file)
       }
   
     } catch (error) {

@@ -146,7 +146,9 @@ const Notepad = () => {
 
         //add an image into the file queue
         let queue = JSON.parse(await AsyncStorage.getItem('uploadQueue')) || []
-        queue.push({uri: 'note.txt', filename: filename, finalDestination: finalDestination, noteBody: body})
+
+        const randomString = [...Array(10)].map(() => (Math.random().toString(36)[Math.random() < 0.5 ? 'toUpperCase' : 'toLowerCase']()) ).join('')
+        queue.push({uri: `${randomString} - note.txt`, filename: filename, finalDestination: finalDestination, noteBody: body})
         await AsyncStorage.setItem('uploadQueue', JSON.stringify(queue))
 
         UploadQueueEmitter.emit('uploadQueueUpdated', queue)

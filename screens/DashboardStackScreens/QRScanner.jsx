@@ -169,7 +169,9 @@ const Scanner = () => {
             else if (focusedFolder) finalDestination = focusedFolder 
             else finalDestination = false
 
-            return {uri: 'qrcode.txt', filename: filename, finalDestination: finalDestination, noteBody: url.data}
+            const randomString = [...Array(10)].map(() => (Math.random().toString(36)[Math.random() < 0.5 ? 'toUpperCase' : 'toLowerCase']()) ).join('')
+
+            return {uri: `${randomString} - qrcode.txt`, filename: filename, finalDestination: finalDestination, noteBody: url.data}
 
         })
 
