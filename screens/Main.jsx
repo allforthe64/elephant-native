@@ -296,6 +296,8 @@ const Main = () => {
       }
     }
 
+    await removeFromQueue(file)
+
   }
 
   const uploadFileWithLock = async (file) => {
@@ -307,7 +309,6 @@ const Main = () => {
 
       try {
         await uploadFile(file)
-        await removeFromQueue(file)
       } catch (error) {
         alert('uploadFileWithLock error: ' + error.message)
       } finally {
