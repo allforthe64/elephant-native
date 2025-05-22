@@ -335,8 +335,13 @@ const Main = () => {
     }
   }
 
+  const hasResumedRef = useRef(false)
+
   useEffect(() => {
-    if (userInst) {
+
+    if (userInst && !hasResumedRef) {
+
+      hasResumedRef.current = true
 
       //run any of the uploads in the queue when the app restarts
       const resumeUploadsOnRestart = async () => {
@@ -356,36 +361,6 @@ const Main = () => {
       }
     }
   }, [userInst])
-
-  /* const uploadEmitter = new EventEmitter(); // Event system for the queue
-
-  const QUEUE_UPDATED_EVENT = 'uploadQueueUpdated';
-
-  // Watch for queue updates
-  uploadEmitter.addListener(QUEUE_UPDATED_EVENT, async () => {
-    console.log('Queue updated! Checking for uploads...');
-    processUploadQueue();
-  }); */
-
-  /* const uploadImages = async () => {
-        let massUploadSize = 0
-        que.forEach(queElement => {
-            massUploadSize += queElement.size
-        });
-        const updatedUser = {...userInst, spaceUsed: userInst.spaceUsed + massUploadSize, fileRefs: [...userInst.fileRefs, ...que]}
-        updateUser(updatedUser)
-        toast.show('Upload successful', {
-            type: 'success'
-        })
-        setQue([])
-  }
-  useEffect(() => {
-    if (que.length > 0) {
-      const timer = setTimeout(() => uploadImages(), 2000)
-
-      return () => clearTimeout(timer)
-    }
-  }, [que, screen]) */
 
   //when the auth state changes, pass the user object from firbaseAuth object into AuthContext
   useEffect(() => {
