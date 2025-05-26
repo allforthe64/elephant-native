@@ -339,7 +339,7 @@ const Main = () => {
 
   useEffect(() => {
 
-    if (userInst && !hasResumedRef) {
+    if (userInst && !hasResumedRef.current) {
 
       hasResumedRef.current = true
 
