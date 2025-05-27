@@ -6,7 +6,9 @@ import {
     doc,
     collection,
     onSnapshot,
-    deleteDoc
+    deleteDoc,
+    arrayUnion,
+    increment
 } from 'firebase/firestore'
 import { db } from '../firebaseConfig'
 
@@ -65,6 +67,15 @@ export async function userListener(setCurrentUser, setStaging, user) {
 export async function updateUser(updatedUser) {
     const userRef = doc(db, 'users', updatedUser.uid)
     await updateDoc(userRef, {...updatedUser})
+}
+
+//function to specifically add new files to user, using the atomic atomic updates
+export async function addFileToUser(userId, reference, fileSize) {
+    const userRef = doc(db, 'users', userId)
+    await updateDoc(userRef, {
+        fileRefs: arrayUnion(reference),
+        spaceUsed: increment(fileSize)
+    })
 }
 
 
