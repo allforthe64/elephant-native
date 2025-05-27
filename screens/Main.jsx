@@ -28,7 +28,7 @@ import * as MediaLibrary from 'expo-media-library'
 import { format } from 'date-fns'
 
 //import addFile, updateUser, userListener from firestore/storage, firbaseAuth object from firebaseConfig/ref uploadBytesResumable from firebase storage
-import { addfile, updateUser, userListener } from '../firebase/firestore';
+import { addfile, addFileToUser, updateUser, userListener } from '../firebase/firestore';
 import { firebaseAuth, storage } from '../firebaseConfig';
 import {ref, uploadBytesResumable} from 'firebase/storage'
 
@@ -178,8 +178,10 @@ const Main = () => {
           timeStamp: `${formattedDate}`
         }, file.finalDestination)
 
-        const updatedUser = {...userInst, fileRefs: [...userInst.fileRefs, reference], spaceUsed: userInst.spaceUsed + uploadSize}
-        updateUser(updatedUser)
+        /* const updatedUser = {...userInst, fileRefs: [...userInst.fileRefs, reference], spaceUsed: userInst.spaceUsed + uploadSize}
+        updateUser(updatedUser) */
+
+        await addFileToUser(currentUser, reference, uploadSize)
 
         toast.show('Upload successful', {
           type: 'success'
@@ -210,8 +212,10 @@ const Main = () => {
         timeStamp: `${formattedDate}`
       }, file.finalDestination)
 
-      const updatedUser = {...userInst, fileRefs: [...userInst.fileRefs, reference], spaceUsed: userInst.spaceUsed + uploadSize}
-      updateUser(updatedUser)
+      /* const updatedUser = {...userInst, fileRefs: [...userInst.fileRefs, reference], spaceUsed: userInst.spaceUsed + uploadSize}
+      updateUser(updatedUser) */
+
+      await addFileToUser(currentUser, reference, uploadSize)
 
       toast.show('Upload successful', {
         type: 'success'
@@ -247,8 +251,10 @@ const Main = () => {
           timeStamp: `${formattedDate}`
         }, file.finalDestination)
   
-        const updatedUser = {...userInst, fileRefs: [...userInst.fileRefs, reference], spaceUsed: userInst.spaceUsed + uploadSize}
-        updateUser(updatedUser)
+        /* const updatedUser = {...userInst, fileRefs: [...userInst.fileRefs, reference], spaceUsed: userInst.spaceUsed + uploadSize}
+        updateUser(updatedUser) */
+
+        await addFileToUser(currentUser, reference, uploadSize)
   
         toast.show('Upload successful', {
           type: 'success'
@@ -285,8 +291,10 @@ const Main = () => {
           timeStamp: `${formattedDate}`
         }, file.finalDestination)
         
-        const updatedUser = {...userInst, fileRefs: [...userInst.fileRefs, reference], spaceUsed: userInst.spaceUsed + uploadSize}
-        updateUser(updatedUser)
+        /* const updatedUser = {...userInst, fileRefs: [...userInst.fileRefs, reference], spaceUsed: userInst.spaceUsed + uploadSize}
+        updateUser(updatedUser) */
+
+        await addFileToUser(currentUser, reference, uploadSize)
 
         toast.show('Upload successful', {
           type: 'success'
