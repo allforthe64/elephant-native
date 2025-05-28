@@ -357,18 +357,22 @@ const Main = () => {
       }
       resumeUploadsOnRestart()
 
-      //listen for uploads being added to the queue
-      const uploadListener = () => {
-        processUploadQueue()
-      }
-
-      UploadQueueEmitter.on('uploadQueueUpdated', uploadListener)
-
-      return () => {
-        UploadQueueEmitter.off('uploadQueueUpdated', uploadListener)
-      }
     }
   }, [userInst])
+
+  //mount queue event listeners
+  useEffect(() => {
+    //listen for uploads being added to the queue
+    const uploadListener = () => {
+      processUploadQueue()
+    }
+
+    UploadQueueEmitter.on('uploadQueueUpdated', uploadListener)
+
+    return () => {
+      UploadQueueEmitter.off('uploadQueueUpdated', uploadListener)
+    }
+  }, [])
 
   //when the auth state changes, pass the user object from firbaseAuth object into AuthContext
   useEffect(() => {
