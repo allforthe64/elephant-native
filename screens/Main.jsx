@@ -360,18 +360,18 @@ const Main = () => {
     }
   }, [userInst])
 
-  //mount queue event listeners
   useEffect(() => {
     //listen for uploads being added to the queue
-    const uploadListener = () => {
-      processUploadQueue()
-    }
+      const uploadListener = () => {
+        alert('[UploadQueueEmitter] uploadQueueUpdated received')
+        processUploadQueue()
+      }
 
-    UploadQueueEmitter.on('uploadQueueUpdated', uploadListener)
+      UploadQueueEmitter.on('uploadQueueUpdated', uploadListener)
 
-    return () => {
-      UploadQueueEmitter.off('uploadQueueUpdated', uploadListener)
-    }
+      return () => {
+        UploadQueueEmitter.off('uploadQueueUpdated', uploadListener)
+      }
   }, [])
 
   //when the auth state changes, pass the user object from firbaseAuth object into AuthContext
