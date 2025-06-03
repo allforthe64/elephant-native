@@ -337,7 +337,10 @@ try {
                         queue.push({uri: photo.uri, filename: filename, finalDestination: finalDestination, metadata: {height: photo.height, width: photo.width}})
                         await AsyncStorage.setItem('uploadQueue', JSON.stringify(queue))
 
-                        UploadQueueEmitter.emit('uploadQueueUpdated', queue)
+                        //confirm the flush by immediately reading it back
+                        const confirmedQueue = JSON.parse(await AsyncStorage.getItem('uploadQueue'))
+
+                        UploadQueueEmitter.emit('uploadQueueUpdated', confirmedQueue)
 
                     } catch (err) {
                         alert(err)
