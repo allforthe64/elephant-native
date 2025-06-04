@@ -328,6 +328,7 @@ const Main = () => {
   const processUploadQueue = async () => {
     try {
       let queue = JSON.parse(await AsyncStorage.getItem('uploadQueue')) || []
+      console.log('upload queue: ', queue)
 
       if (queue.length === 0) {
         alert('No uploads to process or max uploads reached.')
