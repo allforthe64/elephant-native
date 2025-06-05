@@ -209,7 +209,10 @@ const AudioRecorder = () => {
         const newQueue = [...queue, ...filesToAddToQueue]
         await AsyncStorage.setItem('uploadQueue', JSON.stringify(newQueue))
 
-        UploadQueueEmitter.emit('uploadQueueUpdated', newQueue)
+        //confirm the flush by immediately reading it back
+        const confirmedQueue = JSON.parse(await AsyncStorage.getItem('uploadQueue'))
+
+        UploadQueueEmitter.emit('uploadQueueUpdated', confirmedQueue)
 
 
         /* const references = await Promise.all(recordings.map(async (el) => {

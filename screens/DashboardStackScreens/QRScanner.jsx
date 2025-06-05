@@ -183,7 +183,10 @@ const Scanner = () => {
 
         await AsyncStorage.setItem('uploadQueue', JSON.stringify(newQueue))
 
-        UploadQueueEmitter.emit('uploadQueueUpdated', newQueue)
+        //confirm the flush by immediately reading it back
+        const confirmedQueue = JSON.parse(await AsyncStorage.getItem('uploadQueue'))
+
+        UploadQueueEmitter.emit('uploadQueueUpdated', confirmedQueue)
 
         /* let uploadSize = 0
         

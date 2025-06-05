@@ -269,8 +269,10 @@ try {
                         queue.push({uri: videoObj.uri, filename: filename, finalDestination: finalDestination})
                         await AsyncStorage.setItem('uploadQueue', JSON.stringify(queue))
 
-                        UploadQueueEmitter.emit('uploadQueueUpdated', queue)
+                        //confirm the flush by immediately reading it back
+                        const confirmedQueue = JSON.parse(await AsyncStorage.getItem('uploadQueue'))
 
+                        UploadQueueEmitter.emit('uploadQueueUpdated', confirmedQueue)
                         //create blob using the photo from state and save it to elephant staging
                         /* const blob = await new Promise(async (resolve, reject) => {
                             const xhr = new XMLHttpRequest()
