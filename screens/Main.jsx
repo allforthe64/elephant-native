@@ -84,6 +84,15 @@ const Main = () => {
       
   }, [currentUser])
 
+  useEffect(() => {
+    if (userInst) {
+      console.log("userInst:", userInst)
+      console.log("userInst.uid:", userInst.uid)
+      console.log("keys:", Object.keys(userInst))
+      console.log('currentUser: ', currentUser)
+    }
+  }, [userInst])
+
   //generate a random 10 character alpha numeric string
   function generateRandomString(length) {
     const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -145,7 +154,7 @@ const Main = () => {
         })
         
         const thumbnailFileRef = ref(storage, `${currentUser}/thumbnail&${formattedDate}`)
-        const thumbnailFileUri = `${userInst.uid}/thumbnail&${file.filename}`
+        const thumbnailFileUri = `${currentUser}/thumbnail&${file.filename}`
         const thumbNailResult = await uploadBytesResumable(thumbnailFileRef, thumbNailBlob)
 
         //create a blob for the file
@@ -161,8 +170,8 @@ const Main = () => {
           xhr.open('GET', file.uri, true)
           xhr.send(null)
         })
-        const fileUri = `${userInst.uid}/${file.fileName}`
-        const fileRef = ref(storage, `${userInst.uid}/${formattedDate}`)
+        const fileUri = `${currentUser}/${file.fileName}`
+        const fileRef = ref(storage, `${currentUser}/${formattedDate}`)
         const result = await uploadBytesResumable(fileRef, blob)
 
         const uploadSize = result.metadata.size + thumbNailResult.metadata.size
@@ -173,15 +182,12 @@ const Main = () => {
           size: uploadSize,
           uri: fileUri,
           thumbnailUri: thumbnailFileUri,
-          user: userInst.uid,
+          user: currentUser,
           version: 0,
           timeStamp: `${formattedDate}`
         }, file.finalDestination)
 
-        /* const updatedUser = {...userInst, fileRefs: [...userInst.fileRefs, reference], spaceUsed: userInst.spaceUsed + uploadSize}
-        updateUser(updatedUser) */
-
-        await addFileToUser(userInst.uid, reference, uploadSize)
+        await addFileToUser(currentUser, reference, uploadSize)
 
         toast.show('Upload successful', {
           type: 'success'
@@ -196,8 +202,8 @@ const Main = () => {
       const textFile = new Blob([`${file.noteBody}`], {
         type: "text/plain;charset=utf-8",
       });
-      const fileUri = `${userInst.uid}/${file.filename}`
-      const fileRef = ref(storage, `${userInst.uid}/${formattedDate}`)
+      const fileUri = `${currentUser}/${file.filename}`
+      const fileRef = ref(storage, `${currentUser}/${formattedDate}`)
       const result = await uploadBytesResumable(fileRef, textFile)
 
       const uploadSize = result.metadata.size
@@ -207,15 +213,12 @@ const Main = () => {
         fileType: 'txt',
         size: uploadSize,
         uri: fileUri,
-        user: userInst.uid,
+        user: currentUser,
         version: 0,
         timeStamp: `${formattedDate}`
       }, file.finalDestination)
 
-      /* const updatedUser = {...userInst, fileRefs: [...userInst.fileRefs, reference], spaceUsed: userInst.spaceUsed + uploadSize}
-      updateUser(updatedUser) */
-
-      await addFileToUser(userInst.uid, reference, uploadSize)
+      await addFileToUser(currentUser, reference, uploadSize)
 
       toast.show('Upload successful', {
         type: 'success'
@@ -236,8 +239,8 @@ const Main = () => {
           xhr.open('GET', file.uri, true)
           xhr.send(null)
         })
-        const fileUri = `${formattedDate}^&${userInst.uid}`
-        const fileRef = ref(storage, `${formattedDate}^&${userInst.uid}`)
+        const fileUri = `${formattedDate}^&${currentUser}`
+        const fileRef = ref(storage, `${formattedDate}^&${currentUser}`)
         const result = await uploadBytesResumable(fileRef, blob)
         const uploadSize = result.metadata.size
   
@@ -246,15 +249,12 @@ const Main = () => {
           fileType: fileType,
           size: uploadSize,
           uri: fileUri,
-          user: userInst.uid,
+          user: currentUser,
           version: 0,
           timeStamp: `${formattedDate}`
         }, file.finalDestination)
-  
-        /* const updatedUser = {...userInst, fileRefs: [...userInst.fileRefs, reference], spaceUsed: userInst.spaceUsed + uploadSize}
-        updateUser(updatedUser) */
 
-        await addFileToUser(userInst.uid, reference, uploadSize)
+        await addFileToUser(currentUser, reference, uploadSize)
   
         toast.show('Upload successful', {
           type: 'success'
@@ -276,8 +276,8 @@ const Main = () => {
           xhr.open('GET', file.uri, true)
           xhr.send(null)
         })
-        const fileUri = `${userInst.uid}/${file.filename}`
-        const fileRef = ref(storage, `${userInst.uid}/${formattedDate}`)
+        const fileUri = `${currentUser}/${file.filename}`
+        const fileRef = ref(storage, `${currentUser}/${formattedDate}`)
         const result = await uploadBytesResumable(fileRef, blob)
         const uploadSize = result.metadata.size
         
@@ -286,15 +286,12 @@ const Main = () => {
           fileType: fileType,
           size: uploadSize,
           uri: fileUri,
-          user: userInst.uid,
+          user: currentUser,
           version: 0,
           timeStamp: `${formattedDate}`
         }, file.finalDestination)
-        
-        /* const updatedUser = {...userInst, fileRefs: [...userInst.fileRefs, reference], spaceUsed: userInst.spaceUsed + uploadSize}
-        updateUser(updatedUser) */
 
-        await addFileToUser(userInst.uid, reference, uploadSize)
+        await addFileToUser(currentUser, reference, uploadSize)
 
         toast.show('Upload successful', {
           type: 'success'
