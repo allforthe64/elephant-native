@@ -309,7 +309,7 @@ const Main = () => {
 
   }
 
-  const uploadFileWithLock = async (file) => {
+  const uploadFileWithLock = async (file, uid) => {
     if (uploadingFiles.has(file.uri)) {
       alert('file is already in queue')
       return
@@ -317,7 +317,7 @@ const Main = () => {
       uploadingFiles.add(file.uri)
 
       try {
-        await uploadFile(file, userInst.uid)
+        await uploadFile(file, uid)
       } catch (error) {
         alert('uploadFileWithLock error: ' + error.message)
       } finally {
@@ -326,7 +326,7 @@ const Main = () => {
     }
   }
 
-  const processUploadQueue = async () => {
+  const processUploadQueue = async (uid) => {
     try {
       let queue = JSON.parse(await AsyncStorage.getItem('uploadQueue')) || []
       console.log('upload queue: ', queue)
@@ -337,7 +337,7 @@ const Main = () => {
       }
 
       for (const file of queue) {
-        await uploadFileWithLock(file)
+        await uploadFileWithLock(file, uid)
       }
   
     } catch (error) {
@@ -355,26 +355,28 @@ const Main = () => {
 
       //run any of the uploads in the queue when the app restarts
       const resumeUploadsOnRestart = async () => {
-        processUploadQueue()
+        processUploadQueue(userInst.uid)
       }
       resumeUploadsOnRestart()
 
     }
   }, [userInst])
 
+  //listen for queue update signals and run process uploadQueue
   useEffect(() => {
-    //listen for uploads being added to the queue
-      const uploadListener = () => {
-        alert('[UploadQueueEmitter] uploadQueueUpdated received')
-        processUploadQueue()
-      }
+    if (!currentUser) return;
 
-      UploadQueueEmitter.on('uploadQueueUpdated', uploadListener)
+    const uploadListener = () => {
+      alert('[UploadQueueEmitter] uploadQueueUpdated received')
+      processUploadQueue(currentUser)
+    }
 
-      return () => {
-        UploadQueueEmitter.off('uploadQueueUpdated', uploadListener)
-      }
-  }, [])
+    UploadQueueEmitter.on('uploadQueueUpdated', uploadListener)
+
+    return () => {
+      UploadQueueEmitter.off('uploadQueueUpdated', uploadListener)
+    }
+  }, [currentUser])
 
   //when the auth state changes, pass the user object from firbaseAuth object into AuthContext
   useEffect(() => {
