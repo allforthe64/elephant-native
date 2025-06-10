@@ -356,7 +356,7 @@ try {
                 setNameGiven(false)
 
             } catch (error) {
-                alert('Error within media upload function: ', error)
+                /* alert('Error within media upload function: ', error) */
             }
         }
 

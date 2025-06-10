@@ -311,7 +311,6 @@ const Main = () => {
 
   const uploadFileWithLock = async (file, uid) => {
     if (uploadingFiles.has(file.uri)) {
-      alert('file is already in queue')
       return
     } else {
       uploadingFiles.add(file.uri)
@@ -332,7 +331,6 @@ const Main = () => {
       console.log('upload queue: ', queue)
 
       if (queue.length === 0) {
-        alert('No uploads to process or max uploads reached.')
         return
       }
 
@@ -367,7 +365,6 @@ const Main = () => {
     if (!currentUser) return;
 
     const uploadListener = () => {
-      alert('[UploadQueueEmitter] uploadQueueUpdated received')
       processUploadQueue(currentUser)
     }
 
