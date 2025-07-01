@@ -7,7 +7,7 @@ export default function DashCollectContainer({ navigate }) {
 
   return (
         <View style={styles.mainContainer}>
-            <Text style={styles.quickFilesHeading}>Quick Files</Text>
+            <Text style={styles.quickFilesHeading}>Collect:</Text>
             <View style={styles.container}>      
                 <TouchableOpacity onPress={() => navigate('Document Scanner')} style={styles.buttonWrapper}>
                   <View style={styles.iconContainer}>

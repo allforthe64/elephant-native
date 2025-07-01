@@ -9,9 +9,8 @@ const DashHeader = ({navigate}) => {
 
   return (
     <View style={{width: '100%', paddingTop: 10, paddingLeft: 15, marginBottom: 10}}>
-        <Text style={{color: '#593060', fontWeight: 800, fontSize: 30}}>My Dashboard</Text>
         <View style={{width: '100%', display: 'flex', flexDirection: 'row'}}>
-            <Text style={{color: '#593060', fontWeight: 400, fontSize: 18}}>Check out your quick actions</Text>
+            <Text style={{color: '#593060', fontWeight: 800, fontSize: 30}}>Dashboard</Text>
             <TouchableOpacity style={{marginLeft: 40}} onPress={async () => {
                 auth.signOut()
                 navigate('Home')

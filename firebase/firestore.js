@@ -71,6 +71,11 @@ export async function updateUser(updatedUser) {
 
 //function to specifically add new files to user, using the atomic atomic updates
 export async function addFileToUser(userId, reference, fileSize) {
+
+    console.log('from within addFileToUser userId: ', userId)
+    console.log('from within addFileToUser reference: ', reference)
+    console.log('from within addFileToUser fileSize: ', fileSize)
+
     const userRef = doc(db, 'users', userId)
     await updateDoc(userRef, {
         fileRefs: arrayUnion(reference),

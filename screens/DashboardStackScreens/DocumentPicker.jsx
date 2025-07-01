@@ -170,8 +170,8 @@ const DocumentPickerComp = () => {
 
             if (['jpg', 'JPG', 'jpeg', 'JPEG', 'png', 'PNG'].includes(file.fileType)) {
                 console.log(file)
-                return { uri: file.uri, fileName: file.name, finalDestination: finalDestination, metadata: {width: file.width, height: file.height}}
-            } else return { uri: file.uri, fileName: file.name, finalDestination: finalDestination }
+                return { uri: file.uri, filename: file.name, finalDestination: finalDestination, metadata: {width: file.width, height: file.height}}
+            } else return { uri: file.uri, filename: file.name, finalDestination: finalDestination }
         })
 
         let queue = JSON.parse(await AsyncStorage.getItem('uploadQueue')) || []
@@ -187,131 +187,6 @@ const DocumentPickerComp = () => {
         setLoading(false)
         setDestination({id: null, fileName: null, nestedUnder: null})
         setFocusedFolder(null)
-
-        /* const references =  await Promise.all(files.map(async (el) => {
-
-            //check for files with the same name and increase the version number
-            let versionNo = 0
-            userInst.fileRefs.forEach(fileRef => {
-                if (fileRef.fileName === el.name && fileRef.fileName.split('.')[1] === el.name.split('.')[1]) {
-                    versionNo ++
-                }
-            })
-
-            //generate formatted date for file name
-            const formattedDate = format(new Date(), `yyyy-MM-dd:hh:mm:ss::${Date.now()}`) + `${Math.random().toString(36).slice(2)}`
-
-            let thumbnailFilename
-            let thumbnailFileUri
-            let thumbnailFileRef
-            let thumbnailResult
-
-            if (el.fileType === 'jpg' || el.fileType === 'jpeg' || el.fileType === 'png' || el.fileType === 'JPG' || el.fileType === 'JPEG' || el.fileType === 'PNG') {
-                //generate a resized version of the image for thumbnails
-                const manipResult = await manipulateAsync(
-                    el.uri,
-                    [{ resize: {height: 300} }],
-                    { compress: 1, format: SaveFormat.PNG }
-                  );
-
-                //upload thumbnail version
-                const thumbNailBlob = await new Promise(async (resolve, reject) => {
-                    const xhr = new XMLHttpRequest()
-                    xhr.onload = () => {
-                        resolve(xhr.response)
-                    }
-                    xhr.onerror = (e) => {
-                        reject(new TypeError('Network request failed'))
-                    }
-                    xhr.responseType = 'blob'
-                    xhr.open('GET', manipResult.uri, true)
-                    xhr.send(null)
-                })
-                thumbnailFilename = `${formattedDate}&thumbnail.jpg`
-                thumbnailFileUri = `${currentUser}/${`thumbnail&${formattedDate}`}`
-                thumbnailFileRef = ref(storage, `${currentUser}/thumbnail&${formattedDate}`)
-                thumbnailResult = await uploadBytesResumable(thumbnailFileRef, thumbNailBlob) 
-            }
-
-            //create blob and upload it into firebase storage
-            try {
-                const blob = await new Promise((resolve, reject) => {
-                    const xhr = new XMLHttpRequest()
-                    xhr.onload = () => {
-                        resolve(xhr.response) 
-                    }
-                    xhr.onerror = (e) => {
-                        reject(e)
-                        reject(new TypeError('Network request failed'))
-                    }
-                    xhr.responseType = 'blob'
-                    xhr.open('GET', el.uri, true)
-                    xhr.send(null)
-                })
-                
-                let filename
-                if (el.name.split('.')[1] === 'doc' || el.name.split('.')[1] === 'docx') {
-                    filename = `${formattedDate}^&${currentUser}`
-                } else {
-                    filename = `${currentUser}/${formattedDate}`
-                }
-                const fileRef = ref(storage, filename)
-                const result = await uploadBytesResumable(fileRef, blob)
-
-                let finalDestination 
-                if (destination.id !== null) finalDestination = destination.id
-                else if (focusedFolder) finalDestination = focusedFolder 
-                else finalDestination = false
-
-                //increase the upload size
-                if (thumbnailResult) {
-                    uploadSize += result.metadata.size + thumbnailResult.metadata.size
-                } else {
-                    uploadSize += result.metadata.size
-                }
-
-                let reference
-                if (el.fileType === 'jpg' || el.fileType === 'jpeg' || el.fileType === 'png' || el.fileType === 'JPG' || el.fileType === 'JPEG' || el.fileType === 'PNG') {
-                    reference = await addfile({
-                        name: el.name,
-                        fileType: el.fileType,
-                        size: thumbnailResult ? result.metadata.size + thumbnailResult.metadata.size : result.metadata.size,
-                        user: currentUser,
-                        version: 0,
-                        timeStamp: `${formattedDate}`
-                    }, finalDestination)
-                } else {
-                    //generate references
-                    reference = await addfile({
-                        ...el, 
-                        name: el.name, 
-                        user: currentUser, 
-                        size: result.metadata.size, 
-                        timeStamp: formattedDate, 
-                        version: versionNo}, finalDestination)
-                }
-                
-                return reference
-
-            } catch (err) {
-                console.log(err)
-            }
-
-        }))
-
-        try {
-
-            //increase the ammount of storage space being used and add the new references into the user's fileRefs
-            const newSpaceUsed = userInst.spaceUsed + uploadSize
-            const newUser = {...userInst, spaceUsed: newSpaceUsed, fileRefs: [...userInst.fileRefs, ...references]}
-            await updateUser(newUser)
-
-            
-            toast.show('File upload successful', {
-                type: 'success'
-            }) 
-        } catch (error) {console.log(error)}
-           */
     }
 
     //add a folder

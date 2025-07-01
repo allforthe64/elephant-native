@@ -8,7 +8,7 @@ import { faFolder, faFile, faBox } from '@fortawesome/free-solid-svg-icons'
 const FileButtons = ({navigate}) => {
   return (
     <View style={{display: 'flex', flexDirection: 'column', width:'100%'}}>
-        <Text style={styles.quickFilesHeading}>Quick Files</Text>
+        <Text style={styles.quickFilesHeading}>Files</Text>
         <View style={styles.wrapperContainer}>
             <TouchableOpacity onPress={() => navigate('Files', {staging: false})} style={styles.buttonWrapper1}>
                 <View style={styles.iconContainer}>

@@ -273,44 +273,6 @@ try {
                         const confirmedQueue = JSON.parse(await AsyncStorage.getItem('uploadQueue'))
 
                         UploadQueueEmitter.emit('uploadQueueUpdated', confirmedQueue)
-                        //create blob using the photo from state and save it to elephant staging
-                        /* const blob = await new Promise(async (resolve, reject) => {
-                            const xhr = new XMLHttpRequest()
-                            xhr.onload = () => {
-                            resolve(xhr.response) 
-                            }
-                            xhr.onerror = (e) => {
-                                reject(new TypeError('Network request failed'))
-                            }
-                            xhr.responseType = 'blob'
-                            xhr.open('GET', videoObj.uri, true)
-                            xhr.send(null)
-                        })
-
-                        const filename = mediaName !== '' ? `${mediaName}.${Platform.OS === 'ios' ? 'mov' : 'mp4'}` : `${formattedDate}.${Platform.OS === 'ios' ? 'mov' : 'mp4'}`
-                        const fileUri = `${currentUser}/${mediaName !== '' ? mediaName : formattedDate}`
-                        const fileRef = ref(storage, `${currentUser}/${formattedDate}`)
-                        const result = await uploadBytesResumable(fileRef, blob)
-
-                        let finalDestination 
-                        if (destination.id !== null) finalDestination = destination.id
-                        else if (focusedFolder) finalDestination = focusedFolder 
-                        else finalDestination = false
-
-                        const reference = await addfile({
-                                name: filename,
-                                fileType: `${Platform.OS === 'ios' ? 'mov' : 'mp4'}`,
-                                size: result.metadata.size,
-                                uri: fileUri,
-                                user: currentUser,
-                                version: 0,
-                                timeStamp: formattedDate
-                            }, finalDestination)
-                        const updatedUser = {...userInst, fileRefs: [...userInst.fileRefs, reference], spaceUsed: userInst.spaceUsed + result.metadata.size}
-                        updateUser(updatedUser)
-                        toast.show('Upload successful', {
-                            type: 'success'
-                        }) */
 
                         saveVideo()
 
