@@ -48,9 +48,9 @@ const Login = ({navigation: {navigate}}) => {
             headers: {
                 'Content-type': 'application/json'
             },
-            body: {
+            body: JSON.stringify({
                 to_email: userEmail
-            }
+            })
         })
 
         toast.show(`Registration link sent. Check your email!`, {
