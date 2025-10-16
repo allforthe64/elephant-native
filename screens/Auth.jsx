@@ -43,7 +43,7 @@ const Login = ({navigation: {navigate}}) => {
     }
 
     const sendRegistrationLink = async () => {
-        const response = await fetch('https://myelephantapp.com/send-registration-email', {
+        const response = await fetch('https://myelephantapp.com/api/send-registration-email', {
             method: 'POST',
             headers: {
                 'Content-type': 'application/json'
