@@ -40,7 +40,7 @@ Sentry.init({
 export default function App() {
   return (
     <SafeAreaProvider>
-      <ToastProvider placement='top' offsetTop={150} >
+      <ToastProvider placement='top' offsetTop={150}>
         <AuthContextProvider>
           <QueContextProvider>
             <Main />

@@ -171,7 +171,7 @@ const Scanner = () => {
 
             const randomString = [...Array(10)].map(() => (Math.random().toString(36)[Math.random() < 0.5 ? 'toUpperCase' : 'toLowerCase']()) ).join('')
 
-            return {uri: `${randomString} - qrcode.txt`, filename: filename, finalDestination: finalDestination, noteBody: url.data}
+            return {uri: `${randomString} - qrcode.txt`, filename: filename, finalDestination: finalDestination, noteBody: url.data, linksTo: url.data}
 
         })
 
