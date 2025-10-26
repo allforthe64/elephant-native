@@ -212,15 +212,29 @@ const Main = () => {
 
       const uploadSize = result.metadata.size
 
-      const reference = await addfile({
-        name: file.filename,
-        fileType: 'txt',
-        size: uploadSize,
-        uri: fileUri,
-        user: userId,
-        version: 0,
-        timeStamp: `${formattedDate}`
-      }, file.finalDestination)
+      let reference
+      if (file.linksTo) {
+        reference = await addfile({
+          name: file.filename,
+          fileType: 'txt',
+          size: uploadSize,
+          uri: fileUri,
+          user: userId,
+          version: 0,
+          timeStamp: `${formattedDate}`,
+          linksTo: file.linksTo
+        }, file.finalDestination)
+      } else {
+        reference = await addfile({
+          name: file.filename,
+          fileType: 'txt',
+          size: uploadSize,
+          uri: fileUri,
+          user: userId,
+          version: 0,
+          timeStamp: `${formattedDate}`
+        }, file.finalDestination)
+      }
 
       await addFileToUser(userId, reference, uploadSize)
 
