@@ -117,8 +117,30 @@ try {
 
         //set folders
         useEffect(() => {
-            if(userInst)
-            setFolders(userInst.files)
+            if(userInst) {
+                const sortedFiles = userInst.files.sort((a, b) => {
+                    const aFirst = a.fileName[0].toLowerCase();
+                    const bFirst = b.fileName[0].toLowerCase();
+
+                    const isALetter = /^[a-z]/.test(aFirst);
+                    const isBLetter = /^[a-z]/.test(bFirst);
+
+                    // Prioritize numbers first
+                    if (!isALetter && isBLetter) return -1;
+                    if (isALetter && !isBLetter) return 1;
+
+                    // If both start with numbers, compare numerically
+                    if (!isALetter && !isBLetter) {
+                        const numA = parseFloat(aFirst, 10);
+                        const numB = parseFloat(bFirst, 10);
+                        return numA - numB;
+                    }
+
+                    // If both start with letters, compare alphabetically
+                    return a.fileName.localeCompare(b.fileName, undefined, { numeric: true });
+                })
+                setFolders(sortedFiles)
+            }
           }, [userInst, addFolderForm])
 
         

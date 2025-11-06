@@ -16,6 +16,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 const Staging = ({staging, reset, folders, deleteFile, renameFile, moveFile, userFiles}) => {
 
     const [focusedFile, setFocusedFile] = useState()
+    const [alphaSortedFiles, setAlphaSortedFiles] = useState([])
 
     const insets = useSafeAreaInsets()
 
@@ -26,6 +27,35 @@ const Staging = ({staging, reset, folders, deleteFile, renameFile, moveFile, use
         }
 
     }, [userFiles])
+
+    //alpha sort the subfolders
+    useEffect(() => {
+        if (staging) {
+            const sortedFiles = staging.sort((a, b) => {
+                const aFirst = a.fileName[0].toLowerCase();
+                const bFirst = b.fileName[0].toLowerCase();
+
+                const isALetter = /^[a-z]/.test(aFirst);
+                const isBLetter = /^[a-z]/.test(bFirst);
+
+                // Prioritize numbers first
+                if (!isALetter && isBLetter) return -1;
+                if (isALetter && !isBLetter) return 1;
+
+                // If both start with numbers, compare numerically
+                if (!isALetter && !isBLetter) {
+                    const numA = parseFloat(aFirst, 10);
+                    const numB = parseFloat(bFirst, 10);
+                    return numA - numB;
+                }
+
+                // If both start with letters, compare alphabetically
+                return a.fileName.localeCompare(b.fileName, undefined, { numeric: true });
+            })
+
+            setAlphaSortedFiles(sortedFiles)
+        }
+    }, [staging])
 
   return (
     <>
@@ -49,9 +79,9 @@ const Staging = ({staging, reset, folders, deleteFile, renameFile, moveFile, use
                 </TouchableOpacity>
             </View>
             <View style={{height: '80%', paddingBottom: '5%'}}>
-                {staging.length > 0 ? 
+                {alphaSortedFiles.length > 0 ? 
                     <ScrollView>
-                        {staging.map((file, i) => {
+                        {alphaSortedFiles.map((file, i) => {
                             return <File key={file + i}  file={file} focus={setFocusedFile}/>
                         })}        
                     </ScrollView> 

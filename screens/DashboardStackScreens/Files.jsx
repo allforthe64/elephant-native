@@ -37,6 +37,7 @@ export default function Files({navigation: { navigate }, route}) {
   const [add, setAdd] = useState(false)
   const [newFolderName, setNewFolderName] = useState('')
   const [keyBoardClosed, setKeyboardClosed] = useState(true)
+  const [alphaSortedFiles, setAlphaSortedFiles] = useState([])
 
   const inputRef = useRef()
 
@@ -67,6 +68,32 @@ export default function Files({navigation: { navigate }, route}) {
   useEffect(() => {
     if (currentUser) {
       setLoading(false)
+
+
+      //alphabetically sort the currentUser folders
+      const sortedFiles = currentUser.files.sort((a, b) => {
+          const aFirst = a.fileName[0].toLowerCase();
+          const bFirst = b.fileName[0].toLowerCase();
+
+          const isALetter = /^[a-z]/.test(aFirst);
+          const isBLetter = /^[a-z]/.test(bFirst);
+
+          // Prioritize numbers first
+          if (!isALetter && isBLetter) return -1;
+          if (isALetter && !isBLetter) return 1;
+
+          // If both start with numbers, compare numerically
+          if (!isALetter && !isBLetter) {
+              const numA = parseFloat(aFirst, 10);
+              const numB = parseFloat(bFirst, 10);
+              return numA - numB;
+          }
+
+          // If both start with letters, compare alphabetically
+          return a.fileName.localeCompare(b.fileName, undefined, { numeric: true });
+      })
+
+      setAlphaSortedFiles(sortedFiles)
     }
   }, [currentUser])  
 
@@ -266,8 +293,10 @@ export default function Files({navigation: { navigate }, route}) {
   return ( 
       <View style={styles.container}>
         {!loading && currentUser ? 
-          focusedFolder ? <FocusedFolder folder={focusedFolder} renameFolder={renameFolder} moveFolder={moveFolder} addFolder={addFolder} deleteFolder={deleteFolder} folders={currentUser.files} clear={setFocusedFolder} getTargetFolder={getTargetFolder} deleteFile={deleteFile} renameFile={renameFile} moveFile={moveFile} files={currentUser.fileRefs} updateUser={updateUser}/> 
-          : stagingMode ? <Staging reset={setStagingMode} staging={staging} userFiles={currentUser.fileRefs} folders={currentUser.files} deleteFile={deleteFile} renameFile={renameFile} moveFile={moveFile}/> 
+          focusedFolder ? 
+            <FocusedFolder folder={focusedFolder} renameFolder={renameFolder} moveFolder={moveFolder} addFolder={addFolder} deleteFolder={deleteFolder} folders={currentUser.files} clear={setFocusedFolder} getTargetFolder={getTargetFolder} deleteFile={deleteFile} renameFile={renameFile} moveFile={moveFile} files={currentUser.fileRefs} updateUser={updateUser}/> 
+          : stagingMode ? 
+            <Staging reset={setStagingMode} staging={staging} userFiles={currentUser.fileRefs} folders={currentUser.files} deleteFile={deleteFile} renameFile={renameFile} moveFile={moveFile}/> 
           :
           <ScrollView ref={scrollRef} style={
               add && !keyBoardClosed ? {
@@ -296,7 +325,7 @@ export default function Files({navigation: { navigate }, route}) {
                     </View>
                     <View style={add ? {height: 300} : {height: 330, marginBottom: '6%'}}>
                       <ScrollView>
-                        {currentUser.files.map((file, i) => {
+                        {alphaSortedFiles.map((file, i) => {
                           if (file.nestedUnder === '') {
                             return <Folder key={i + file.fileName} files={currentUser.files} renameFolder={renameFolder} pressable={true} moveFolderFunc={moveFolder} folders={currentUser.files} folder={file} getTargetFolder={getTargetFolder} deleteFolder={deleteFolder} updateUser={updateUser}/>
                           }
@@ -304,38 +333,38 @@ export default function Files({navigation: { navigate }, route}) {
                       </ScrollView>
                     </View>
                     {add ? 
-                    <Modal animationType='slide' presentationStyle='pageSheet' onShow={() => setTimeout(()=>{
-                        inputRef.current.focus()
-                      }, 200)}>
-                      <View style={{height: '100%', width: '100%', backgroundColor: '#593060'}}>
-                        <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', paddingRight: '5%', paddingTop: '10%',width: '100%'}}>
-                            <Pressable onPress={() => {
-                              setAdd(false)
-                              setNewFolderName('')
-                            }}>
-                            <FontAwesomeIcon icon={faXmark} color={'white'} size={30}/>
-                            </Pressable>
-                        </View>
-                        <View style={styles.addFolderContainer}>
-                          <Text style={styles.addFolderHeading}>Add new folder:</Text>
-                          <View ref={formRef} style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-around', marginBottom: '6%'}}  
-                          >
-                            <View style={styles.iconHolder}>
-                              <FontAwesomeIcon icon={faFolder} size={22} color='#9F37B0'/>
-                            </View>
-                            <TextInput value={newFolderName} style={{color: 'white', fontSize: 22, fontWeight: 'bold', borderBottomColor: 'white', borderBottomWidth: 2, width: '70%', marginLeft: '5%'}} onChangeText={(e) => setNewFolderName(e)} onFocus={() => setKeyboardClosed(false)} onBlur={() => {if (newFolderName === '') setAdd(false)}} ref={inputRef}/>
+                      <Modal animationType='slide' presentationStyle='pageSheet' onShow={() => setTimeout(()=>{
+                          inputRef.current.focus()
+                        }, 200)}>
+                        <View style={{height: '100%', width: '100%', backgroundColor: '#593060'}}>
+                          <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', paddingRight: '5%', paddingTop: '10%',width: '100%'}}>
+                              <Pressable onPress={() => {
+                                setAdd(false)
+                                setNewFolderName('')
+                              }}>
+                              <FontAwesomeIcon icon={faXmark} color={'white'} size={30}/>
+                              </Pressable>
                           </View>
-                          <TouchableOpacity style={styles.nonFolderButtonSM}
-                            onPress={() => addFolder(newFolderName, '')}
-                          >
-                              <View style={styles.iconHolderSM}>
-                                <FontAwesomeIcon icon={faFloppyDisk} size={18} color='#9F37B0'/>
+                          <View style={styles.addFolderContainer}>
+                            <Text style={styles.addFolderHeading}>Add new folder:</Text>
+                            <View ref={formRef} style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-around', marginBottom: '6%'}}  
+                            >
+                              <View style={styles.iconHolder}>
+                                <FontAwesomeIcon icon={faFolder} size={22} color='#9F37B0'/>
                               </View>
-                              <Text style={{fontSize: 22, color: '#9F37B0', fontWeight: '600', paddingTop: '1%', marginLeft: '15%'}}>Save</Text>
-                          </TouchableOpacity>
+                              <TextInput value={newFolderName} style={{color: 'white', fontSize: 22, fontWeight: 'bold', borderBottomColor: 'white', borderBottomWidth: 2, width: '70%', marginLeft: '5%'}} onChangeText={(e) => setNewFolderName(e)} onFocus={() => setKeyboardClosed(false)} onBlur={() => {if (newFolderName === '') setAdd(false)}} ref={inputRef}/>
+                            </View>
+                            <TouchableOpacity style={styles.nonFolderButtonSM}
+                              onPress={() => addFolder(newFolderName, '')}
+                            >
+                                <View style={styles.iconHolderSM}>
+                                  <FontAwesomeIcon icon={faFloppyDisk} size={18} color='#9F37B0'/>
+                                </View>
+                                <Text style={{fontSize: 22, color: '#9F37B0', fontWeight: '600', paddingTop: '1%', marginLeft: '15%'}}>Save</Text>
+                            </TouchableOpacity>
+                          </View>
                         </View>
-                      </View>
-                    </Modal>
+                      </Modal>
                     : 
                     <View style={{display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%'}}>
                       <View style={{display: 'flex', flexDirection: 'row', marginBottom: 10}}>                  
