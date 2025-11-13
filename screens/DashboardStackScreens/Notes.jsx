@@ -69,7 +69,7 @@ const Notepad = () => {
 
     useEffect(() => {
       if(currentUser) {
-        const sortedFiles = userInst.files.sort((a, b) => {
+        const sortedFiles = currentUser.files.sort((a, b) => {
             const aFirst = a.fileName[0].toLowerCase();
             const bFirst = b.fileName[0].toLowerCase();
 
