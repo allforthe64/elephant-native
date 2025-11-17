@@ -69,11 +69,11 @@ export default function Files({navigation: { navigate }, route}) {
     if (currentUser) {
       setLoading(false)
 
-
+      
       //alphabetically sort the currentUser folders
       const sortedFiles = currentUser.files.sort((a, b) => {
-          const aFirst = a.fileName[0].toLowerCase();
-          const bFirst = b.fileName[0].toLowerCase();
+          const aFirst = (a.fileName?.[0] ?? "").toLowerCase();
+          const bFirst = (b.fileName?.[0] ?? "").toLowerCase();
 
           const isALetter = /^[a-z]/.test(aFirst);
           const isBLetter = /^[a-z]/.test(bFirst);
@@ -84,8 +84,8 @@ export default function Files({navigation: { navigate }, route}) {
 
           // If both start with numbers, compare numerically
           if (!isALetter && !isBLetter) {
-              const numA = parseFloat(aFirst, 10);
-              const numB = parseFloat(bFirst, 10);
+              const numA = parseInt(aFirst, 10);
+              const numB = parseInt(bFirst, 10);
               return numA - numB;
           }
 
