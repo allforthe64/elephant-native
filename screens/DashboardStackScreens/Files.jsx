@@ -69,7 +69,7 @@ export default function Files({navigation: { navigate }, route}) {
     if (currentUser) {
       setLoading(false)
 
-      if (Array.isArray(userInst?.files)) {
+      if (Array.isArray(currentUser?.files)) {
         //alphabetically sort the currentUser folders
         const sortedFiles = currentUser.files.sort((a, b) => {
             const aFirst = (a.fileName?.[0] ?? "").toLowerCase();
@@ -95,7 +95,7 @@ export default function Files({navigation: { navigate }, route}) {
 
         setAlphaSortedFiles(sortedFiles)
       } else {
-        alert('userInst.files is not an array')
+        alert('currentUser.files is not an array')
       }
     }
   }, [currentUser])  
