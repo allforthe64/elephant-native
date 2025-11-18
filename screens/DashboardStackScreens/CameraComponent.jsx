@@ -118,28 +118,32 @@ try {
         //set folders
         useEffect(() => {
             if(userInst) {
-                const sortedFiles = userInst.files.sort((a, b) => {
-                    const aFirst = (a.fileName?.[0] ?? "").toLowerCase();
-                    const bFirst = (b.fileName?.[0] ?? "").toLowerCase();
+                if (Array.isArray(userInst?.files)) {
+                    const sortedFiles = userInst.files.sort((a, b) => {
+                        const aFirst = (a.fileName?.[0] ?? "").toLowerCase();
+                        const bFirst = (b.fileName?.[0] ?? "").toLowerCase();
 
-                    const isALetter = /^[a-z]/.test(aFirst);
-                    const isBLetter = /^[a-z]/.test(bFirst);
+                        const isALetter = /^[a-z]/.test(aFirst);
+                        const isBLetter = /^[a-z]/.test(bFirst);
 
-                    // Prioritize numbers first
-                    if (!isALetter && isBLetter) return -1;
-                    if (isALetter && !isBLetter) return 1;
+                        // Prioritize numbers first
+                        if (!isALetter && isBLetter) return -1;
+                        if (isALetter && !isBLetter) return 1;
 
-                    // If both start with numbers, compare numerically
-                    if (!isALetter && !isBLetter) {
-                        const numA = parseInt(aFirst, 10);
-                        const numB = parseInt(bFirst, 10);
-                        return numA - numB;
-                    }
+                        // If both start with numbers, compare numerically
+                        if (!isALetter && !isBLetter) {
+                            const numA = parseInt(aFirst, 10);
+                            const numB = parseInt(bFirst, 10);
+                            return numA - numB;
+                        }
 
-                    // If both start with letters, compare alphabetically
-                    return a.fileName.localeCompare(b.fileName, undefined, { numeric: true });
-                })
-                setFolders(sortedFiles)
+                        // If both start with letters, compare alphabetically
+                        return a.fileName.localeCompare(b.fileName, undefined, { numeric: true });
+                    })
+                    setFolders(sortedFiles)
+                } else {
+                    alert('userInst.files is not an array')
+                }   
             }
           }, [userInst, addFolderForm])
 

@@ -70,29 +70,33 @@ const DocumentPickerComp = () => {
     //set folders 
     useEffect(() => {
         if(userInst) {
-            const sortedFiles = userInst.files.sort((a, b) => {
-                const aFirst = (a.fileName?.[0] ?? "").toLowerCase();
-                const bFirst = (b.fileName?.[0] ?? "").toLowerCase();
+            if (Array.isArray(userInst?.files)) {
+                const sortedFiles = userInst.files.sort((a, b) => {
+                    const aFirst = (a.fileName?.[0] ?? "").toLowerCase();
+                    const bFirst = (b.fileName?.[0] ?? "").toLowerCase();
 
-                const isALetter = /^[a-z]/.test(aFirst);
-                const isBLetter = /^[a-z]/.test(bFirst);
+                    const isALetter = /^[a-z]/.test(aFirst);
+                    const isBLetter = /^[a-z]/.test(bFirst);
 
-                // Prioritize numbers first
-                if (!isALetter && isBLetter) return -1;
-                if (isALetter && !isBLetter) return 1;
+                    // Prioritize numbers first
+                    if (!isALetter && isBLetter) return -1;
+                    if (isALetter && !isBLetter) return 1;
 
-                // If both start with numbers, compare numerically
-                if (!isALetter && !isBLetter) {
-                    const numA = parseInt(aFirst, 10);
-                    const numB = parseInt(bFirst, 10);
-                    return numA - numB;
-                }
+                    // If both start with numbers, compare numerically
+                    if (!isALetter && !isBLetter) {
+                        const numA = parseInt(aFirst, 10);
+                        const numB = parseInt(bFirst, 10);
+                        return numA - numB;
+                    }
 
-                // If both start with letters, compare alphabetically
-                return a.fileName.localeCompare(b.fileName, undefined, { numeric: true });
-            })
+                    // If both start with letters, compare alphabetically
+                    return a.fileName.localeCompare(b.fileName, undefined, { numeric: true });
+                })
 
-            setFolders(sortedFiles)
+                setFolders(sortedFiles)
+            } else {
+                alert('userInst.files is not an array')
+            } 
         }
     }, [userInst, addFolderForm])
 
@@ -161,33 +165,37 @@ const DocumentPickerComp = () => {
 
     const renderFiles = () => {
 
-        const sortedFileRefs = files.sort((a, b) => {
-            const aFirst = (a.fileName?.[0] ?? "").toLowerCase();
-            const bFirst = (b.fileName?.[0] ?? "").toLowerCase();
+        if (Array.isArray(files)) {
+            const sortedFileRefs = files.sort((a, b) => {
+                const aFirst = (a.fileName?.[0] ?? "").toLowerCase();
+                const bFirst = (b.fileName?.[0] ?? "").toLowerCase();
 
-            const isALetter = /^[a-z]/.test(aFirst);
-            const isBLetter = /^[a-z]/.test(bFirst);
+                const isALetter = /^[a-z]/.test(aFirst);
+                const isBLetter = /^[a-z]/.test(bFirst);
 
-            // Prioritize numbers first
-            if (!isALetter && isBLetter) return -1;
-            if (isALetter && !isBLetter) return 1;
+                // Prioritize numbers first
+                if (!isALetter && isBLetter) return -1;
+                if (isALetter && !isBLetter) return 1;
 
-            // If both start with numbers, compare numerically
-            if (!isALetter && !isBLetter) {
-                const numA = parseInt(aFirst, 10);
-                const numB = parseInt(bFirst, 10);
-                return numA - numB;
-            }
+                // If both start with numbers, compare numerically
+                if (!isALetter && !isBLetter) {
+                    const numA = parseInt(aFirst, 10);
+                    const numB = parseInt(bFirst, 10);
+                    return numA - numB;
+                }
 
-            // If both start with letters, compare alphabetically
-            return a.fileName.localeCompare(b.fileName, undefined, { numeric: true });
-        })
+                // If both start with letters, compare alphabetically
+                return a.fileName.localeCompare(b.fileName, undefined, { numeric: true });
+            })
 
-        return sortedFileRefs.map((file, index) => {
-            return (
-                <FileRow file={file} files={files} index={index} key={index} deleteFunc={filterFiles} setFiles={setFiles}/>
-            )
-        })
+            return sortedFileRefs.map((file, index) => {
+                return (
+                    <FileRow file={file} files={files} index={index} key={index} deleteFunc={filterFiles} setFiles={setFiles}/>
+                )
+            })
+        } else {
+            alert('Files is not a function')
+        }
     }
 
     const filterFiles = (input, target) => {
