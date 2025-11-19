@@ -48,6 +48,19 @@ export default function Files({navigation: { navigate }, route}) {
   //get the auth user context object
   const auth = firebaseAuth
 
+  const getFirstChar = (val) => {
+    if (typeof val !== "string" || val.length === 0) return "";
+    return val.charAt(0).toLowerCase(); // safest possible extraction
+  };
+
+  const safeLocaleCompare = (a, b) => {
+    try {
+      return a.localeCompare(b, undefined, { numeric: true });
+    } catch {
+      return a.localeCompare(b);
+    }
+  };
+
   //get the current user 
   useEffect(() => {
     setLoading(true) //prevent component to attempting to render files/folders before they exist
@@ -70,28 +83,32 @@ export default function Files({navigation: { navigate }, route}) {
       setLoading(false)
       try {
         if (Array.isArray(currentUser?.files)) {
+          
           //alphabetically sort the currentUser folders
           const sortedFiles = currentUser.files.sort((a, b) => {
-              const aFirst = (a.fileName?.[0] ?? "").toLowerCase();
-              const bFirst = (b.fileName?.[0] ?? "").toLowerCase();
+            const aName = typeof a.fileName === "string" ? a.fileName : "";
+            const bName = typeof b.fileName === "string" ? b.fileName : "";
 
-              const isALetter = /^[a-z]/.test(aFirst);
-              const isBLetter = /^[a-z]/.test(bFirst);
+            const aFirst = getFirstChar(aName);
+            const bFirst = getFirstChar(bName);
 
-              // Prioritize numbers first
-              if (!isALetter && isBLetter) return -1;
-              if (isALetter && !isBLetter) return 1;
+            const isALetter = /^[a-z]/.test(aFirst);
+            const isBLetter = /^[a-z]/.test(bFirst);
 
-              // If both start with numbers, compare numerically
-              if (!isALetter && !isBLetter) {
-                  const numA = parseInt(aFirst, 10);
-                  const numB = parseInt(bFirst, 10);
-                  return numA - numB;
-              }
+            // Numbers first
+            if (!isALetter && isBLetter) return -1;
+            if (isALetter && !isBLetter) return 1;
 
-              // If both start with letters, compare alphabetically
-              return a.fileName.localeCompare(b.fileName, undefined, { numeric: true });
-          })
+            // Both start with numbers → compare numerically
+            if (!isALetter && !isBLetter) {
+              const numA = parseInt(aFirst, 10) || 0;
+              const numB = parseInt(bFirst, 10) || 0;
+              return numA - numB;
+            }
+
+            // Both start with letters → compare alphabetically
+            return safeLocaleCompare(aName, bName);
+          });
 
           setAlphaSortedFiles(sortedFiles)
         } else {
