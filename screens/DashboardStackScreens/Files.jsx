@@ -48,9 +48,24 @@ export default function Files({navigation: { navigate }, route}) {
   //get the auth user context object
   const auth = firebaseAuth
 
-  const getFirstChar = (val) => {
-    if (typeof val !== "string" || val.length === 0) return "";
-    return val.charAt(0).toLowerCase(); // safest possible extraction
+  const getSortableValue = (val) => {
+    if (typeof val !== "string") return "";
+
+    const trimmed = val.trim();
+
+    // Extract first "important" character
+    const firstChar = trimmed.charAt(0).toLowerCase();
+
+    // Detect letters, numbers, symbols
+    const isLetter = /^[a-z]/i.test(firstChar);
+    const isNumber = /^[0-9]/.test(firstChar);
+
+    return {
+      original: trimmed,
+      firstChar,
+      isLetter,
+      isNumber,
+    };
   };
 
   const safeLocaleCompare = (a, b) => {
@@ -59,7 +74,7 @@ export default function Files({navigation: { navigate }, route}) {
     } catch {
       return a.localeCompare(b);
     }
-  };
+  }
 
   //get the current user 
   useEffect(() => {
@@ -85,30 +100,28 @@ export default function Files({navigation: { navigate }, route}) {
         if (Array.isArray(currentUser?.files)) {
           
           //alphabetically sort the currentUser folders
-          const sortedFiles = currentUser.files.sort((a, b) => {
-            const aName = typeof a.fileName === "string" ? a.fileName : "";
-            const bName = typeof b.fileName === "string" ? b.fileName : "";
+          const sortedFiles = [...currentUser.files].sort((a, b) => {
+            const aVal = getSortableValue(a.fileName);
+            const bVal = getSortableValue(b.fileName);
 
-            const aFirst = getFirstChar(aName);
-            const bFirst = getFirstChar(bName);
+            // Letters first
+            if (aVal.isLetter && !bVal.isLetter) return -1;
+            if (!aVal.isLetter && bVal.isLetter) return 1;
 
-            const isALetter = /^[a-z]/.test(aFirst);
-            const isBLetter = /^[a-z]/.test(bFirst);
+            // Numbers second
+            if (aVal.isNumber && !bVal.isNumber) return -1;
+            if (!aVal.isNumber && bVal.isNumber) return 1;
 
-            // Numbers first
-            if (!isALetter && isBLetter) return -1;
-            if (isALetter && !isBLetter) return 1;
-
-            // Both start with numbers → compare numerically
-            if (!isALetter && !isBLetter) {
-              const numA = parseInt(aFirst, 10) || 0;
-              const numB = parseInt(bFirst, 10) || 0;
-              return numA - numB;
+            // Both numbers → compare numerically
+            if (aVal.isNumber && bVal.isNumber) {
+              const numA = parseInt(aVal.original, 10) || 0;
+              const numB = parseInt(bVal.original, 10) || 0;
+              if (numA !== numB) return numA - numB;
             }
 
-            // Both start with letters → compare alphabetically
-            return safeLocaleCompare(aName, bName);
-          });
+            // Both letters or symbols → alphabetical
+            return safeLocaleCompare(aVal.original, bVal.original);
+          })
 
           setAlphaSortedFiles(sortedFiles)
         } else {
