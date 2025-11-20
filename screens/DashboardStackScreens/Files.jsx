@@ -49,21 +49,15 @@ export default function Files({navigation: { navigate }, route}) {
   const auth = firebaseAuth
 
   const getSortableValue = (val) => {
-    if (typeof val !== "string") return "";
+    if (typeof val !== "string") return { original: "", isNumber: false };
 
     const trimmed = val.trim();
+    const firstChar = trimmed.charAt(0);
 
-    // Extract first "important" character
-    const firstChar = trimmed.charAt(0).toLowerCase();
-
-    // Detect letters, numbers, symbols
-    const isLetter = /^[a-z]/i.test(firstChar);
     const isNumber = /^[0-9]/.test(firstChar);
 
     return {
       original: trimmed,
-      firstChar,
-      isLetter,
       isNumber,
     };
   };
@@ -104,22 +98,17 @@ export default function Files({navigation: { navigate }, route}) {
             const aVal = getSortableValue(a.fileName);
             const bVal = getSortableValue(b.fileName);
 
-            // Letters first
-            if (aVal.isLetter && !bVal.isLetter) return -1;
-            if (!aVal.isLetter && bVal.isLetter) return 1;
-
-            // Numbers second
-            if (aVal.isNumber && !bVal.isNumber) return -1;
-            if (!aVal.isNumber && bVal.isNumber) return 1;
-
-            // Both numbers → compare numerically
+            // Numbers first (descending)
             if (aVal.isNumber && bVal.isNumber) {
-              const numA = parseInt(aVal.original, 10) || 0;
-              const numB = parseInt(bVal.original, 10) || 0;
-              if (numA !== numB) return numA - numB;
+              const numA = parseFloat(aVal.original) || 0;
+              const numB = parseFloat(bVal.original) || 0;
+              return numB - numA; // descending
             }
 
-            // Both letters or symbols → alphabetical
+            if (aVal.isNumber && !bVal.isNumber) return -1; // number before non-number
+            if (!aVal.isNumber && bVal.isNumber) return 1;  // non-number after number
+
+            // Both non-numbers → alphabetical (UTF-8 safe)
             return safeLocaleCompare(aVal.original, bVal.original);
           })
 
