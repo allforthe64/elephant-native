@@ -59,7 +59,7 @@ export default function Files({navigation: { navigate }, route}) {
     return {
       original: trimmed,
       isNumber,
-      firstChar: firstChar
+      firstChar
     };
   };
 
