@@ -59,6 +59,7 @@ export default function Files({navigation: { navigate }, route}) {
     return {
       original: trimmed,
       isNumber,
+      firstChar: firstChar
     };
   };
 
@@ -102,14 +103,14 @@ export default function Files({navigation: { navigate }, route}) {
             if (aVal.isNumber && bVal.isNumber) {
               const numA = parseFloat(aVal.original) || 0;
               const numB = parseFloat(bVal.original) || 0;
-              return numB - numA; // descending
+              return numA - numB; // ascending
             }
 
             if (aVal.isNumber && !bVal.isNumber) return -1; // number before non-number
             if (!aVal.isNumber && bVal.isNumber) return 1;  // non-number after number
 
             // Both non-numbers → alphabetical (UTF-8 safe)
-            return safeLocaleCompare(aVal.original, bVal.original);
+            return safeLocaleCompare(aVal.firstChar, bVal.firstChar);
           })
 
           setAlphaSortedFiles(sortedFiles)
