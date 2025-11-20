@@ -54,6 +54,9 @@ export default function Files({navigation: { navigate }, route}) {
     const trimmed = val.trim();
     const firstChar = trimmed.charAt(0);
 
+    console.log('orginal value: ', val)
+    console.log('trimmed: ', trimmed)
+
     const isNumber = /^[0-9]/.test(firstChar);
 
     return {
