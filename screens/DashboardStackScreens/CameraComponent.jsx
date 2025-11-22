@@ -70,341 +70,361 @@ try {
     const cameraRef = useRef()
     const nameRef = useRef()
 
-        const currentUser = firebaseAuth.currentUser.uid
+    const currentUser = firebaseAuth.currentUser.uid
 
-        const {setQue} = useContext(QueContext)
+    const {setQue} = useContext(QueContext)
 
-        const toast = useToast()
+    const toast = useToast()
 
-        //initialize animation ref
-        let fadeAnim = useRef(new Animated.Value(100)).current
+    //initialize animation ref
+    let fadeAnim = useRef(new Animated.Value(100)).current
 
-        //get the current user 
-        useEffect(() => {
-            if (firebaseAuth) {
-            try {
-                const getCurrentUser = async () => {
-                const unsubscribe = await userListener(setUserInst, false, currentUser)
-            
-                return () => unsubscribe()
-                }
-                getCurrentUser()
-            } catch (err) {console.log(err)}
-            } else console.log('no user yet')
-            
-        }, [firebaseAuth])
+    //alpha sort functionality
+    const getSortableValue = (val) => {
+        if (typeof val !== "string") return { original: "", isNumber: false };
 
-        //get camera permissions
-        useEffect(() => {
-            (async () => {
-                const cameraPermission = await Camera.requestCameraPermissionsAsync()
-                const mediaLibraryPermission = await MediaLibrary.requestPermissionsAsync()
-                const {status} = await Audio.requestPermissionsAsync() 
-                setHasCameraPermission(cameraPermission.status === "granted")
-                setHasMediaLibraryPermission(mediaLibraryPermission.status === "granted")
-                setHasAudioRecordingPermission(status === "granted")
-            })()
-        }, [])
+        const trimmed = val.trim();
+        const firstChar = trimmed.charAt(0);
 
-        useEffect(() => {
-            //Will change fadeAnim value to 0 in 3 seconds
-            Animated.timing(fadeAnim, {
-                toValue: 100,
-                duration: 0,
-                useNativeDriver: true
-            }).start()
-        }, [photo])
+        const isNumber = /^[0-9]/.test(firstChar);
 
-        //set folders
-        useEffect(() => {
-            if(userInst) {
-                if (Array.isArray(userInst?.files)) {
-                    const sortedFiles = userInst.files.sort((a, b) => {
-                        const aFirst = (a.fileName?.[0] ?? "").toLowerCase();
-                        const bFirst = (b.fileName?.[0] ?? "").toLowerCase();
+        return {
+        original: trimmed,
+        isNumber,
+        firstChar
+        };
+    };
 
-                        const isALetter = /^[a-z]/.test(aFirst);
-                        const isBLetter = /^[a-z]/.test(bFirst);
+    const safeLocaleCompare = (a, b) => {
+        try {
+        return a.localeCompare(b, undefined, { numeric: true });
+        } catch {
+        return a.localeCompare(b);
+        }
+    }
 
-                        // Prioritize numbers first
-                        if (!isALetter && isBLetter) return -1;
-                        if (isALetter && !isBLetter) return 1;
-
-                        // If both start with numbers, compare numerically
-                        if (!isALetter && !isBLetter) {
-                            const numA = parseInt(aFirst, 10);
-                            const numB = parseInt(bFirst, 10);
-                            return numA - numB;
-                        }
-
-                        // If both start with letters, compare alphabetically
-                        return a.fileName.localeCompare(b.fileName, undefined, { numeric: true });
-                    })
-                    setFolders(sortedFiles)
-                } else {
-                    alert('userInst.files is not an array')
-                }   
-            }
-          }, [userInst, addFolderForm])
-
+    //get the current user 
+    useEffect(() => {
+        if (firebaseAuth) {
+        try {
+            const getCurrentUser = async () => {
+            const unsubscribe = await userListener(setUserInst, false, currentUser)
         
-        useEffect(() => {
-            const exists = Object.values(folders).some((value) => {
-                return value.nestedUnder === focusedFolder
-            })
-            setSubFolders(exists)
-        }, [focusedFolder, addFolderForm])
-
-        useEffect(() => {
-            if (folders && focusedFolder) {
-                setFocusedFolderInst(folders.filter(folder => folder.id === focusedFolder)[0])
+            return () => unsubscribe()
             }
-        }, [folders, focusedFolder])
+            getCurrentUser()
+        } catch (err) {console.log(err)}
+        } else console.log('no user yet')
+        
+    }, [firebaseAuth])
 
-        //add a folder
-        const addFolder = async (folderName, targetNest) => {
-            //if the incoming targetNest is empty string, create the new folder under the home directory
-            if (folderName.length > 0) {
-                const folderId = Math.floor(Math.random() * 9e11) + 1e11
-                if (targetNest === '') {
-                    const newFile = {
-                    id: folderId,
-                    fileName: folderName,
-                    nestedUnder: ''
-                    }
-            
-                    const newFiles = [...userInst.files, newFile]
-                    const updatedUser = {...userInst, files: newFiles}
-                    await updateUser(updatedUser)
-                    setNewFolderName('')
-                    setFolders(newFiles)
-                    setFocusedFolder(folderId)
-                    
-                } else {           //if the incoming targetNest has a value, create the new folder with the nestedUnder property set to targetNest
-                    const newFile = {
-                    id: folderId,
-                    fileName: folderName,
-                    nestedUnder: targetNest
+    //get camera permissions
+    useEffect(() => {
+        (async () => {
+            const cameraPermission = await Camera.requestCameraPermissionsAsync()
+            const mediaLibraryPermission = await MediaLibrary.requestPermissionsAsync()
+            const {status} = await Audio.requestPermissionsAsync() 
+            setHasCameraPermission(cameraPermission.status === "granted")
+            setHasMediaLibraryPermission(mediaLibraryPermission.status === "granted")
+            setHasAudioRecordingPermission(status === "granted")
+        })()
+    }, [])
+
+    useEffect(() => {
+        //Will change fadeAnim value to 0 in 3 seconds
+        Animated.timing(fadeAnim, {
+            toValue: 100,
+            duration: 0,
+            useNativeDriver: true
+        }).start()
+    }, [photo])
+
+    //set folders
+    useEffect(() => {
+        if(userInst) {
+            if (Array.isArray(userInst?.files)) {
+                const sortedFiles = userInst.files.sort((a, b) => {
+                    const aVal = getSortableValue(a.fileName);
+                    const bVal = getSortableValue(b.fileName);
+
+                    // Numbers first (descending)
+                    if (aVal.isNumber && bVal.isNumber) {
+                    const numA = parseFloat(aVal.original) || 0;
+                    const numB = parseFloat(bVal.original) || 0;
+                    return numA - numB; // ascending
                     }
 
-                    const newFiles = [...userInst.files, newFile]
-                    const updatedUser = {...userInst, files: newFiles}
+                    if (aVal.isNumber && !bVal.isNumber) return -1; // number before non-number
+                    if (!aVal.isNumber && bVal.isNumber) return 1;  // non-number after number
+
+                    // Both non-numbers → alphabetical (UTF-8 safe)
+                    return safeLocaleCompare(aVal.firstChar, bVal.firstChar);
+                })
+                setFolders(sortedFiles)
+            } else {
+                alert('userInst.files is not an array')
+            }   
+        }
+    }, [userInst, addFolderForm])
+
+    
+    useEffect(() => {
+        const exists = Object.values(folders).some((value) => {
+            return value.nestedUnder === focusedFolder
+        })
+        setSubFolders(exists)
+    }, [focusedFolder, addFolderForm])
+
+    useEffect(() => {
+        if (folders && focusedFolder) {
+            setFocusedFolderInst(folders.filter(folder => folder.id === focusedFolder)[0])
+        }
+    }, [folders, focusedFolder])
+
+    //add a folder
+    const addFolder = async (folderName, targetNest) => {
+        //if the incoming targetNest is empty string, create the new folder under the home directory
+        if (folderName.length > 0) {
+            const folderId = Math.floor(Math.random() * 9e11) + 1e11
+            if (targetNest === '') {
+                const newFile = {
+                id: folderId,
+                fileName: folderName,
+                nestedUnder: ''
+                }
+        
+                const newFiles = [...userInst.files, newFile]
+                const updatedUser = {...userInst, files: newFiles}
+                await updateUser(updatedUser)
+                setNewFolderName('')
+                setFolders(newFiles)
+                setFocusedFolder(folderId)
+                
+            } else {           //if the incoming targetNest has a value, create the new folder with the nestedUnder property set to targetNest
+                const newFile = {
+                id: folderId,
+                fileName: folderName,
+                nestedUnder: targetNest
+                }
+
+                const newFiles = [...userInst.files, newFile]
+                const updatedUser = {...userInst, files: newFiles}
+        
+                updateUser(updatedUser)
+                setAddFolderForm(false)
+                setFolders(newFiles)
+                setFocusedFolder(folderId)
+            }
+        } else {
+        alert('Please enter a folder name')
+        }
+    }
+    
+
+    //render content based on permissions
+    if (hasCameraPermission === undefined || hasMediaLibraryPermission === undefined || hasAudioRecordingPermission === undefined) {
+        return <Text>Requesting permissions...</Text>
+    } else if (!hasCameraPermission) {
+        return <Text>Permission for camera not granted. Please change this in settings.</Text>
+    }
+
+    //take photo using takePictureAsync method
+    const takePic = async () => {
+        try {
+            const options = {
+                quality: 1,
+                base64: true,
+                exif: false
+            }
+
+            const newPhoto = await cameraRef.current.takePictureAsync(options)
+            setPhoto(newPhoto)
+        } catch (err) {
+            alert(err)
+        }
+    }
+
+    //take a video using takeAsyncVideo method
+    const takeVideo = async () => {
+        const codecs = CameraView.getAvailableVideoCodecsAsync()
+        console.log(codecs)
+        try {
+            setRecording(true)
+            let options 
             
-                    updateUser(updatedUser)
-                    setAddFolderForm(false)
-                    setFolders(newFiles)
-                    setFocusedFolder(folderId)
+            if (Platform.OS === 'ios') {
+                options = {
+                    mute: false,
+                    codec: codecs.H264
                 }
             } else {
-            alert('Please enter a folder name')
-            }
-        }
-      
-
-        //render content based on permissions
-        if (hasCameraPermission === undefined || hasMediaLibraryPermission === undefined || hasAudioRecordingPermission === undefined) {
-            return <Text>Requesting permissions...</Text>
-        } else if (!hasCameraPermission) {
-            return <Text>Permission for camera not granted. Please change this in settings.</Text>
-        }
-
-        //take photo using takePictureAsync method
-        const takePic = async () => {
-            try {
-                const options = {
-                    quality: 1,
-                    base64: true,
-                    exif: false
+                options = {
+                    mute: false,
                 }
+            }
+
+            const recordedVideo = await cameraRef.current.recordAsync(options)
+            setVideoObj(recordedVideo)
+        } catch (error) { 
+            alert('error within recording function: ', error) 
+            console.log(error)
+        }
+    }
+
+    //stop recording video
+    const stopVideo = () => {
+        cameraRef.current.stopRecording()
+        setRecording(false)
+    }
+
+    function generateRandomString(length) {
+        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        let result = '';
+        const charactersLength = characters.length;
     
-                const newPhoto = await cameraRef.current.takePictureAsync(options)
-                setPhoto(newPhoto)
-            } catch (err) {
-                alert(err)
-            }
+        for (let i = 0; i < length; i++) {
+            result += characters.charAt(Math.floor(Math.random() * charactersLength));
         }
+    
+        return result;
+    }
 
-        //take a video using takeAsyncVideo method
-        const takeVideo = async () => {
-            const codecs = CameraView.getAvailableVideoCodecsAsync()
-            console.log(codecs)
-            try {
-                setRecording(true)
-                let options 
+    const saveToElephant = async (videoMode) => {
+
+        try {
+                //save video
+            if (videoMode) {
                 
-                if (Platform.OS === 'ios') {
-                    options = {
-                        mute: false,
-                        codec: codecs.H264
-                    }
-                } else {
-                    options = {
-                        mute: false,
-                    }
-                }
-
-                const recordedVideo = await cameraRef.current.recordAsync(options)
-                setVideoObj(recordedVideo)
-            } catch (error) { 
-                alert('error within recording function: ', error) 
-                console.log(error)
-            }
-        }
-
-        //stop recording video
-        const stopVideo = () => {
-            cameraRef.current.stopRecording()
-            setRecording(false)
-        }
-
-        function generateRandomString(length) {
-            const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-            let result = '';
-            const charactersLength = characters.length;
-        
-            for (let i = 0; i < length; i++) {
-                result += characters.charAt(Math.floor(Math.random() * charactersLength));
-            }
-        
-            return result;
-        }
-
-        const saveToElephant = async (videoMode) => {
-
-            try {
-                 //save video
-                if (videoMode) {
-                    
-                    setVideoObj(undefined)
-
-                    //create new formatted date for file
-                    const formattedDate = format(new Date(), "yyyy-MM-dd:hh:mm:ss")
-
-                    try {  
-
-                        //generate a fileName and finalDestination
-                        const filename = mediaName !== '' ? `${mediaName}.${Platform.OS === 'ios' ? 'mov' : 'mp4'}` : `${formattedDate}.${Platform.OS === 'ios' ? 'mov' : 'mp4'}`
-
-                        let finalDestination 
-                        if (destination.id !== null) finalDestination = destination.id
-                        else if (focusedFolder) finalDestination = focusedFolder 
-                        else finalDestination = false
-
-                        //add an image into the file queue
-                        let queue = JSON.parse(await AsyncStorage.getItem('uploadQueue')) || []
-                        queue.push({uri: videoObj.uri, filename: filename, finalDestination: finalDestination})
-                        await AsyncStorage.setItem('uploadQueue', JSON.stringify(queue))
-
-                        //confirm the flush by immediately reading it back
-                        const confirmedQueue = JSON.parse(await AsyncStorage.getItem('uploadQueue'))
-
-                        UploadQueueEmitter.emit('uploadQueueUpdated', confirmedQueue)
-
-                        saveVideo()
-
-                    } catch (err) {
-                        alert(err)
-                    }
-                } else {
-                    setPhoto(undefined)
-                    const randomString = generateRandomString(10);
-
-                    //create new formatted date for file
-                    const formattedDate = format(new Date(), "yyyy-MM-dd:hh:mm:ss") + randomString
-
-                    try {  
-
-                        //generate a fileName and finalDestination
-                        const filename = mediaName !== '' ? `${mediaName}.jpg` : `${formattedDate}.jpg`
-
-                        let finalDestination 
-                        if (destination.id !== null) finalDestination = destination.id
-                        else if (focusedFolder) finalDestination = focusedFolder 
-                        else finalDestination = false
-
-                        //add an image into the file queue
-                        let queue = JSON.parse(await AsyncStorage.getItem('uploadQueue')) || []
-                        queue.push({uri: photo.uri, filename: filename, finalDestination: finalDestination, metadata: {height: photo.height, width: photo.width}})
-                        await AsyncStorage.setItem('uploadQueue', JSON.stringify(queue))
-
-                        //confirm the flush by immediately reading it back
-                        const confirmedQueue = JSON.parse(await AsyncStorage.getItem('uploadQueue'))
-
-                        UploadQueueEmitter.emit('uploadQueueUpdated', confirmedQueue)
-
-                    } catch (err) {
-                        alert(err)
-                    }
-                }
-                savePhoto()
-                setMediaName('')
-                setDestination({id: null, fileName: null, nestedUnder: null})
-                setFocusedFolder(null)
-                setPreAdd(false)
-                setNameGiven(false)
-
-            } catch (error) {
-                /* alert('Error within media upload function: ', error) */
-            }
-        }
-
-        //allow photo to be shared using shareAsync method
-        const sharePic = () => {
-            shareAsync(photo.uri).then(() => {
-                setPhoto(undefined)
-            })
-        }
-
-        //allow photo to be shared using shareAsync method
-        const shareVideo = () => {
-            shareAsync(videoObj.uri).then(() => {
                 setVideoObj(undefined)
-            })
-        }
 
-        //save photo to the phone's local storage using saveToLibraryAsync method
-        const savePhoto = () => {
-            MediaLibrary.saveToLibraryAsync(photo.uri).then((() => {
-                console.log('success')
-            }))
-        }
+                //create new formatted date for file
+                const formattedDate = format(new Date(), "yyyy-MM-dd:hh:mm:ss")
 
-        //save photo to the phone's local storage using saveToLibraryAsync method
-        const saveVideo = () => {
-            MediaLibrary.saveToLibraryAsync(videoObj.uri).then((() => {
-                console.log('success')
-            }))
-        }
+                try {  
 
-        //if session mode is turned on after picture is taken, immediately save the photo to elephant storage
-        if (photo) {
-            if (session === true) {
-                saveToElephant(false)
+                    //generate a fileName and finalDestination
+                    const filename = mediaName !== '' ? `${mediaName}.${Platform.OS === 'ios' ? 'mov' : 'mp4'}` : `${formattedDate}.${Platform.OS === 'ios' ? 'mov' : 'mp4'}`
+
+                    let finalDestination 
+                    if (destination.id !== null) finalDestination = destination.id
+                    else if (focusedFolder) finalDestination = focusedFolder 
+                    else finalDestination = false
+
+                    //add an image into the file queue
+                    let queue = JSON.parse(await AsyncStorage.getItem('uploadQueue')) || []
+                    queue.push({uri: videoObj.uri, filename: filename, finalDestination: finalDestination})
+                    await AsyncStorage.setItem('uploadQueue', JSON.stringify(queue))
+
+                    //confirm the flush by immediately reading it back
+                    const confirmedQueue = JSON.parse(await AsyncStorage.getItem('uploadQueue'))
+
+                    UploadQueueEmitter.emit('uploadQueueUpdated', confirmedQueue)
+
+                    saveVideo()
+
+                } catch (err) {
+                    alert(err)
+                }
+            } else {
+                setPhoto(undefined)
+                const randomString = generateRandomString(10);
+
+                //create new formatted date for file
+                const formattedDate = format(new Date(), "yyyy-MM-dd:hh:mm:ss") + randomString
+
+                try {  
+
+                    //generate a fileName and finalDestination
+                    const filename = mediaName !== '' ? `${mediaName}.jpg` : `${formattedDate}.jpg`
+
+                    let finalDestination 
+                    if (destination.id !== null) finalDestination = destination.id
+                    else if (focusedFolder) finalDestination = focusedFolder 
+                    else finalDestination = false
+
+                    //add an image into the file queue
+                    let queue = JSON.parse(await AsyncStorage.getItem('uploadQueue')) || []
+                    queue.push({uri: photo.uri, filename: filename, finalDestination: finalDestination, metadata: {height: photo.height, width: photo.width}})
+                    await AsyncStorage.setItem('uploadQueue', JSON.stringify(queue))
+
+                    //confirm the flush by immediately reading it back
+                    const confirmedQueue = JSON.parse(await AsyncStorage.getItem('uploadQueue'))
+
+                    UploadQueueEmitter.emit('uploadQueueUpdated', confirmedQueue)
+
+                } catch (err) {
+                    alert(err)
+                }
             }
-            
-        }
+            savePhoto()
+            setMediaName('')
+            setDestination({id: null, fileName: null, nestedUnder: null})
+            setFocusedFolder(null)
+            setPreAdd(false)
+            setNameGiven(false)
 
-        //if session mode is turned on after video is taken, immediately save the photo to elephant storage
-        if (videoObj) {
-            if (session === true) {
-                saveToElephant(true)
-            }
+        } catch (error) {
+            /* alert('Error within media upload function: ', error) */
         }
+    }
 
-        const fadeOut = () => {
-            //Will change fadeAnim value to 0 in 3 seconds
-            Animated.timing(fadeAnim, {
-                delay: 100,
-                toValue: 0,
-                duration: 2500,
-                useNativeDriver: true
-            }).start()
-        }
+    //allow photo to be shared using shareAsync method
+    const sharePic = () => {
+        shareAsync(photo.uri).then(() => {
+            setPhoto(undefined)
+        })
+    }
 
-        //toggle between front and back camera
-        const toggleType = () => {
-            if (!recording) setFacing(prev => prev === 'back' ? 'front' : 'back')
+    //allow photo to be shared using shareAsync method
+    const shareVideo = () => {
+        shareAsync(videoObj.uri).then(() => {
+            setVideoObj(undefined)
+        })
+    }
+
+    //save photo to the phone's local storage using saveToLibraryAsync method
+    const savePhoto = () => {
+        MediaLibrary.saveToLibraryAsync(photo.uri).then((() => {
+            console.log('success')
+        }))
+    }
+
+    //save photo to the phone's local storage using saveToLibraryAsync method
+    const saveVideo = () => {
+        MediaLibrary.saveToLibraryAsync(videoObj.uri).then((() => {
+            console.log('success')
+        }))
+    }
+
+    //if session mode is turned on after picture is taken, immediately save the photo to elephant storage
+    if (photo) {
+        if (session === true) {
+            saveToElephant(false)
         }
+        
+    }
+
+    //if session mode is turned on after video is taken, immediately save the photo to elephant storage
+    if (videoObj) {
+        if (session === true) {
+            saveToElephant(true)
+        }
+    }
+
+    const fadeOut = () => {
+        //Will change fadeAnim value to 0 in 3 seconds
+        Animated.timing(fadeAnim, {
+            delay: 100,
+            toValue: 0,
+            duration: 2500,
+            useNativeDriver: true
+        }).start()
+    }
+
+    //toggle between front and back camera
+    const toggleType = () => {
+        if (!recording) setFacing(prev => prev === 'back' ? 'front' : 'back')
+    }
 
   if (!permission) {
     // Camera permissions are still loading.

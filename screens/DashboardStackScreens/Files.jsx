@@ -54,9 +54,6 @@ export default function Files({navigation: { navigate }, route}) {
     const trimmed = val.trim();
     const firstChar = trimmed.charAt(0);
 
-    console.log('orginal value: ', val)
-    console.log('trimmed: ', trimmed)
-
     const isNumber = /^[0-9]/.test(firstChar);
 
     return {
@@ -67,10 +64,6 @@ export default function Files({navigation: { navigate }, route}) {
   };
 
   const safeLocaleCompare = (a, b) => {
-
-    console.log('value of a: ', a)
-    console.log('value of b: ', b)
-
     try {
       return a.localeCompare(b, undefined, { numeric: true });
     } catch {

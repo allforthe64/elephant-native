@@ -20,6 +20,30 @@ const Staging = ({staging, reset, folders, deleteFile, renameFile, moveFile, use
 
     const insets = useSafeAreaInsets()
 
+    //alpha sort functionality
+    const getSortableValue = (val) => {
+        if (typeof val !== "string") return { original: "", isNumber: false };
+
+        const trimmed = val.trim();
+        const firstChar = trimmed.charAt(0);
+
+        const isNumber = /^[0-9]/.test(firstChar);
+
+        return {
+        original: trimmed,
+        isNumber,
+        firstChar
+        };
+    };
+
+    const safeLocaleCompare = (a, b) => {
+        try {
+        return a.localeCompare(b, undefined, { numeric: true });
+        } catch {
+        return a.localeCompare(b);
+        }
+    }
+
     useEffect(() => {
         if (focusedFile) {
             const newFile = userFiles.filter(fileRef => fileRef.fileId === focusedFile.fileId)
@@ -34,25 +58,21 @@ const Staging = ({staging, reset, folders, deleteFile, renameFile, moveFile, use
             if (staging) {
                 if (Array.isArray(staging)) {
                     const sortedFiles = staging.sort((a, b) => {
-                        const aFirst = (a.fileName?.[0] ?? "").toLowerCase();
-                        const bFirst = (b.fileName?.[0] ?? "").toLowerCase();
+                        const aVal = getSortableValue(a.fileName);
+                        const bVal = getSortableValue(b.fileName);
 
-                        const isALetter = /^[a-z]/.test(aFirst);
-                        const isBLetter = /^[a-z]/.test(bFirst);
-
-                        // Prioritize numbers first
-                        if (!isALetter && isBLetter) return -1;
-                        if (isALetter && !isBLetter) return 1;
-
-                        // If both start with numbers, compare numerically
-                        if (!isALetter && !isBLetter) {
-                            const numA = parseInt(aFirst, 10);
-                            const numB = parseInt(bFirst, 10);
-                            return numA - numB;
+                        // Numbers first (descending)
+                        if (aVal.isNumber && bVal.isNumber) {
+                        const numA = parseFloat(aVal.original) || 0;
+                        const numB = parseFloat(bVal.original) || 0;
+                        return numA - numB; // ascending
                         }
 
-                        // If both start with letters, compare alphabetically
-                        return a.fileName.localeCompare(b.fileName, undefined, { numeric: true });
+                        if (aVal.isNumber && !bVal.isNumber) return -1; // number before non-number
+                        if (!aVal.isNumber && bVal.isNumber) return 1;  // non-number after number
+
+                        // Both non-numbers → alphabetical (UTF-8 safe)
+                        return safeLocaleCompare(aVal.firstChar, bVal.firstChar);
                     })
 
                     setAlphaSortedFiles(sortedFiles)

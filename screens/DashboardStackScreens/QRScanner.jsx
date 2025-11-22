@@ -49,6 +49,30 @@ const Scanner = () => {
 
     const currentUser = firebaseAuth.currentUser.uid
 
+    //alpha sort functionality
+    const getSortableValue = (val) => {
+        if (typeof val !== "string") return { original: "", isNumber: false };
+
+        const trimmed = val.trim();
+        const firstChar = trimmed.charAt(0);
+
+        const isNumber = /^[0-9]/.test(firstChar);
+
+        return {
+        original: trimmed,
+        isNumber,
+        firstChar
+        };
+    };
+
+    const safeLocaleCompare = (a, b) => {
+        try {
+        return a.localeCompare(b, undefined, { numeric: true });
+        } catch {
+        return a.localeCompare(b);
+        }
+    }
+
     //get the current user 
     useEffect(() => {
         if (currentUser) {
