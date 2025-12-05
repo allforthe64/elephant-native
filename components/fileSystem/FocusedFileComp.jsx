@@ -74,6 +74,30 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
 
     const auth = firebaseAuth
 
+    //alpha sort helper functions
+    const getSortableValue = (val) => {
+        if (typeof val !== "string") return { original: "", isNumber: false };
+
+        const trimmed = val.trim();
+        const firstChar = trimmed.charAt(0);
+
+        const isNumber = /^[0-9]/.test(firstChar);
+
+        return {
+        original: trimmed,
+        isNumber,
+        firstChar
+        };
+    };
+
+    const safeLocaleCompare = (a, b) => {
+        try {
+        return a.localeCompare(b, undefined, { numeric: true });
+        } catch {
+        return a.localeCompare(b);
+        }
+    }
+
     //get the current user 
     useEffect(() => {
         if (auth) {
@@ -93,7 +117,25 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
     //set the userFolders
     useEffect(() => {
         if (userInst) {
-            setFolders(userInst.files)
+            //sorting the subfolders
+            const sortedFolders = userInst.files.sort((a, b) => {
+                const aVal = getSortableValue(a.fileName);
+                const bVal = getSortableValue(b.fileName);
+
+                // Numbers first (descending)
+                if (aVal.isNumber && bVal.isNumber) {
+                const numA = parseFloat(aVal.original) || 0;
+                const numB = parseFloat(bVal.original) || 0;
+                return numA - numB; // ascending
+                }
+
+                if (aVal.isNumber && !bVal.isNumber) return -1; // number before non-number
+                if (!aVal.isNumber && bVal.isNumber) return 1;  // non-number after number
+
+                // Both non-numbers → alphabetical (UTF-8 safe)
+                return safeLocaleCompare(aVal.firstChar, bVal.firstChar);
+            })
+            setFolders(sortedFolders)
         }
     }, [userInst, addFolderForm])
 

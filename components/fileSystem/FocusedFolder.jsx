@@ -24,11 +24,34 @@ const FocusedFolder = ({folder, folders, clear, getTargetFolder, addFolder, rena
     const [focusedFile, setFocusedFile] = useState()
     const [keybaordClosed, setKeyboardClosed] = useState(true)
     const [nestedFiles, setNestedFiles] = useState([])
+    const [alphaSortedFolders, setAlphaSortedFolders] = useState([])
 
     //initialize ref for addFolder form
     const folderRef = useRef()
     
+    //alpha sort helper functions
+    const getSortableValue = (val) => {
+        if (typeof val !== "string") return { original: "", isNumber: false };
 
+        const trimmed = val.trim();
+        const firstChar = trimmed.charAt(0);
+
+        const isNumber = /^[0-9]/.test(firstChar);
+
+        return {
+        original: trimmed,
+        isNumber,
+        firstChar
+        };
+    };
+
+    const safeLocaleCompare = (a, b) => {
+        try {
+        return a.localeCompare(b, undefined, { numeric: true });
+        } catch {
+        return a.localeCompare(b);
+        }
+    }
 
     //refresh the folder when the files change
     useEffect(() => {
@@ -49,6 +72,26 @@ const FocusedFolder = ({folder, folders, clear, getTargetFolder, addFolder, rena
         const targetFolder = getNestedFolder()
         setLoading(false)
         setNestedFolder(targetFolder)
+        
+        //sorting the subfolders
+        const sortedFolders = folder.folders.sort((a, b) => {
+            const aVal = getSortableValue(a.fileName);
+            const bVal = getSortableValue(b.fileName);
+
+            // Numbers first (descending)
+            if (aVal.isNumber && bVal.isNumber) {
+            const numA = parseFloat(aVal.original) || 0;
+            const numB = parseFloat(bVal.original) || 0;
+            return numA - numB; // ascending
+            }
+
+            if (aVal.isNumber && !bVal.isNumber) return -1; // number before non-number
+            if (!aVal.isNumber && bVal.isNumber) return 1;  // non-number after number
+
+            // Both non-numbers → alphabetical (UTF-8 safe)
+            return safeLocaleCompare(aVal.firstChar, bVal.firstChar);
+        })
+        setAlphaSortedFolders(sortedFolders)
 
         //if a file is currently being focused on, refresh the file instance being passed to the focus file component
         if (focusedFile) {
@@ -59,7 +102,26 @@ const FocusedFolder = ({folder, folders, clear, getTargetFolder, addFolder, rena
             setFocusedFile(newFile[0])
         }
 
-        setNestedFiles(folder.files)
+        //alpha sorting the files
+        const sortedFiles = folder.files.sort((a, b) => {
+            const aVal = getSortableValue(a.fileName);
+            const bVal = getSortableValue(b.fileName);
+
+            // Numbers first (descending)
+            if (aVal.isNumber && bVal.isNumber) {
+            const numA = parseFloat(aVal.original) || 0;
+            const numB = parseFloat(bVal.original) || 0;
+            return numA - numB; // ascending
+            }
+
+            if (aVal.isNumber && !bVal.isNumber) return -1; // number before non-number
+            if (!aVal.isNumber && bVal.isNumber) return 1;  // non-number after number
+
+            // Both non-numbers → alphabetical (UTF-8 safe)
+            return safeLocaleCompare(aVal.firstChar, bVal.firstChar);
+        })
+
+        setNestedFiles(sortedFiles)
 
     }, [folder])
 
@@ -130,7 +192,7 @@ const FocusedFolder = ({folder, folders, clear, getTargetFolder, addFolder, rena
                     </View>
                     <View style={add ? {height: 250} : {height: 365, marginBottom: '10%'}}>
                         <ScrollView style={{height: '100%'}}>
-                            {folder.folders.map((f, i) => {return <Folder key={f + i} focusedFolder={folder} getTargetFolder={getTargetFolder} folders={folders} renameFolder={renameFolder} moveFolderFunc={moveFolder} folder={f} deleteFolder={deleteFolder} updateUser={updateUser}/>})}
+                            {alphaSortedFolders.map((f, i) => {return <Folder key={f + i} focusedFolder={folder} getTargetFolder={getTargetFolder} folders={folders} renameFolder={renameFolder} moveFolderFunc={moveFolder} folder={f} deleteFolder={deleteFolder} updateUser={updateUser}/>})}
                             {nestedFiles.map((file, i) => {return <File key={file + i} focus={setFocusedFile} file={file} />})}
                         </ScrollView> 
                     </View>

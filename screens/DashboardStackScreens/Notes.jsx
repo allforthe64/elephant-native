@@ -94,7 +94,7 @@ const Notepad = () => {
     useEffect(() => {
       if(currentUser) {
 
-        if (Array.isArray(userInst?.files)) {
+        if (Array.isArray(currentUser?.files)) {
           const sortedFiles = currentUser.files.sort((a, b) => {
               const aVal = getSortableValue(a.fileName);
               const bVal = getSortableValue(b.fileName);
@@ -115,7 +115,7 @@ const Notepad = () => {
 
           setFolders(sortedFiles)
         } else {
-          alert('userInst.files is not an array')
+          alert('currentUser.files is not an array')
         }
       }
     }, [currentUser, addFolderForm])
