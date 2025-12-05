@@ -368,7 +368,6 @@ const AudioRecorder = () => {
                         else {
                             setPreAdd(false)
                             setFocusedFolder(null)
-                            setNameGiven(false)
                             setMediaName('')
                         }
                         }}>
