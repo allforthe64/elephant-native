@@ -368,7 +368,6 @@ const AudioRecorder = () => {
                         else {
                             setPreAdd(false)
                             setFocusedFolder(null)
-                            setMediaName('')
                         }
                         }}>
                             <FontAwesomeIcon icon={faXmark} color={'white'} size={30}/>

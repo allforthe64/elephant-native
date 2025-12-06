@@ -27,14 +27,78 @@ const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolder
 
   const auth = firebaseAuth
 
+  //alpha sort functionality
+  const getSortableValue = (val) => {
+      if (typeof val !== "string") return { original: "", isNumber: false };
+
+      const trimmed = val.trim();
+      const firstChar = trimmed.charAt(0);
+
+      const isNumber = /^[0-9]/.test(firstChar);
+
+      return {
+      original: trimmed,
+      isNumber,
+      firstChar
+      };
+  };
+
+  const safeLocaleCompare = (a, b) => {
+      try {
+      return a.localeCompare(b, undefined, { numeric: true });
+      } catch {
+      return a.localeCompare(b);
+      }
+  }
 
   useEffect(() => {
-    if (folder.nestedUnder === '') {
-      setValidFolders(folders.filter(f => {
+    if (folder.nestedUnder === '' && folders) {
+      const filteredFolders = folders.filter(f => {
         if (f.nestedUnder === '' && f.fileName !== folder.fileName) return f
-      }))
+      })
+
+      const sortedFolders = filteredFolders.sort((a, b) => {
+        const aVal = getSortableValue(a.fileName);
+        const bVal = getSortableValue(b.fileName);
+
+        // Numbers first (descending)
+        if (aVal.isNumber && bVal.isNumber) {
+        const numA = parseFloat(aVal.original) || 0;
+        const numB = parseFloat(bVal.original) || 0;
+        return numA - numB; // ascending
+        }
+
+        if (aVal.isNumber && !bVal.isNumber) return -1; // number before non-number
+        if (!aVal.isNumber && bVal.isNumber) return 1;  // non-number after number
+
+        // Both non-numbers → alphabetical (UTF-8 safe)
+        return safeLocaleCompare(aVal.firstChar, bVal.firstChar);
+      })
+      setValidFolders(sortedFolders)
     }
-    else setValidFolders(folders)
+    else {
+      if (folders) {
+        const sortedFolders = folders.sort((a, b) => {
+          const aVal = getSortableValue(a.fileName);
+          const bVal = getSortableValue(b.fileName);
+
+          // Numbers first (descending)
+          if (aVal.isNumber && bVal.isNumber) {
+          const numA = parseFloat(aVal.original) || 0;
+          const numB = parseFloat(bVal.original) || 0;
+          return numA - numB; // ascending
+          }
+
+          if (aVal.isNumber && !bVal.isNumber) return -1; // number before non-number
+          if (!aVal.isNumber && bVal.isNumber) return 1;  // non-number after number
+
+          // Both non-numbers → alphabetical (UTF-8 safe)
+          return safeLocaleCompare(aVal.firstChar, bVal.firstChar);
+        })
+        
+        setValidFolders(sortedFolders)
+      }
+    }
   }, [folders, addFolderForm])
 
   useEffect(() => {
