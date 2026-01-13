@@ -75,13 +75,24 @@ const Login = ({navigation: {navigate}}) => {
                                 <Text style={styles.subheading}>Enter Password:</Text>
                                 <TextInput secureTextEntry={true} style={styles.input} placeholder='Enter Password' placeholderTextColor={'rgb(0, 0, 0)'} value={password} onChangeText={(e) => setPassword(e)}/>
                             </View>
-                        </View>
-                        <View style={styles.wrapperContainer}>
-                                <View style={userEmail === '' || !validEmail || password === '' ? styles.buttonWrapperDisabled : styles.buttonWrapper}>
-                                    <TouchableOpacity onPress={() => login()}>
-                                        <Text style={styles.inputButton}>Sign In</Text>
+                            <View style={styles.wrapperContainer}>
+                                <Text style={{color: 'white', width: '80%', textAlign: 'center'}}>
+                                    {signUpMode ? "Already have an account?" : "Don't have an Account?"}
+                                    <TouchableOpacity onPress={() => {
+                                            setUserEmail('')
+                                            setPassword('')
+                                            setSignUpMode(prev => !prev)
+                                        }}>
+                                        <Text style={styles.inputText}> Click here </Text>
                                     </TouchableOpacity>
-                                </View>        
+                                    {signUpMode ? "to login." : "to Register for a new one."}
+                                </Text>
+                            </View>
+                            <View style={styles.wrapperContainer}>
+                                <TouchableOpacity onPress={() => login()} style={userEmail === '' || !validEmail || password === '' ? styles.buttonWrapperDisabled : styles.buttonWrapper}>
+                                    <Text style={styles.inputButton}>Sign In</Text>
+                                </TouchableOpacity>      
+                            </View>
                         </View>
                     </>
                 :
@@ -93,30 +104,27 @@ const Login = ({navigation: {navigate}}) => {
                                 <Text style={styles.subheading}>Enter Email:</Text>
                                 <TextInput style={(validEmail || userEmail === '') ? styles.input : styles.inputInvalid} placeholder='Enter Email' autoCapitalize='none' placeholderTextColor={'rgb(0, 0, 0)'} value={userEmail} onChangeText={(e) => setUserEmail(e)}/>
                                 <View style={styles.wrapperContainer}>
-                                    <View style={userEmail === '' || !validEmail ? styles.buttonWrapperDisabled : styles.buttonWrapper}>
-                                        <TouchableOpacity onPress={() => sendRegistrationLink()}>
-                                            <Text style={styles.inputButton}>Send link</Text>
-                                        </TouchableOpacity>
-                                    </View>        
+                                    <TouchableOpacity onPress={() => sendRegistrationLink()} style={userEmail === '' || !validEmail ? styles.buttonWrapperDisabled : styles.buttonWrapper}>
+                                        <Text style={styles.inputButton}>Send link</Text>
+                                    </TouchableOpacity>     
                                 </View>
+                            </View>
+                            <View style={styles.wrapperContainer}>
+                                <Text style={{color: 'white', width: '80%', textAlign: 'center'}}>
+                                    {signUpMode ? "Already have an account?" : "Don't have an Account?"}
+                                    <TouchableOpacity onPress={() => {
+                                            setUserEmail('')
+                                            setPassword('')
+                                            setSignUpMode(prev => !prev)
+                                        }}>
+                                        <Text style={styles.inputText}> Click here </Text>
+                                    </TouchableOpacity>
+                                    {signUpMode ? "to login." : "to Register for a new one."}
+                                </Text>
                             </View>
                         </View>
                     </>
                 }
-
-                <View style={styles.wrapperContainer}>
-                    <Text style={{color: 'white', width: '80%', textAlign: 'center'}}>
-                        {signUpMode ? "Already have an account?" : "Don't have an Account?"}
-                        <TouchableOpacity onPress={() => {
-                                setUserEmail('')
-                                setPassword('')
-                                setSignUpMode(prev => !prev)
-                            }}>
-                            <Text style={styles.inputText}> Click here </Text>
-                        </TouchableOpacity>
-                        {signUpMode ? "to login." : "to Register for a new one."}
-                    </Text>
-                </View>
     </KeyboardAvoidingView>
   )
 }
