@@ -23,12 +23,16 @@ export default function Home({navigation: {navigate}}) {
     <>
       {loading ?
         <View style={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-          <Text>Loading...</Text>
+          <Text style={{
+            color: '#593060',
+            fontWeight: '600',
+            fontSize: 40
+          }}>Loading...</Text>
         </View>
       :
         <View style={{
           flex: 1,
-          backgroundColor: 'rgb(0, 0, 0)',
+          backgroundColor: 'white',
           alignItems: 'center',
           justifyContent: 'center',
           paddingTop: insets.top,
@@ -38,7 +42,7 @@ export default function Home({navigation: {navigate}}) {
           <View style={styles.modal}>
             <Text style={styles.bigHeader}>Welcome to My Elephant App</Text>
             <Text style={styles.subheading}>Take control of your personal data</Text>
-            <View style={styles.buttonContainer}>
+            <View style={styles.wrapperContainer}>
               <TouchableOpacity style={styles.button} onPress={() => navigate('Sign In/Sign Up')}>
                   <Text style={styles.buttonText}>Sign In/Sign Up</Text>
               </TouchableOpacity>
@@ -63,7 +67,6 @@ const styles = StyleSheet.create({
   modal: {
     width: '90%',
     height: '60%',
-    backgroundColor: 'rgba(0, 0, 0, .65)',
     paddingTop: '20%',
     paddingBottom: 10,
     position: 'absolute',
@@ -72,29 +75,28 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
   bigHeader: {
-    color: 'white',
+    color: '#593060',
     fontSize: 24,
     textAlign: 'center',
     fontWeight: '700',
     marginBottom: '2.5%'
   },
   subheading: {
-    color: 'white',
+    color: '#593060',
     textAlign: 'center',
     fontSize: 16,
     marginBottom: '6%'
   },
-  buttonContainer: {
-    flex: 1,
-    alignItems: 'center',
-    width: '100%'
+  wrapperContainer: {
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      width: '100%',
   },
   button: {
     width: '60%',
-    borderColor: '#777',
-    borderRadius: 25,
-    backgroundColor: 'white',
-    borderWidth: 1,
+    borderRadius: 10,
+    backgroundColor: '#593060',
     paddingTop: '2%',
     paddingBottom: '2%',
     marginTop: '5%',
@@ -103,9 +105,10 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 14,
     width: '100%',
+    color: '#593060'
   },
   tagline: {
-    color: 'white', 
+    color: '#593060', 
     textAlign: 'center', 
     width: '90%', 
     marginBottom: '15%'
