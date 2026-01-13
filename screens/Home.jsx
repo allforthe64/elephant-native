@@ -38,7 +38,7 @@ export default function Home({navigation: {navigate}}) {
           paddingTop: insets.top,
           paddingBottom: insets.bottom
         }}>
-          <Image source={require('../assets/elephant_bg.jpg')} style={styles.bgImg}/>
+          {/* <Image source={require('../assets/elephant_bg.jpg')} style={styles.bgImg}/> */}
           <View style={styles.modal}>
             <Text style={styles.bigHeader}>Welcome to My Elephant App</Text>
             <Text style={styles.subheading}>Take control of your personal data</Text>
