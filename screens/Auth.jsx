@@ -170,7 +170,6 @@ const styles = StyleSheet.create({
         width: '60%',
         borderRadius: 10,
         backgroundColor: '#593060',
-        borderWidth: 1,
         paddingTop: '2%',
         paddingBottom: '2%',
         marginBottom: '5%'
@@ -179,7 +178,6 @@ const styles = StyleSheet.create({
         width: '60%',
         borderRadius: 10,
         backgroundColor: 'rgba(89, 48, 96, .75)',
-        borderWidth: 1,
         paddingTop: '2%',
         paddingBottom: '2%',
         marginBottom: '5%'
@@ -210,6 +208,7 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         fontSize: 20,
         width: '100%',
+        color: 'white'
     },
     inputText: {
         textAlign: 'center',
