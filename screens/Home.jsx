@@ -105,12 +105,12 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 14,
     width: '100%',
-    color: '#593060'
+    color: 'white'
   },
   tagline: {
     color: '#593060', 
     textAlign: 'center', 
     width: '90%', 
-    marginBottom: '15%'
+    marginBottom: '10%'
   }
 });

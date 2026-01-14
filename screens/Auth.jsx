@@ -62,7 +62,7 @@ const Login = ({navigation: {navigate}}) => {
 
 
   return (
-    <KeyboardAvoidingView style={{width: '100%', height: '100%', backgroundColor: 'black', position: 'relative'}} enabled={true} behavior='padding'>
+    <KeyboardAvoidingView style={{width: '100%', height: '100%', backgroundColor: 'white'}} enabled={true} behavior='padding'>
 
                 {!signUpMode ?
                     <>
@@ -70,14 +70,14 @@ const Login = ({navigation: {navigate}}) => {
                             <Text style={styles.bigHeader}>{signUpMode ? 'Register account' : 'Sign in'}</Text>
                             <View style={styles.formCon}>
                                 <Text style={styles.subheading}>Enter Email:</Text>
-                                <TextInput style={(validEmail || userEmail === '') ? styles.input : styles.inputInvalid} placeholder='Enter Email' autoCapitalize='none' placeholderTextColor={'rgb(0, 0, 0)'} value={userEmail} onChangeText={(e) => setUserEmail(e)}/>
+                                <TextInput style={(validEmail || userEmail === '') ? styles.input : styles.inputInvalid} placeholder='Enter Email' autoCapitalize='none' placeholderTextColor={'#593060'} value={userEmail} onChangeText={(e) => setUserEmail(e)}/>
                                 <Text style={(validEmail || userEmail === '') ? {display: 'none'} : styles.invalid}>Please Enter A Valid Email</Text>
                                 <Text style={styles.subheading}>Enter Password:</Text>
-                                <TextInput secureTextEntry={true} style={styles.input} placeholder='Enter Password' placeholderTextColor={'rgb(0, 0, 0)'} value={password} onChangeText={(e) => setPassword(e)}/>
+                                <TextInput secureTextEntry={true} style={styles.input} placeholder='Enter Password' placeholderTextColor={'#593060'} value={password} onChangeText={(e) => setPassword(e)}/>
                             </View>
-                            <View style={styles.wrapperContainer}>
+                            <View style={styles.buttonContainer}>
                                 <Text style={{color: 'white', width: '80%', textAlign: 'center'}}>
-                                    {signUpMode ? "Already have an account?" : "Don't have an Account?"}
+                                    Already have an account? 
                                     <TouchableOpacity onPress={() => {
                                             setUserEmail('')
                                             setPassword('')
@@ -85,11 +85,11 @@ const Login = ({navigation: {navigate}}) => {
                                         }}>
                                         <Text style={styles.inputText}> Click here </Text>
                                     </TouchableOpacity>
-                                    {signUpMode ? "to login." : "to Register for a new one."}
+                                    to Register for a new one.
                                 </Text>
                             </View>
-                            <View style={styles.wrapperContainer}>
-                                <TouchableOpacity onPress={() => login()} style={userEmail === '' || !validEmail || password === '' ? styles.buttonWrapperDisabled : styles.buttonWrapper}>
+                            <View style={styles.buttonContainer}>
+                                <TouchableOpacity onPress={() => login()} style={userEmail === '' || !validEmail || password === '' ? styles.buttonDisabled : styles.button}>
                                     <Text style={styles.inputButton}>Sign In</Text>
                                 </TouchableOpacity>      
                             </View>
@@ -102,16 +102,16 @@ const Login = ({navigation: {navigate}}) => {
                             <Text style={styles.subheading}>Enter your email to get a registration link:</Text>
                             <View style={styles.registerFormCon}>
                                 <Text style={styles.subheading}>Enter Email:</Text>
-                                <TextInput style={(validEmail || userEmail === '') ? styles.input : styles.inputInvalid} placeholder='Enter Email' autoCapitalize='none' placeholderTextColor={'rgb(0, 0, 0)'} value={userEmail} onChangeText={(e) => setUserEmail(e)}/>
-                                <View style={styles.wrapperContainer}>
-                                    <TouchableOpacity onPress={() => sendRegistrationLink()} style={userEmail === '' || !validEmail ? styles.buttonWrapperDisabled : styles.buttonWrapper}>
+                                <TextInput style={(validEmail || userEmail === '') ? styles.input : styles.inputInvalid} placeholder='Enter Email' autoCapitalize='none' placeholderTextColor={'#593060'} value={userEmail} onChangeText={(e) => setUserEmail(e)}/>
+                                <View style={styles.buttonContainer}>
+                                    <TouchableOpacity onPress={() => sendRegistrationLink()} style={userEmail === '' || !validEmail ? styles.buttonDisabled : styles.button}>
                                         <Text style={styles.inputButton}>Send link</Text>
                                     </TouchableOpacity>     
                                 </View>
                             </View>
-                            <View style={styles.wrapperContainer}>
+                            <View style={styles.buttonContainer}>
                                 <Text style={{color: 'white', width: '80%', textAlign: 'center'}}>
-                                    {signUpMode ? "Already have an account?" : "Don't have an Account?"}
+                                    Already have an account?
                                     <TouchableOpacity onPress={() => {
                                             setUserEmail('')
                                             setPassword('')
@@ -119,7 +119,7 @@ const Login = ({navigation: {navigate}}) => {
                                         }}>
                                         <Text style={styles.inputText}> Click here </Text>
                                     </TouchableOpacity>
-                                    {signUpMode ? "to login." : "to Register for a new one."}
+                                    to login.
                                 </Text>
                             </View>
                         </View>
@@ -139,7 +139,6 @@ const styles = StyleSheet.create({
         fontWeight: '700',
         marginBottom: '5%',
     },
-
     subheading: {
         color: 'white',
         fontSize: 22,
@@ -170,42 +169,30 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center'
     },
-    wrapperContainer: {
+    buttonContainer: {
         display: 'flex',
         alignItems: 'center',
         width: '100%',
-        marginBottom: '8%',
-        position: 'absolute',
-        bottom: '5%'
+        marginTop: '5%'
     },
-    buttonWrapper: {
+    button: {
         width: '60%',
-        borderColor: '#777',
-        borderRadius: 25,
-        backgroundColor: 'white',
+        borderRadius: 10,
+        backgroundColor: '#593060',
         borderWidth: 1,
         paddingTop: '2%',
         paddingBottom: '2%',
         marginBottom: '5%'
     },
-    buttonWrapperDisabled: {
+    buttonDisabled: {
         width: '60%',
         borderColor: '#777',
         borderRadius: 25,
-        backgroundColor: 'rgba(255, 255, 255, .5)',
+        backgroundColor: 'rgba(89, 48, 96, .5)',
         borderWidth: 1,
         paddingTop: '2%',
         paddingBottom: '2%',
         marginBottom: '5%'
-    },
-    buttonWrapperSm: {
-        width: '40%',
-        borderColor: '#777',
-        borderRadius: 25,
-        backgroundColor: 'white',
-        borderWidth: 1,
-        paddingTop: '2%',
-        paddingBottom: '2%',
     },
     input: {
         backgroundColor: 'white',
@@ -214,7 +201,9 @@ const styles = StyleSheet.create({
         paddingLeft: '2%',
         paddingTop: '1%',
         paddingBottom: '1%',
-        marginBottom: '7%'
+        marginBottom: '7%',
+        borderBottomWidth: 2,
+        borderColor: '#593060'
     },
     inputInvalid: {
         backgroundColor: 'white',
@@ -223,7 +212,9 @@ const styles = StyleSheet.create({
         paddingLeft: '2%',
         paddingTop: '2%',
         paddingBottom: '2%',
-        marginBottom: '4%'
+        marginBottom: '4%',
+        borderBottomWidth: 2,
+        borderColor: '#593060'
     },
     inputButton: {
         textAlign: 'center',
