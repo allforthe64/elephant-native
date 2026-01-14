@@ -22,11 +22,11 @@ export default function Home({navigation: {navigate}}) {
   return (
     <>
       {loading ?
-        <View style={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+        <View style={{width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
           <Text style={{
             color: '#593060',
             fontWeight: '600',
-            fontSize: 40
+            fontSize: 25
           }}>Loading...</Text>
         </View>
       :

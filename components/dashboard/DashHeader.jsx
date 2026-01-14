@@ -9,7 +9,7 @@ const DashHeader = ({navigate}) => {
 
   return (
     <View style={{width: '100%', paddingTop: 10, paddingLeft: 15, marginBottom: 10}}>
-        <View style={{width: '100%', display: 'flex', flexDirection: 'row'}}>
+        <View style={{width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
             <Text style={{color: '#593060', fontWeight: 800, fontSize: 30}}>Dashboard</Text>
             <TouchableOpacity style={{marginLeft: 40}} onPress={async () => {
                 auth.signOut()
