@@ -76,14 +76,14 @@ const Login = ({navigation: {navigate}}) => {
                                 <TextInput secureTextEntry={true} style={styles.input} placeholder='Enter Password' placeholderTextColor={'#593060'} value={password} onChangeText={(e) => setPassword(e)}/>
                             </View>
                             <View style={styles.buttonContainer}>
-                                <Text style={{color: 'white', width: '80%', textAlign: 'center'}}>
+                                <Text style={{color: 'white', width: '80%', textAlign: 'center', fontSize: 20}}>
                                     Already have an account? 
                                     <TouchableOpacity onPress={() => {
                                             setUserEmail('')
                                             setPassword('')
                                             setSignUpMode(prev => !prev)
                                         }}>
-                                        <Text style={styles.inputText}> Click here </Text>
+                                        <Text style={styles.inputText}>Click here</Text>
                                     </TouchableOpacity>
                                     to Register for a new one.
                                 </Text>
@@ -110,7 +110,7 @@ const Login = ({navigation: {navigate}}) => {
                                 </View>
                             </View>
                             <View style={styles.buttonContainer}>
-                                <Text style={{color: 'white', width: '80%', textAlign: 'center'}}>
+                                <Text style={{color: 'white', width: '80%', textAlign: 'center', fontSize: 20}}>
                                     Already have an account?
                                     <TouchableOpacity onPress={() => {
                                             setUserEmail('')
@@ -218,7 +218,7 @@ const styles = StyleSheet.create({
     },
     inputButton: {
         textAlign: 'center',
-        fontSize: 15,
+        fontSize: 20,
         width: '100%',
     },
     inputText: {
