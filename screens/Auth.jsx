@@ -74,6 +74,9 @@ const Login = ({navigation: {navigate}}) => {
                                 <Text style={(validEmail || userEmail === '') ? {display: 'none'} : styles.invalid}>Please Enter A Valid Email</Text>
                                 <Text style={styles.subheading}>Enter Password:</Text>
                                 <TextInput secureTextEntry={true} style={styles.input} placeholder='Enter Password' placeholderTextColor={'#593060'} value={password} onChangeText={(e) => setPassword(e)}/>
+                                    <TouchableOpacity onPress={() => login()} style={userEmail === '' || !validEmail || password === '' ? {...styles.buttonDisabled, marginTop: 15 } : {...styles.button, marginTop: 15}}>
+                                    <Text style={styles.inputButton}>Sign In</Text>
+                                </TouchableOpacity> 
                                 <View style={styles.switchAuthContainer}>
                                     <Text style={styles.switchAuthText}>
                                         Already have an account?
@@ -89,9 +92,6 @@ const Login = ({navigation: {navigate}}) => {
                                         to login.
                                     </Text>
                                 </View>
-                                <TouchableOpacity onPress={() => login()} style={userEmail === '' || !validEmail || password === '' ? styles.buttonDisabled : styles.button}>
-                                    <Text style={styles.inputButton}>Sign In</Text>
-                                </TouchableOpacity> 
                             </View>
                         </View>
                     </>
@@ -133,14 +133,14 @@ export default Login
 
 const styles = StyleSheet.create({
     bigHeader: {
-        color: 'white',
+        color: '#593060',
         fontSize: 40,
         textAlign: 'center',
         fontWeight: '700',
         marginBottom: '5%',
     },
     subheading: {
-        color: 'white',
+        color: '#593060',
         fontSize: 22,
         textAlign: 'left',
         width: '80%',
@@ -234,12 +234,12 @@ const styles = StyleSheet.create({
     },
 
     switchAuthText: {
-        color: '#9F37B0',
+        color: '#593060',
         fontSize: 18,
     },
 
     switchAuthLink: {
-        color: '#9F37B0',
+        color: '#593060',
         fontSize: 18,
         fontWeight: '600',
         textDecorationLine: 'underline',
