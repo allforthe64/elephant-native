@@ -141,12 +141,16 @@ const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolder
 
   //pass an object containing data from the current file obj + the new filename to the main component 
   const handleNameChange = () => {
-    const newFolder = {
-      ...folder,
-      fileName: newName
+
+    if (newName === '') return
+    else {
+      const newFolder = {
+        ...folder,
+        fileName: newName
+      }
+      renameFolder(newFolder)
+      setEditName(false)
     }
-    renameFolder(newFolder)
-    setEditName(false)
   }
 
   //pass an object containing data from the current file obj + the new nestedUnder property to the main component 
@@ -277,6 +281,7 @@ const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolder
                       <Pressable onPress={() => {
                           setEditName(false)
                           setVisible(false)
+                          setNewName('')
                         }}>
                         <FontAwesomeIcon icon={faXmark} color={'white'} size={30}/>
                       </Pressable>
@@ -288,7 +293,7 @@ const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolder
                           <View style={styles.iconHolder}>
                               <FontAwesomeIcon icon={faFolder} size={22} color='#9F37B0'/>
                           </View>
-                          <TextInput value={newName} style={{color: 'white', fontSize: 20, fontWeight: 'bold', borderBottomColor: 'white', borderBottomWidth: 2, width: '70%', marginLeft: '5%'}} onChangeText={(e) => setNewName(e)} autoFocus/>
+                          <TextInput value={newName} style={{color: 'white', fontSize: 20, fontWeight: 'bold', borderBottomColor: 'white', borderBottomWidth: 2, width: '70%', marginLeft: '5%'}} placeholderTextColor={'white'} placeholder='Enter new name' onChangeText={(e) => setNewName(e)} autoFocus/>
                         </View>
                         <View style={{display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'space-around', marginTop: '4%'}}>
                             <TouchableOpacity onPress={handleNameChange} style={styles.yellowButtonSM}>
@@ -336,7 +341,7 @@ const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolder
                                       <View style={styles.iconHolder}> 
                                           <FontAwesomeIcon icon={faFolder} size={22} color='#9F37B0'/>
                                       </View>
-                                      <TextInput value={newFolderName} style={{color: 'white', fontSize: 20, fontWeight: 'bold', borderBottomColor: 'white', borderBottomWidth: 2, width: '75%'}} onChangeText={(e) => setNewFolderName(e)} autoFocus onBlur={() => {if (newFolderName === '') setAddFolderForm(false)}}/>
+                                      <TextInput value={newFolderName} style={{color: 'white', fontSize: 20, fontWeight: 'bold', borderBottomColor: 'white', borderBottomWidth: 2, width: '75%'}} placeholder={'Enter new name'} placeholderTextColor={'white'} onChangeText={(e) => setNewFolderName(e)} autoFocus onBlur={() => {if (newFolderName === '') setAddFolderForm(false)}}/>
                                   </View>
                                   <View style={{width: '100%', paddingTop: '10%', display: 'flex', flexDirection: 'row', justifyContent: 'center'}}>
                                       <TouchableOpacity style={styles.yellowButtonSM}

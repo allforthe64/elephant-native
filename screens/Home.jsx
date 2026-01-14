@@ -110,7 +110,7 @@ const styles = StyleSheet.create({
   tagline: {
     color: '#593060', 
     textAlign: 'center', 
-    width: '90%', 
-    marginBottom: '10%'
+    width: '90%',
+    paddingTop: '10%'
   }
 });

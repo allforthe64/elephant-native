@@ -62,7 +62,7 @@ const Login = ({navigation: {navigate}}) => {
 
 
   return (
-    <KeyboardAvoidingView style={{width: '100%', height: '100%', backgroundColor: 'white'}} enabled={true} behavior='padding'>
+    <KeyboardAvoidingView style={{ flex: 1, backgroundColor: 'white' }} enabled={true} behavior={Platform.OS === 'ios' ? 'padding' : undefined} >
 
                 {!signUpMode ?
                     <>
@@ -74,24 +74,24 @@ const Login = ({navigation: {navigate}}) => {
                                 <Text style={(validEmail || userEmail === '') ? {display: 'none'} : styles.invalid}>Please Enter A Valid Email</Text>
                                 <Text style={styles.subheading}>Enter Password:</Text>
                                 <TextInput secureTextEntry={true} style={styles.input} placeholder='Enter Password' placeholderTextColor={'#593060'} value={password} onChangeText={(e) => setPassword(e)}/>
-                            </View>
-                            <View style={styles.buttonContainer}>
-                                <Text style={{color: 'white', width: '80%', textAlign: 'center', fontSize: 20}}>
-                                    Already have an account? 
+                                <View style={styles.switchAuthContainer}>
+                                    <Text style={styles.switchAuthText}>
+                                        Already have an account?
+                                    </Text>
                                     <TouchableOpacity onPress={() => {
-                                            setUserEmail('')
-                                            setPassword('')
-                                            setSignUpMode(prev => !prev)
-                                        }}>
-                                        <Text style={styles.inputText}>Click here</Text>
+                                        setUserEmail('')
+                                        setPassword('')
+                                        setSignUpMode(prev => !prev)
+                                    }}>
+                                        <Text style={styles.switchAuthLink}>Click here</Text>
                                     </TouchableOpacity>
-                                    to Register for a new one.
-                                </Text>
-                            </View>
-                            <View style={styles.buttonContainer}>
+                                    <Text style={styles.switchAuthText}>
+                                        to login.
+                                    </Text>
+                                </View>
                                 <TouchableOpacity onPress={() => login()} style={userEmail === '' || !validEmail || password === '' ? styles.buttonDisabled : styles.button}>
                                     <Text style={styles.inputButton}>Sign In</Text>
-                                </TouchableOpacity>      
+                                </TouchableOpacity> 
                             </View>
                         </View>
                     </>
@@ -103,22 +103,22 @@ const Login = ({navigation: {navigate}}) => {
                             <View style={styles.registerFormCon}>
                                 <Text style={styles.subheading}>Enter Email:</Text>
                                 <TextInput style={(validEmail || userEmail === '') ? styles.input : styles.inputInvalid} placeholder='Enter Email' autoCapitalize='none' placeholderTextColor={'#593060'} value={userEmail} onChangeText={(e) => setUserEmail(e)}/>
-                                <View style={styles.buttonContainer}>
-                                    <TouchableOpacity onPress={() => sendRegistrationLink()} style={userEmail === '' || !validEmail ? styles.buttonDisabled : styles.button}>
-                                        <Text style={styles.inputButton}>Send link</Text>
-                                    </TouchableOpacity>     
-                                </View>
+                                <TouchableOpacity onPress={() => sendRegistrationLink()} style={userEmail === '' || !validEmail ? styles.buttonDisabled : styles.button}>
+                                    <Text style={styles.inputButton}>Send link</Text>
+                                </TouchableOpacity>     
                             </View>
-                            <View style={styles.buttonContainer}>
-                                <Text style={{color: 'white', width: '80%', textAlign: 'center', fontSize: 20}}>
+                            <View style={styles.switchAuthContainer}>
+                                <Text style={styles.switchAuthText}>
                                     Already have an account?
-                                    <TouchableOpacity onPress={() => {
-                                            setUserEmail('')
-                                            setPassword('')
-                                            setSignUpMode(prev => !prev)
-                                        }}>
-                                        <Text style={styles.inputText}> Click here </Text>
-                                    </TouchableOpacity>
+                                </Text>
+                                <TouchableOpacity onPress={() => {
+                                    setUserEmail('')
+                                    setPassword('')
+                                    setSignUpMode(prev => !prev)
+                                }}>
+                                    <Text style={styles.switchAuthLink}>Click here</Text>
+                                </TouchableOpacity>
+                                <Text style={styles.switchAuthText}>
                                     to login.
                                 </Text>
                             </View>
@@ -148,32 +148,23 @@ const styles = StyleSheet.create({
         marginBottom: '4%'
     },
     innerContainer: {
-        width: '100%',
-        display: 'flex',
-        height: '100%',
-        justifyContent: 'center'
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     formCon: {
         width: '100%',
-        height: '60%',
-        marginBottom: '10%',
-        display: 'flex',
         alignItems: 'center',
+        marginBottom: 24,
     },
     registerFormCon: {
         width: '100%',
-        height: '60%',
-        marginBottom: '10%',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center',
-        alignItems: 'center'
+        alignItems: 'center',
+        marginVertical: 24,
     },
     buttonContainer: {
-        display: 'flex',
         alignItems: 'center',
-        width: '100%',
-        marginTop: '5%'
+        marginTop: 24,
     },
     button: {
         width: '60%',
@@ -186,9 +177,8 @@ const styles = StyleSheet.create({
     },
     buttonDisabled: {
         width: '60%',
-        borderColor: '#777',
-        borderRadius: 25,
-        backgroundColor: 'rgba(89, 48, 96, .5)',
+        borderRadius: 10,
+        backgroundColor: 'rgba(89, 48, 96, .75)',
         borderWidth: 1,
         paddingTop: '2%',
         paddingBottom: '2%',
@@ -234,5 +224,25 @@ const styles = StyleSheet.create({
         textAlign:'left', 
         width: '80%', 
         marginBottom: '10%'
-    }
+    },
+    switchAuthContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginTop: 24,
+        flexWrap: 'wrap',
+        justifyContent: 'center',
+    },
+
+    switchAuthText: {
+        color: '#9F37B0',
+        fontSize: 18,
+    },
+
+    switchAuthLink: {
+        color: '#9F37B0',
+        fontSize: 18,
+        fontWeight: '600',
+        textDecorationLine: 'underline',
+        marginHorizontal: 4,
+    },
 }) 

@@ -216,7 +216,7 @@ const FocusedFolder = ({folder, folders, clear, getTargetFolder, addFolder, rena
                                         <View style={styles.iconHolder}>
                                         <FontAwesomeIcon icon={faFolder} size={22} color='#9F37B0'/>
                                         </View>
-                                        <TextInput value={newFolderName} style={{color: 'white', fontSize: 22, fontWeight: 'bold', borderBottomColor: 'white', borderBottomWidth: 2, width: '70%', marginLeft: '5%'}} onChangeText={(e) => setNewFolderName(e)} onFocus={() => setKeyboardClosed(false)} ref={folderRef} onBlur={() => {if (newFolderName === '') setAdd(false)}}/>
+                                        <TextInput placeholder='Enter new name' placeholderTextColor={'white'} value={newFolderName} style={{color: 'white', fontSize: 22, fontWeight: 'bold', borderBottomColor: 'white', borderBottomWidth: 2, width: '70%', marginLeft: '5%'}} onChangeText={(e) => setNewFolderName(e)} onFocus={() => setKeyboardClosed(false)} ref={folderRef} onBlur={() => {if (newFolderName === '') setAdd(false)}}/>
                                     </View>
                                     <Pressable style={styles.nonFolderButtonSM}
                                         onPress={() => {
