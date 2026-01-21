@@ -909,7 +909,7 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
                                                                 </View>
                                                         : file.fileName.split('.')[1] === 'docx' || file.fileName.split('.')[1] === 'doc' || file.fileName.split('.')[1] === 'docm' || file.fileName.split('.')[1] === 'dot' || file.fileName.split('.')[1] === 'dotx' || file.fileName.split('.')[1] === 'dotm' && convertedPDFURL ?
                                                             <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'center', marginTop: '10%', marginBottom: '10%'}}>
-                                                                {fileURL !== '' ? 
+                                                                {convertedPDFURL ? 
                                                                     <View width={300} height={300} /* onPress={() => setExpanded(true)} */>
                                                                         <Pressable style={{width: '100%', height: '100%'}} onPress={() => setExpanded('wordDoc')}>
                                                                             {/* <WebView source={{ uri: `https://drive.google.com/viewerng/viewer?embedded=true&url=${fileURL}` }}
