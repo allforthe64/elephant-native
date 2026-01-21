@@ -61,6 +61,8 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
     const [noteText, setNoteText] = useState('')
     const [editingMode, setEditingMode] = useState(false)
     const [focusedFolderInst, setFocusedFolderInst] = useState()
+    const [hasRun, setHasRun] = useState(false)
+    const [convertedPDFURL, setConvertedPDFURL] = useState()
 
     //gesture values
     /* const scale = useRef(new Animated.Value(1)).current
@@ -158,6 +160,25 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
         }
         getPermissions()
     }, [])
+
+    useEffect(() => {
+        if (!hasRun && file && fileURL) {
+            if (file.fileName.split('.')[1] === 'docx' || file.fileName.split('.')[1] === 'doc' || file.fileName.split('.')[1] === 'docm' || file.fileName.split('.')[1] === 'dot' || file.fileName.split('.')[1] === 'dotx' || file.fileName.split('.')[1] === 'dotm') {
+                const convertToPDF = async () => {
+                    const res = await fetch('https://myelephantapp.com/api/convert-docx-to-pdf', {
+                        method: 'POST',
+                        headers: { 'Content-Type' : 'application/json' },
+                        body: JSON.stringify({ docxUrl: fileURL, fileName: file.fileName })
+                    })
+
+                    const data = await res.json()
+                    setConvertedPDFURL(data.convertedPDFURL)
+                    setHasRun(true)
+                }
+                convertToPDF()
+            }
+        }
+    }, [fileURL, file, hasRun])
 
     //unload the sound
     useEffect(() => {
@@ -846,10 +867,9 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
                                                                     <Image source={{uri: `${fileURL}`}} style={{width: '100%', height: '100%', objectFit: 'contain'}}/>
                                                                 </ReactNativeZoomableView>
                                                             : expanded === 'wordDoc' ?
-                                                                <WebView source={{ uri: `https://drive.google.com/viewerng/viewer?embedded=true&url=${fileURL}` }}
-                                                                style={{ flex: 1 }} />
+                                                                <PDFViewer fileURL={convertedPDFURL}/>
                                                             :
-                                                                <PDFViewer fileURL={/* wordDocPDFURL !== '' ? wordDocPDFURL : */ fileURL}/>
+                                                                <PDFViewer fileURL={fileURL}/>
                                                             }
                                                         </View>     
                                                     </View>
@@ -887,13 +907,14 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
                                                                         </View>
                                                                     }
                                                                 </View>
-                                                        : file.fileName.split('.')[1] === 'docx' || file.fileName.split('.')[1] === 'doc' || file.fileName.split('.')[1] === 'docm' || file.fileName.split('.')[1] === 'dot' || file.fileName.split('.')[1] === 'dotx' || file.fileName.split('.')[1] === 'dotm' && fileURL ?
+                                                        : file.fileName.split('.')[1] === 'docx' || file.fileName.split('.')[1] === 'doc' || file.fileName.split('.')[1] === 'docm' || file.fileName.split('.')[1] === 'dot' || file.fileName.split('.')[1] === 'dotx' || file.fileName.split('.')[1] === 'dotm' && convertedPDFURL ?
                                                             <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'center', marginTop: '10%', marginBottom: '10%'}}>
                                                                 {fileURL !== '' ? 
                                                                     <View width={300} height={300} /* onPress={() => setExpanded(true)} */>
                                                                         <Pressable style={{width: '100%', height: '100%'}} onPress={() => setExpanded('wordDoc')}>
-                                                                            <WebView source={{ uri: `https://drive.google.com/viewerng/viewer?embedded=true&url=${fileURL}` }}
-                                                                            style={{ flex: 1 }} />
+                                                                            {/* <WebView source={{ uri: `https://drive.google.com/viewerng/viewer?embedded=true&url=${fileURL}` }}
+                                                                            style={{ flex: 1 }} /> */}
+                                                                            <PDFViewer fileURL={convertedPDFURL}/>
                                                                         </Pressable>
                                                                     </View>
                                                                 : 
