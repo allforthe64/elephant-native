@@ -134,6 +134,7 @@ const Main = () => {
 
     let manipResult = null
     if (fileType === 'jpg' || fileType === 'JPG' || fileType === 'jpeg' || fileType === 'JPEG' || fileType === 'png' || fileType === 'PNG') {
+      alert('in here')
       manipResult = await manipulateAsync(
         file.uri,
         [{ resize: {height: file.metadata.height * .1, width: file.metadata.width * .1} }],
@@ -142,6 +143,7 @@ const Main = () => {
     }
 
     if (manipResult) {
+      alert('in second block')
       try {
         //upload thumbnail version
         const thumbNailBlob = await new Promise(async (resolve, reject) => {
