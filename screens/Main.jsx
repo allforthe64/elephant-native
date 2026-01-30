@@ -131,6 +131,7 @@ const Main = () => {
     const fileUriArray = file.uri.split('.')
     const fileType = fileUriArray[fileUriArray.length - 1]
     
+    alert('fileType variable from upload: ', fileType)
 
     let manipResult = null
     if (fileType === 'jpg' || fileType === 'JPG' || fileType === 'jpeg' || fileType === 'JPEG' || fileType === 'png' || fileType === 'PNG') {

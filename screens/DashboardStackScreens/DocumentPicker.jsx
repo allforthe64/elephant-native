@@ -232,14 +232,14 @@ const DocumentPickerComp = () => {
         setFiles([])
 
         const filesToAddToQueue = files.map(file => {
-            console.log(file)
+            alert('file.fileType: ', file.fileType)
             let finalDestination 
             if (destination.id !== null) finalDestination = destination.id
             else if (focusedFolder) finalDestination = focusedFolder 
             else finalDestination = false
 
             if (['jpg', 'JPG', 'jpeg', 'JPEG', 'png', 'PNG'].includes(file.fileType)) {
-                console.log(file)
+                alert('image recognized')
                 return { uri: file.uri, filename: file.name, finalDestination: finalDestination, metadata: {width: file.width, height: file.height}}
             } else return { uri: file.uri, filename: file.name, finalDestination: finalDestination }
         })
