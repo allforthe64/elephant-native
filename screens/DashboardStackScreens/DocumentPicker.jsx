@@ -135,27 +135,27 @@ const DocumentPickerComp = () => {
     }, [focusedFolder, folders])
 
     const selectFile = async () => {
-        let updatedFiles = [...files]
         try {
-            
-            DocumentPicker.pick({ allowMultiSelection: true }).then((result => {
-                console.log(result)
-                result.forEach(file => updatedFiles.push({name: file.name, uri: file.uri, size: file.size, fileType: file.name.split('.')[1]}))
-                setFiles(updatedFiles)
-            }))
-              
-        } catch (err) {alert(err)}
-        /* try {
-            const files = await DocumentPicker.getDocumentAsync({copyToCacheDirectory: false, multiple: true})
+            const result = await DocumentPicker.pick({ allowMultiSelection: true })
 
-            //map over incoming files and push them all into the file arr
-            files.assets.forEach(file => updatedFiles.push({name: file.name, uri: file.uri, size: file.size, fileType: file.name.split('.')[1]}))
-            setFiles(updatedFiles)
+            const updatedFiles = result.map(file => {
+            const extension = file.name?.split('.').pop()?.toLowerCase() ||
+            file.mimeType?.split('/')[1]
+
+            return {
+                name: file.name,
+                uri: file.uri,
+                size: file.size,
+                fileType: extension, // "png", "pdf", etc
+                mimeType: file.mimeType
+            };
+            });
+
+            setFiles(prev => [...prev, ...updatedFiles])
         } catch (err) {
-            console.log(err)
-        } */
-        
-    }
+            alert(err)
+        }
+    };
 
     const selectImage = async () => {
         try {
