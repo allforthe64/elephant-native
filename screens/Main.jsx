@@ -128,8 +128,10 @@ const Main = () => {
     //create new formatted date for file
     const formattedDate = format(new Date(), "yyyy-MM-dd:hh:mm:ss") + randomString
 
-    const fileUriArray = file.uri.split('.')
-    const fileType = fileUriArray[fileUriArray.length - 1]
+    /* const fileUriArray = file.uri.split('.')
+    const fileType = fileUriArray[fileUriArray.length - 1] */
+
+    const fileType = file.fileType
 
     let manipResult = null
     if (fileType === 'jpg' || fileType === 'JPG' || fileType === 'jpeg' || fileType === 'JPEG' || fileType === 'png' || fileType === 'PNG') {

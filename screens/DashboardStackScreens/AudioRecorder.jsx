@@ -248,7 +248,7 @@ const AudioRecorder = () => {
             else if (focusedFolder) finalDestination = focusedFolder 
             else finalDestination = false
 
-            return {uri: recording.file, filename: `${recording.name}.mp3`, finalDestination: finalDestination}
+            return {uri: recording.file, filename: `${recording.name}.mp3`, fileType: 'mp3', finalDestination: finalDestination}
         })
 
         let queue = JSON.parse(await AsyncStorage.getItem('uploadQueue')) || []

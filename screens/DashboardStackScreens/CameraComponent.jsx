@@ -312,7 +312,7 @@ try {
 
                     //add an image into the file queue
                     let queue = JSON.parse(await AsyncStorage.getItem('uploadQueue')) || []
-                    queue.push({uri: videoObj.uri, filename: filename, finalDestination: finalDestination})
+                    queue.push({uri: videoObj.uri, filename: filename, fileType: Platform.OS === 'ios' ? 'mov' : 'mp4', finalDestination: finalDestination})
                     await AsyncStorage.setItem('uploadQueue', JSON.stringify(queue))
 
                     //confirm the flush by immediately reading it back
@@ -334,6 +334,12 @@ try {
 
                 try {  
 
+                    const jpgImage = await manipulateAsync(
+                        photo.uri,
+                        [],
+                        { compress: 0.9, format: ImageManipulator.SaveFormat.JPEG }
+                    )
+
                     //generate a fileName and finalDestination
                     const filename = mediaName !== '' ? `${mediaName}.jpg` : `${formattedDate}.jpg`
 
@@ -344,7 +350,7 @@ try {
 
                     //add an image into the file queue
                     let queue = JSON.parse(await AsyncStorage.getItem('uploadQueue')) || []
-                    queue.push({uri: photo.uri, filename: filename, finalDestination: finalDestination, metadata: {height: photo.height, width: photo.width}})
+                    queue.push({uri: jpgImage.uri, filename: filename, fileType: 'jpg', finalDestination: finalDestination, metadata: {height: jpgImage.height, width: jpgImage.width}})
                     await AsyncStorage.setItem('uploadQueue', JSON.stringify(queue))
 
                     //confirm the flush by immediately reading it back
