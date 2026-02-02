@@ -139,10 +139,9 @@ const DocumentPickerComp = () => {
             const result = await DocumentPicker.pick({ allowMultiSelection: true })
 
             const updatedFiles = result.map(file => {
+                alert('file Name: ', file.name)
                 const extension = file.name?.split('.').pop()?.toLowerCase() ||
                 file.mimeType?.split('/')[1]
-
-                alert('extension: ', extension)
 
                 return {
                     name: file.name,

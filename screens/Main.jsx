@@ -333,7 +333,7 @@ const Main = () => {
       try {
         await uploadFile(file, uid)
       } catch (error) {
-        alert('uploadFileWithLock error: ' + error.message)
+        /* alert('uploadFileWithLock error: ' + error.message) */
       } finally {
         uploadingFiles.delete(file.uri)
       }
