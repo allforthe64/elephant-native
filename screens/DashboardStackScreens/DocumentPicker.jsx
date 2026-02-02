@@ -139,16 +139,18 @@ const DocumentPickerComp = () => {
             const result = await DocumentPicker.pick({ allowMultiSelection: true })
 
             const updatedFiles = result.map(file => {
-            const extension = file.name?.split('.').pop()?.toLowerCase() ||
-            file.mimeType?.split('/')[1]
+                const extension = file.name?.split('.').pop()?.toLowerCase() ||
+                file.mimeType?.split('/')[1]
 
-            return {
-                name: file.name,
-                uri: file.uri,
-                size: file.size,
-                fileType: extension, // "png", "pdf", etc
-                mimeType: file.mimeType
-            };
+                alert('extension: ', extension)
+
+                return {
+                    name: file.name,
+                    uri: file.uri,
+                    size: file.size,
+                    fileType: extension, // "png", "pdf", etc
+                    mimeType: file.mimeType
+                };
             });
 
             setFiles(prev => [...prev, ...updatedFiles])
@@ -232,7 +234,6 @@ const DocumentPickerComp = () => {
         setFiles([])
 
         const filesToAddToQueue = files.map(file => {
-            alert('file.fileType: ', file.fileType)
             let finalDestination 
             if (destination.id !== null) finalDestination = destination.id
             else if (focusedFolder) finalDestination = focusedFolder 
