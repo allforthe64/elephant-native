@@ -240,8 +240,8 @@ const DocumentPickerComp = () => {
 
             if (['jpg', 'JPG', 'jpeg', 'JPEG', 'png', 'PNG'].includes(file.fileType)) {
                 alert('image recognized')
-                return { uri: file.uri, filename: file.name, finalDestination: finalDestination, metadata: {width: file.width, height: file.height}}
-            } else return { uri: file.uri, filename: file.name, finalDestination: finalDestination }
+                return { uri: file.uri, filename: file.name, fileType: file.fileType, finalDestination: finalDestination, metadata: {width: file.width, height: file.height}}
+            } else return { uri: file.uri, filename: file.name, fileType: file.fileType, finalDestination: finalDestination }
         })
 
         let queue = JSON.parse(await AsyncStorage.getItem('uploadQueue')) || []

@@ -255,7 +255,7 @@ const DocScanner = () => {
 
       //add an image into the file queue
       let queue = JSON.parse(await AsyncStorage.getItem('uploadQueue')) || []
-      queue.push({uri: modifiedPath, filename: filename, finalDestination: finalDestination})
+      queue.push({uri: modifiedPath, filename: filename, fileType: 'pdf', finalDestination: finalDestination})
       await AsyncStorage.setItem('uploadQueue', JSON.stringify(queue))
       
       //confirm the flush by immediately reading it back
