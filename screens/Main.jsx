@@ -133,7 +133,9 @@ const Main = () => {
 
     const fileType = file.fileType
 
-    let manipResult = null
+    alert(fileType)
+
+    /* let manipResult = null
     if (fileType === 'jpg' || fileType === 'JPG' || fileType === 'jpeg' || fileType === 'JPEG' || fileType === 'png' || fileType === 'PNG') {
       alert('in here')
       manipResult = await manipulateAsync(
@@ -200,7 +202,7 @@ const Main = () => {
           type: 'success'
         })
       } catch (error) {
-        /* console.log('error from manipResult: ', error) */
+        console.log('error from manipResult: ', error)
       }
     }
 
@@ -320,7 +322,7 @@ const Main = () => {
       } catch (err) {
         console.log('error from upload file: ', err)
       }
-    }
+    } */
 
     await removeFromQueue(file)
 
