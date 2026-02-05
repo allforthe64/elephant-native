@@ -42,6 +42,8 @@ import { useToast } from 'react-native-toast-notifications'
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { UploadQueueEmitter } from '../hooks/QueueEventEmitter';
 
+import * as FileSystem from "expo-file-system";
+
 
 const Main = () => {
 
@@ -116,11 +118,20 @@ const Main = () => {
     }
   }
 
-  const uploadFile = async (file, userId) => {
+  
 
-    console.log('currentUser within uploadFile: ', currentUser)
-    console.log('userInst.uid from within uploadFile: ', userInst?.uid)
-    console.log('userId argument: ', userId)
+  const ensureFileUri = async (uri) => {
+    if (uri.startsWith("content://")) {
+      const ext = uri.split(".").pop() || "jpg"
+      const newPath = FileSystem.cacheDirectory + Date.now() + "." + ext;
+      await FileSystem.copyAsync({ from: uri, to: newPath });
+      return newPath;
+    }
+    return uri;
+  };
+
+
+  const uploadFile = async (file, userId) => {
 
     //generate a new randomString
     const randomString = generateRandomString(10);
@@ -133,14 +144,16 @@ const Main = () => {
 
     const fileType = file.fileType
 
+    const safeUri = await ensureFileUri(file.uri)
+
     try {
       let manipResult = null
       if (fileType === 'jpg' || fileType === 'JPG' || fileType === 'jpeg' || fileType === 'JPEG' || fileType === 'png' || fileType === 'PNG') {
         alert('in here')
         manipResult = await manipulateAsync(
-          file.uri,
+          safeUri,
           [{ resize: {height: file.metadata.height * .1, width: file.metadata.width * .1} }],
-          { compress: 1, format: SaveFormat.PNG }
+          { compress: 1, format: SaveFormat.JPEG }
         )
       }
 
@@ -175,7 +188,7 @@ const Main = () => {
                 reject(new TypeError('Network request failed'))
             }
             xhr.responseType = 'blob'
-            xhr.open('GET', file.uri, true)
+            xhr.open('GET', safeUri, true)
             xhr.send(null)
           })
           const fileUri = `${userId}/${file.fileName}`

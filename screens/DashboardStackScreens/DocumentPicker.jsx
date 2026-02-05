@@ -34,6 +34,8 @@ import DocumentPicker from 'react-native-document-picker'
 import { UploadQueueEmitter } from '../../hooks/QueueEventEmitter'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
+import * as FileSystem from "expo-file-system"
+
 const DocumentPickerComp = () => {
 
     const [files, setFiles] = useState([])
@@ -133,6 +135,16 @@ const DocumentPickerComp = () => {
             setFocusedFolderInst(folders.filter(folder => folder.id === focusedFolder)[0])
         }
     }, [focusedFolder, folders])
+
+    //convert uris for images coming from selectFile rather than selectImage
+    const ensureFileUri = async (uri) => {
+        if (uri.startsWith("content://")) {
+            const newPath = FileSystem.cacheDirectory + Date.now() + ".jpg";
+            await FileSystem.copyAsync({ from: uri, to: newPath });
+            return newPath;
+        }
+        return uri;
+    }
 
     const selectFile = async () => {
         try {
@@ -239,7 +251,6 @@ const DocumentPickerComp = () => {
             else finalDestination = false
 
             if (['jpg', 'JPG', 'jpeg', 'JPEG', 'png', 'PNG'].includes(file.fileType)) {
-                alert('image recognized')
                 return { uri: file.uri, filename: file.name, fileType: file.fileType, finalDestination: finalDestination, metadata: {width: file.width, height: file.height}}
             } else return { uri: file.uri, filename: file.name, fileType: file.fileType, finalDestination: finalDestination }
         })
