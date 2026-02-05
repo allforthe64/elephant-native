@@ -326,7 +326,12 @@ const Main = () => {
       await removeFromQueue(file)
 
     } catch (err) {
-      alert(err.message)
+      const message =
+      err?.message ||
+      err?.toString() ||
+      "Something went wrong";
+
+      alert(message)
     }
 
   }
