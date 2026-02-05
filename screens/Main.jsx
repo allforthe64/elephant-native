@@ -133,198 +133,201 @@ const Main = () => {
 
     const fileType = file.fileType
 
-    alert(fileType)
-
-    /* let manipResult = null
-    if (fileType === 'jpg' || fileType === 'JPG' || fileType === 'jpeg' || fileType === 'JPEG' || fileType === 'png' || fileType === 'PNG') {
-      alert('in here')
-      manipResult = await manipulateAsync(
-        file.uri,
-        [{ resize: {height: file.metadata.height * .1, width: file.metadata.width * .1} }],
-        { compress: 1, format: SaveFormat.PNG }
-      )
-    }
-
-    if (manipResult) {
-      alert('in second block')
-      try {
-        //upload thumbnail version
-        const thumbNailBlob = await new Promise(async (resolve, reject) => {
-          const xhr = new XMLHttpRequest()
-          xhr.onload = () => {
-              resolve(xhr.response)
-          }
-          xhr.onerror = (e) => {
-              reject(new TypeError('Network request failed'))
-          }
-          xhr.responseType = 'blob'
-          xhr.open('GET', manipResult.uri, true)
-          xhr.send(null)
-        })
-        
-        const thumbnailFileRef = ref(storage, `${userId}/thumbnail&${formattedDate}`)
-        const thumbnailFileUri = `${userId}/thumbnail&${file.filename}`
-        const thumbNailResult = await uploadBytesResumable(thumbnailFileRef, thumbNailBlob)
-
-        //create a blob for the file
-        const blob = await new Promise(async (resolve, reject) => {
-          const xhr = new XMLHttpRequest()
-          xhr.onload = () => {
-          resolve(xhr.response) 
-          }
-          xhr.onerror = (e) => {
-              reject(new TypeError('Network request failed'))
-          }
-          xhr.responseType = 'blob'
-          xhr.open('GET', file.uri, true)
-          xhr.send(null)
-        })
-        const fileUri = `${userId}/${file.fileName}`
-        const fileRef = ref(storage, `${userId}/${formattedDate}`)
-        const result = await uploadBytesResumable(fileRef, blob)
-
-        const uploadSize = result.metadata.size + thumbNailResult.metadata.size
-
-        const reference = await addfile({
-          name: file.filename,
-          fileType: fileType,
-          size: uploadSize,
-          uri: fileUri,
-          thumbnailUri: thumbnailFileUri,
-          user: userId,
-          version: 0,
-          timeStamp: `${formattedDate}`
-        }, file.finalDestination)
-
-        await addFileToUser(userId, reference, uploadSize)
-
-        toast.show('Upload successful', {
-          type: 'success'
-        })
-      } catch (error) {
-        console.log('error from manipResult: ', error)
-      }
-    }
-
-    else if (fileType === 'txt') {
-      //upload noteBody as blob
-      const textFile = new Blob([`${file.noteBody}`], {
-        type: "text/plain;charset=utf-8",
-      });
-      const fileUri = `${userId}/${file.filename}`
-      const fileRef = ref(storage, `${userId}/${formattedDate}`)
-      const result = await uploadBytesResumable(fileRef, textFile)
-
-      const uploadSize = result.metadata.size
-
-      let reference
-      if (file.linksTo) {
-        reference = await addfile({
-          name: file.filename,
-          fileType: 'txt',
-          size: uploadSize,
-          uri: fileUri,
-          user: userId,
-          version: 0,
-          timeStamp: `${formattedDate}`,
-          linksTo: file.linksTo
-        }, file.finalDestination)
-      } else {
-        reference = await addfile({
-          name: file.filename,
-          fileType: 'txt',
-          size: uploadSize,
-          uri: fileUri,
-          user: userId,
-          version: 0,
-          timeStamp: `${formattedDate}`
-        }, file.finalDestination)
+    try {
+      let manipResult = null
+      if (fileType === 'jpg' || fileType === 'JPG' || fileType === 'jpeg' || fileType === 'JPEG' || fileType === 'png' || fileType === 'PNG') {
+        alert('in here')
+        manipResult = await manipulateAsync(
+          file.uri,
+          [{ resize: {height: file.metadata.height * .1, width: file.metadata.width * .1} }],
+          { compress: 1, format: SaveFormat.PNG }
+        )
       }
 
-      await addFileToUser(userId, reference, uploadSize)
+      if (manipResult) {
+        alert('in second block')
+        try {
+          //upload thumbnail version
+          const thumbNailBlob = await new Promise(async (resolve, reject) => {
+            const xhr = new XMLHttpRequest()
+            xhr.onload = () => {
+                resolve(xhr.response)
+            }
+            xhr.onerror = (e) => {
+                reject(new TypeError('Network request failed'))
+            }
+            xhr.responseType = 'blob'
+            xhr.open('GET', manipResult.uri, true)
+            xhr.send(null)
+          })
+          
+          const thumbnailFileRef = ref(storage, `${userId}/thumbnail&${formattedDate}`)
+          const thumbnailFileUri = `${userId}/thumbnail&${file.filename}`
+          const thumbNailResult = await uploadBytesResumable(thumbnailFileRef, thumbNailBlob)
 
-      toast.show('Upload successful', {
-        type: 'success'
-      })
-    }
+          //create a blob for the file
+          const blob = await new Promise(async (resolve, reject) => {
+            const xhr = new XMLHttpRequest()
+            xhr.onload = () => {
+            resolve(xhr.response) 
+            }
+            xhr.onerror = (e) => {
+                reject(new TypeError('Network request failed'))
+            }
+            xhr.responseType = 'blob'
+            xhr.open('GET', file.uri, true)
+            xhr.send(null)
+          })
+          const fileUri = `${userId}/${file.fileName}`
+          const fileRef = ref(storage, `${userId}/${formattedDate}`)
+          const result = await uploadBytesResumable(fileRef, blob)
 
-    else if (fileType === 'doc' || fileType === 'docx') {
-      try {
-        const blob = await new Promise(async (resolve, reject) => {
-          const xhr = new XMLHttpRequest()
-          xhr.onload = () => {
-          resolve(xhr.response) 
-          }
-          xhr.onerror = (e) => {
-              reject(new TypeError('Network request failed'))
-          }
-          xhr.responseType = 'blob'
-          xhr.open('GET', file.uri, true)
-          xhr.send(null)
-        })
-        const fileUri = `${formattedDate}^&${userId}`
-        const fileRef = ref(storage, `${formattedDate}^&${userId}`)
-        const result = await uploadBytesResumable(fileRef, blob)
-        const uploadSize = result.metadata.size
-  
-        const reference = await addfile({
-          name: file.filename,
-          fileType: fileType,
-          size: uploadSize,
-          uri: fileUri,
-          user: userId,
-          version: 0,
-          timeStamp: `${formattedDate}`
-        }, file.finalDestination)
+          const uploadSize = result.metadata.size + thumbNailResult.metadata.size
 
-        await addFileToUser(userId, reference, uploadSize)
-  
-        toast.show('Upload successful', {
-          type: 'success'
-        })
-      } catch (error) {
-        alert('error within docx upload: ', error)
+          const reference = await addfile({
+            name: file.filename,
+            fileType: fileType,
+            size: uploadSize,
+            uri: fileUri,
+            thumbnailUri: thumbnailFileUri,
+            user: userId,
+            version: 0,
+            timeStamp: `${formattedDate}`
+          }, file.finalDestination)
+
+          await addFileToUser(userId, reference, uploadSize)
+
+          toast.show('Upload successful', {
+            type: 'success'
+          })
+        } catch (error) {
+          console.log('error from manipResult: ', error)
+        }
       }
-    } else {
-      try {
-        const blob = await new Promise(async (resolve, reject) => {
-          const xhr = new XMLHttpRequest()
-          xhr.onload = () => {
-          resolve(xhr.response) 
-          }
-          xhr.onerror = (e) => {
-              reject(new TypeError('Network request failed'))
-          }
-          xhr.responseType = 'blob'
-          xhr.open('GET', file.uri, true)
-          xhr.send(null)
-        })
+
+      else if (fileType === 'txt') {
+        //upload noteBody as blob
+        const textFile = new Blob([`${file.noteBody}`], {
+          type: "text/plain;charset=utf-8",
+        });
         const fileUri = `${userId}/${file.filename}`
         const fileRef = ref(storage, `${userId}/${formattedDate}`)
-        const result = await uploadBytesResumable(fileRef, blob)
+        const result = await uploadBytesResumable(fileRef, textFile)
+
         const uploadSize = result.metadata.size
-        
-        const reference = await addfile({
-          name: file.filename,
-          fileType: fileType,
-          size: uploadSize,
-          uri: fileUri,
-          user: userId,
-          version: 0,
-          timeStamp: `${formattedDate}`
-        }, file.finalDestination)
+
+        let reference
+        if (file.linksTo) {
+          reference = await addfile({
+            name: file.filename,
+            fileType: 'txt',
+            size: uploadSize,
+            uri: fileUri,
+            user: userId,
+            version: 0,
+            timeStamp: `${formattedDate}`,
+            linksTo: file.linksTo
+          }, file.finalDestination)
+        } else {
+          reference = await addfile({
+            name: file.filename,
+            fileType: 'txt',
+            size: uploadSize,
+            uri: fileUri,
+            user: userId,
+            version: 0,
+            timeStamp: `${formattedDate}`
+          }, file.finalDestination)
+        }
 
         await addFileToUser(userId, reference, uploadSize)
 
         toast.show('Upload successful', {
           type: 'success'
         })
-      } catch (err) {
-        console.log('error from upload file: ', err)
       }
-    } */
 
-    await removeFromQueue(file)
+      else if (fileType === 'doc' || fileType === 'docx') {
+        try {
+          const blob = await new Promise(async (resolve, reject) => {
+            const xhr = new XMLHttpRequest()
+            xhr.onload = () => {
+            resolve(xhr.response) 
+            }
+            xhr.onerror = (e) => {
+                reject(new TypeError('Network request failed'))
+            }
+            xhr.responseType = 'blob'
+            xhr.open('GET', file.uri, true)
+            xhr.send(null)
+          })
+          const fileUri = `${formattedDate}^&${userId}`
+          const fileRef = ref(storage, `${formattedDate}^&${userId}`)
+          const result = await uploadBytesResumable(fileRef, blob)
+          const uploadSize = result.metadata.size
+    
+          const reference = await addfile({
+            name: file.filename,
+            fileType: fileType,
+            size: uploadSize,
+            uri: fileUri,
+            user: userId,
+            version: 0,
+            timeStamp: `${formattedDate}`
+          }, file.finalDestination)
+
+          await addFileToUser(userId, reference, uploadSize)
+    
+          toast.show('Upload successful', {
+            type: 'success'
+          })
+        } catch (error) {
+          alert('error within docx upload: ', error)
+        }
+      } else {
+        try {
+          const blob = await new Promise(async (resolve, reject) => {
+            const xhr = new XMLHttpRequest()
+            xhr.onload = () => {
+            resolve(xhr.response) 
+            }
+            xhr.onerror = (e) => {
+                reject(new TypeError('Network request failed'))
+            }
+            xhr.responseType = 'blob'
+            xhr.open('GET', file.uri, true)
+            xhr.send(null)
+          })
+          const fileUri = `${userId}/${file.filename}`
+          const fileRef = ref(storage, `${userId}/${formattedDate}`)
+          const result = await uploadBytesResumable(fileRef, blob)
+          const uploadSize = result.metadata.size
+          
+          const reference = await addfile({
+            name: file.filename,
+            fileType: fileType,
+            size: uploadSize,
+            uri: fileUri,
+            user: userId,
+            version: 0,
+            timeStamp: `${formattedDate}`
+          }, file.finalDestination)
+
+          await addFileToUser(userId, reference, uploadSize)
+
+          toast.show('Upload successful', {
+            type: 'success'
+          })
+        } catch (err) {
+          console.log('error from upload file: ', err)
+        }
+      }
+
+      await removeFromQueue(file)
+
+    } catch (err) {
+      alert(err.message)
+    }
 
   }
 

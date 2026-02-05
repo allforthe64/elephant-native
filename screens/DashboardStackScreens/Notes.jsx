@@ -196,7 +196,7 @@ const Notepad = () => {
         let queue = JSON.parse(await AsyncStorage.getItem('uploadQueue')) || []
 
         const randomString = [...Array(10)].map(() => (Math.random().toString(36)[Math.random() < 0.5 ? 'toUpperCase' : 'toLowerCase']()) ).join('')
-        queue.push({uri: `${randomString} - note.txt`, filename: filename, fileTpye: 'txt', finalDestination: finalDestination, noteBody: body})
+        queue.push({uri: `${randomString} - note.txt`, filename: filename, fileType: 'txt', finalDestination: finalDestination, noteBody: body})
         await AsyncStorage.setItem('uploadQueue', JSON.stringify(queue))
 
         //confirm the flush by immediately reading it back
