@@ -148,7 +148,7 @@ const DocumentPickerComp = () => {
 
     const selectFile = async () => {
         try {
-            const result = await DocumentPicker.pick({ allowMultiSelection: true })
+            const result = await DocumentPicker.pick({ allowMultiSelection: true, copyTo: 'cachesDirectory' })
 
             const updatedFiles = result.map(file => {
                 alert(`file name: ${file.name}`)
