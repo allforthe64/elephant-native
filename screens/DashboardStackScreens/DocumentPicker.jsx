@@ -136,19 +136,9 @@ const DocumentPickerComp = () => {
         }
     }, [focusedFolder, folders])
 
-    //convert uris for images coming from selectFile rather than selectImage
-    const ensureFileUri = async (uri) => {
-        if (uri.startsWith("content://")) {
-            const newPath = FileSystem.cacheDirectory + Date.now() + ".jpg";
-            await FileSystem.copyAsync({ from: uri, to: newPath });
-            return newPath;
-        }
-        return uri;
-    }
-
     const selectFile = async () => {
         try {
-            const result = await DocumentPicker.pick({ allowMultiSelection: true, copyTo: 'cachesDirectory' })
+            const result = await DocumentPicker.pick({ allowMultiSelection: true, /* copyTo: 'cachesDirectory', */ copyToCacheDirectory: true })
 
             const updatedFiles = result.map(file => {
                 alert(`file name: ${file.name}`)
