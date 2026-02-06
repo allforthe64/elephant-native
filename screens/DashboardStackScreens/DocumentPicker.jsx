@@ -139,11 +139,12 @@ const DocumentPickerComp = () => {
 
     const selectFile = async () => {
         try {
+            
             const result = await DocumentPicker.getDocumentAsync({ multiple: true, copyToCacheDirectory: true })
 
             if (result.canceled) return
  
-            const updatedFiles = result.map(file => {
+            const updatedFiles = result.assets.map(file => {
                 alert(`file name: ${file.name}`)
                 const extension = file.name?.split('.').pop()?.toLowerCase() ||
                 file.mimeType?.split('/')[1]
