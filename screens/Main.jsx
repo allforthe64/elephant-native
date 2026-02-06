@@ -133,14 +133,11 @@ const Main = () => {
 
   const uploadFile = async (file, userId) => {
 
-    //generate a new randomString
+    /* //generate a new randomString
     const randomString = generateRandomString(10);
 
     //create new formatted date for file
     const formattedDate = format(new Date(), "yyyy-MM-dd:hh:mm:ss") + randomString
-
-    /* const fileUriArray = file.uri.split('.')
-    const fileType = fileUriArray[fileUriArray.length - 1] */
 
     const fileType = file.fileType
 
@@ -334,18 +331,18 @@ const Main = () => {
         } catch (err) {
           console.log('error from upload file: ', err)
         }
-      }
+      } */
 
       await removeFromQueue(file)
 
-    } catch (err) {
+    /* } catch (err) {
       const message =
       err?.message ||
       err?.toString() ||
       "Something went wrong";
 
       alert(message)
-    }
+    } */
 
   }
 

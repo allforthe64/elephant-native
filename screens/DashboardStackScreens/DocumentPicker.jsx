@@ -28,7 +28,8 @@ import { format } from 'date-fns'
 //import ImageManipulator object from expo
 import { manipulateAsync, SaveFormat } from 'expo-image-manipulator';
 
-import DocumentPicker from 'react-native-document-picker'
+import * as DocumentPicker from 'expo-document-picker'
+
 
 //import stuff for QueueUpload
 import { UploadQueueEmitter } from '../../hooks/QueueEventEmitter'
@@ -138,8 +139,10 @@ const DocumentPickerComp = () => {
 
     const selectFile = async () => {
         try {
-            const result = await DocumentPicker.pick({ allowMultiSelection: true, /* copyTo: 'cachesDirectory', */ copyToCacheDirectory: true })
+            const result = await DocumentPicker.getDocumentAsync({ multiple: true, copyToCacheDirectory: true })
 
+            if (result.canceled) return
+ 
             const updatedFiles = result.map(file => {
                 alert(`file name: ${file.name}`)
                 const extension = file.name?.split('.').pop()?.toLowerCase() ||
