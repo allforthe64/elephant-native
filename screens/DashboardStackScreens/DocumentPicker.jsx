@@ -34,6 +34,7 @@ import * as DocumentPicker from 'expo-document-picker'
 //import stuff for QueueUpload
 import { UploadQueueEmitter } from '../../hooks/QueueEventEmitter'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import { Image } from 'react-native'
 
 import * as FileSystem from "expo-file-system"
 
@@ -137,6 +138,16 @@ const DocumentPickerComp = () => {
         }
     }, [focusedFolder, folders])
 
+    //helper for getting image sizes if an image is returned out of the document picker
+    const getImageSize = (uri) =>
+        new Promise((resolve, reject) => {
+            Image.getSize(
+            uri,
+            (width, height) => resolve({ width, height }),
+            (error) => reject(error)
+        );
+    })
+
     const selectFile = async () => {
         try {
             
@@ -144,18 +155,33 @@ const DocumentPickerComp = () => {
 
             if (result.canceled) return
  
-            const updatedFiles = result.assets.map(file => {
+            const updatedFiles = await Promise.all(result.assets.map(async file => {
                 const extension = file.name?.split('.').pop()?.toLowerCase() ||
                 file.mimeType?.split('/')[1]
+
+                let width = null
+                let height = null
+
+                if (file.mimeType?.startsWith('image/')) {
+                    try {
+                        const size = await getImageSize(file.uri)
+                        width = size.width
+                        height = size.height
+                    } catch (err) {
+                        console.log("could read image size: ", err)
+                    }
+                }
 
                 return {
                     name: file.name,
                     uri: file.uri,
                     size: file.size,
                     fileType: extension, // "png", "pdf", etc
-                    mimeType: file.mimeType
+                    mimeType: file.mimeType,
+                    width: width,
+                    height: height
                 };
-            });
+            }));
 
             setFiles(prev => [...prev, ...updatedFiles])
         } catch (err) {
