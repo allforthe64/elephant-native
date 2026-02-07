@@ -145,7 +145,6 @@ const DocumentPickerComp = () => {
             if (result.canceled) return
  
             const updatedFiles = result.assets.map(file => {
-                alert(`file name: ${file.name}`)
                 const extension = file.name?.split('.').pop()?.toLowerCase() ||
                 file.mimeType?.split('/')[1]
 

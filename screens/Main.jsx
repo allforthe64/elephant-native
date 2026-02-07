@@ -141,15 +141,14 @@ const Main = () => {
 
     const fileType = file.fileType
 
-    const safeUri = await ensureFileUri(file.uri)
+    console.log('file.uri: ', file.uri)
 
     try {
       let manipResult = null
       if (fileType === 'jpg' || fileType === 'JPG' || fileType === 'jpeg' || fileType === 'JPEG' || fileType === 'png' || fileType === 'PNG') {
-        alert('in here')
         try {
           manipResult = await manipulateAsync(
-            safeUri,
+            file.uri,
             [{ resize: {height: file.metadata.height * .1, width: file.metadata.width * .1} }],
             { compress: 1, format: SaveFormat.JPEG }
           ) 
@@ -159,7 +158,7 @@ const Main = () => {
           err?.toString() ||
           "Something went wrong";
 
-          alert(message)
+          console.log('error in manipulateAsync: ', message)
         }
         
       }
@@ -195,7 +194,7 @@ const Main = () => {
                 reject(new TypeError('Network request failed'))
             }
             xhr.responseType = 'blob'
-            xhr.open('GET', safeUri, true)
+            xhr.open('GET', file.uri, true)
             xhr.send(null)
           })
           const fileUri = `${userId}/${file.fileName}`
@@ -351,7 +350,7 @@ const Main = () => {
       err?.toString() ||
       "Something went wrong";
 
-      alert(message)
+      console.log('main error: ', message)
     }
 
   }
