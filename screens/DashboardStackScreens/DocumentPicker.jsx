@@ -34,7 +34,6 @@ import * as DocumentPicker from 'expo-document-picker'
 //import stuff for QueueUpload
 import { UploadQueueEmitter } from '../../hooks/QueueEventEmitter'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { Image } from 'react-native'
 
 import * as FileSystem from "expo-file-system"
 
