@@ -147,11 +147,21 @@ const Main = () => {
       let manipResult = null
       if (fileType === 'jpg' || fileType === 'JPG' || fileType === 'jpeg' || fileType === 'JPEG' || fileType === 'png' || fileType === 'PNG') {
         alert('in here')
-        manipResult = await manipulateAsync(
-          safeUri,
-          [{ resize: {height: file.metadata.height * .1, width: file.metadata.width * .1} }],
-          { compress: 1, format: SaveFormat.JPEG }
-        )
+        try {
+          manipResult = await manipulateAsync(
+            safeUri,
+            [{ resize: {height: file.metadata.height * .1, width: file.metadata.width * .1} }],
+            { compress: 1, format: SaveFormat.JPEG }
+          ) 
+        } catch (err) {
+          const message =
+          err?.message ||
+          err?.toString() ||
+          "Something went wrong";
+
+          alert(message)
+        }
+        
       }
 
       if (manipResult) {
