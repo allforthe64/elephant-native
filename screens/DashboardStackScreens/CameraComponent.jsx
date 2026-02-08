@@ -337,7 +337,7 @@ try {
                     const jpgImage = await manipulateAsync(
                         photo.uri,
                         [],
-                        { compress: 0.9, format: ImageManipulator.SaveFormat.JPEG }
+                        { compress: 0.9, format: SaveFormat.JPEG }
                     )
 
                     //generate a fileName and finalDestination
