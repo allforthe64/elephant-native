@@ -164,7 +164,6 @@ const Main = () => {
       }
 
       if (manipResult) {
-        alert('in second block')
         try {
           //upload thumbnail version
           const thumbNailBlob = await new Promise(async (resolve, reject) => {
