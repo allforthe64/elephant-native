@@ -173,7 +173,7 @@ const FocusedFolder = ({folder, folders, clear, getTargetFolder, addFolder, rena
         }}>
         {loading ? <></> 
         : focusedFile ?
-            <FocusedFileComp file={focusedFile} focus={setFocusedFile} deleteFile={deleteFile} renameFileFunction={renameFile} folders={folders} handleFileMove={moveFile} addFolder={addFolder}/> 
+            <FocusedFileComp file={focusedFile} focus={setFocusedFile} deleteFile={deleteFile} renameFileFunction={renameFile} folders={folders} handleFileMove={moveFile} /> 
         :      
                 <View>
 
@@ -221,6 +221,7 @@ const FocusedFolder = ({folder, folders, clear, getTargetFolder, addFolder, rena
                                     <Pressable style={styles.nonFolderButtonSM}
                                         onPress={() => {
                                             addFolder(newFolderName, folder.folder.id)
+                                            setNewFolderName('')
                                             setAdd(false)
                                         }}
                                     >

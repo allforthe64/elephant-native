@@ -446,6 +446,7 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
                 setNewFolderName('')
                 setFolders(newFiles)
                 setFocusedFolder(folderId)
+                setAddFolderForm(false)
                 
             } else {           //if the incoming targetNest has a value, create the new folder with the nestedUnder property set to targetNest
                 const newFile = {
