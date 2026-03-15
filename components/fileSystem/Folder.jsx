@@ -9,6 +9,8 @@ import { faArrowRight, faEllipsisVertical, faFloppyDisk, faFolder, faPencil, faT
 import { firebaseAuth } from '../../firebaseConfig';
 import { userListener } from '../../firebase/firestore';
 
+import { useToast } from 'react-native-toast-notifications';
+
 const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolderFunc, folders, updateUser}) => {
 
   const [visible, setVisible] = useState(false)
@@ -26,6 +28,9 @@ const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolder
   const [focusedFolderInst, setFocusedFolderInst] = useState()
 
   const auth = firebaseAuth
+
+  //instantiate toast object
+  const toast = useToast()
 
   //alpha sort functionality
   const getSortableValue = (val) => {
@@ -401,12 +406,18 @@ const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolder
                                                       if (f.nestedUnder === focusedFolder) {
                                                               return (
                                                                   <Pressable key={index} style={{display: 'flex', flexDirection: 'row', justifyContent: 'center', marginTop: '1%'}} onPress={() => {
+                                                                        if (destination.id === f.id) {
+                                                                          toast.show("In order to prevent nesting a folder within itself, you are unable to view this folder's subfolders", {
+                                                                            type: 'error'
+                                                                          }) 
+                                                                        } else {
                                                                           if (destination.id === null || f.id !== destination.id) {
                                                                               setDestination({id: f.id, fileName: f.fileName, nestedUnder: f.nestedUnder})
                                                                           } else {
                                                                               setFocusedFolder(f.id)
                                                                               setDestination({id: null, fileName: null, nestedUnder: null})
                                                                           }
+                                                                        }
                                                                       }
                                                                       }>
                                                                       <View style={f.id === destination.id ? styles.moveFolderWhite : styles.moveFolder}>
@@ -420,7 +431,7 @@ const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolder
                                                           
                                                       }
                                                   } else {
-                                                      if (f.id !== folder.nestedUnder && f.nestedUnder === '') {
+                                                      if (f.nestedUnder === '') {
                                                           return (
                                                               <Pressable key={index} style={{display: 'flex', flexDirection: 'row', justifyContent: 'center', marginTop: '1%'}} onPress={() => {
                                                                       if (destination.id === null || f.id !== destination.id) {
