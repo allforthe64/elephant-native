@@ -1058,7 +1058,7 @@ const styles = StyleSheet.create({
         paddingTop: 4,
         paddingBottom: 4, 
         paddingRight: 20, 
-        borderRadius: 100,
+        borderRadius: 12,
         display: 'flex',
         flexDirection: 'row'
     },

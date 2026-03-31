@@ -302,7 +302,7 @@ const styles = StyleSheet.create({
         paddingLeft: '2%', 
         paddingTop: '2%', 
         paddingBottom: '2%', 
-        borderRadius: 100, 
+        borderRadius: 12, 
         width: '110%'
       },
       iconHolder: {
@@ -332,7 +332,7 @@ const styles = StyleSheet.create({
         paddingLeft: '2%', 
         paddingTop: '2%', 
         paddingBottom: '2%', 
-        borderRadius: 100, 
+        borderRadius: 12, 
         width: 180,
       },
     addFolderContainer: {

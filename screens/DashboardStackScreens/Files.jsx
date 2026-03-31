@@ -495,7 +495,7 @@ const styles = StyleSheet.create({
     paddingLeft: '2%', 
     paddingTop: '2%', 
     paddingBottom: '2%', 
-    borderRadius: 100, 
+    borderRadius: 12, 
     width: '45%'
   },
   nonFolderButton65: {
@@ -505,7 +505,7 @@ const styles = StyleSheet.create({
     paddingLeft: '2%', 
     paddingTop: '2%', 
     paddingBottom: '2%', 
-    borderRadius: 100, 
+    borderRadius: 12, 
     width: '65%'
   },
   nonFolderButton80: {
@@ -515,7 +515,7 @@ const styles = StyleSheet.create({
     paddingLeft: '2%', 
     paddingTop: '2%', 
     paddingBottom: '2%', 
-    borderRadius: 100, 
+    borderRadius: 12, 
     width: '80%'
   },
   iconHolder: {
