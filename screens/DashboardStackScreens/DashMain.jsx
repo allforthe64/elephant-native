@@ -73,7 +73,7 @@ const styles = StyleSheet.create({
   buttonWrapper: {
     width: '80%',
     borderColor: '#777',
-    borderRadius: 25,
+    borderRadius: 12,
     backgroundColor: 'white',
     borderWidth: 1,
     paddingTop: '2%',
@@ -84,7 +84,7 @@ const styles = StyleSheet.create({
   },
   buttonWrapperLogout: {
     width: '45%',
-    borderRadius: 25,
+    borderRadius: 12,
     backgroundColor: 'red',
     borderWidth: 1,
     paddingTop: '2%',

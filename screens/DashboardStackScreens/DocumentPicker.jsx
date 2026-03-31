@@ -572,7 +572,7 @@ const DocumentPickerComp = () => {
                         <TouchableOpacity style={files.length === 0 ? 
                                 {
                                     width: '60%',
-                                    borderRadius: 25,
+                                    borderRadius: 12,
                                     backgroundColor: '#FFE562',
                                     paddingLeft: '2%', 
                                     paddingTop: '2%', 
@@ -585,7 +585,7 @@ const DocumentPickerComp = () => {
 
                                 {
                                     width: '60%',
-                                    borderRadius: 25,
+                                    borderRadius: 12,
                                     backgroundColor: '#FFE562',
                                     paddingLeft: '2%', 
                                     paddingTop: '2%', 
@@ -647,7 +647,7 @@ const styles = StyleSheet.create({
         paddingLeft: '2%', 
         paddingTop: '2%', 
         paddingBottom: '2%', 
-        borderRadius: 100, 
+        borderRadius: 12, 
         width: '45%',
         display: 'flex',
         flexDirection: 'row'
@@ -766,7 +766,7 @@ const styles = StyleSheet.create({
     },
     addFolderButton: {
         width: '50%',
-        borderRadius: 25,
+        borderRadius: 12,
         backgroundColor: '#FFE562',
         paddingTop: '2%',
         paddingBottom: '2%',
@@ -792,7 +792,7 @@ const styles = StyleSheet.create({
         paddingTop: 6,
         paddingBottom: 6,
         paddingRight: 20,
-        borderRadius: 100,
+        borderRadius: 12,
         display: 'flex',
         flexDirection: 'row',
         width: '45%',
@@ -803,7 +803,7 @@ const styles = StyleSheet.create({
         paddingTop: 6,
         paddingBottom: 6,
         paddingRight: 20,
-        borderRadius: 100,
+        borderRadius: 12,
         display: 'flex',
         flexDirection: 'row',
         width: '45%',
@@ -815,7 +815,7 @@ const styles = StyleSheet.create({
         paddingTop: 6,
         paddingBottom: 6,
         paddingRight: 20,
-        borderRadius: 100,
+        borderRadius: 12,
         display: 'flex',
         flexDirection: 'row',
         width: '30%',
