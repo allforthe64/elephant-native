@@ -10,6 +10,7 @@
     "eas-build-pre-install": "npm config set legacy-peer-deps true"
   },
   "dependencies": {
+    "@expo-google-fonts/anybody": "^0.4.2",
     "@expo/config-plugins": "^9.0.17",
     "@expo/metro-runtime": "^3.2.2",
     "@fortawesome/fontawesome-svg-core": "^6.6.0",
@@ -35,6 +36,7 @@
     "expo-constants": "~16.0.2",
     "expo-document-picker": "~12.0.2",
     "expo-file-system": "~17.0.1",
+    "expo-font": "^55.0.6",
     "expo-image": "~1.13.0",
     "expo-image-manipulator": "~12.0.5",
     "expo-image-picker": "~15.0.7",
