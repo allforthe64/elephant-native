@@ -59,7 +59,8 @@
             "useFrameworks": "static"
           }
         }
-      ]
+      ],
+      "expo-font"
     ],
     "owner": "bisforbilliam"
   }
