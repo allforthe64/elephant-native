@@ -54,14 +54,14 @@ export default function Home({navigation: {navigate}}) {
         }}>
           {/* <Image source={require('../assets/elephant_bg.jpg')} style={styles.bgImg}/> */}
           <View style={styles.modal}>
-            <Text style={[{fontFamily: 'Anybody_900Black'}, ...styles.bigHeader]}>ORGANIZE</Text>
-            <Text style={[{fontFamily: 'Anybody_700Bold'}, ...styles.subheading]}>with</Text>
-            <Text style={[{fontFamily: 'Anybody_700Bold'}, ...styles.subheading1]}>MyElephantApp</Text>
+            <Text style={[{fontFamily: 'Anybody_900Black'}, styles.bigHeader]}>ORGANIZE</Text>
+            <Text style={[{fontFamily: 'Anybody_700Bold'}, styles.subheading]}>with</Text>
+            <Text style={[{fontFamily: 'Anybody_700Bold'}, styles.subheading1]}>MyElephantApp</Text>
             <View style={styles.wrapperContainer}>
               <TouchableOpacity style={styles.button} onPress={() => navigate('Sign In/Sign Up')}>
-                  <Text style={[{fontFamily: 'Anybody_700Bold'}, ...styles.buttonText]}>Sign In/Sign Up</Text>
+                  <Text style={[{fontFamily: 'Anybody_700Bold'}, styles.buttonText]}>Sign In/Sign Up</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={[{fontFamily: 'Anybody_700Bold'}, ...styles.button]} onPress={() => navigate('About')}>
+              <TouchableOpacity style={[{fontFamily: 'Anybody_700Bold'}, styles.button]} onPress={() => navigate('About')}>
                   <Text style={styles.buttonText}>I have a question</Text>
               </TouchableOpacity>
             </View>
