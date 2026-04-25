@@ -83,7 +83,6 @@ const styles = StyleSheet.create({
   modal: {
     width: '90%',
     height: '60%',
-    paddingTop: '20%',
     paddingBottom: 10,
     position: 'absolute',
     display: 'flex',
@@ -92,7 +91,7 @@ const styles = StyleSheet.create({
   },
   bigHeader: {
     color: 'white',
-    fontSize: 50,
+    fontSize: 60,
     textAlign: 'center',
     fontWeight: '700',
     marginBottom: '6%'
@@ -100,13 +99,13 @@ const styles = StyleSheet.create({
   subheading: {
     color: 'white',
     textAlign: 'center',
-    fontSize: 16,
+    fontSize: 20,
     marginBottom: '2.5%'
   },
   subheading1: {
     color: 'white',
     textAlign: 'center',
-    fontSize: 18,
+    fontSize: 30,
     marginBottom: '2.5%',
   },
   wrapperContainer: {
@@ -133,6 +132,7 @@ const styles = StyleSheet.create({
     color: 'white', 
     textAlign: 'center', 
     width: '90%',
-    paddingTop: '10%'
+    paddingTop: '15%',
+    fontSize: 10
   }
 });
