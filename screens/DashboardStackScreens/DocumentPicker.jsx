@@ -98,7 +98,7 @@ const DocumentPickerComp = () => {
     useEffect(() => {
         if(userInst) {
             if (Array.isArray(userInst?.files)) {
-                const sortedFiles = userInst.files.sort((a, b) => {
+                const sortedFiles = [...userInst.files].sort((a, b) => {
                     const aVal = getSortableValue(a.fileName);
                     const bVal = getSortableValue(b.fileName);
 
@@ -217,9 +217,9 @@ const DocumentPickerComp = () => {
     const renderFiles = () => {
 
         if (Array.isArray(files)) {
-            const sortedFileRefs = files.sort((a, b) => {
-                const aVal = getSortableValue(a.fileName);
-                const bVal = getSortableValue(b.fileName);
+            const sortedFileRefs = [...files].sort((a, b) => {
+                const aVal = getSortableValue(a.name);
+                const bVal = getSortableValue(b.name);
 
                 // Numbers first (descending)
                 if (aVal.isNumber && bVal.isNumber) {
