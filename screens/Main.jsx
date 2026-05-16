@@ -43,6 +43,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { UploadQueueEmitter } from '../hooks/QueueEventEmitter';
 
 import * as FileSystem from "expo-file-system";
+import FAQs from './FAQs';
+import TOSMain from './TOSMain';
+import PrivacyMain from './PrivacyMain';
 
 
 const Main = () => {
@@ -437,10 +440,19 @@ const Main = () => {
         <Drawer.Navigator initialRouteName='Home'>
             <Drawer.Screen name='Home' component={Home} options={authUser && {drawerItemStyle: {display: 'none'}, title: ''}} />
             <Drawer.Screen name="Sign In/Sign Up" component={Auth} options={authUser && {drawerItemStyle: {display: 'none'}, title: ''}}/>
-            <Drawer.Screen name='About' component={About} />
+            <Drawer.Screen name='FAQs' component={FAQs} />
             <Drawer.Screen name='Contact' component={Contact} />
             <Drawer.Screen name="Dashboard" component={Dashboard} options={!authUser && {drawerItemStyle: {display: 'none'}, title: ''}} />
-            <Drawer.Screen name="Settings" component={Settings} options={!authUser && {drawerItemStyle: {display: 'none'}, title: ''}} />
+            {/* <Drawer.Screen name="Settings" component={Settings} options={!authUser && {drawerItemStyle: {display: 'none'}, title: ''}} /> */}
+            <Drawer.Screen name="Settings" component={Home} listeners={{
+              drawerItemPress: (e) => {
+                e.preventDefault()
+
+                Linking.openURL('https://myelephantapp.com/settings')
+              },
+            }} />
+            <Drawer.Screen name='Privacy Policy' component={PrivacyMain} />
+            <Drawer.Screen name='Terms Of Service' component={TOSMain} />
             <Drawer.Screen name="Registration Complete" component={ThankYou} options={{drawerItemStyle: {height: 0}, title: ''}}/>
         </Drawer.Navigator>
     </NavigationContainer>
