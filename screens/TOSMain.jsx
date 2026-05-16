@@ -496,7 +496,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#44154B',
     padding: 12,
     borderRadius: 8,
-    width: '50%'
+    width: '60%'
   },
   backButtonLarge: {
     flexDirection: 'row',
