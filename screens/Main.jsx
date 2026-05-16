@@ -47,6 +47,7 @@ import FAQs from './FAQs';
 import TOSMain from './TOSMain';
 import PrivacyMain from './PrivacyMain';
 
+import { Linking } from 'react-native'
 
 const Main = () => {
 
