@@ -497,17 +497,13 @@ const PrivacyMain = () => {
       </View>
 
       <View style={styles.footerButtonContainer}>
-        <TouchableOpacity
-          style={styles.footerButton}
-          onPress={() => navigation.navigate('Home')}
-          activeOpacity={0.8}
-        >
-          <FontAwesomeIcon icon={faArrowLeft} size={18} color="#FFFFFF" />
-
-          <Text style={styles.footerButtonText}>
-            Back to home page
-          </Text>
-        </TouchableOpacity>
+        {/* Bottom Button */}
+              <View style={styles.bottomButtonWrap}>
+                <TouchableOpacity style={styles.backButtonLarge} onPress={() => navigation.navigate('Home')}>
+                  <FontAwesomeIcon icon={faArrowLeft} style={styles.icon} color="#FFFFFF"/>
+                  <Text style={styles.backButtonTextLarge}>Back to home page</Text>
+                </TouchableOpacity>
+              </View>
       </View>
     </ScrollView>
   )
@@ -652,6 +648,18 @@ const styles = StyleSheet.create({
     fontSize: 28,
     marginLeft: 10,
     fontWeight: '500',
+  },
+  backButtonTextLarge: {
+    color: 'white',
+    marginLeft: 8,
+    fontSize: 18,
+  },
+  backButtonLarge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#44154B',
+    padding: 16,
+    borderRadius: 8,
   },
 })
 

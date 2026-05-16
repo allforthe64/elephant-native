@@ -12,7 +12,7 @@ const TOSMain = () => {
 
       {/* Top Button */}
       <TouchableOpacity style={styles.backButton} onPress={() => navigation.navigate('Home')}>
-        <FontAwesomeIcon icon={faArrowLeft} style={styles.icon} />
+        <FontAwesomeIcon icon={faArrowLeft} style={styles.icon} color="#FFFFFF"/>
         <Text style={styles.backButtonText}>Back to home page</Text>
       </TouchableOpacity>
 
@@ -472,7 +472,7 @@ const TOSMain = () => {
       {/* Bottom Button */}
       <View style={styles.bottomButtonWrap}>
         <TouchableOpacity style={styles.backButtonLarge} onPress={() => navigation.navigate('Home')}>
-          <FontAwesomeIcon icon={faArrowLeft} style={styles.icon} />
+          <FontAwesomeIcon icon={faArrowLeft} style={styles.icon} color="#FFFFFF"/>
           <Text style={styles.backButtonTextLarge}>Back to home page</Text>
         </TouchableOpacity>
       </View>
@@ -496,6 +496,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#44154B',
     padding: 12,
     borderRadius: 8,
+    width: '50%'
   },
   backButtonLarge: {
     flexDirection: 'row',
