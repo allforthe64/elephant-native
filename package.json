@@ -57,6 +57,7 @@
     "react-native-gesture-handler": "~2.16.1",
     "react-native-image-modal": "^1.0.16",
     "react-native-images-to-pdf": "^0.2.1",
+    "react-native-paper": "^5.15.2",
     "react-native-pdf": "^6.7.5",
     "react-native-reanimated": "~3.10.1",
     "react-native-reanimated-carousel": "^3.5.1",
@@ -64,6 +65,7 @@
     "react-native-screens": "3.31.1",
     "react-native-svg": "15.2.0",
     "react-native-toast-notifications": "^3.4.0",
+    "react-native-vector-icons": "^10.3.0",
     "react-native-web": "~0.19.10",
     "react-native-webview": "^13.12.5",
     "react-navigation": "^5.0.0"
