@@ -10,8 +10,8 @@ import { useToast } from 'react-native-toast-notifications'
 const EMAIL_REGEX = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/
 
 const Login = ({navigation: {navigate}}) => {
-    const [userEmail, setUserEmail] = useState('')
-    const [password, setPassword] = useState('')
+    const [userEmail, setUserEmail] = useState('myelephanttesting@gmail.com')
+    const [password, setPassword] = useState('myelephanttest1234')
     const [passwordConf, setPasswordConf] = useState('')
     const [loading, setLoading] = useState(false)
     const [validEmail, setValidEmail] = useState(false)
