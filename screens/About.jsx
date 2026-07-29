@@ -1,6 +1,8 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, ScrollView, Image, TouchableOpacity} from 'react-native';
+import { StyleSheet, Text, View, ScrollView } from 'react-native';
 import Accordion from '../components/aboutPage/Accordion';
+import AppPressable from '../components/ui/AppPressable'
+import { TestIds } from '../constants/testIds'
 
 export default function About({navigation: { navigate }}) {
 
@@ -13,9 +15,14 @@ export default function About({navigation: { navigate }}) {
       </View>
       <View style={styles.wrapperContainer}>
           <Text style={styles.buttonHeading}>Ready To Get Started?</Text>    
-          <TouchableOpacity style={styles.button} onPress={() => navigate('Sign In/Sign Up')}>
+          <AppPressable
+            testID={TestIds.home.signIn}
+            accessibilityLabel="Sign In or Sign Up"
+            style={styles.button}
+            onPress={() => navigate('Sign In/Sign Up')}
+          >
               <Text style={styles.buttonText}>Sign In/Sign Up</Text>
-          </TouchableOpacity>
+          </AppPressable>
         </View>
       </View>
       <StatusBar style="auto" />

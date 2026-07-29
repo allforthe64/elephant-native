@@ -1,24 +1,25 @@
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, KeyboardAvoidingView } from 'react-native'
+import { StyleSheet, Text, View, KeyboardAvoidingView, Platform } from 'react-native'
 import React, {useState, useEffect} from 'react'
 import { firebaseAuth } from '../firebaseConfig'
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth'
-import { getUser } from '../firebase/firestore'
-
-//useToast import for displaying notifications
+import { signInWithEmailAndPassword } from 'firebase/auth'
 import { useToast } from 'react-native-toast-notifications'
+import AppPressable from '../components/ui/AppPressable'
+import AppTextInput from '../components/ui/AppTextInput'
+import { TestIds } from '../constants/testIds'
 
 const EMAIL_REGEX = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/
 
+const testEmail = process.env.EXPO_PUBLIC_TEST_EMAIL || ''
+const testPassword = process.env.EXPO_PUBLIC_TEST_PASSWORD || ''
+
 const Login = ({navigation: {navigate}}) => {
-    const [userEmail, setUserEmail] = useState('myelephanttesting@gmail.com')
-    const [password, setPassword] = useState('myelephanttest1234')
-    const [passwordConf, setPasswordConf] = useState('')
+    const [userEmail, setUserEmail] = useState(testEmail)
+    const [password, setPassword] = useState(testPassword)
     const [loading, setLoading] = useState(false)
     const [validEmail, setValidEmail] = useState(false)
     const [signUpMode, setSignUpMode] = useState(false)
     const auth = firebaseAuth
 
-    //consume toast context for notifications
     const toast = useToast()
 
     useEffect(() => {
@@ -27,10 +28,9 @@ const Login = ({navigation: {navigate}}) => {
     }, [userEmail])
 
     const login = async () => {
-        let response
         setLoading(true)
         try {
-            response = await signInWithEmailAndPassword(auth, userEmail, password)
+            await signInWithEmailAndPassword(auth, userEmail, password)
             navigate('Dashboard')
         } catch (err) {
             console.log(err)
@@ -43,7 +43,7 @@ const Login = ({navigation: {navigate}}) => {
     }
 
     const sendRegistrationLink = async () => {
-        const response = await fetch('https://myelephantapp.com/api/send-registration-email', {
+        await fetch('https://myelephantapp.com/api/send-registration-email', {
             method: 'POST',
             headers: {
                 'Content-type': 'application/json'
@@ -60,6 +60,11 @@ const Login = ({navigation: {navigate}}) => {
         setSignUpMode(false)
     }
 
+    const switchMode = () => {
+        setUserEmail('')
+        setPassword('')
+        setSignUpMode(prev => !prev)
+    }
 
   return (
     <KeyboardAvoidingView style={{ flex: 1, backgroundColor: 'white' }} enabled={true} behavior={Platform.OS === 'ios' ? 'padding' : undefined} >
@@ -67,27 +72,53 @@ const Login = ({navigation: {navigate}}) => {
                 {!signUpMode ?
                     <>
                         <View style={styles.innerContainer}>
-                            <Text style={styles.bigHeader}>{signUpMode ? 'Register account' : 'Sign in'}</Text>
+                            <Text style={styles.bigHeader}>Sign in</Text>
                             <View style={styles.formCon}>
                                 <Text style={styles.subheading}>Enter Email:</Text>
-                                <TextInput style={(validEmail || userEmail === '') ? styles.input : styles.inputInvalid} placeholder='Enter Email' autoCapitalize='none' placeholderTextColor={'#593060'} value={userEmail} onChangeText={(e) => setUserEmail(e)}/>
+                                <AppTextInput
+                                  testID={TestIds.auth.email}
+                                  accessibilityLabel="Email"
+                                  style={(validEmail || userEmail === '') ? styles.input : styles.inputInvalid}
+                                  placeholder='Enter Email'
+                                  autoCapitalize='none'
+                                  placeholderTextColor={'#593060'}
+                                  value={userEmail}
+                                  onChangeText={setUserEmail}
+                                  keyboardType="email-address"
+                                  autoCorrect={false}
+                                />
                                 <Text style={(validEmail || userEmail === '') ? {display: 'none'} : styles.invalid}>Please Enter A Valid Email</Text>
                                 <Text style={styles.subheading}>Enter Password:</Text>
-                                <TextInput secureTextEntry={true} style={styles.input} placeholder='Enter Password' placeholderTextColor={'#593060'} value={password} onChangeText={(e) => setPassword(e)}/>
-                                    <TouchableOpacity onPress={() => login()} style={userEmail === '' || !validEmail || password === '' ? {...styles.buttonDisabled, marginTop: 15 } : {...styles.button, marginTop: 15}}>
+                                <AppTextInput
+                                  testID={TestIds.auth.password}
+                                  accessibilityLabel="Password"
+                                  secureTextEntry
+                                  style={styles.input}
+                                  placeholder='Enter Password'
+                                  placeholderTextColor={'#593060'}
+                                  value={password}
+                                  onChangeText={setPassword}
+                                />
+                                <AppPressable
+                                  testID={TestIds.auth.signIn}
+                                  accessibilityLabel="Sign In"
+                                  disabled={loading || userEmail === '' || !validEmail || password === ''}
+                                  onPress={login}
+                                  style={userEmail === '' || !validEmail || password === '' ? {...styles.buttonDisabled, marginTop: 15 } : {...styles.button, marginTop: 15}}
+                                >
                                     <Text style={styles.inputButton}>Sign In</Text>
-                                </TouchableOpacity> 
+                                </AppPressable>
                                 <View style={styles.switchAuthContainer}>
                                     <Text style={styles.switchAuthText}>
                                         Already have an account?
                                     </Text>
-                                    <TouchableOpacity onPress={() => {
-                                        setUserEmail('')
-                                        setPassword('')
-                                        setSignUpMode(prev => !prev)
-                                    }}>
+                                    <AppPressable
+                                      testID={TestIds.auth.switchMode}
+                                      accessibilityLabel="Switch to registration"
+                                      onPress={switchMode}
+                                    >
                                         <Text style={styles.switchAuthLink}>Click here</Text>
-                                    </TouchableOpacity>
+                                    </AppPressable>
                                     <Text style={styles.switchAuthText}>
                                         to login.
                                     </Text>
@@ -102,22 +133,39 @@ const Login = ({navigation: {navigate}}) => {
                             <Text style={styles.subheading}>Enter your email to get a registration link:</Text>
                             <View style={styles.registerFormCon}>
                                 <Text style={styles.subheading}>Enter Email:</Text>
-                                <TextInput style={(validEmail || userEmail === '') ? styles.input : styles.inputInvalid} placeholder='Enter Email' autoCapitalize='none' placeholderTextColor={'#593060'} value={userEmail} onChangeText={(e) => setUserEmail(e)}/>
-                                <TouchableOpacity onPress={() => sendRegistrationLink()} style={userEmail === '' || !validEmail ? styles.buttonDisabled : styles.button}>
+                                <AppTextInput
+                                  testID={TestIds.auth.email}
+                                  accessibilityLabel="Email"
+                                  style={(validEmail || userEmail === '') ? styles.input : styles.inputInvalid}
+                                  placeholder='Enter Email'
+                                  autoCapitalize='none'
+                                  placeholderTextColor={'#593060'}
+                                  value={userEmail}
+                                  onChangeText={setUserEmail}
+                                  keyboardType="email-address"
+                                  autoCorrect={false}
+                                />
+                                <AppPressable
+                                  testID={TestIds.auth.sendLink}
+                                  accessibilityLabel="Send registration link"
+                                  disabled={userEmail === '' || !validEmail}
+                                  onPress={sendRegistrationLink}
+                                  style={userEmail === '' || !validEmail ? styles.buttonDisabled : styles.button}
+                                >
                                     <Text style={styles.inputButton}>Send link</Text>
-                                </TouchableOpacity>     
+                                </AppPressable>
                             </View>
                             <View style={styles.switchAuthContainer}>
                                 <Text style={styles.switchAuthText}>
                                     Already have an account?
                                 </Text>
-                                <TouchableOpacity onPress={() => {
-                                    setUserEmail('')
-                                    setPassword('')
-                                    setSignUpMode(prev => !prev)
-                                }}>
+                                <AppPressable
+                                  testID={TestIds.auth.switchMode}
+                                  accessibilityLabel="Switch to sign in"
+                                  onPress={switchMode}
+                                >
                                     <Text style={styles.switchAuthLink}>Click here</Text>
-                                </TouchableOpacity>
+                                </AppPressable>
                                 <Text style={styles.switchAuthText}>
                                     to login.
                                 </Text>
@@ -244,4 +292,4 @@ const styles = StyleSheet.create({
         textDecorationLine: 'underline',
         marginHorizontal: 4,
     },
-}) 
+})

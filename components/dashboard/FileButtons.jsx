@@ -1,37 +1,53 @@
 import React from 'react'
-import { View, TouchableOpacity, Text, StyleSheet } from 'react-native'
+import { View, Text, StyleSheet } from 'react-native'
 
-//fontAwesome imports
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
 import { faFolder, faFile, faBox } from '@fortawesome/free-solid-svg-icons'
+import AppPressable from '../ui/AppPressable'
+import { TestIds } from '../../constants/testIds'
 
 const FileButtons = ({navigate}) => {
   return (
     <View style={{display: 'flex', flexDirection: 'column', width:'100%'}}>
         <Text style={styles.quickFilesHeading}>Files</Text>
         <View style={styles.wrapperContainer}>
-            <TouchableOpacity onPress={() => navigate('Files', {staging: false})} style={styles.buttonWrapper1}>
+            <AppPressable
+              testID={TestIds.dashboard.myFiles}
+              accessibilityLabel="My Files"
+              onPress={() => navigate('Files', {staging: false})}
+              style={styles.buttonWrapper1}
+            >
                 <View style={styles.iconContainer}>
                     <FontAwesomeIcon icon={faFolder} size={22} style={{color: '#9F37B0'}}/>
                 </View>
                 <Text style={{fontSize: 24, color: '#9F37B0', fontWeight: '500', paddingTop: 6, marginLeft: '20%'}}>My Files</Text>
-            </TouchableOpacity>
+            </AppPressable>
         </View>
         <View style={styles.wrapperContainer}>
-            <TouchableOpacity onPress={() => navigate('Upload Files')} style={styles.buttonWrapper1}>
+            <AppPressable
+              testID={TestIds.dashboard.uploadDoc}
+              accessibilityLabel="Upload Doc"
+              onPress={() => navigate('Upload Files')}
+              style={styles.buttonWrapper1}
+            >
                 <View style={styles.iconContainer}>
                     <FontAwesomeIcon icon={faFile} size={22} style={{color: '#9F37B0'}}/>
                 </View>
                 <Text style={{fontSize: 24, color: '#9F37B0', fontWeight: '500', paddingTop: 6, marginLeft: '17%'}}>Upload Doc</Text>
-            </TouchableOpacity>
+            </AppPressable>
         </View>
         <View style={styles.wrapperContainer}>
-            <TouchableOpacity onPress={() => navigate('Files', {staging: true})} style={styles.buttonWrapper1}>
+            <AppPressable
+              testID={TestIds.dashboard.toBeFiled}
+              accessibilityLabel="To Be Filed"
+              onPress={() => navigate('Files', {staging: true})}
+              style={styles.buttonWrapper1}
+            >
                 <View style={styles.iconContainer}>
                     <FontAwesomeIcon icon={faBox} size={22} style={{color: '#9F37B0'}}/>
                 </View>
                 <Text style={{fontSize: 24, color: '#9F37B0', fontWeight: '500', paddingTop: 6, marginLeft: '22%'}}>To Be Filed</Text>
-            </TouchableOpacity>
+            </AppPressable>
         </View>
     </View>
   )

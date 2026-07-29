@@ -10,6 +10,17 @@
     "preview": {
       "distribution": "internal"
     },
+    "testlab": {
+      "distribution": "internal",
+      "android": {
+        "buildType": "apk"
+      },
+      "env": {
+        "EXPO_PUBLIC_DISABLE_APP_CHECK": "true",
+        "EXPO_PUBLIC_TEST_EMAIL": "myelephanttesting@gmail.com",
+        "EXPO_PUBLIC_TEST_PASSWORD": "myelephanttest1234"
+      }
+    },
     "production": {
       "android": {
         "buildType": "app-bundle"

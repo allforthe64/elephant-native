@@ -13,7 +13,6 @@ import Dashboard from './Dashboard';
 import Contact from './Contact';
 import About from './About';
 import Auth from './Auth';
-import Settings from './Settings';
 import ThankYou from './ThankYou';
 
 //import firebase auth object/AuthContext/onAuthStateChanged function
@@ -441,10 +440,10 @@ const Main = () => {
         <Drawer.Navigator initialRouteName='Home'>
             <Drawer.Screen name='Home' component={Home} options={authUser && {drawerItemStyle: {display: 'none'}, title: ''}} />
             <Drawer.Screen name="Sign In/Sign Up" component={Auth} options={authUser && {drawerItemStyle: {display: 'none'}, title: ''}}/>
+            <Drawer.Screen name='About' component={About} options={{ drawerItemStyle: { display: 'none' }, title: 'About' }} />
             <Drawer.Screen name='FAQs' component={FAQs} />
             <Drawer.Screen name='Contact' component={Contact} />
             <Drawer.Screen name="Dashboard" component={Dashboard} options={!authUser && {drawerItemStyle: {display: 'none'}, title: ''}} />
-            {/* <Drawer.Screen name="Settings" component={Settings} options={!authUser && {drawerItemStyle: {display: 'none'}, title: ''}} /> */}
             <Drawer.Screen name="Settings" component={Home} listeners={{
               drawerItemPress: (e) => {
                 e.preventDefault()
