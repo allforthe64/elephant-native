@@ -7,6 +7,7 @@ import { faFile, faFileAudio, faFileLines, faFilePdf, faImage, faVideo } from '@
 
 import { getFileDownloadURL } from '../../firebase/cloudStorage';
 import { getFile } from '../../firebase/firestore';
+import { tabletStyle, useResponsiveLayout } from '../../hooks/useResponsiveLayout';
 
 
 const blurhash =
@@ -15,6 +16,7 @@ const blurhash =
 import { Image } from 'expo-image';
 
 const File = ({file, focus}) => {
+  const { isTablet, contentMaxWidth } = useResponsiveLayout()
 
   const [fileName, setFileName] = useState(file.fileName.split('.')[0] + (file.version > 0 ? ` (${file.version}).${file.fileName.split('.')[1]}` : '.' + file.fileName.split('.')[1]))
   const [thumbnailURL, setThumbnailURL] = useState()
@@ -54,7 +56,14 @@ const File = ({file, focus}) => {
   }, [file])
 
   return (
-    <TouchableOpacity style={styles.file} onPress={() => focus(file)}>
+    <TouchableOpacity
+      style={tabletStyle(isTablet, styles.file, {
+        width: '100%',
+        maxWidth: contentMaxWidth,
+        alignSelf: 'center',
+      })}
+      onPress={() => focus(file)}
+    >
         <View style={styles.fileTitle}>
             {thumbnailURL ?
               <View style={styles.container}>

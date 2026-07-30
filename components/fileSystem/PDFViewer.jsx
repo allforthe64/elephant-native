@@ -2,8 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { View, ActivityIndicator, StyleSheet } from 'react-native';
 import PDFReader from 'react-native-pdf';
 import * as FileSystem from 'expo-file-system';
+import { tabletStyle, useResponsiveLayout } from '../../hooks/useResponsiveLayout';
 
 const PDFViewer = ({ fileURL }) => {
+  const { isTablet, contentMaxWidth } = useResponsiveLayout();
   const [pdfUri, setPdfUri] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -52,7 +54,11 @@ const PDFViewer = ({ fileURL }) => {
   }
 
   return (
-    <View style={styles.container}>
+    <View style={tabletStyle(isTablet, styles.container, {
+      width: '100%',
+      maxWidth: contentMaxWidth,
+      alignSelf: 'center',
+    })}>
       {pdfUri && (
         <PDFReader
           source={{ uri: pdfUri }}

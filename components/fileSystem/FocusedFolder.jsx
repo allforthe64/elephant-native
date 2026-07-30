@@ -14,8 +14,10 @@ import FocusedFileComp from './FocusedFileComp'
 
 //safe area context imports
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { tabletStyle, useResponsiveLayout } from '../../hooks/useResponsiveLayout'
 
 const FocusedFolder = ({folder, folders, clear, getTargetFolder, addFolder, renameFolder, moveFolder, deleteFolder, deleteFile, renameFile, moveFile, files, updateUser}) => {
+    const { isTablet, contentMaxWidth, modalMaxWidth } = useResponsiveLayout()
 
     const [nestedFolder, setNestedFolder] = useState()
     const [loading, setLoading] = useState(true)
@@ -150,7 +152,7 @@ const FocusedFolder = ({folder, folders, clear, getTargetFolder, addFolder, rena
     }, [])
 
   return (
-    <View style={add && !keybaordClosed
+    <View style={tabletStyle(isTablet, add && !keybaordClosed
         ? {
             height: '180%',
             width: '100%',
@@ -170,12 +172,16 @@ const FocusedFolder = ({folder, folders, clear, getTargetFolder, addFolder, rena
             backgroundColor: '#FFFCF6',
             paddingTop: insets.top,
             paddingBottom: insets.bottom
-        }}>
+        }, {
+            flex: 1,
+            height: '100%',
+            width: '100%',
+        })}>
         {loading ? <></> 
         : focusedFile ?
             <FocusedFileComp file={focusedFile} focus={setFocusedFile} deleteFile={deleteFile} renameFileFunction={renameFile} folders={folders} handleFileMove={moveFile} /> 
         :      
-                <View>
+                <View style={isTablet ? {width: '100%', maxWidth: contentMaxWidth, alignSelf: 'center'} : undefined}>
 
                     <View style={styles.buttonContainer}>
                         <TouchableOpacity style={styles.backButtonContainer} onPress={folder.folder.nestedUnder === '' ? () => clear(null) : () => navigateUp()}>
@@ -200,7 +206,7 @@ const FocusedFolder = ({folder, folders, clear, getTargetFolder, addFolder, rena
                         <Modal presentationStyle='pageSheet' animationType='slide' onShow={() => setTimeout(()=>{
                             folderRef.current.focus()
                         }, 200)}>
-                            <View style={{height: '100%', width: '100%', backgroundColor: '#593060'}}>
+                            <View style={tabletStyle(isTablet, {height: '100%', width: '100%', backgroundColor: '#593060'}, {maxWidth: modalMaxWidth, alignSelf: 'center'})}>
                                 <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', paddingRight: '5%', paddingTop: '10%',width: '100%'}}>
                                     <Pressable onPress={() => {
                                         setAdd(false)
@@ -235,7 +241,7 @@ const FocusedFolder = ({folder, folders, clear, getTargetFolder, addFolder, rena
                         </Modal>
                     : 
                         <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'center'}}>
-                            <TouchableOpacity style={styles.nonFolderButton65}
+                            <TouchableOpacity style={tabletStyle(isTablet, styles.nonFolderButton65, {width: '100%', maxWidth: 360, alignSelf: 'center'})}
                                 onPress={() => {
                                     setAdd(true)
                                     setKeyboardClosed(false)

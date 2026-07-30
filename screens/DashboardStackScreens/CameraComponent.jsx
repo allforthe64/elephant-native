@@ -38,11 +38,18 @@ import { QueContext } from '../../context/QueContext';
 
 //import stuff for the Queue
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import AppPressable from '../../components/ui/AppPressable'
+import ContentShell from '../../components/ui/ContentShell'
+import { TestIds } from '../../constants/testIds'
 import { UploadQueueEmitter } from '../../hooks/QueueEventEmitter';
+import { useResponsiveLayout, tabletStyle } from '../../hooks/useResponsiveLayout'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 
 export default function CameraComponent() {
 try {
+    const { isTablet, select } = useResponsiveLayout()
+    const insets = useSafeAreaInsets()
     const [facing, setFacing] = useState('back');
     const [permission, requestPermission] = useCameraPermissions();
     const [hasCameraPermission, setHasCameraPermission] = useState()
@@ -496,11 +503,12 @@ try {
                     </Pressable>
                 </View>
                 
+                <ContentShell variant="modal" fill>
                 { 
 
                 !nameGiven ?
                 <>
-                    <Text style={{color: 'white', fontSize: 35, fontWeight: '700', marginTop: '30%', textAlign: 'center'}}>{photo ? 'Name Photo' : 'Name Video: '}</Text>
+                    <Text style={[{color: 'white', fontSize: 35, fontWeight: '700', marginTop: '30%', textAlign: 'center'}, select(undefined, tabletStyles.modalHeading)]}>{photo ? 'Name Photo' : 'Name Video: '}</Text>
                     <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', marginTop: '10%'}}>
                         <View style={styles.iconHolder}>
                             <FontAwesomeIcon icon={faFile} size={22} color='#9F37B0'/>
@@ -545,7 +553,7 @@ try {
                 </>
                 : addFolderForm ? 
                     <View style={{width: '100%', height: '100', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center'}}>
-                        <Text style={{color: 'white', fontSize: 35, fontWeight: '700', marginTop: '40%', textAlign: 'center'}}>Add A New Folder:</Text>
+                        <Text style={[{color: 'white', fontSize: 35, fontWeight: '700', marginTop: '40%', textAlign: 'center'}, select(undefined, tabletStyles.modalHeading)]}>Add A New Folder:</Text>
                         <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', marginTop: '10%', width: '100%'}}>
                             <View style={styles.iconHolder}> 
                                 <FontAwesomeIcon icon={faFolder} size={22} color='#9F37B0'/>
@@ -605,7 +613,7 @@ try {
                                 <ScrollView style={focusedFolder ? {paddingTop: '5%', marginTop: '2%'} : {}}>
                                 {/* map over each of the folders from the filesystem and display them as a pressable element // call movefile function when one of them is pressed */}
                                 {focusedFolder && !subFolders ? 
-                                    <Text style={{fontSize: 30, color: 'white', fontWeight: 'bold', marginTop: '30%', textAlign: 'center'}}>No Subfolders...</Text>
+                                    <Text style={[{fontSize: 30, color: 'white', fontWeight: 'bold', marginTop: '30%', textAlign: 'center'}, select(undefined, tabletStyles.modalHeading)]}>No Subfolders...</Text>
                                 
                                 :   
                                     <>
@@ -704,6 +712,7 @@ try {
                     </View>
                     
                 }
+                </ContentShell>
 
             </View>
         </Modal>
@@ -715,7 +724,7 @@ try {
             justifyContent: 'flex-end'
         }}>
             <Image style={styles.preview} source={{ uri: "data:image/jpg;base64," + photo.base64}}/>
-            <View style={{position: 'absolute', top: '8%', right: '2.5%'}} >
+            <ContentShell variant="modal" style={[styles.reviewActions, select(undefined, {top: insets.top + 24, right: 24})]}>
                 <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', paddingRight: '2%'}}>
                     <Animated.View style={{display: 'flex', flexDirection: 'coloumn', alignItems: 'flex-end', marginRight: 10, paddingTop: 20, opacity: fadeAnim}} onLayout={() => fadeOut()}>
                         <View style={{backgroundColor: '#DDCADB',  marginBottom: 25, paddingTop: 2, paddingBottom: 2, borderRadius: 17, width: '50%', marginTop: '2%'}}>
@@ -750,7 +759,7 @@ try {
                         </TouchableOpacity>
                     </View>
                 </View>
-            </View>
+            </ContentShell>
         </View>
 : videoObj ? 
     <>
@@ -761,7 +770,7 @@ try {
             justifyContent: 'flex-end',
         }}>
             <Video style={{flex: 1, alignSelf: 'stretch', height: '100%'}} source={{uri: videoObj.uri}} useNativeControls resizeMode='contain' isLooping onError={(error) => alert(error)}/>
-            <View style={{position: 'absolute', top: '8%', right: '2.5%'}} >
+            <ContentShell variant="modal" style={[styles.reviewActions, select(undefined, {top: insets.top + 24, right: 24})]}>
                 <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', paddingRight: '2%'}}>
                     <Animated.View style={{display: 'flex', flexDirection: 'coloumn', alignItems: 'flex-end', marginRight: 10, paddingTop: 20, opacity: fadeAnim}} onLayout={() => fadeOut()}>
                         <View style={{backgroundColor: '#DDCADB',  marginBottom: 25, paddingTop: 2, paddingBottom: 2, borderRadius: 17, width: '50%', marginTop: '2%'}}>
@@ -796,7 +805,7 @@ try {
                         </TouchableOpacity>
                     </View>
                 </View>
-            </View>
+            </ContentShell>
         </View>
     </>
     :
@@ -829,28 +838,38 @@ try {
                         alignItems: 'flex-end',
                         paddingRight: '5%',
                     }}>
-                        <TouchableOpacity onPress={toggleType} style={{ width: '14%', height: '55%', borderRadius: 100, display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0, 0, 0, .5)'}}>
+                        <AppPressable
+                          testID={TestIds.camera.flip}
+                          accessibilityLabel="Flip camera"
+                          onPress={toggleType}
+                          style={{ width: '14%', height: '55%', borderRadius: 100, display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0, 0, 0, .5)'}}
+                        >
                             <FontAwesomeIcon icon={faRepeat} color={'white'} size={30} />
-                        </TouchableOpacity>
+                        </AppPressable>
                 </View>
-                <View style={styles.buttonContainer}>
-                    <TouchableOpacity onPress={() => setVideo(prev => !prev)} style={video ? {/* backgroundColor: 'white' */backgroundColor: 'rgba(0, 0, 0, .5)', width: '14%', height: '55%', borderRadius: 100, display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginRight: '10%', marginTop: '5%'} : { width: '14%', height: '55%', borderRadius: 100, display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0, 0, 0, .5)', marginRight: '10%', marginTop: '5%'}}>
+                <View style={tabletStyle(isTablet, styles.buttonContainer, tabletStyles.buttonContainer)}>
+                    <AppPressable
+                      testID={TestIds.camera.modeToggle}
+                      accessibilityLabel={video ? 'Switch to photo mode' : 'Switch to video mode'}
+                      onPress={() => setVideo(prev => !prev)}
+                      style={video ? {/* backgroundColor: 'white' */backgroundColor: 'rgba(0, 0, 0, .5)', width: '14%', height: '55%', borderRadius: 100, display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginRight: '10%', marginTop: '5%'} : { width: '14%', height: '55%', borderRadius: 100, display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0, 0, 0, .5)', marginRight: '10%', marginTop: '5%'}}
+                    >
                             <FontAwesomeIcon icon={video ? faCamera : faVideoCamera} color={/* video ? 'black' :  */'white'} size={30} />
-                    </TouchableOpacity>
+                    </AppPressable>
                     {!video ? 
-                        <TouchableOpacity onPress={takePic} style={{marginRight: '17%'}}> 
+                        <AppPressable testID={TestIds.camera.shutter} accessibilityLabel="Take photo" onPress={takePic} style={{marginRight: '17%'}}> 
                             <FontAwesomeIcon icon={faCircle} size={90} color='white'/>
-                        </TouchableOpacity>
+                        </AppPressable>
                     :   
                         <>
                             {recording ? 
-                                <TouchableOpacity onPress={stopVideo} style={{marginRight: '17%', backgroundColor: 'transparent', borderWidth: 8, borderColor: 'white', borderRadius: 1000, width: '24%', height: 90, display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}> 
+                                <AppPressable testID={TestIds.camera.shutter} accessibilityLabel="Stop video" onPress={stopVideo} style={{marginRight: '17%', backgroundColor: 'transparent', borderWidth: 8, borderColor: 'white', borderRadius: 1000, width: '24%', height: 90, display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}> 
                                     <FontAwesomeIcon icon={faSquare} size={55} color='red'/>
-                                </TouchableOpacity>
+                                </AppPressable>
                                 :
-                                <TouchableOpacity onPress={takeVideo} style={{marginRight: '17%', backgroundColor: 'transparent', borderWidth: 8, borderColor: 'white', borderRadius: 1000, width: '24%', height: 90, display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}> 
+                                <AppPressable testID={TestIds.camera.shutter} accessibilityLabel="Start video" onPress={takeVideo} style={{marginRight: '17%', backgroundColor: 'transparent', borderWidth: 8, borderColor: 'white', borderRadius: 1000, width: '24%', height: 90, display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}> 
                                     <FontAwesomeIcon icon={solidCircle} size={55} color='red'/>
-                                </TouchableOpacity>
+                                </AppPressable>
                             }
                         </>
                     }
@@ -893,6 +912,11 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         width: '100%',
         justifyContent: 'center'
+    },
+    reviewActions: {
+        position: 'absolute',
+        top: '8%',
+        right: '2.5%'
     },
     preview: {
         alignSelf: 'stretch',
@@ -1029,4 +1053,13 @@ const styles = StyleSheet.create({
         borderRadius: 100
     },
   
+});
+
+const tabletStyles = StyleSheet.create({
+    modalHeading: {
+        marginTop: 48,
+    },
+    buttonContainer: {
+        bottom: 32,
+    },
 });

@@ -11,18 +11,24 @@ import {
 import { useNavigation } from '@react-navigation/native'
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons'
+import { useResponsiveLayout } from '../hooks/useResponsiveLayout'
 
 const PrivacyMain = () => {
 
   //instantiate router object
   const navigation = useNavigation()
+  const { isTablet, contentMaxWidth } = useResponsiveLayout()
 
   return (
     <ScrollView
       style={styles.container}
-      contentContainerStyle={styles.contentContainer}
+      contentContainerStyle={[
+        styles.contentContainer,
+        isTablet && { paddingHorizontal: 24, alignItems: 'center' },
+      ]}
       showsVerticalScrollIndicator={false}
     >
+      <View style={isTablet ? { width: '100%', maxWidth: contentMaxWidth } : undefined}>
 
       <TouchableOpacity
         style={styles.backButton}
@@ -504,6 +510,7 @@ const PrivacyMain = () => {
                   <Text style={styles.backButtonTextLarge}>Back to home page</Text>
                 </TouchableOpacity>
               </View>
+      </View>
       </View>
     </ScrollView>
   )

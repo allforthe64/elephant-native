@@ -28,10 +28,15 @@ import { useToast } from 'react-native-toast-notifications'
 //import stuff for the UploadQueue
 import { UploadQueueEmitter } from '../../hooks/QueueEventEmitter'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import AppPressable from '../../components/ui/AppPressable'
+import ContentShell from '../../components/ui/ContentShell'
+import { TestIds } from '../../constants/testIds'
+import { useResponsiveLayout, tabletStyle } from '../../hooks/useResponsiveLayout'
 
 const AudioRecorder = () => {
 
     try {
+        const { isTablet, select } = useResponsiveLayout()
         const [recording, setRecording] = useState()
         const [recordings, setRecordings] = useState([])
         const [userInst, setUserInst] = useState()
@@ -374,11 +379,12 @@ const AudioRecorder = () => {
                         </Pressable>
                     </View>
                     
+                    <ContentShell variant="modal" fill>
                     { 
     
                     addFolderForm ? 
                         <View style={{width: '100%', height: '100', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center'}}>
-                            <Text style={{color: 'white', fontSize: 35, fontWeight: '700', marginTop: '40%', textAlign: 'center'}}>Add A New Folder:</Text>
+                            <Text style={[{color: 'white', fontSize: 35, fontWeight: '700', marginTop: '40%', textAlign: 'center'}, select(undefined, tabletStyles.modalHeading)]}>Add A New Folder:</Text>
                             <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', marginTop: '10%', width: '100%'}}>
                                 <View style={styles.iconHolder}> 
                                     <FontAwesomeIcon icon={faFolder} size={22} color='#9F37B0'/>
@@ -438,7 +444,7 @@ const AudioRecorder = () => {
                                     <ScrollView style={focusedFolder ? {paddingTop: '5%', marginTop: '2%'} : {}}>
                                     {/* map over each of the folders from the filesystem and display them as a pressable element // call movefile function when one of them is pressed */}
                                     {focusedFolder && !subFolders ? 
-                                        <Text style={{fontSize: 30, color: 'white', fontWeight: 'bold', marginTop: '30%', textAlign: 'center'}}>No Subfolders...</Text>
+                                        <Text style={[{fontSize: 30, color: 'white', fontWeight: 'bold', marginTop: '30%', textAlign: 'center'}, select(undefined, tabletStyles.modalHeading)]}>No Subfolders...</Text>
                                     
                                     :   
                                         <>
@@ -537,10 +543,12 @@ const AudioRecorder = () => {
                         </View>
                         
                     }
+                    </ContentShell>
     
                 </View>
             </Modal>
         :
+            <ContentShell variant="content" fill>
             <View style={{
                 width: '100%',
                 height: '100%',
@@ -568,19 +576,30 @@ const AudioRecorder = () => {
                     </View>
                 }
                 <View style={styles.wrapperContainer}>
-                        <TouchableOpacity onPress={recording ? stopRecording : startRecording} style={{backgroundColor: 'transparent', borderWidth: 8, borderColor: 'white', borderRadius: 1000, width: '20%', height: 70, display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
+                        <AppPressable
+                          testID={TestIds.audio.recordToggle}
+                          accessibilityLabel={recording ? 'Stop recording' : 'Start recording'}
+                          onPress={recording ? stopRecording : startRecording}
+                          style={{backgroundColor: 'transparent', borderWidth: 8, borderColor: 'white', borderRadius: 1000, width: '20%', height: 70, display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}
+                        >
                             {recording ? <FontAwesomeIcon icon={faSquare} size={30} color='red'/> : <FontAwesomeIcon icon={faMicrophone} size={30} color='red'/>}
-                        </TouchableOpacity>
+                        </AppPressable>
                 </View>
                 <View style={styles.wrapperContainer}>
-                    <TouchableOpacity onPress={() => setPreAdd(true)} style={styles.buttonWrapper}>
+                    <AppPressable
+                      testID={TestIds.audio.saveAll}
+                      accessibilityLabel="Save All"
+                      onPress={() => setPreAdd(true)}
+                      style={tabletStyle(isTablet, styles.buttonWrapper, tabletStyles.actionButton)}
+                    >
                         <View style={styles.iconHolderSmall}>
                             <FontAwesomeIcon icon={faCloudArrowUp} color='#9F37B0' />
                         </View>
                         <Text style={{fontSize: 18, width: '100%', fontWeight: '600', color: '#9F37B0', paddingTop: '1%', marginLeft: '25%'}}>Save All</Text>
-                    </TouchableOpacity>
+                    </AppPressable>
                 </View>
             </View>
+            </ContentShell>
         }    
     </>
   )
@@ -748,6 +767,16 @@ const styles = StyleSheet.create({
         opacity: .5
     },
     
+})
+
+const tabletStyles = StyleSheet.create({
+    modalHeading: {
+        marginTop: 48,
+    },
+    actionButton: {
+        width: '100%',
+        maxWidth: 360,
+    },
 })
 
 export default AudioRecorder

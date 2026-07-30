@@ -27,10 +27,13 @@ import { faXmark, faFolder, faArrowLeft, faCloudArrowUp, faQrcode, faPlus, faChe
 //import stuff for QueueUpload
 import { UploadQueueEmitter } from '../../hooks/QueueEventEmitter'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import ContentShell from '../../components/ui/ContentShell'
+import { useResponsiveLayout, tabletStyle } from '../../hooks/useResponsiveLayout'
 
 const Scanner = () => {
 
   try {
+    const { isTablet, select } = useResponsiveLayout()
     const [scanData, setScanData] = useState()
     const [urls, setUrls] = useState([])
     const [userInst, setUserInst] = useState()
@@ -331,10 +334,11 @@ return (
                         </Pressable>
                     </View>
                     
+                    <ContentShell variant="modal" fill>
                     { 
                     addFolderForm ? 
                         <>
-                            <Text style={{color: 'white', fontSize: 35, fontWeight: '700', marginTop: '40%', textAlign: 'center'}}>Add A New Folder:</Text>
+                            <Text style={[{color: 'white', fontSize: 35, fontWeight: '700', marginTop: '40%', textAlign: 'center'}, select(undefined, tabletStyles.modalHeading)]}>Add A New Folder:</Text>
                             <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', marginTop: '10%'}}>
                                 <View style={styles.iconHolder}>
                                     <FontAwesomeIcon icon={faFolder} size={22} color='#9F37B0'/>
@@ -394,7 +398,7 @@ return (
                                     <ScrollView style={focusedFolder ? {paddingTop: '5%', marginTop: '2%'} : {}}>
                                     {/* map over each of the folders from the filesystem and display them as a pressable element // call movefile function when one of them is pressed */}
                                     {focusedFolder && !subFolders ? 
-                                        <Text style={{fontSize: 30, color: 'white', fontWeight: 'bold', marginTop: '30%', textAlign: 'center'}}>No Subfolders...</Text>
+                                        <Text style={[{fontSize: 30, color: 'white', fontWeight: 'bold', marginTop: '30%', textAlign: 'center'}, select(undefined, tabletStyles.modalHeading)]}>No Subfolders...</Text>
                                     
                                     :   
                                         <>
@@ -491,6 +495,7 @@ return (
                         </View>
                         
                     }
+                    </ContentShell>
 
                 </View>
             </Modal>
@@ -498,6 +503,7 @@ return (
         <>
           {scanData ?
             <>
+              <ContentShell variant="content" fill>
               <View style={{
                   backgroundColor: '#FFFCF6',
                   flex: 1,
@@ -521,7 +527,7 @@ return (
                             </ScrollView>
                         </View> 
                         <View style={styles.wrapperContainer}>
-                            <TouchableOpacity onPress={() => setScanData(undefined)} style={styles.buttonWrapper}>
+                            <TouchableOpacity onPress={() => setScanData(undefined)} style={tabletStyle(isTablet, styles.buttonWrapper, tabletStyles.actionButton)}>
                                 <View style={styles.iconHolderSmall}>
                                     <FontAwesomeIcon icon={faQrcode} color='#9F37B0' />
                                 </View>
@@ -529,7 +535,7 @@ return (
                             </TouchableOpacity>
                         </View>
                         <View style={styles.wrapperContainer}>
-                            <TouchableOpacity onPress={() => setPreAdd(true)} style={styles.buttonWrapper}>
+                            <TouchableOpacity onPress={() => setPreAdd(true)} style={tabletStyle(isTablet, styles.buttonWrapper, tabletStyles.actionButton)}>
                                 <View style={styles.iconHolderSmall}>
                                     <FontAwesomeIcon icon={faCloudArrowUp} color='#9F37B0' />
                                 </View>
@@ -541,6 +547,7 @@ return (
                   <></>
                 }
               </View>
+              </ContentShell>
             </>
           :
             <View style={styles.container}>
@@ -713,5 +720,15 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         width: '47%',
         opacity: .5
+    },
+})
+
+const tabletStyles = StyleSheet.create({
+    modalHeading: {
+        marginTop: 48,
+    },
+    actionButton: {
+        width: '100%',
+        maxWidth: 360,
     },
 })

@@ -36,8 +36,11 @@ import { UploadQueueEmitter } from '../../hooks/QueueEventEmitter'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
 import * as FileSystem from "expo-file-system"
+import ContentShell from '../../components/ui/ContentShell'
+import { useResponsiveLayout, tabletStyle } from '../../hooks/useResponsiveLayout'
 
 const DocumentPickerComp = () => {
+    const { isTablet, select } = useResponsiveLayout()
 
     const [files, setFiles] = useState([])
     const [userInst, setUserInst] = useState()
@@ -348,10 +351,11 @@ const DocumentPickerComp = () => {
                         </Pressable>
                     </View>
                     
+                    <ContentShell variant="modal" fill>
                     { 
                     addFolderForm ? 
                         <View style={{width: '100%', height: '100', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center'}}>
-                            <Text style={{color: 'white', fontSize: 35, fontWeight: '700', marginTop: '40%', textAlign: 'center'}}>Add A New Folder:</Text>
+                            <Text style={[{color: 'white', fontSize: 35, fontWeight: '700', marginTop: '40%', textAlign: 'center'}, select(undefined, tabletStyles.modalHeading)]}>Add A New Folder:</Text>
                             <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', marginTop: '10%', width: '100%'}}>
                                 <View style={styles.iconHolder}> 
                                     <FontAwesomeIcon icon={faFolder} size={22} color='#9F37B0'/>
@@ -409,7 +413,7 @@ const DocumentPickerComp = () => {
                                     <ScrollView style={focusedFolder ? {paddingTop: '5%', marginTop: '2%'} : {}}>
                                     {/* map over each of the folders from the filesystem and display them as a pressable element // call movefile function when one of them is pressed */}
                                     {focusedFolder && !subFolders ? 
-                                        <Text style={{fontSize: 30, color: 'white', fontWeight: 'bold', marginTop: '30%', textAlign: 'center'}}>No Subfolders...</Text>
+                                        <Text style={[{fontSize: 30, color: 'white', fontWeight: 'bold', marginTop: '30%', textAlign: 'center'}, select(undefined, tabletStyles.modalHeading)]}>No Subfolders...</Text>
                                     
                                     :   
                                         <>
@@ -502,11 +506,13 @@ const DocumentPickerComp = () => {
                         </View>
                         
                     }
+                    </ContentShell>
 
                 </View>
             </Modal>
         :
             <View style={styles.container}>
+                <ContentShell variant="content" fill>
                 <View style={{
                     width: '100%',
                     height: '100%',
@@ -552,7 +558,7 @@ const DocumentPickerComp = () => {
                         }
                     <View style={styles.buttonCon}>
 
-                        <TouchableOpacity style={styles.buttonWrapperSm} onPress={() => selectFile()}>
+                        <TouchableOpacity style={tabletStyle(isTablet, styles.buttonWrapperSm, tabletStyles.actionButton)} onPress={() => selectFile()}>
                             <View style={styles.iconHolderSM}>
                               <FontAwesomeIcon icon={faFile} size={18} color='#9F37B0'/>
                             </View>
@@ -561,7 +567,7 @@ const DocumentPickerComp = () => {
 
                         
                         
-                        <TouchableOpacity style={styles.buttonWrapperSm} onPress={() => selectImage()}>
+                        <TouchableOpacity style={tabletStyle(isTablet, styles.buttonWrapperSm, tabletStyles.actionButton)} onPress={() => selectImage()}>
                             <View style={styles.iconHolderSM}>
                               <FontAwesomeIcon icon={faImage} size={18} color='#9F37B0'/>
                             </View>
@@ -601,6 +607,7 @@ const DocumentPickerComp = () => {
                         </TouchableOpacity>
                     </View>
                 </View>
+                </ContentShell>
             </View>
         }
     </>
@@ -820,5 +827,15 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         width: '30%',
         marginLeft: '5%'
+    },
+})
+
+const tabletStyles = StyleSheet.create({
+    modalHeading: {
+        marginTop: 48,
+    },
+    actionButton: {
+        width: '100%',
+        maxWidth: 360,
     },
 })

@@ -4,8 +4,10 @@ import React, { useEffect, useState } from 'react'
 //fontAwesome imports
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
 import { faTrash } from '@fortawesome/free-solid-svg-icons'
+import { tabletStyle, useResponsiveLayout } from '../../hooks/useResponsiveLayout'
 
 const UrlEditor = ({url, deleteFunc, editUrls, index}) => {
+    const { isTablet, contentMaxWidth } = useResponsiveLayout()
     try {
         const [urlTitle, setUrlTitle] = useState(url.title)
 
@@ -21,7 +23,10 @@ const UrlEditor = ({url, deleteFunc, editUrls, index}) => {
 
 
         return (
-            <View key={index} style={styles.fileRow}>
+            <View key={index} style={tabletStyle(isTablet, styles.fileRow, {
+                maxWidth: contentMaxWidth,
+                alignSelf: 'center',
+            })}>
                 <TextInput style={styles.input} value={urlTitle} numberOfLines={1} placeholder='Enter URL Name...' onChangeText={e => setUrlTitle(e)}/>
                 <TouchableOpacity title='Delete' onPress={() => deleteFunc(files, file)}>
                     <View style={styles.iconHolderSM}>

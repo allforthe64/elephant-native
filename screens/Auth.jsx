@@ -5,7 +5,9 @@ import { signInWithEmailAndPassword } from 'firebase/auth'
 import { useToast } from 'react-native-toast-notifications'
 import AppPressable from '../components/ui/AppPressable'
 import AppTextInput from '../components/ui/AppTextInput'
+import ContentShell from '../components/ui/ContentShell'
 import { TestIds } from '../constants/testIds'
+import { useResponsiveLayout, tabletStyle } from '../hooks/useResponsiveLayout'
 
 const EMAIL_REGEX = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/
 
@@ -19,6 +21,7 @@ const Login = ({navigation: {navigate}}) => {
     const [validEmail, setValidEmail] = useState(false)
     const [signUpMode, setSignUpMode] = useState(false)
     const auth = firebaseAuth
+    const { isTablet } = useResponsiveLayout()
 
     const toast = useToast()
 
@@ -66,19 +69,30 @@ const Login = ({navigation: {navigate}}) => {
         setSignUpMode(prev => !prev)
     }
 
+    const inputStyle = tabletStyle(
+      isTablet,
+      (validEmail || userEmail === '') ? styles.input : styles.inputInvalid,
+      tabletStyles.input
+    )
+    const buttonStyle = (disabled) => tabletStyle(
+      isTablet,
+      disabled ? styles.buttonDisabled : styles.button,
+      tabletStyles.button
+    )
+
   return (
     <KeyboardAvoidingView style={{ flex: 1, backgroundColor: 'white' }} enabled={true} behavior={Platform.OS === 'ios' ? 'padding' : undefined} >
-
+      <ContentShell variant="form" fill style={{ justifyContent: 'center' }}>
                 {!signUpMode ?
                     <>
                         <View style={styles.innerContainer}>
-                            <Text style={styles.bigHeader}>Sign in</Text>
+                            <Text style={tabletStyle(isTablet, styles.bigHeader, tabletStyles.bigHeader)}>Sign in</Text>
                             <View style={styles.formCon}>
-                                <Text style={styles.subheading}>Enter Email:</Text>
+                                <Text style={tabletStyle(isTablet, styles.subheading, tabletStyles.subheading)}>Enter Email:</Text>
                                 <AppTextInput
                                   testID={TestIds.auth.email}
                                   accessibilityLabel="Email"
-                                  style={(validEmail || userEmail === '') ? styles.input : styles.inputInvalid}
+                                  style={inputStyle}
                                   placeholder='Enter Email'
                                   autoCapitalize='none'
                                   placeholderTextColor={'#593060'}
@@ -87,13 +101,13 @@ const Login = ({navigation: {navigate}}) => {
                                   keyboardType="email-address"
                                   autoCorrect={false}
                                 />
-                                <Text style={(validEmail || userEmail === '') ? {display: 'none'} : styles.invalid}>Please Enter A Valid Email</Text>
-                                <Text style={styles.subheading}>Enter Password:</Text>
+                                <Text style={(validEmail || userEmail === '') ? {display: 'none'} : tabletStyle(isTablet, styles.invalid, tabletStyles.subheading)}>Please Enter A Valid Email</Text>
+                                <Text style={tabletStyle(isTablet, styles.subheading, tabletStyles.subheading)}>Enter Password:</Text>
                                 <AppTextInput
                                   testID={TestIds.auth.password}
                                   accessibilityLabel="Password"
                                   secureTextEntry
-                                  style={styles.input}
+                                  style={tabletStyle(isTablet, styles.input, tabletStyles.input)}
                                   placeholder='Enter Password'
                                   placeholderTextColor={'#593060'}
                                   value={password}
@@ -104,7 +118,7 @@ const Login = ({navigation: {navigate}}) => {
                                   accessibilityLabel="Sign In"
                                   disabled={loading || userEmail === '' || !validEmail || password === ''}
                                   onPress={login}
-                                  style={userEmail === '' || !validEmail || password === '' ? {...styles.buttonDisabled, marginTop: 15 } : {...styles.button, marginTop: 15}}
+                                  style={[buttonStyle(userEmail === '' || !validEmail || password === ''), { marginTop: 15 }]}
                                 >
                                     <Text style={styles.inputButton}>Sign In</Text>
                                 </AppPressable>
@@ -129,14 +143,14 @@ const Login = ({navigation: {navigate}}) => {
                 :
                     <>
                         <View style={styles.innerContainer}>
-                            <Text style={styles.bigHeader}>Get started:</Text>
-                            <Text style={styles.subheading}>Enter your email to get a registration link:</Text>
+                            <Text style={tabletStyle(isTablet, styles.bigHeader, tabletStyles.bigHeader)}>Get started:</Text>
+                            <Text style={tabletStyle(isTablet, styles.subheading, tabletStyles.subheading)}>Enter your email to get a registration link:</Text>
                             <View style={styles.registerFormCon}>
-                                <Text style={styles.subheading}>Enter Email:</Text>
+                                <Text style={tabletStyle(isTablet, styles.subheading, tabletStyles.subheading)}>Enter Email:</Text>
                                 <AppTextInput
                                   testID={TestIds.auth.email}
                                   accessibilityLabel="Email"
-                                  style={(validEmail || userEmail === '') ? styles.input : styles.inputInvalid}
+                                  style={inputStyle}
                                   placeholder='Enter Email'
                                   autoCapitalize='none'
                                   placeholderTextColor={'#593060'}
@@ -150,7 +164,7 @@ const Login = ({navigation: {navigate}}) => {
                                   accessibilityLabel="Send registration link"
                                   disabled={userEmail === '' || !validEmail}
                                   onPress={sendRegistrationLink}
-                                  style={userEmail === '' || !validEmail ? styles.buttonDisabled : styles.button}
+                                  style={buttonStyle(userEmail === '' || !validEmail)}
                                 >
                                     <Text style={styles.inputButton}>Send link</Text>
                                 </AppPressable>
@@ -173,6 +187,7 @@ const Login = ({navigation: {navigate}}) => {
                         </View>
                     </>
                 }
+      </ContentShell>
     </KeyboardAvoidingView>
   )
 }
@@ -199,6 +214,8 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
+        width: '100%',
+        paddingHorizontal: 16,
     },
     formCon: {
         width: '100%',
@@ -209,10 +226,6 @@ const styles = StyleSheet.create({
         width: '100%',
         alignItems: 'center',
         marginVertical: 24,
-    },
-    buttonContainer: {
-        alignItems: 'center',
-        marginTop: 24,
     },
     button: {
         width: '60%',
@@ -258,18 +271,11 @@ const styles = StyleSheet.create({
         width: '100%',
         color: 'white'
     },
-    inputText: {
-        textAlign: 'center',
-        fontSize: 15,
-        color: 'white',
-        textDecorationColor: 'white',
-        textDecorationLine: 'underline'
-    },
     invalid: {
-        display: 'flex', 
-        color: 'red', 
-        textAlign:'left', 
-        width: '80%', 
+        display: 'flex',
+        color: 'red',
+        textAlign:'left',
+        width: '80%',
         marginBottom: '10%'
     },
     switchAuthContainer: {
@@ -279,12 +285,10 @@ const styles = StyleSheet.create({
         flexWrap: 'wrap',
         justifyContent: 'center',
     },
-
     switchAuthText: {
         color: '#593060',
         fontSize: 18,
     },
-
     switchAuthLink: {
         color: '#593060',
         fontSize: 18,
@@ -292,4 +296,25 @@ const styles = StyleSheet.create({
         textDecorationLine: 'underline',
         marginHorizontal: 4,
     },
+})
+
+const tabletStyles = StyleSheet.create({
+  bigHeader: {
+    marginBottom: 24,
+  },
+  subheading: {
+    width: '100%',
+    marginBottom: 12,
+  },
+  input: {
+    width: '100%',
+    fontSize: 18,
+    paddingVertical: 10,
+    marginBottom: 20,
+  },
+  button: {
+    width: '100%',
+    paddingVertical: 14,
+    marginBottom: 16,
+  },
 })

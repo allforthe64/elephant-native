@@ -12,8 +12,10 @@ import File from './File'
 
 //safe area context imports
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { tabletStyle, useResponsiveLayout } from '../../hooks/useResponsiveLayout'
 
 const Staging = ({staging, reset, folders, deleteFile, renameFile, moveFile, userFiles}) => {
+    const { isTablet, contentMaxWidth } = useResponsiveLayout()
 
     const [focusedFile, setFocusedFile] = useState()
     const [alphaSortedFiles, setAlphaSortedFiles] = useState([])
@@ -90,7 +92,7 @@ const Staging = ({staging, reset, folders, deleteFile, renameFile, moveFile, use
         {focusedFile ?
                 <FocusedFileComp file={focusedFile} focus={setFocusedFile} deleteFile={deleteFile} renameFileFunction={renameFile} folders={folders} handleFileMove={moveFile}/> 
         :
-        <View style={{
+        <View style={tabletStyle(isTablet, {
                 height: '100%',
                 paddingTop: '5%',
                 paddingBottom: '5%',
@@ -99,7 +101,11 @@ const Staging = ({staging, reset, folders, deleteFile, renameFile, moveFile, use
                 backgroundColor: '#FFFCF6',
                 paddingTop: insets.top,
                 paddingBottom: insets.bottom
-            }}>
+            }, {
+                width: '100%',
+                maxWidth: contentMaxWidth,
+                alignSelf: 'center',
+            })}>
             <View style={styles.title}>
                 <Text style={styles.header}>Files to be filed</Text>
                 <TouchableOpacity style={{marginLeft: '10%', paddingTop: '5%'}} onPressOut={() => reset(false)}>

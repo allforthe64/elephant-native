@@ -23,10 +23,13 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 //toast notification import
 import { useToast } from 'react-native-toast-notifications';
+import ContentShell from '../../components/ui/ContentShell';
+import { useResponsiveLayout, tabletStyle } from '../../hooks/useResponsiveLayout';
 
 export default function Files({navigation: { navigate }, route}) {
 
   try {
+  const { isTablet, select } = useResponsiveLayout()
 
   //initialize state 
   const [currentUser, setCurrentUser] = useState()
@@ -318,6 +321,7 @@ export default function Files({navigation: { navigate }, route}) {
 
   return ( 
       <View style={styles.container}>
+        <ContentShell variant="content" fill>
         {!loading && currentUser ? 
           focusedFolder ? 
             <FocusedFolder folder={focusedFolder} renameFolder={renameFolder} moveFolder={moveFolder} addFolder={addFolder} deleteFolder={deleteFolder} folders={currentUser.files} clear={setFocusedFolder} getTargetFolder={getTargetFolder} deleteFile={deleteFile} renameFile={renameFile} moveFile={moveFile} files={currentUser.fileRefs} updateUser={updateUser}/> 
@@ -371,8 +375,9 @@ export default function Files({navigation: { navigate }, route}) {
                               <FontAwesomeIcon icon={faXmark} color={'white'} size={30}/>
                               </Pressable>
                           </View>
+                          <ContentShell variant="modal" fill>
                           <View style={styles.addFolderContainer}>
-                            <Text style={styles.addFolderHeading}>Add new folder:</Text>
+                            <Text style={tabletStyle(isTablet, styles.addFolderHeading, tabletStyles.modalHeading)}>Add new folder:</Text>
                             <View ref={formRef} style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-around', marginBottom: '6%'}}  
                             >
                               <View style={styles.iconHolder}>
@@ -380,7 +385,7 @@ export default function Files({navigation: { navigate }, route}) {
                               </View>
                               <TextInput value={newFolderName} placeholder='Enter new name' placeholderTextColor={'white'} style={{color: 'white', fontSize: 22, fontWeight: 'bold', borderBottomColor: 'white', borderBottomWidth: 2, width: '70%', marginLeft: '5%'}} onChangeText={(e) => setNewFolderName(e)} onFocus={() => setKeyboardClosed(false)} onBlur={() => {if (newFolderName === '') setAdd(false)}} ref={inputRef}/>
                             </View>
-                            <TouchableOpacity style={styles.nonFolderButtonSM}
+                            <TouchableOpacity style={tabletStyle(isTablet, styles.nonFolderButtonSM, tabletStyles.actionButton)}
                               onPress={() => addFolder(newFolderName, '')}
                             >
                                 <View style={styles.iconHolderSM}>
@@ -389,12 +394,13 @@ export default function Files({navigation: { navigate }, route}) {
                                 <Text style={{fontSize: 22, color: '#9F37B0', fontWeight: '600', paddingTop: '1%', marginLeft: '15%'}}>Save</Text>
                             </TouchableOpacity>
                           </View>
+                          </ContentShell>
                         </View>
                       </Modal>
                     : 
                     <View style={{display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%'}}>
                       <View style={{display: 'flex', flexDirection: 'row', marginBottom: 10}}>                  
-                          <TouchableOpacity style={styles.nonFolderButton80}
+                          <TouchableOpacity style={tabletStyle(isTablet, styles.nonFolderButton80, tabletStyles.actionButton)}
                             onPress={() => {
                               setAdd(true)
                               setKeyboardClosed(false)
@@ -406,7 +412,7 @@ export default function Files({navigation: { navigate }, route}) {
                               <Text style={styles.subheadingMLLarge}>Add New Folder</Text>
                           </TouchableOpacity>
                       </View>
-                        <TouchableOpacity onPress={() => navigate('Upload Files')} style={styles.nonFolderButton80}>
+                        <TouchableOpacity onPress={() => navigate('Upload Files')} style={tabletStyle(isTablet, styles.nonFolderButton80, tabletStyles.actionButton)}>
                             <View style={styles.iconHolderSM}>
                               <FontAwesomeIcon icon={faFile} size={18} color='#9F37B0'/>
                             </View>
@@ -422,6 +428,7 @@ export default function Files({navigation: { navigate }, route}) {
             <Text style={{color: 'white'}}>Loading...</Text>
           </>
         }
+        </ContentShell>
       <StatusBar style="auto" />
     </View>
     
@@ -552,4 +559,14 @@ const styles = StyleSheet.create({
     color: 'white',
     marginBottom: '10%'
   }
+});
+
+const tabletStyles = StyleSheet.create({
+  modalHeading: {
+    marginBottom: 48,
+  },
+  actionButton: {
+    width: '100%',
+    maxWidth: 420,
+  },
 });

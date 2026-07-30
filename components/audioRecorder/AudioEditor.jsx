@@ -4,8 +4,10 @@ import React, {useEffect, useState} from 'react'
 //fontAwesome imports
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
 import { faPlay, faTrash } from '@fortawesome/free-solid-svg-icons'
+import { tabletStyle, useResponsiveLayout } from '../../hooks/useResponsiveLayout'
 
 const AudioEditor = ({recordingLine, index, deleteFunc, editRecordings, recordings}) => {
+    const { isTablet, contentMaxWidth } = useResponsiveLayout()
     const [recordingTitle, setRecordingTitle] = useState(recordingLine.name)
 
     useEffect(() => {
@@ -35,7 +37,10 @@ const AudioEditor = ({recordingLine, index, deleteFunc, editRecordings, recordin
             </TouchableOpacity>
         </View>
     </View> */
-    <View key={index} style={styles.fileRow}>
+    <View key={index} style={tabletStyle(isTablet, styles.fileRow, {
+        maxWidth: contentMaxWidth,
+        alignSelf: 'center',
+    })}>
         <TouchableOpacity onPress={() => {recordingLine.sound.replayAsync()}}>
             <FontAwesomeIcon icon={faPlay} style={{color: 'white', marginTop: '2%'}} size={18}/>
         </TouchableOpacity>

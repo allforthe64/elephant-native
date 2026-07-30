@@ -32,9 +32,14 @@ import PDFViewer from './PDFViewer'
 
 import Constants from 'expo-constants';
 import WebView from 'react-native-webview'
+import { tabletStyle, useResponsiveLayout } from '../../hooks/useResponsiveLayout'
 
 
 const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFileMove}) => {
+    const { isTablet, contentMaxWidth, modalMaxWidth } = useResponsiveLayout()
+    const tabletModalPanel = isTablet
+        ? { width: '100%', maxWidth: modalMaxWidth, alignSelf: 'center' }
+        : null
 
     //initialize state
     const [userInst, setUserInst] = useState()
@@ -498,7 +503,7 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
                     {preDelete ? 
                             (   
                                 <Modal animationType='slide' presentationStyle='pageSheet'>
-                                    <View style={{ paddingTop: '10%', backgroundColor: '#593060', height: '100%', width: '100%'}}>
+                                    <View style={[{ paddingTop: '10%', backgroundColor: '#593060', height: '100%', width: '100%'}, tabletModalPanel]}>
                                         {/* if the user hits the delete button on a file, open a modal that confirms they want to delete the file*/}
                                         <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', paddingRight: '5%', paddingTop: '10%',     width: '100%'}}>
                                             <TouchableOpacity onPress={() => setPreDelete(false)}>
@@ -538,7 +543,7 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
                         moveFile ? 
                         (
                             <Modal animationType='slide' presentationStyle='pageSheet' >
-                                <View style={{height: '100%', width: '100%', backgroundColor: '#593060'}}>
+                                <View style={[{height: '100%', width: '100%', backgroundColor: '#593060'}, tabletModalPanel]}>
                                     {/* if the moveFile state is true, display the modal with the file movement code*/}
                                     {/* xMark icon for closing out the moveFile modal */}
                                     <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', paddingRight: '5%', paddingTop: '10%', width: '100%'}}>
@@ -635,7 +640,7 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
                                                                                             }
                                                                                         }
                                                                                         }>
-                                                                                        <View style={f.id === destination.id ? styles.folderWhite : styles.folder}>
+                                                                                        <View style={tabletStyle(isTablet, f.id === destination.id ? styles.folderWhite : styles.folder, {width: '100%', maxWidth: contentMaxWidth, alignSelf: 'center'})}>
                                                                                         <View style={f.id === destination.id ? styles.iconHolderBlack : styles.iconHolder}>
                                                                                             <FontAwesomeIcon icon={faFolder} size={28} color={f.id === destination.id ? 'white' : '#9F37B0'}/>
                                                                                         </View>
@@ -657,7 +662,7 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
                                                                                         }
                                                                                     }
                                                                                     }>
-                                                                                    <View style={f.id === destination.id ? styles.folderWhite : styles.folder}>
+                                                                                    <View style={tabletStyle(isTablet, f.id === destination.id ? styles.folderWhite : styles.folder, {width: '100%', maxWidth: contentMaxWidth, alignSelf: 'center'})}>
                                                                                     <View style={f.id === destination.id ? styles.iconHolderBlack : styles.iconHolder}>
                                                                                         <FontAwesomeIcon icon={faFolder} size={28} color={f.id === destination.id ? 'white' : '#9F37B0'}/>
                                                                                     </View>
@@ -750,7 +755,7 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
                                 <Modal animationType='slide' presentationStyle='pageSheet' onShow={() => setTimeout(()=>{
                                     ref.current.focus()
                                 }, 200)}>
-                                    <View style={{height: '100%', width: '100%', backgroundColor: '#593060'}}>
+                                    <View style={[{height: '100%', width: '100%', backgroundColor: '#593060'}, tabletModalPanel]}>
                                         {/* if the moveFile state is true, display the modal with the file movement code*/}
                                         {/* xMark icon for closing out the moveFile modal */}
                                         <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', paddingRight: '5%', paddingTop: '10%', width: '100%'}}>
@@ -803,7 +808,7 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
                                 </Modal>
                             )
                         :
-                            <View style={{ paddingTop: '10%', backgroundColor: '#593060', height: '100%', width: '100%'}}>
+                            <View style={[{ paddingTop: '10%', backgroundColor: '#593060', height: '100%', width: '100%'}, tabletModalPanel]}>
                                     
                                     {/*x button container */}
                                     <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', paddingRight: '5%'}}>
@@ -849,7 +854,7 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
                                                 : expanded ? 
                                                 <Modal animationType='slide' presentationStyle='pageSheet'>
                                                     {/* code to render expanded images */}
-                                                    <View style={{ paddingTop: '10%', backgroundColor: '#593060', height: '100%', width: '100%'}}>
+                                                    <View style={[{ paddingTop: '10%', backgroundColor: '#593060', height: '100%', width: '100%'}, tabletModalPanel]}>
                                                         <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', paddingRight: '5%', paddingTop: '5%', width: '100%'}}>
                                                             <Pressable onPress={() => setExpanded(false)}>
                                                                 <FontAwesomeIcon icon={faXmark} color={'white'} size={30}/>

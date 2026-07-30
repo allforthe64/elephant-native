@@ -5,9 +5,12 @@ import { List } from 'react-native-paper'
 import { useNavigation } from '@react-navigation/native'
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons'
+import ContentShell from '../components/ui/ContentShell'
+import { useResponsiveLayout, tabletStyle } from '../hooks/useResponsiveLayout'
 
 const FAQs = () => {
   const [expanded, setExpanded] = useState(null)
+  const { isTablet } = useResponsiveLayout()
 
   //handler to control the expanded state of accordion
   const handlePress = (panel) => {
@@ -17,7 +20,8 @@ const FAQs = () => {
   const navigation = useNavigation()
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+    <ScrollView style={styles.container} contentContainerStyle={tabletStyle(isTablet, styles.content, tabletStyles.content)}>
+      <ContentShell variant="content">
       <Text style={styles.title}>Frequently Asked Questions</Text>
 
       <Text style={styles.subtitle}>
@@ -180,6 +184,7 @@ const FAQs = () => {
                 </TouchableOpacity>
             </View>
         </View>
+      </ContentShell>
     </ScrollView>
   )
 }
@@ -275,3 +280,10 @@ const styles = StyleSheet.create({
     marginBottom: 64,
   },
 })
+const tabletStyles = StyleSheet.create({
+  content: {
+    paddingHorizontal: 32,
+    paddingBottom: 96,
+  },
+})
+

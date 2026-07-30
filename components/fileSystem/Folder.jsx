@@ -10,8 +10,13 @@ import { firebaseAuth } from '../../firebaseConfig';
 import { userListener } from '../../firebase/firestore';
 
 import { useToast } from 'react-native-toast-notifications';
+import { tabletStyle, useResponsiveLayout } from '../../hooks/useResponsiveLayout';
 
 const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolderFunc, folders, updateUser}) => {
+  const { isTablet, contentMaxWidth, modalMaxWidth } = useResponsiveLayout()
+  const tabletModalPanel = isTablet
+    ? { width: '100%', maxWidth: modalMaxWidth, alignSelf: 'center' }
+    : null
 
   const [visible, setVisible] = useState(false)
   const [preDelete, setPreDelete] = useState(false)
@@ -229,7 +234,7 @@ const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolder
               {preDelete ? 
                 /*Code for deleting a folder */
                 <Modal animationType='slide' presentationStyle='pageSheet'>
-                    <View style={{height: '100%', width: '100%', backgroundColor: '#593060'}}>
+                    <View style={[{height: '100%', width: '100%', backgroundColor: '#593060'}, tabletModalPanel]}>
                     
                       <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', paddingRight: '5%', paddingTop: '10%', width: '100%'}}>
                         <Pressable onPress={() => setPreDelete(false)}>
@@ -281,7 +286,7 @@ const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolder
                   </View>
                 </Modal>
                 : 
-                  <View style={{ paddingTop: '10%', backgroundColor: '#593060', height: '100%'}}>
+                  <View style={[{ paddingTop: '10%', backgroundColor: '#593060', height: '100%'}, tabletModalPanel]}>
                     <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', paddingRight: '5%'}}>
                       <Pressable onPress={() => {
                           setEditName(false)
@@ -318,7 +323,7 @@ const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolder
                     /*Code for moving a folder */
                     : moveFolder ? 
                       <Modal animationType='slide' presentationStyle='pageSheet' >
-                          <View style={{height: '100%', width: '100%', backgroundColor: '#593060'}}>
+                          <View style={[{height: '100%', width: '100%', backgroundColor: '#593060'}, tabletModalPanel]}>
                           
                             <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', paddingRight: '5%', paddingTop: '10%', width: '100%'}}>
                               <Pressable onPress={() => {
@@ -420,7 +425,7 @@ const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolder
                                                                         }
                                                                       }
                                                                       }>
-                                                                      <View style={f.id === destination.id ? styles.moveFolderWhite : styles.moveFolder}>
+                                                                      <View style={tabletStyle(isTablet, f.id === destination.id ? styles.moveFolderWhite : styles.moveFolder, {width: '100%', maxWidth: contentMaxWidth, alignSelf: 'center'})}>
                                                                       <View style={f.id === destination.id ? styles.iconHolderBlack : styles.iconHolderWhite}>
                                                                           <FontAwesomeIcon icon={faFolder} size={28} color={f.id === destination.id ? 'white' : '#9F37B0'}/>
                                                                       </View>
@@ -442,7 +447,7 @@ const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolder
                                                                       }
                                                                   }
                                                                   }>
-                                                                  <View style={f.id === destination.id ? styles.moveFolderWhite : styles.moveFolder}>
+                                                                  <View style={tabletStyle(isTablet, f.id === destination.id ? styles.moveFolderWhite : styles.moveFolder, {width: '100%', maxWidth: contentMaxWidth, alignSelf: 'center'})}>
                                                                   <View style={f.id === destination.id ? styles.iconHolderBlack : styles.iconHolderWhite}>
                                                                       <FontAwesomeIcon icon={faFolder} size={28} color={f.id === destination.id ? 'white' : '#9F37B0'}/>
                                                                   </View>
@@ -514,7 +519,11 @@ const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolder
                 }
           </Modal>
       : <></>}
-      <View style={visible ? styles.folderVisibleMenu : styles.folder}>
+      <View style={tabletStyle(isTablet, visible ? styles.folderVisibleMenu : styles.folder, {
+        width: '100%',
+        maxWidth: contentMaxWidth,
+        alignSelf: 'center',
+      })}>
         <TouchableOpacity onPress={() => getTargetFolder(folder)} style={{width: '85%'}}>
             <View style={styles.folderTitle}>
                 <View style={styles.iconHolder}>
