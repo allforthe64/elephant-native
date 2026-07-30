@@ -8,9 +8,6 @@
       "distribution": "internal"
     },
     "preview": {
-      "distribution": "internal"
-    },
-    "testlab": {
       "distribution": "internal",
       "android": {
         "buildType": "apk"
@@ -20,6 +17,9 @@
         "EXPO_PUBLIC_TEST_EMAIL": "myelephanttesting@gmail.com",
         "EXPO_PUBLIC_TEST_PASSWORD": "myelephanttest1234"
       }
+    },
+    "testlab": {
+      "extends": "preview"
     },
     "production": {
       "android": {
