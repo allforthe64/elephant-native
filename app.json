@@ -63,7 +63,6 @@
         }
       ],
       "expo-font",
-      "@sentry/react-native",
       "expo-asset"
     ],
     "owner": "bisforbilliam"
