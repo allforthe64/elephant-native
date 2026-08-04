@@ -333,17 +333,17 @@ export default function Files({navigation: { navigate }, route}) {
               width: '100%', /*Expand height to allow the text input to scroll into view*/
               alignSelf: 'stretch',
               height: '190%',
-              paddingTop: insets.top,
-              paddingBottom: insets.bottom,
             } : {
             width: '100%', /* Default styling */
             alignSelf: 'stretch',
             flex: 1,
-            paddingTop: insets.top,
-            paddingBottom: insets.bottom,
           }}
-            contentContainerStyle={{ width: '100%', paddingBottom: 24 }}
-            scrollEnabled={add  ? true : false}
+            contentContainerStyle={{
+              width: '100%',
+              paddingTop: 8,
+              paddingBottom: Math.max(insets.bottom, 16) + 48,
+            }}
+            scrollEnabled
           >
                   <View>
                     <View style={styles.header}>
@@ -399,7 +399,7 @@ export default function Files({navigation: { navigate }, route}) {
                         </View>
                       </Modal>
                     : 
-                    <View style={{display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%'}}>
+                    <View style={{display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', marginTop: 8, marginBottom: 8}}>
                       <View style={{display: 'flex', flexDirection: 'row', marginBottom: 10}}>                  
                           <TouchableOpacity style={tabletStyle(isTablet, styles.nonFolderButton80, tabletStyles.actionButton)}
                             onPress={() => {

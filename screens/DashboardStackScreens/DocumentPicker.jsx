@@ -519,8 +519,8 @@ const DocumentPickerComp = () => {
                     display: 'flex',
                     alignItems: 'center',
                     position: 'absolute',
-                    paddingTop: insets.top,
-                    paddingBottom: insets.bottom
+                    paddingTop: 8,
+                    paddingBottom: Math.max(insets.bottom, 16) + 48,
                 }}>
                     <Text style={styles.bigHeader}>Files to upload:</Text>
                         {loading ? 
@@ -648,6 +648,7 @@ const styles = StyleSheet.create({
         display: 'flex',
         alignItems: 'center',
         width: '100%',
+        marginBottom: 8,
     },
     buttonWrapperSm: {
         backgroundColor: '#FFE562',
