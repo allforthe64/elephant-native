@@ -111,27 +111,24 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 60,
     textAlign: 'center',
-    fontWeight: '700',
+    // Don't set fontWeight with a weight-specific fontFamily (Android renders blank glyphs)
     marginBottom: '6%'
   },
   subheading: {
     color: 'white',
     textAlign: 'center',
     fontSize: 22,
-    fontWeight: 600
   },
   subheading1: {
     color: 'white',
     textAlign: 'center',
     fontSize: 35,
-    fontWeight: 600,
     marginBottom: '10%'
   },
   tagline: {
     color: 'white',
     textAlign: 'center',
     fontSize: 10,
-    fontWeight: 600,
     marginTop: '15%'
   },
   wrapperContainer: {
@@ -151,7 +148,6 @@ const styles = StyleSheet.create({
   buttonText: {
     textAlign: 'center',
     fontSize: 22,
-    fontWeight: 700,
     color: '#593060'
   }
 });

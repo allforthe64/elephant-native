@@ -51,14 +51,22 @@ export async function addUser(user) {
 
 //get a user document using a uid, setup snapshot listener to monitor changes
 export async function userListener(setCurrentUser, setStaging, user) {
-    const unsub = onSnapshot(doc(db, 'users', user), (doc) => {
-        try {
-            //filter file references from the current user that are in staging
-            const stagingRefs = doc.data().fileRefs.filter(el => el.flag === 'Staging')
-            if (setStaging) setStaging(stagingRefs)
-            setCurrentUser({...doc.data(), uid: user})
-        } catch (err) {console.log(err)}
-    })
+    const unsub = onSnapshot(
+        doc(db, 'users', user),
+        (snap) => {
+            try {
+                if (!snap.exists()) return
+                const data = snap.data()
+                //filter file references from the current user that are in staging
+                const stagingRefs = (data.fileRefs || []).filter(el => el.flag === 'Staging')
+                if (setStaging) setStaging(stagingRefs)
+                setCurrentUser({...data, uid: user})
+            } catch (err) {console.log(err)}
+        },
+        (error) => {
+            console.warn('userListener error:', error?.code || error?.message || error)
+        }
+    )
 
     return unsub
 }

@@ -13,7 +13,6 @@
         "buildType": "apk"
       },
       "env": {
-        "EXPO_PUBLIC_DISABLE_APP_CHECK": "true",
         "EXPO_PUBLIC_TEST_EMAIL": "myelephanttesting@gmail.com",
         "EXPO_PUBLIC_TEST_PASSWORD": "myelephanttest1234",
         "SENTRY_DISABLE_AUTO_UPLOAD": "true",
@@ -21,7 +20,14 @@
       }
     },
     "testlab": {
-      "extends": "preview"
+      "extends": "preview",
+      "env": {
+        "EXPO_PUBLIC_DISABLE_APP_CHECK": "true",
+        "EXPO_PUBLIC_TEST_EMAIL": "myelephanttesting@gmail.com",
+        "EXPO_PUBLIC_TEST_PASSWORD": "myelephanttest1234",
+        "SENTRY_DISABLE_AUTO_UPLOAD": "true",
+        "SENTRY_ALLOW_FAILURE": "true"
+      }
     },
     "production": {
       "android": {
