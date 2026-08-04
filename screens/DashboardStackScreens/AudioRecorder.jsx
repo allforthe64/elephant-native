@@ -30,6 +30,7 @@ import { UploadQueueEmitter } from '../../hooks/QueueEventEmitter'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import AppPressable from '../../components/ui/AppPressable'
 import ContentShell from '../../components/ui/ContentShell'
+import YellowActionButton from '../../components/ui/YellowActionButton'
 import { TestIds } from '../../constants/testIds'
 import { useResponsiveLayout, tabletStyle } from '../../hooks/useResponsiveLayout'
 
@@ -586,17 +587,15 @@ const AudioRecorder = () => {
                         </AppPressable>
                 </View>
                 <View style={[styles.wrapperContainer, styles.bottomButtonWrap]}>
-                    <AppPressable
+                    <YellowActionButton
                       testID={TestIds.audio.saveAll}
                       accessibilityLabel="Save All"
+                      label="Save All"
                       onPress={() => setPreAdd(true)}
-                      style={tabletStyle(isTablet, styles.buttonWrapper, tabletStyles.actionButton)}
-                    >
-                        <View style={styles.iconHolderSmall}>
-                            <FontAwesomeIcon icon={faCloudArrowUp} color='#9F37B0' />
-                        </View>
-                        <Text style={{fontSize: 18, width: '100%', fontWeight: '600', color: '#9F37B0', paddingTop: '1%', marginLeft: '25%'}}>Save All</Text>
-                    </AppPressable>
+                      style={tabletStyle(isTablet, { width: '60%' }, tabletStyles.actionButton)}
+                      icon={<FontAwesomeIcon icon={faCloudArrowUp} color='#9F37B0' size={16} />}
+                      iconSize={28}
+                    />
                 </View>
             </View>
             </ContentShell>

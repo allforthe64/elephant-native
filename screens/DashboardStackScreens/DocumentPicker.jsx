@@ -37,6 +37,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 
 import * as FileSystem from "expo-file-system"
 import ContentShell from '../../components/ui/ContentShell'
+import YellowActionButton from '../../components/ui/YellowActionButton'
 import { useResponsiveLayout, tabletStyle } from '../../hooks/useResponsiveLayout'
 
 const DocumentPickerComp = () => {
@@ -557,54 +558,28 @@ const DocumentPickerComp = () => {
                             </>
                         }
                     <View style={styles.buttonCon}>
-
-                        <TouchableOpacity style={tabletStyle(isTablet, styles.buttonWrapperSm, tabletStyles.actionButton)} onPress={() => selectFile()}>
-                            <View style={styles.iconHolderSM}>
-                              <FontAwesomeIcon icon={faFile} size={18} color='#9F37B0'/>
-                            </View>
-                            <Text style={styles.subheadingMLLarge}>Select File</Text>
-                        </TouchableOpacity>
-
-                        
-                        
-                        <TouchableOpacity style={tabletStyle(isTablet, styles.buttonWrapperSm, tabletStyles.actionButton)} onPress={() => selectImage()}>
-                            <View style={styles.iconHolderSM}>
-                              <FontAwesomeIcon icon={faImage} size={18} color='#9F37B0'/>
-                            </View>
-                            <Text style={styles.subheadingMLLarge}>Select Photo</Text>
-                        </TouchableOpacity>
+                        <YellowActionButton
+                          label="Select File"
+                          onPress={() => selectFile()}
+                          style={tabletStyle(isTablet, { width: '45%' }, tabletStyles.actionButton)}
+                          icon={<FontAwesomeIcon icon={faFile} size={18} color='#9F37B0'/>}
+                        />
+                        <YellowActionButton
+                          label="Select Photo"
+                          onPress={() => selectImage()}
+                          style={tabletStyle(isTablet, { width: '45%' }, tabletStyles.actionButton)}
+                          icon={<FontAwesomeIcon icon={faImage} size={18} color='#9F37B0'/>}
+                        />
                     </View>
                     <View style={styles.wrapperContainer}>
-                        <TouchableOpacity style={files.length === 0 ? 
-                                {
-                                    width: '60%',
-                                    borderRadius: 12,
-                                    backgroundColor: '#FFE562',
-                                    paddingLeft: '2%', 
-                                    paddingTop: '2%', 
-                                    paddingBottom: '2%', 
-                                    opacity: .5,
-                                    display: 'flex',
-                                    flexDirection: 'row'
-                                }
-                            :                            
-
-                                {
-                                    width: '60%',
-                                    borderRadius: 12,
-                                    backgroundColor: '#FFE562',
-                                    paddingLeft: '2%', 
-                                    paddingTop: '2%', 
-                                    paddingBottom: '2%', 
-                                    display: 'flex',
-                                    flexDirection: 'row'
-                                }
-                            } onPress={() => setPreAdd(true)} disabled={files.length === 0 ? true : false}>
-                            <View style={styles.iconHolderSM}>
-                              <FontAwesomeIcon icon={faCloudArrowUp} size={18} color='#9F37B0'/>
-                            </View>
-                            <Text style={styles.subheadingMLXLarge}>Upload Files</Text>
-                        </TouchableOpacity>
+                        <YellowActionButton
+                          label="Upload Files"
+                          onPress={() => setPreAdd(true)}
+                          dimmed={files.length === 0}
+                          disabled={files.length === 0}
+                          style={{ width: '60%' }}
+                          icon={<FontAwesomeIcon icon={faCloudArrowUp} size={18} color='#9F37B0'/>}
+                        />
                     </View>
                 </View>
                 </ContentShell>
@@ -641,8 +616,10 @@ const styles = StyleSheet.create({
         display: 'flex',
         flexDirection: 'row',
         justifyContent: 'space-around',
+        alignItems: 'center',
         marginBottom: '3%',
-        width: '100%'
+        width: '100%',
+        paddingHorizontal: 8,
     },
     wrapperContainer: {
         display: 'flex',

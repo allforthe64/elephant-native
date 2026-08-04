@@ -24,6 +24,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 //toast notification import
 import { useToast } from 'react-native-toast-notifications';
 import ContentShell from '../../components/ui/ContentShell';
+import YellowActionButton from '../../components/ui/YellowActionButton';
 import { useResponsiveLayout, tabletStyle } from '../../hooks/useResponsiveLayout';
 
 export default function Files({navigation: { navigate }, route}) {
@@ -351,7 +352,7 @@ export default function Files({navigation: { navigate }, route}) {
                         <View style={styles.iconHolder}>
                           <FontAwesomeIcon icon={faBox} color='#9F37B0' size={22}/>
                         </View>
-                        <Text style={styles.subheading}>To be filed</Text>
+                        <Text style={styles.subheading} numberOfLines={1}>To be filed</Text>
                       </TouchableOpacity>
                     </View>
                     <View style={add ? {height: 300} : {height: 330, marginBottom: '6%'}}>
@@ -399,27 +400,22 @@ export default function Files({navigation: { navigate }, route}) {
                         </View>
                       </Modal>
                     : 
-                    <View style={{display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', marginTop: 8, marginBottom: 8}}>
-                      <View style={{display: 'flex', flexDirection: 'row', marginBottom: 10}}>                  
-                          <TouchableOpacity style={tabletStyle(isTablet, styles.nonFolderButton80, tabletStyles.actionButton)}
+                    <View style={{display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', marginTop: 8, marginBottom: 8, gap: 12}}>
+                          <YellowActionButton
+                            label="Add New Folder"
                             onPress={() => {
                               setAdd(true)
                               setKeyboardClosed(false)
                             }}
-                          >
-                              <View style={styles.iconHolderSM}>
-                                <FontAwesomeIcon icon={faPlus} size={18} color='#9F37B0'/>
-                              </View>
-                              <Text style={styles.subheadingMLLarge}>Add New Folder</Text>
-                          </TouchableOpacity>
-                      </View>
-                        <TouchableOpacity onPress={() => navigate('Upload Files')} style={tabletStyle(isTablet, styles.nonFolderButton80, tabletStyles.actionButton)}>
-                            <View style={styles.iconHolderSM}>
-                              <FontAwesomeIcon icon={faFile} size={18} color='#9F37B0'/>
-                            </View>
-                            <Text style={styles.subheadingMLLarge}>Get Document</Text>
-                        </TouchableOpacity>
-                      
+                            style={tabletStyle(isTablet, { width: '80%' }, tabletStyles.actionButton)}
+                            icon={<FontAwesomeIcon icon={faPlus} size={18} color='#9F37B0'/>}
+                          />
+                          <YellowActionButton
+                            label="Get Document"
+                            onPress={() => navigate('Upload Files')}
+                            style={tabletStyle(isTablet, { width: '80%' }, tabletStyles.actionButton)}
+                            icon={<FontAwesomeIcon icon={faFile} size={18} color='#9F37B0'/>}
+                          />
                     </View>
                     }
                   </View>
@@ -455,21 +451,21 @@ const styles = StyleSheet.create({
   },
   subheading: {
     color: '#9F37B0',
-    textAlign: 'center',
     fontWeight: '600',
-    fontSize: 22,
-    marginTop: 'auto',
-    marginBottom: 'auto',
-    marginLeft: '10%'
+    fontSize: 18,
+    flex: 1,
+    flexShrink: 1,
+    minWidth: 0,
+    marginLeft: 10,
   },
   subheadingMLLarge: {
     color: '#9F37B0',
-    textAlign: 'center',
     fontWeight: '600',
-    fontSize: 18,
-    marginTop: 'auto',
-    marginBottom: 'auto',
-    marginLeft: '15%'
+    fontSize: 16,
+    flex: 1,
+    flexShrink: 1,
+    minWidth: 0,
+    marginLeft: 10,
   },
   header: {
     display: 'flex', 
@@ -497,31 +493,40 @@ const styles = StyleSheet.create({
   },
   nonFolderButtonSM: {
     display: 'flex', 
-    flexDirection: 'row', 
+    flexDirection: 'row',
+    alignItems: 'center',
+    overflow: 'hidden',
     backgroundColor: '#FFE562', 
-    paddingLeft: '2%', 
-    paddingTop: '2%', 
-    paddingBottom: '2%', 
+    paddingLeft: 8, 
+    paddingTop: 8, 
+    paddingBottom: 8,
+    paddingRight: 12,
     borderRadius: 12, 
     width: '45%'
   },
   nonFolderButton65: {
     display: 'flex', 
-    flexDirection: 'row', 
+    flexDirection: 'row',
+    alignItems: 'center',
+    overflow: 'hidden',
     backgroundColor: '#FFE562', 
-    paddingLeft: '2%', 
-    paddingTop: '2%', 
-    paddingBottom: '2%', 
+    paddingLeft: 8, 
+    paddingTop: 8, 
+    paddingBottom: 8,
+    paddingRight: 12,
     borderRadius: 12, 
     width: '65%'
   },
   nonFolderButton80: {
     display: 'flex', 
-    flexDirection: 'row', 
+    flexDirection: 'row',
+    alignItems: 'center',
+    overflow: 'hidden',
     backgroundColor: '#FFE562', 
-    paddingLeft: '2%', 
-    paddingTop: '2%', 
-    paddingBottom: '2%', 
+    paddingLeft: 8, 
+    paddingTop: 8, 
+    paddingBottom: 8,
+    paddingRight: 12,
     borderRadius: 12, 
     width: '80%'
   },
@@ -533,7 +538,8 @@ const styles = StyleSheet.create({
     display: 'flex', 
     flexDirection: 'row', 
     justifyContent: 'center', 
-    alignItems: 'center'
+    alignItems: 'center',
+    flexShrink: 0,
   },
   iconHolderSM: {
     backgroundColor: 'white', 
@@ -543,7 +549,8 @@ const styles = StyleSheet.create({
     display: 'flex', 
     flexDirection: 'row', 
     justifyContent: 'center', 
-    alignItems: 'center'
+    alignItems: 'center',
+    flexShrink: 0,
   },
   addFolderContainer: {
     width: '100%',
