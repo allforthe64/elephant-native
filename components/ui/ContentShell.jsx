@@ -28,15 +28,18 @@ const ContentShell = ({
 
   if (isPhone) {
     return (
-      <View style={[fill && styles.fill, style, innerStyle]}>{children}</View>
+      <View style={[styles.fullWidth, fill && styles.fill, style, innerStyle]}>
+        {children}
+      </View>
     )
   }
 
   return (
-    <View style={[styles.outer, fill && styles.fill, style]}>
+    <View style={[styles.outer, styles.fullWidth, fill && styles.fill, style]}>
       <View
         style={[
           styles.inner,
+          styles.fullWidth,
           fill && styles.fill,
           { maxWidth },
           innerStyle,
@@ -49,13 +52,16 @@ const ContentShell = ({
 }
 
 const styles = StyleSheet.create({
-  outer: {
+  // Critical: parents often use alignItems:'center'; without this, flex children
+  // shrink-wrap and percentage widths / margins explode off to the right.
+  fullWidth: {
     width: '100%',
+    alignSelf: 'stretch',
+  },
+  outer: {
     alignItems: 'center',
   },
-  inner: {
-    width: '100%',
-  },
+  inner: {},
   fill: {
     flex: 1,
   },

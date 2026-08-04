@@ -331,17 +331,18 @@ export default function Files({navigation: { navigate }, route}) {
           <ScrollView ref={scrollRef} style={
               add && !keyBoardClosed ? {
               width: '100%', /*Expand height to allow the text input to scroll into view*/
+              alignSelf: 'stretch',
               height: '190%',
               paddingTop: insets.top,
               paddingBottom: insets.bottom,
-              position: 'absolute'
             } : {
             width: '100%', /* Default styling */
-            height: '100%',
+            alignSelf: 'stretch',
+            flex: 1,
             paddingTop: insets.top,
             paddingBottom: insets.bottom,
-            position: 'absolute'
           }}
+            contentContainerStyle={{ width: '100%', paddingBottom: 24 }}
             scrollEnabled={add  ? true : false}
           >
                   <View>
@@ -442,9 +443,8 @@ export default function Files({navigation: { navigate }, route}) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    width: '100%',
     backgroundColor: '#FFFCF6',
-    alignItems: 'center',
-    justifyContent: 'center',
   },
   bigHeader: {
     color: 'white',

@@ -93,14 +93,13 @@ const Staging = ({staging, reset, folders, deleteFile, renameFile, moveFile, use
                 <FocusedFileComp file={focusedFile} focus={setFocusedFile} deleteFile={deleteFile} renameFileFunction={renameFile} folders={folders} handleFileMove={moveFile}/> 
         :
         <View style={tabletStyle(isTablet, {
-                height: '100%',
-                paddingTop: '5%',
-                paddingBottom: '5%',
-                position: 'absolute',
-                top: 0,
+                flex: 1,
+                width: '100%',
+                alignSelf: 'stretch',
                 backgroundColor: '#FFFCF6',
                 paddingTop: insets.top,
-                paddingBottom: insets.bottom
+                paddingBottom: insets.bottom,
+                paddingHorizontal: 16,
             }, {
                 width: '100%',
                 maxWidth: contentMaxWidth,
@@ -108,7 +107,7 @@ const Staging = ({staging, reset, folders, deleteFile, renameFile, moveFile, use
             })}>
             <View style={styles.title}>
                 <Text style={styles.header}>Files to be filed</Text>
-                <TouchableOpacity style={{marginLeft: '10%', paddingTop: '5%'}} onPressOut={() => reset(false)}>
+                <TouchableOpacity style={styles.closeButton} onPressOut={() => reset(false)}>
                     <FontAwesomeIcon icon={faXmark} size={35} color='#593060' />
                 </TouchableOpacity>
             </View>
@@ -131,15 +130,21 @@ export default Staging
 
 const styles = StyleSheet.create({
     title: {
-        display: 'flex', 
         flexDirection: 'row',
-        marginBottom: '15%'
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        width: '100%',
+        marginBottom: 24,
+        paddingTop: 8,
     },
     header: {
         color: '#593060',
-        fontSize: 30,
-        marginLeft: '25%',
-        width: '60%',
-        fontWeight: '600'
-    }
+        fontSize: 28,
+        fontWeight: '600',
+        flex: 1,
+        paddingRight: 12,
+    },
+    closeButton: {
+        padding: 4,
+    },
 })
