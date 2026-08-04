@@ -11,12 +11,12 @@ import { useResponsiveLayout, tabletStyle } from '../hooks/useResponsiveLayout'
 
 const EMAIL_REGEX = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/
 
-const testEmail = process.env.EXPO_PUBLIC_TEST_EMAIL || ''
-const testPassword = process.env.EXPO_PUBLIC_TEST_PASSWORD || ''
+/* const testEmail = process.env.EXPO_PUBLIC_TEST_EMAIL || ''
+const testPassword = process.env.EXPO_PUBLIC_TEST_PASSWORD || '' */
 
 const Login = ({navigation: {navigate}}) => {
-    const [userEmail, setUserEmail] = useState(testEmail)
-    const [password, setPassword] = useState(testPassword)
+    const [userEmail, setUserEmail] = useState('')
+    const [password, setPassword] = useState('')
     const [loading, setLoading] = useState(false)
     const [validEmail, setValidEmail] = useState(false)
     const [signUpMode, setSignUpMode] = useState(false)
