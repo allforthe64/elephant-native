@@ -53,7 +53,7 @@ export default function Home({navigation: {navigate}}) {
                   testID={TestIds.home.about}
                   accessibilityLabel="I have a question"
                   style={tabletStyle(isTablet, styles.button, tabletStyles.button)}
-                  onPress={() => navigate('About')}
+                  onPress={() => navigate('FAQs')}
                 >
                     <Text style={styles.buttonText}>I have a question</Text>
                 </AppPressable>

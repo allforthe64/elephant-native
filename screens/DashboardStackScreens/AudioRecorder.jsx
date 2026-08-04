@@ -555,8 +555,8 @@ const AudioRecorder = () => {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                paddingTop: insets.top,
-                paddingBottom: insets.bottom
+                paddingTop: 8,
+                paddingBottom: Math.max(insets.bottom, 16) + 48,
             }}>
                 <Text style={styles.bigHeader}>Audio Recordings:</Text>
 
@@ -585,7 +585,7 @@ const AudioRecorder = () => {
                             {recording ? <FontAwesomeIcon icon={faSquare} size={30} color='red'/> : <FontAwesomeIcon icon={faMicrophone} size={30} color='red'/>}
                         </AppPressable>
                 </View>
-                <View style={styles.wrapperContainer}>
+                <View style={[styles.wrapperContainer, styles.bottomButtonWrap]}>
                     <AppPressable
                       testID={TestIds.audio.saveAll}
                       accessibilityLabel="Save All"
@@ -648,6 +648,9 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         width: '100%',
         marginBottom: '5%'
+    },
+    bottomButtonWrap: {
+        marginBottom: 8,
     },
     buttonWrapper: {
     width: '60%',
