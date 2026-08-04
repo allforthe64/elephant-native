@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useContext } from 'react';
-import { View, Text, StatusBar, StyleSheet, Animated, Image, TouchableOpacity, Platform, Pressable, TextInput, Modal, ScrollView, Button } from 'react-native'
+import { View, Text, StatusBar, StyleSheet, Animated, Image, TouchableOpacity, Platform, Pressable, TextInput, Modal, ScrollView, Linking } from 'react-native'
 
 //fontAwesome imports
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
@@ -8,7 +8,6 @@ import { faCircle } from '@fortawesome/free-regular-svg-icons'
 import { faCircle as solidCircle } from '@fortawesome/free-solid-svg-icons'
 
 //import expo Camera api
-import { Camera } from 'expo-camera'
 import { CameraView, useCameraPermissions } from 'expo-camera';
 
 //import Video and Audio components from expo-av
@@ -52,9 +51,8 @@ try {
     const insets = useSafeAreaInsets()
     const [facing, setFacing] = useState('back');
     const [permission, requestPermission] = useCameraPermissions();
-    const [hasCameraPermission, setHasCameraPermission] = useState()
-    const [hasMediaLibraryPermission, setHasMediaLibraryPermission] = useState()
-    const [hasAudioRecordingPermission, setHasAudioRecordingPermission] = useState()
+    const [hasMediaLibraryPermission, setHasMediaLibraryPermission] = useState(false)
+    const [secondaryPermissionsReady, setSecondaryPermissionsReady] = useState(false)
     const [photo, setPhoto] = useState()
     const [session, setSession] = useState(true)
     const [userInst, setUserInst] = useState()
@@ -125,17 +123,44 @@ try {
         
     }, [firebaseAuth])
 
-    //get camera permissions
+    // Request media library / mic only after camera is granted (single source of truth)
     useEffect(() => {
-        (async () => {
-            const cameraPermission = await Camera.requestCameraPermissionsAsync()
-            const mediaLibraryPermission = await MediaLibrary.requestPermissionsAsync()
-            const {status} = await Audio.requestPermissionsAsync() 
-            setHasCameraPermission(cameraPermission.status === "granted")
-            setHasMediaLibraryPermission(mediaLibraryPermission.status === "granted")
-            setHasAudioRecordingPermission(status === "granted")
+        if (!permission?.granted) {
+            setSecondaryPermissionsReady(false)
+            return
+        }
+
+        let cancelled = false
+        ;(async () => {
+            try {
+                const mediaLibraryPermission = await MediaLibrary.requestPermissionsAsync()
+                await Audio.requestPermissionsAsync()
+                if (cancelled) return
+                setHasMediaLibraryPermission(mediaLibraryPermission.status === 'granted')
+            } catch (err) {
+                console.warn('Secondary camera permissions error:', err)
+            } finally {
+                if (!cancelled) setSecondaryPermissionsReady(true)
+            }
         })()
-    }, [])
+
+        return () => {
+            cancelled = true
+        }
+    }, [permission?.granted])
+
+    const handleGrantCameraPermission = async () => {
+        try {
+            const result = await requestPermission()
+            if (result?.granted) return
+            if (result && result.canAskAgain === false) {
+                await Linking.openSettings()
+            }
+        } catch (err) {
+            console.warn('Camera permission request failed:', err)
+            alert(err?.message || String(err))
+        }
+    }
 
     useEffect(() => {
         //Will change fadeAnim value to 0 in 3 seconds
@@ -227,13 +252,6 @@ try {
         }
     }
     
-
-    //render content based on permissions
-    if (hasCameraPermission === undefined || hasMediaLibraryPermission === undefined || hasAudioRecordingPermission === undefined) {
-        return <Text>Requesting permissions...</Text>
-    } else if (!hasCameraPermission) {
-        return <Text>Permission for camera not granted. Please change this in settings.</Text>
-    }
 
     //take photo using takePictureAsync method
     const takePic = async () => {
@@ -441,7 +459,11 @@ try {
 
   if (!permission) {
     // Camera permissions are still loading.
-    return <View />;
+    return (
+      <View style={styles.container}>
+        <Text style={styles.message}>Loading camera permissions...</Text>
+      </View>
+    );
   }
 
   if (!permission.granted) {
@@ -449,7 +471,22 @@ try {
     return (
       <View style={styles.container}>
         <Text style={styles.message}>We need your permission to show the camera</Text>
-        <Button onPress={requestPermission} title="grant permission" />
+        <AppPressable
+          testID={TestIds.camera.grantPermission}
+          accessibilityLabel="Grant camera permission"
+          onPress={handleGrantCameraPermission}
+          style={styles.grantButton}
+        >
+          <Text style={styles.grantButtonText}>Grant permission</Text>
+        </AppPressable>
+      </View>
+    );
+  }
+
+  if (!secondaryPermissionsReady) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.message}>Setting up camera...</Text>
       </View>
     );
   }
@@ -888,6 +925,26 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#FFFCF6',
+    paddingHorizontal: 24,
+  },
+  message: {
+    textAlign: 'center',
+    color: '#593060',
+    fontSize: 18,
+    marginBottom: 20,
+  },
+  grantButton: {
+    backgroundColor: '#2196F3',
+    borderRadius: 8,
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+  },
+  grantButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: '600',
   },
   camera: {
     flex: 1,

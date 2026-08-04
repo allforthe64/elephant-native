@@ -41,6 +41,7 @@ export const TestIds = {
     shutter: 'camera-shutter',
     flip: 'camera-flip',
     modeToggle: 'camera-mode-toggle',
+    grantPermission: 'camera-grant-permission',
   },
   scanner: {
     scan: 'scanner-scan',
