@@ -11,6 +11,10 @@ import { userListener } from '../../firebase/firestore';
 
 import { useToast } from 'react-native-toast-notifications';
 import { tabletStyle, useResponsiveLayout } from '../../hooks/useResponsiveLayout';
+import {
+  fileSystemRowStyles,
+  FILE_SYSTEM_ROW_ACTIVE_OPACITY,
+} from './fileSystemRowStyles';
 
 const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolderFunc, folders, updateUser}) => {
   const { isTablet, contentMaxWidth, modalMaxWidth } = useResponsiveLayout()
@@ -519,21 +523,34 @@ const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolder
                 }
           </Modal>
       : <></>}
-      <View style={tabletStyle(isTablet, visible ? styles.folderVisibleMenu : styles.folder, {
+      <View style={tabletStyle(isTablet, visible ? [fileSystemRowStyles.row, fileSystemRowStyles.rowMenuOpen] : [fileSystemRowStyles.row, fileSystemRowStyles.rowFolder], {
         width: '100%',
         maxWidth: contentMaxWidth,
         alignSelf: 'center',
       })}>
-        <TouchableOpacity onPress={() => getTargetFolder(folder)} style={{width: '85%'}}>
-            <View style={styles.folderTitle}>
-                <View style={styles.iconHolder}>
-                  <FontAwesomeIcon icon={faFolder} color={'#593060'} size={22} />
-                </View>
-                <Text style={styles.folderName}>{folder.fileName}</Text>
+        <TouchableOpacity
+          onPress={() => getTargetFolder(folder)}
+          activeOpacity={FILE_SYSTEM_ROW_ACTIVE_OPACITY}
+          style={fileSystemRowStyles.main}
+        >
+            <View style={[fileSystemRowStyles.iconHolder, fileSystemRowStyles.iconHolderFolder]}>
+              <FontAwesomeIcon icon={faFolder} color={'#593060'} size={20} />
             </View>
+            <Text
+              numberOfLines={1}
+              ellipsizeMode="tail"
+              style={[fileSystemRowStyles.label, fileSystemRowStyles.labelFolder]}
+            >
+              {folder.fileName}
+            </Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => setVisible(prev => !prev)} style={visible ? {backgroundColor: 'rgba(38, 38, 38, .75)', width: '15%', display: 'flex', justifyContent: 'center', paddingBottom: '1%', flexDirection: 'row'} : {width: '15%', display: 'flex', justifyContent: 'center', flexDirection: 'row', paddingBottom: '2%'}}>
-          <FontAwesomeIcon icon={faEllipsisVertical} size={26} color={'white'} style={styles.folderArrow}/>
+        <TouchableOpacity
+          onPress={() => setVisible(prev => !prev)}
+          activeOpacity={FILE_SYSTEM_ROW_ACTIVE_OPACITY}
+          style={[fileSystemRowStyles.trailing, visible && fileSystemRowStyles.trailingActive]}
+          accessibilityLabel="Folder options"
+        >
+          <FontAwesomeIcon icon={faEllipsisVertical} size={22} color={'white'} />
         </TouchableOpacity>
       </View>
     </View>
