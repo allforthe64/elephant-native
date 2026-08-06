@@ -37,6 +37,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 
 import * as FileSystem from "expo-file-system"
 import ContentShell from '../../components/ui/ContentShell'
+import KeyboardSafeForm from '../../components/ui/KeyboardSafeForm'
 import YellowActionButton from '../../components/ui/YellowActionButton'
 import { useResponsiveLayout, tabletStyle } from '../../hooks/useResponsiveLayout'
 
@@ -355,6 +356,7 @@ const DocumentPickerComp = () => {
                     <ContentShell variant="modal" fill>
                     { 
                     addFolderForm ? 
+                        <KeyboardSafeForm>
                         <View style={{width: '100%', height: '100', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center'}}>
                             <Text style={[{color: 'white', fontSize: 35, fontWeight: '700', marginTop: '40%', textAlign: 'center'}, select(undefined, tabletStyles.modalHeading)]}>Add A New Folder:</Text>
                             <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', marginTop: '10%', width: '100%'}}>
@@ -376,6 +378,7 @@ const DocumentPickerComp = () => {
                                 </TouchableOpacity>
                             </View>
                         </View>
+                        </KeyboardSafeForm>
 
                     :
 

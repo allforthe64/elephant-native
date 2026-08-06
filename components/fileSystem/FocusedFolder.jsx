@@ -15,6 +15,7 @@ import FocusedFileComp from './FocusedFileComp'
 //safe area context imports
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { tabletStyle, useResponsiveLayout } from '../../hooks/useResponsiveLayout'
+import KeyboardSafeForm from '../ui/KeyboardSafeForm'
 
 const FocusedFolder = ({folder, folders, clear, getTargetFolder, addFolder, renameFolder, moveFolder, deleteFolder, deleteFile, renameFile, moveFile, files, updateUser}) => {
     const { isTablet, contentMaxWidth, modalMaxWidth } = useResponsiveLayout()
@@ -215,6 +216,7 @@ const FocusedFolder = ({folder, folders, clear, getTargetFolder, addFolder, rena
                                     <FontAwesomeIcon icon={faXmark} color={'white'} size={30}/>
                                     </Pressable>
                                 </View>
+                                <KeyboardSafeForm>
                                 <View style={styles.addFolderContainer}>
                                     <Text style={styles.addFolderHeading}>Add new folder:</Text>
                                     <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-around', marginBottom: '6%'}}  
@@ -237,6 +239,7 @@ const FocusedFolder = ({folder, folders, clear, getTargetFolder, addFolder, rena
                                         <Text style={{fontSize: 22, color: '#9F37B0', fontWeight: '600', paddingTop: '1%', marginLeft: '15%'}}>Save</Text>
                                     </Pressable>
                                 </View>
+                                </KeyboardSafeForm>
                             </View>
                         </Modal>
                     : 

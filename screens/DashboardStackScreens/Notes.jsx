@@ -25,6 +25,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 import AppPressable from '../../components/ui/AppPressable'
 import AppTextInput from '../../components/ui/AppTextInput'
 import ContentShell from '../../components/ui/ContentShell'
+import KeyboardSafeForm from '../../components/ui/KeyboardSafeForm'
 import { TestIds } from '../../constants/testIds'
 import { useResponsiveLayout, tabletStyle } from '../../hooks/useResponsiveLayout'
 
@@ -380,6 +381,7 @@ const Notepad = () => {
                     </View>
               </>
               : addFolderForm ? 
+                  <KeyboardSafeForm>
                   <>
                       <Text style={[{color: 'white', fontSize: 35, fontWeight: '700', marginTop: '40%', textAlign: 'center'}, select(undefined, tabletStyles.modalHeading)]}>Add A New Folder:</Text>
                       <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', marginTop: '10%'}}>
@@ -406,6 +408,7 @@ const Notepad = () => {
                           </TouchableOpacity>
                       </View>
                   </>
+                  </KeyboardSafeForm>
 
               :
 
@@ -605,12 +608,15 @@ const Notepad = () => {
                     style={styles.buttonWrapper}
                   >
                     {open ? (
-                        <FontAwesomeIcon icon={faCheck} color='#9F37B0' size={22}/>
+                        <FontAwesomeIcon icon={faCheck} color='#9F37B0' size={20}/>
                       )
                       : (
-                        <FontAwesomeIcon icon={faPencil} size={22} color='#9F37B0'/>
+                        <FontAwesomeIcon icon={faPencil} size={20} color='#9F37B0'/>
                       )
                     }
+                    <Text style={styles.saveEditLabel} numberOfLines={1}>
+                      {open ? 'Save note' : 'Edit note'}
+                    </Text>
                   </AppPressable>
           </View>
         </View>
@@ -697,7 +703,7 @@ const styles = StyleSheet.create({
       marginLeft: 10,
     },
     buttonWrapper: {
-      width: 48,
+      minWidth: 48,
       height: 48,
       flexShrink: 0,
       flexDirection: 'row',
@@ -705,6 +711,13 @@ const styles = StyleSheet.create({
       alignItems: 'center',
       borderRadius: 12,
       backgroundColor: '#FFE562',
+      paddingHorizontal: 12,
+      gap: 8,
+    },
+    saveEditLabel: {
+      color: '#9F37B0',
+      fontSize: 15,
+      fontWeight: '700',
     },
     buttonWrapperText: {
       flex: 1,

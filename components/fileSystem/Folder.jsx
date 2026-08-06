@@ -15,6 +15,7 @@ import {
   fileSystemRowStyles,
   FILE_SYSTEM_ROW_ACTIVE_OPACITY,
 } from './fileSystemRowStyles';
+import KeyboardSafeForm from '../ui/KeyboardSafeForm';
 
 const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolderFunc, folders, updateUser}) => {
   const { isTablet, contentMaxWidth, modalMaxWidth } = useResponsiveLayout()
@@ -301,6 +302,7 @@ const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolder
                       </Pressable>
                     </View>
                     {editName ? /*Code for renaming a folder */ 
+                    <KeyboardSafeForm>
                     <View style={{paddingTop: '40%', display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%'}}>
                         <Text style={{color: 'white', fontSize: 35, fontWeight: '700'}}>Rename folder:</Text>
                         <View style={{display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center',  marginTop: '10%'}}>
@@ -323,7 +325,8 @@ const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolder
                               <Text style={{fontSize: 18, color: '#9F37B0', fontWeight: '600', paddingTop: '1%', marginLeft: '22%'}}>Cancel</Text>
                           </TouchableOpacity>
                         </View>
-                    </View> 
+                    </View>
+                    </KeyboardSafeForm>
                     /*Code for moving a folder */
                     : moveFolder ? 
                       <Modal animationType='slide' presentationStyle='pageSheet' >
@@ -349,6 +352,7 @@ const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolder
                               </>
                             }
                             {addFolderForm ? 
+                              <KeyboardSafeForm>
                               <View style={{width: '100%', height: '100%', display: 'flex', flexDirection:'column', alignItems: 'center'}}>
                                   <Text style={{color: 'white', fontSize: 35, fontWeight: '700', marginTop: '40%', textAlign: 'center'}}>Add A New Folder:</Text>
                                   <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', marginTop: '10%', width: '100%'}}>
@@ -370,6 +374,7 @@ const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolder
                                       </TouchableOpacity>
                                   </View>
                               </View>
+                              </KeyboardSafeForm>
 
                             :
       

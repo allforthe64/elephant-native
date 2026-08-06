@@ -33,6 +33,7 @@ import PDFViewer from './PDFViewer'
 import Constants from 'expo-constants';
 import WebView from 'react-native-webview'
 import { tabletStyle, useResponsiveLayout } from '../../hooks/useResponsiveLayout'
+import KeyboardSafeForm from '../ui/KeyboardSafeForm'
 
 
 const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFileMove}) => {
@@ -563,6 +564,7 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
                                     </View>
                                     
                                     {addFolderForm ? 
+                                        <KeyboardSafeForm>
                                         <>
                                             <Text style={{color: 'white', fontSize: 35, fontWeight: '700', marginTop: '40%', textAlign: 'center'}}>Add A New Folder:</Text>
                                             <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', marginTop: '10%'}}>
@@ -584,6 +586,7 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
                                                 </TouchableOpacity>
                                             </View>
                                         </>
+                                        </KeyboardSafeForm>
 
                                     :
 
@@ -820,6 +823,7 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
 
                                         {/* handle file rename*/}
                                         {add ?  
+                                                <KeyboardSafeForm>
                                                 <View style={{paddingTop: '40%', display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%'}}>
                                                     <Text style={{color: 'white', fontSize: 35, fontWeight: '700'}}>Rename File:</Text>
                                                     <View style={{display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center',  marginTop: '10%'}}>
@@ -850,7 +854,8 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
                                                             <Text style={{fontSize: 18, color: '#9F37B0', fontWeight: '600', marginLeft: '20%'}}>Cancel</Text>
                                                         </TouchableOpacity>
                                                     </View>
-                                                </View>            
+                                                </View>
+                                                </KeyboardSafeForm>
                                                 : expanded ? 
                                                 <Modal animationType='slide' presentationStyle='pageSheet'>
                                                     {/* code to render expanded images */}

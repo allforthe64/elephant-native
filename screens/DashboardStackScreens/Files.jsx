@@ -24,6 +24,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 //toast notification import
 import { useToast } from 'react-native-toast-notifications';
 import ContentShell from '../../components/ui/ContentShell';
+import KeyboardSafeForm from '../../components/ui/KeyboardSafeForm';
 import YellowActionButton from '../../components/ui/YellowActionButton';
 import { useResponsiveLayout, tabletStyle } from '../../hooks/useResponsiveLayout';
 
@@ -378,6 +379,7 @@ export default function Files({navigation: { navigate }, route}) {
                               </Pressable>
                           </View>
                           <ContentShell variant="modal" fill>
+                          <KeyboardSafeForm>
                           <View style={styles.addFolderContainer}>
                             <Text style={tabletStyle(isTablet, styles.addFolderHeading, tabletStyles.modalHeading)}>Add new folder:</Text>
                             <View ref={formRef} style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-around', marginBottom: '6%'}}  
@@ -396,6 +398,7 @@ export default function Files({navigation: { navigate }, route}) {
                                 <Text style={{fontSize: 22, color: '#9F37B0', fontWeight: '600', paddingTop: '1%', marginLeft: '15%'}}>Save</Text>
                             </TouchableOpacity>
                           </View>
+                          </KeyboardSafeForm>
                           </ContentShell>
                         </View>
                       </Modal>

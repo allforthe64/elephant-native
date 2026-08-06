@@ -28,6 +28,7 @@ import { faXmark, faFolder, faArrowLeft, faCloudArrowUp, faQrcode, faPlus, faChe
 import { UploadQueueEmitter } from '../../hooks/QueueEventEmitter'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import ContentShell from '../../components/ui/ContentShell'
+import KeyboardSafeForm from '../../components/ui/KeyboardSafeForm'
 import { useResponsiveLayout, tabletStyle } from '../../hooks/useResponsiveLayout'
 
 const Scanner = () => {
@@ -337,6 +338,7 @@ return (
                     <ContentShell variant="modal" fill>
                     { 
                     addFolderForm ? 
+                        <KeyboardSafeForm>
                         <>
                             <Text style={[{color: 'white', fontSize: 35, fontWeight: '700', marginTop: '40%', textAlign: 'center'}, select(undefined, tabletStyles.modalHeading)]}>Add A New Folder:</Text>
                             <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', marginTop: '10%'}}>
@@ -360,6 +362,7 @@ return (
                                 </TouchableOpacity>
                             </View>
                         </>
+                        </KeyboardSafeForm>
 
                     :
 
