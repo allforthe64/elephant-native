@@ -1,153 +1,221 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View, Pressable, Platform } from 'react-native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faCamera, faMicrophone, faQrcode, faPencil, faFile } from '@fortawesome/free-solid-svg-icons';
-import AppPressable from '../ui/AppPressable'
 import { TestIds } from '../../constants/testIds'
 import { useResponsiveLayout, tabletStyle } from '../../hooks/useResponsiveLayout'
+import { Brand } from '../../constants/layout'
+
+const tileShadow = Platform.select({
+  ios: {
+    shadowColor: Brand.purple,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.28,
+    shadowRadius: 8,
+  },
+  android: {
+    elevation: 6,
+  },
+  default: {},
+})
+
+const notesShadow = Platform.select({
+  ios: {
+    shadowColor: Brand.purple,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.18,
+    shadowRadius: 6,
+  },
+  android: {
+    elevation: 4,
+  },
+  default: {},
+})
 
 export default function DashCollectContainer({ navigate }) {
   const { isTablet, isLargeTablet } = useResponsiveLayout()
   const iconSize = isTablet ? 34 : 30
 
   const tile = (testID, label, a11y, route, icon) => (
-    <AppPressable
+    <Pressable
       testID={testID}
       accessibilityLabel={a11y}
+      accessibilityRole="button"
       onPress={() => navigate(route)}
-      style={tabletStyle(isTablet, styles.buttonWrapper, tabletStyles.buttonWrapper)}
+      style={({ pressed }) => [
+        tabletStyle(isTablet, styles.buttonWrapper, tabletStyles.buttonWrapper),
+        tileShadow,
+        pressed && styles.buttonPressed,
+      ]}
     >
       <View style={tabletStyle(isTablet, styles.iconContainer, tabletStyles.iconContainer)}>
-        <FontAwesomeIcon icon={icon} size={iconSize} style={{color: '#593060'}}/>
+        <FontAwesomeIcon icon={icon} size={iconSize} style={{ color: Brand.purple }} />
       </View>
       <Text style={styles.input}>{label}</Text>
-    </AppPressable>
+    </Pressable>
   )
 
   return (
-        <View style={tabletStyle(isTablet, styles.mainContainer, tabletStyles.mainContainer)}>
-            <Text style={tabletStyle(isTablet, styles.quickFilesHeading, tabletStyles.quickFilesHeading)}>Collect:</Text>
+    <View style={tabletStyle(isTablet, styles.mainContainer, tabletStyles.mainContainer)}>
+      <Text style={tabletStyle(isTablet, styles.quickFilesHeading, tabletStyles.quickFilesHeading)}>
+        Collect:
+      </Text>
 
-            {isTablet ? (
-              <View style={isLargeTablet ? tabletStyles.gridLarge : tabletStyles.grid}>
-                {tile(TestIds.dashboard.scan, 'Scan', 'Document Scanner', 'Document Scanner', faFile)}
-                {tile(TestIds.dashboard.camera, 'Cam', 'Camera', 'Camera', faCamera)}
-                {tile(TestIds.dashboard.qr, 'QR', 'QR Scanner', 'QR Scanner', faQrcode)}
-                {tile(TestIds.dashboard.mic, 'Mic', 'Record Audio', 'Record Audio', faMicrophone)}
-              </View>
-            ) : (
-              <>
-                <View style={styles.container}>
-                  {tile(TestIds.dashboard.scan, 'Scan', 'Document Scanner', 'Document Scanner', faFile)}
-                  {tile(TestIds.dashboard.camera, 'Cam', 'Camera', 'Camera', faCamera)}
-                </View>
-                <View style={styles.container}>
-                  {tile(TestIds.dashboard.qr, 'QR', 'QR Scanner', 'QR Scanner', faQrcode)}
-                  {tile(TestIds.dashboard.mic, 'Mic', 'Record Audio', 'Record Audio', faMicrophone)}
-                </View>
-              </>
-            )}
-
-            <View style={tabletStyle(isTablet, styles.notesRow, tabletStyles.notesRow)}>
-              <AppPressable
-                testID={TestIds.dashboard.notes}
-                accessibilityLabel="Notes"
-                onPress={() => navigate('Notepad')}
-                style={tabletStyle(isTablet, styles.notesButton, tabletStyles.notesButton)}
-              >
-                  <View style={tabletStyle(isTablet, styles.iconContainerWhiteBG, tabletStyles.iconContainerWhiteBG)}>
-                    <FontAwesomeIcon icon={faPencil} size={iconSize} style={{color: '#593060'}}/>
-                  </View>
-                    <Text style={tabletStyle(isTablet, styles.notesLabel, tabletStyles.notesLabel)}>Notes</Text>
-              </AppPressable>
-            </View>
-            <StatusBar style='auto' />
+      {isTablet ? (
+        <View style={isLargeTablet ? tabletStyles.gridLarge : tabletStyles.grid}>
+          {tile(TestIds.dashboard.scan, 'Scan', 'Document Scanner', 'Document Scanner', faFile)}
+          {tile(TestIds.dashboard.camera, 'Cam', 'Camera', 'Camera', faCamera)}
+          {tile(TestIds.dashboard.qr, 'QR', 'QR Scanner', 'QR Scanner', faQrcode)}
+          {tile(TestIds.dashboard.mic, 'Mic', 'Record Audio', 'Record Audio', faMicrophone)}
         </View>
-  );
+      ) : (
+        <>
+          <View style={styles.container}>
+            {tile(TestIds.dashboard.scan, 'Scan', 'Document Scanner', 'Document Scanner', faFile)}
+            {tile(TestIds.dashboard.camera, 'Cam', 'Camera', 'Camera', faCamera)}
+          </View>
+          <View style={styles.container}>
+            {tile(TestIds.dashboard.qr, 'QR', 'QR Scanner', 'QR Scanner', faQrcode)}
+            {tile(TestIds.dashboard.mic, 'Mic', 'Record Audio', 'Record Audio', faMicrophone)}
+          </View>
+        </>
+      )}
+
+      <View style={tabletStyle(isTablet, styles.notesRow, tabletStyles.notesRow)}>
+        <Pressable
+          testID={TestIds.dashboard.notes}
+          accessibilityLabel="Notes"
+          accessibilityRole="button"
+          onPress={() => navigate('Notepad')}
+          style={({ pressed }) => [
+            tabletStyle(isTablet, styles.notesButton, tabletStyles.notesButton),
+            notesShadow,
+            pressed && styles.notesPressed,
+          ]}
+        >
+          <View
+            style={tabletStyle(
+              isTablet,
+              styles.iconContainerWhiteBG,
+              tabletStyles.iconContainerWhiteBG
+            )}
+          >
+            <FontAwesomeIcon icon={faPencil} size={iconSize} style={{ color: Brand.purple }} />
+          </View>
+          <Text style={tabletStyle(isTablet, styles.notesLabel, tabletStyles.notesLabel)}>
+            Notes
+          </Text>
+        </Pressable>
+      </View>
+      <StatusBar style="auto" />
+    </View>
+  )
 }
 
 const styles = StyleSheet.create({
   mainContainer: {
     width: '100%',
     marginBottom: 20,
-    paddingHorizontal: 15
+    paddingHorizontal: 15,
   },
   container: {
     width: '100%',
-    display: 'flex',
     flexDirection: 'row',
     justifyContent: 'space-around',
-    paddingTop: '2%'
+    paddingTop: '2%',
   },
   buttonWrapper: {
     width: '48%',
     height: 115,
-    backgroundColor: '#593060',
+    backgroundColor: Brand.purple,
     borderRadius: 12,
-    display: 'flex',
     flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
     paddingTop: 10,
     paddingBottom: 10,
   },
+  buttonPressed: {
+    opacity: 0.9,
+    transform: [{ scale: 0.97 }],
+    ...Platform.select({
+      ios: {
+        shadowOpacity: 0.14,
+        shadowOffset: { width: 0, height: 2 },
+        shadowRadius: 4,
+      },
+      android: {
+        elevation: 2,
+      },
+    }),
+  },
   input: {
     textAlign: 'center',
     fontSize: 18,
     paddingTop: '1%',
-    color: 'white'
+    color: 'white',
   },
   iconContainer: {
-    backgroundColor: '#DDCADB',
+    backgroundColor: Brand.lavender,
     width: '39%',
     height: 65,
     borderRadius: 100,
-    display: 'flex',
     justifyContent: 'center',
-    alignItems: 'center'
+    alignItems: 'center',
   },
   iconContainerWhiteBG: {
     backgroundColor: 'white',
     width: '23%',
     height: 65,
     borderRadius: 100,
-    display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
   },
   quickFilesHeading: {
     fontSize: 20,
-    color: '#593060',
+    color: Brand.purple,
     fontWeight: '500',
     marginTop: '2%',
-    paddingLeft: 5
+    paddingLeft: 5,
   },
   notesRow: {
     width: '100%',
-    display: 'flex',
     flexDirection: 'row',
     justifyContent: 'center',
   },
   notesButton: {
-    display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',
     width: '96%',
-    backgroundColor: '#DDCADB',
+    backgroundColor: Brand.lavender,
     marginTop: '2%',
     borderRadius: 10,
     paddingTop: 6,
     paddingBottom: 6,
     paddingLeft: '15%',
   },
+  notesPressed: {
+    opacity: 0.9,
+    transform: [{ scale: 0.985 }],
+    ...Platform.select({
+      ios: {
+        shadowOpacity: 0.1,
+        shadowOffset: { width: 0, height: 1 },
+        shadowRadius: 3,
+      },
+      android: {
+        elevation: 1,
+      },
+    }),
+  },
   notesLabel: {
     textAlign: 'center',
     fontSize: 22,
     paddingTop: '1%',
-    color: '#593060',
+    color: Brand.purple,
     marginLeft: '10%',
   },
-});
+})
 
 const tabletStyles = StyleSheet.create({
   mainContainer: {
