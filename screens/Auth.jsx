@@ -252,7 +252,8 @@ const styles = StyleSheet.create({
         paddingBottom: '1%',
         marginBottom: '7%',
         borderBottomWidth: 2,
-        borderColor: '#593060'
+        borderColor: '#593060',
+        color: '#593060'
     },
     inputInvalid: {
         backgroundColor: 'white',
@@ -263,7 +264,8 @@ const styles = StyleSheet.create({
         paddingBottom: '2%',
         marginBottom: '4%',
         borderBottomWidth: 2,
-        borderColor: '#593060'
+        borderColor: '#593060',
+        color: 'red'
     },
     inputButton: {
         textAlign: 'center',
