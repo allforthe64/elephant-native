@@ -1,6 +1,7 @@
 import React from 'react'
-import { Text, View, StyleSheet } from 'react-native'
+import { Text, View, StyleSheet, Platform } from 'react-native'
 import AppPressable from './AppPressable'
+import { Brand } from '../../constants/layout'
 
 /**
  * Yellow icon+label action button that keeps label text inside the border.
@@ -12,6 +13,7 @@ const YellowActionButton = ({
   style,
   disabled = false,
   dimmed = false,
+  elevated = false,
   testID,
   accessibilityLabel,
   iconSize = 28,
@@ -22,8 +24,10 @@ const YellowActionButton = ({
       accessibilityLabel={accessibilityLabel || label}
       onPress={onPress}
       disabled={disabled || dimmed}
+      activeOpacity={0.82}
       style={[
         styles.button,
+        elevated && styles.elevated,
         dimmed && styles.dimmed,
         style,
       ]}
@@ -42,11 +46,10 @@ const YellowActionButton = ({
 
 const styles = StyleSheet.create({
   button: {
-    backgroundColor: '#FFE562',
+    backgroundColor: Brand.yellow,
     borderRadius: 12,
     flexDirection: 'row',
     alignItems: 'center',
-    overflow: 'hidden',
     paddingVertical: 8,
     paddingLeft: 8,
     paddingRight: 14,
@@ -54,6 +57,18 @@ const styles = StyleSheet.create({
     maxWidth: 420,
     alignSelf: 'center',
   },
+  elevated: Platform.select({
+    ios: {
+      shadowColor: Brand.purple,
+      shadowOffset: { width: 0, height: 3 },
+      shadowOpacity: 0.22,
+      shadowRadius: 6,
+    },
+    android: {
+      elevation: 5,
+    },
+    default: {},
+  }),
   dimmed: {
     opacity: 0.5,
   },
@@ -68,7 +83,7 @@ const styles = StyleSheet.create({
     flex: 1,
     flexShrink: 1,
     minWidth: 0,
-    color: '#9F37B0',
+    color: Brand.purpleBright,
     fontSize: 16,
     fontWeight: '600',
     marginLeft: 10,

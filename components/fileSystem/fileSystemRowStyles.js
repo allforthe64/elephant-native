@@ -16,7 +16,7 @@ export const fileSystemRowStyles = StyleSheet.create({
     paddingLeft: 8,
     paddingRight: 10,
     marginBottom: 8,
-    borderRadius: 100,
+    borderRadius: 14,
     overflow: 'hidden',
   },
   rowFolder: {
@@ -43,7 +43,7 @@ export const fileSystemRowStyles = StyleSheet.create({
   iconHolder: {
     width: 44,
     height: 44,
-    borderRadius: 22,
+    borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
     flexShrink: 0,
@@ -74,7 +74,7 @@ export const fileSystemRowStyles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     flexShrink: 0,
-    borderRadius: 22,
+    borderRadius: 12,
   },
   trailingActive: {
     backgroundColor: 'rgba(0, 0, 0, 0.35)',
@@ -82,7 +82,7 @@ export const fileSystemRowStyles = StyleSheet.create({
   thumb: {
     width: 44,
     height: 44,
-    borderRadius: 22,
+    borderRadius: 12,
     overflow: 'hidden',
     backgroundColor: '#fff',
     flexShrink: 0,

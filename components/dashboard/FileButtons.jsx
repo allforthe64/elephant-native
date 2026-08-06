@@ -17,6 +17,7 @@ const FileButtons = ({ navigate }) => {
         accessibilityLabel={label}
         label={label}
         onPress={onPress}
+        elevated
         style={tabletStyle(isTablet, styles.button, tabletStyles.button)}
         iconSize={isTablet ? 52 : 44}
         icon={<FontAwesomeIcon icon={icon} size={isTablet ? 26 : 22} style={{ color: '#9F37B0' }} />}
