@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react'
-import { StyleSheet, View, Text, TextInput, TouchableOpacity, Keyboard, KeyboardAvoidingView, Modal, Pressable, ScrollView } from 'react-native'
+import { StyleSheet, View, Text, TextInput, TouchableOpacity, Keyboard, Modal, Pressable, ScrollView, Platform } from 'react-native'
 
 //fontAwesome imports
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
@@ -33,6 +33,7 @@ const Notepad = () => {
 
     const [open, setOpen] = useState(true)
     const [body, setBody] = useState('')
+    const [keyboardHeight, setKeyboardHeight] = useState(0)
     const [preAdd, setPreAdd] = useState(false)
     const [destination, setDestination] = useState({id: null, fileName: null, nestedUnder: null})
     const [currentUser, setCurrentUser] = useState()
@@ -278,6 +279,21 @@ const Notepad = () => {
       if (open === false) Keyboard.dismiss() 
       else ref.current.focus() 
     },[open])
+
+    useEffect(() => {
+      const showEvent = Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow'
+      const hideEvent = Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide'
+      const onShow = Keyboard.addListener(showEvent, (e) => {
+        setKeyboardHeight(e.endCoordinates?.height || 0)
+      })
+      const onHide = Keyboard.addListener(hideEvent, () => {
+        setKeyboardHeight(0)
+      })
+      return () => {
+        onShow.remove()
+        onHide.remove()
+      }
+    }, [])
 
     const insets = useSafeAreaInsets() 
 
@@ -532,44 +548,43 @@ const Notepad = () => {
         
       : <>
         <ContentShell variant="content" fill>
-        <KeyboardAvoidingView behavior="padding" style={select(undefined, tabletStyles.fill)}>
+        <View style={styles.editorRoot}>
             <AppTextInput
                         testID={TestIds.notes.body}
                         accessibilityLabel="Note body"
                         onChangeText={(e) => setBody(e)}
                         value={body}
                         placeholder={'Add a note...'}
-                        style={open ? {
+                        style={{
+                            flex: 1,
                             backgroundColor: 'white',
                             paddingLeft: 10,
                             paddingRight: 10,
-                            paddingTop: insets.top,
-                            paddingBottom: insets.bottom,
+                            paddingTop: Math.max(insets.top, 12),
+                            // Leave room for the floating edit toolbar
+                            paddingBottom: 88 + Math.max(insets.bottom, 12),
                             fontSize: 18,
                             textAlignVertical: 'top',
                             width: '100%',
-                            height: '100%',
                             color: 'black'
-                        } : {
-                          backgroundColor: 'white',
-                          paddingLeft: 10,
-                          paddingRight: 10,
-                          paddingTop: insets.top,
-                          paddingBottom: insets.bottom,
-                          fontSize: 18,
-                          textAlignVertical: 'top',
-                          width: '100%',
-                          height: '100%',
-                          color: 'black'
-                      }}
-                        editable={open ? true : false}
+                        }}
+                        editable={!!open}
                         multiline
                         numberOfLines={2}
                         placeholderTextColor='grey'
                         ref={ref}
                         autoFocus
                         />
-          <View style={open ? styles.wrapperContainer : styles.wrapperContainerFull}>
+          <View
+            style={[
+              styles.toolbar,
+              {
+                paddingBottom: Math.max(insets.bottom, 12),
+                // iOS: lift by keyboard height. Android: window resizes (see app.json).
+                bottom: Platform.OS === 'ios' ? keyboardHeight : 0,
+              },
+            ]}
+          >
             {!open && 
                 <AppPressable
                   testID={TestIds.notes.addToStorage}
@@ -580,7 +595,7 @@ const Notepad = () => {
                   <View style={styles.iconHolderSmall}>
                     <FontAwesomeIcon icon={faCloudArrowUp} color='#9F37B0'/>
                   </View>
-                  <Text style={{fontSize: 18, color: '#9F37B0', fontWeight: '600', marginLeft: '10%', paddingTop: '1%'}}>Add To Storage</Text>
+                  <Text style={styles.addToStorageLabel} numberOfLines={1}>Add To Storage</Text>
                 </AppPressable>
               }
                   <AppPressable
@@ -598,7 +613,7 @@ const Notepad = () => {
                     }
                   </AppPressable>
           </View>
-        </KeyboardAvoidingView>
+        </View>
         </ContentShell>
         </>
       } 
@@ -649,30 +664,59 @@ const styles = StyleSheet.create({
       justifyContent: 'flex-end',
       paddingRight: '5%',
     },
+    editorRoot: {
+      flex: 1,
+      width: '100%',
+      backgroundColor: 'white',
+    },
+    toolbar: {
+      position: 'absolute',
+      left: 0,
+      right: 0,
+      bottom: 0,
+      width: '100%',
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'flex-end',
+      paddingHorizontal: 16,
+      paddingTop: 10,
+      backgroundColor: '#FFFCF6',
+      borderTopWidth: StyleSheet.hairlineWidth,
+      borderTopColor: '#DDCADB',
+      gap: 10,
+      zIndex: 20,
+      elevation: 8,
+    },
+    addToStorageLabel: {
+      flex: 1,
+      flexShrink: 1,
+      minWidth: 0,
+      fontSize: 16,
+      color: '#9F37B0',
+      fontWeight: '600',
+      marginLeft: 10,
+    },
     buttonWrapper: {
-      width: 44,
-      height: 44,
-      display: 'flex',
+      width: 48,
+      height: 48,
+      flexShrink: 0,
       flexDirection: 'row',
       justifyContent: 'center',
       alignItems: 'center',
       borderRadius: 12,
       backgroundColor: '#FFE562',
-      paddingLeft: '2%',
-      paddingTop: '2%',
-      paddingBottom: '2%',
-      paddingRight: '2%'
     },
     buttonWrapperText: {
-      width: '55%',
+      flex: 1,
+      maxWidth: 240,
       borderRadius: 12,
       backgroundColor: '#FFE562',
-      marginRight: '5%',
-      display: 'flex',
       flexDirection: 'row',
-      paddingTop: '2%',
-      paddingLeft: '2%',
-      paddingBottom: '2%'
+      alignItems: 'center',
+      overflow: 'hidden',
+      paddingVertical: 8,
+      paddingLeft: 8,
+      paddingRight: 12,
     },
     iconHolder: {
       backgroundColor: 'white', 

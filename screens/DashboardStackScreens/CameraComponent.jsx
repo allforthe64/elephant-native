@@ -52,7 +52,6 @@ try {
     const [facing, setFacing] = useState('back');
     const [permission, requestPermission] = useCameraPermissions();
     const [hasMediaLibraryPermission, setHasMediaLibraryPermission] = useState(false)
-    const [secondaryPermissionsReady, setSecondaryPermissionsReady] = useState(false)
     const [photo, setPhoto] = useState()
     const [session, setSession] = useState(true)
     const [userInst, setUserInst] = useState()
@@ -123,12 +122,9 @@ try {
         
     }, [firebaseAuth])
 
-    // Request media library / mic only after camera is granted (single source of truth)
+    // Request media library / mic after camera is granted (non-blocking for CameraView)
     useEffect(() => {
-        if (!permission?.granted) {
-            setSecondaryPermissionsReady(false)
-            return
-        }
+        if (!permission?.granted) return
 
         let cancelled = false
         ;(async () => {
@@ -139,8 +135,6 @@ try {
                 setHasMediaLibraryPermission(mediaLibraryPermission.status === 'granted')
             } catch (err) {
                 console.warn('Secondary camera permissions error:', err)
-            } finally {
-                if (!cancelled) setSecondaryPermissionsReady(true)
             }
         })()
 
@@ -460,7 +454,7 @@ try {
   if (!permission) {
     // Camera permissions are still loading.
     return (
-      <View style={styles.container}>
+      <View style={styles.permissionContainer}>
         <Text style={styles.message}>Loading camera permissions...</Text>
       </View>
     );
@@ -469,7 +463,7 @@ try {
   if (!permission.granted) {
     // Camera permissions are not granted yet.
     return (
-      <View style={styles.container}>
+      <View style={styles.permissionContainer}>
         <Text style={styles.message}>We need your permission to show the camera</Text>
         <AppPressable
           testID={TestIds.camera.grantPermission}
@@ -483,13 +477,8 @@ try {
     );
   }
 
-  if (!secondaryPermissionsReady) {
-    return (
-      <View style={styles.container}>
-        <Text style={styles.message}>Setting up camera...</Text>
-      </View>
-    );
-  }
+  // Don't block the live camera on media-library / mic prompts.
+  // Those are requested in the background after camera is granted.
 
   //if velocity of pinch event is positive increase zoom, if it is negative decrease zoom
   const onPinchEvent = (event) => {
@@ -846,8 +835,9 @@ try {
         </View>
     </>
     :
-    <View style={styles.container}>
+    <View style={styles.cameraContainer}>
         <PinchGestureHandler onGestureEvent={onPinchEvent}>
+            <View style={styles.camera}>
             <CameraView style={styles.camera} facing={facing} ref={cameraRef} mode={video ? 'video' : 'picture'} zoom={zoom}>
                 <View style={{
                     position: 'absolute',
@@ -913,6 +903,7 @@ try {
                 </View>
                 <StatusBar style="auto" /> 
             </CameraView>
+            </View>
         </PinchGestureHandler>
     </View>
   );
@@ -922,12 +913,17 @@ try {
 }
 
 const styles = StyleSheet.create({
-  container: {
+  permissionContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#FFFCF6',
     paddingHorizontal: 24,
+  },
+  cameraContainer: {
+    flex: 1,
+    width: '100%',
+    backgroundColor: '#000',
   },
   message: {
     textAlign: 'center',
@@ -948,6 +944,7 @@ const styles = StyleSheet.create({
   },
   camera: {
     flex: 1,
+    width: '100%',
   },
   containerCenter: {
     flex: 1,
