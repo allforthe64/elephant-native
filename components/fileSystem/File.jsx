@@ -50,7 +50,7 @@ const File = ({file, focus}) => {
 
   const iconForType = () => {
     if (fileType === 'pdf') return faFilePdf
-    if (fileType === 'mp3' || fileType === 'mp4a') return faFileAudio
+    if (fileType === 'mp3' || fileType === 'mp4a' || fileType === 'm4a') return faFileAudio
     if (fileType === 'txt') return faFileLines
     if (fileType === 'mov' || fileType === 'mp4') return faVideo
     if (fileType === 'jpg' || fileType === 'png' || fileType === 'jpeg' || fileType === 'JPG' || fileType === 'PNG' || fileType === 'JPEG') {

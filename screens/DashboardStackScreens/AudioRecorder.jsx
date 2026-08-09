@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'
-import { Text, View , TouchableOpacity, ScrollView, StyleSheet, Image, TextInput, Modal, Pressable} from 'react-native'
+import { Text, View , TouchableOpacity, ScrollView, StyleSheet, Image, TextInput, Modal, Pressable, Alert} from 'react-native'
 
 //fontAwesome imports
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
@@ -10,6 +10,7 @@ import AudioEditor from '../../components/audioRecorder/AudioEditor'
 
 //import expo-av Audio component
 import { Audio } from 'expo-av'
+import * as FileSystem from 'expo-file-system'
 
 //import updateUser, addfile, userListener from firestore file/firebaseAuth and storage objects from firebase config/ref, uploadBytesResumable from firebase storage
 import { updateUser, addfile, userListener } from '../../firebase/firestore'
@@ -39,6 +40,7 @@ const AudioRecorder = () => {
 
     try {
         const { isTablet, select } = useResponsiveLayout()
+        const insets = useSafeAreaInsets()
         const [recording, setRecording] = useState()
         const [recordings, setRecordings] = useState([])
         const [userInst, setUserInst] = useState()
@@ -151,7 +153,7 @@ const AudioRecorder = () => {
     
                 setRecording(recording)
             } else {
-               setMessage('Please grant permission to Elephant App to access microphone') 
+               Alert.alert('Please grant permission to Elephant App to access microphone')
             }
 
             
@@ -161,16 +163,45 @@ const AudioRecorder = () => {
     }
 
     const stopRecording = async () => {
+        if (!recording) return
+
         setRecording(undefined)
         await recording.stopAndUnloadAsync()
+        // Required by expo-av so the recorded file can be read/uploaded after stop
+        await Audio.setAudioModeAsync({
+            allowsRecordingIOS: false,
+        })
+
+        const uri = recording.getURI()
+        if (!uri) {
+            Alert.alert('Recording failed', 'No audio file was produced.')
+            return
+        }
+
+        // Cache URIs can disappear before the upload queue runs; persist a stable copy
+        const ext = ((uri.split('.').pop() || 'm4a').split('?')[0] || 'm4a').toLowerCase()
+        const docsDir = FileSystem.documentDirectory || FileSystem.cacheDirectory
+        if (!docsDir) {
+            Alert.alert('Recording failed', 'Could not access local storage for the recording.')
+            return
+        }
+        const stableUri = `${docsDir}recording-${Date.now()}.${ext}`
+        try {
+            await FileSystem.copyAsync({ from: uri, to: stableUri })
+        } catch (copyErr) {
+            console.error('Failed to persist recording', copyErr)
+            Alert.alert('Recording failed', 'Could not save the recording file.')
+            return
+        }
+
+        const { sound, status } = await Audio.Sound.createAsync({ uri: stableUri })
 
         const updatedRecordings = [...recordings]
-        const {sound, status} = await recording.createNewLoadedSoundAsync()
-        
         updatedRecordings.push({
             sound: sound,
             duration: getDurartionFormatted(status.durationMillis),
-            file: recording.getURI(),
+            file: stableUri,
+            fileType: ext,
             name: `Recording ${recordings.length + 1}`
         })
 
@@ -248,14 +279,23 @@ const AudioRecorder = () => {
 
         setLoading(true)
 
-        const filesToAddToQueue = recordings.map(recording => {
+        try {
+        const recordingsToSave = [...recordings]
+        if (recordingsToSave.length === 0) {
+            setLoading(false)
+            Alert.alert('No recordings', 'Record audio before saving to staging.')
+            return
+        }
+
+        const filesToAddToQueue = recordingsToSave.map(rec => {
 
             let finalDestination 
             if (destination.id !== null) finalDestination = destination.id
             else if (focusedFolder) finalDestination = focusedFolder 
             else finalDestination = false
 
-            return {uri: recording.file, filename: `${recording.name}.mp3`, fileType: 'mp3', finalDestination: finalDestination}
+            const ext = rec.fileType || 'm4a'
+            return {uri: rec.file, filename: `${rec.name}.${ext}`, fileType: ext, finalDestination: finalDestination}
         })
 
         let queue = JSON.parse(await AsyncStorage.getItem('uploadQueue')) || []
@@ -266,6 +306,11 @@ const AudioRecorder = () => {
         const confirmedQueue = JSON.parse(await AsyncStorage.getItem('uploadQueue'))
 
         UploadQueueEmitter.emit('uploadQueueUpdated', confirmedQueue)
+        } catch (err) {
+            Alert.alert('Save failed', err?.message || String(err))
+            setLoading(false)
+            return
+        }
 
 
         /* const references = await Promise.all(recordings.map(async (el) => {
@@ -359,8 +404,6 @@ const AudioRecorder = () => {
         setPreAdd(false)
           
     }
-
-    const insets = useSafeAreaInsets()
 
   return (
     <>

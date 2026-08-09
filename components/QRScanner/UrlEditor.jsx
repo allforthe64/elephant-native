@@ -28,7 +28,7 @@ const UrlEditor = ({url, deleteFunc, editUrls, index}) => {
                 alignSelf: 'center',
             })}>
                 <TextInput style={styles.input} value={urlTitle} numberOfLines={1} placeholder='Enter URL Name...' onChangeText={e => setUrlTitle(e)}/>
-                <TouchableOpacity title='Delete' onPress={() => deleteFunc(files, file)}>
+                <TouchableOpacity title='Delete' onPress={() => deleteFunc(url)}>
                     <View style={styles.iconHolderSM}>
                         <FontAwesomeIcon icon={faTrash} size={18} color='red'/>
                     </View>

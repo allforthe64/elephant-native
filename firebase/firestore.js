@@ -98,6 +98,13 @@ export async function addFileToUser(userId, reference, fileSize) {
 export async function addfile(file, destination) {
     console.log(file)
     try {
+        // Use the real extension (last segment) so names like "URL for https://a.b/c.txt" still work
+        const nameExt = (String(file.name || '').split('.').pop() || '').toLowerCase()
+        const isOfficeDoc = nameExt === 'doc' || nameExt === 'docx' || file.fileType === 'doc' || file.fileType === 'docx'
+        const storageUri = isOfficeDoc
+            ? BUCKET_URL + '/' + file.timeStamp + '^&' + file.user
+            : BUCKET_URL + '/' + file.user + '/' + file.timeStamp
+
         let fileRef
         if (file.linksTo) {
             fileRef = await addDoc(collection(db, 'files'), {
@@ -105,8 +112,7 @@ export async function addfile(file, destination) {
                 documentType: file.fileType,
                 linksTo: file.linksTo,
                 size: file.size,
-                uri: file.name.split('.')[1] === 'doc' || file.name.split('.')[1] === 'docx' ? BUCKET_URL + '/' + file.timeStamp + '^&' + file.user
-                : BUCKET_URL + '/' + file.user + '/' + file.timeStamp,
+                uri: storageUri,
                 version: file.version
             })
         } else {
@@ -115,8 +121,7 @@ export async function addfile(file, destination) {
                     fileName: file.name,
                     documentType: file.fileType,
                     size: file.size,
-                    uri: file.name.split('.')[1] === 'doc' || file.name.split('.')[1] === 'docx' ? BUCKET_URL + '/' + file.timeStamp + '^&' + file.user
-                    : BUCKET_URL + '/' + file.user + '/' + file.timeStamp,
+                    uri: storageUri,
                     version: file.version
                 })
             } else {
@@ -141,6 +146,7 @@ export async function addfile(file, destination) {
         return reference
     } catch (error) {
         console.log('error within storage: ', error)
+        throw error
     }
 }
 
