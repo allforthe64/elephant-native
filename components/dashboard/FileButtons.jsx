@@ -61,6 +61,7 @@ const styles = StyleSheet.create({
 
 const tabletStyles = StyleSheet.create({
   root: {
+    width: '100%',
     paddingHorizontal: 8,
   },
   quickFilesHeading: {
@@ -70,5 +71,7 @@ const tabletStyles = StyleSheet.create({
   },
   button: {
     width: '100%',
+    maxWidth: '100%',
+    alignSelf: 'stretch',
   },
 })

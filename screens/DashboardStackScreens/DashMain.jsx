@@ -23,6 +23,7 @@ export default function DashMain({navigation: { navigate }}) {
   return (
     <View style={[styles.mainContainer, { paddingTop: insets.top }]}>
       <ScrollView
+        style={styles.scroll}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
@@ -42,7 +43,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFCF6',
     flex: 1
   },
+  scroll: {
+    flex: 1,
+    width: '100%',
+  },
   scrollContent: {
     paddingBottom: 32,
+    width: '100%',
+    flexGrow: 1,
   },
 });

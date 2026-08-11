@@ -90,7 +90,7 @@ const tabletStyles = StyleSheet.create({
   },
   button: {
     width: '100%',
-    maxWidth: 320,
+    maxWidth: '100%',
     paddingVertical: 14,
   },
 })

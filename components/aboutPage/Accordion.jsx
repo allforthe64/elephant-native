@@ -6,7 +6,7 @@ import { faChevronDown } from '@fortawesome/free-solid-svg-icons';
 import { tabletStyle, useResponsiveLayout } from '../../hooks/useResponsiveLayout';
 
 const Accordion = () => {
-    const { isTablet, contentMaxWidth } = useResponsiveLayout()
+    const { isTablet, contentFill } = useResponsiveLayout()
 
     const [collapsed, setCollapsed] = useState(true)
     const [collapsed1, setCollapsed1] = useState(true)
@@ -19,11 +19,7 @@ const Accordion = () => {
 
 
     return (
-    <View style={tabletStyle(isTablet, styles.accordion, {
-        width: '100%',
-        maxWidth: contentMaxWidth,
-        alignSelf: 'center',
-    })}>
+    <View style={tabletStyle(isTablet, styles.accordion, contentFill)}>
         <TouchableOpacity onPress={() => setCollapsed(prev => !prev)} style={collapsed ? styles.accButton : styles.accButtonNoBorder}>
             <Text style={styles.accHeadingText}>Who We Are</Text>
             <FontAwesomeIcon icon={ faChevronDown } style={!collapsed ? {transform: [{rotateX: '180deg'}], marginTop: 5} : {marginTop: 5} } size={22} color='white'/>

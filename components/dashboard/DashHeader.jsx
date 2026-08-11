@@ -63,6 +63,7 @@ const styles = StyleSheet.create({
 
 const tabletStyles = StyleSheet.create({
   wrap: {
+    width: '100%',
     paddingHorizontal: 8,
     paddingTop: 16,
     marginBottom: 16,

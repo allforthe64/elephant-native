@@ -7,7 +7,7 @@ import { faTrash } from '@fortawesome/free-solid-svg-icons'
 import { tabletStyle, useResponsiveLayout } from '../../hooks/useResponsiveLayout'
 
 const UrlEditor = ({url, deleteFunc, editUrls, index}) => {
-    const { isTablet, contentMaxWidth } = useResponsiveLayout()
+    const { isTablet, contentFill } = useResponsiveLayout()
     try {
         const [urlTitle, setUrlTitle] = useState(url.title)
 
@@ -23,10 +23,7 @@ const UrlEditor = ({url, deleteFunc, editUrls, index}) => {
 
 
         return (
-            <View key={index} style={tabletStyle(isTablet, styles.fileRow, {
-                maxWidth: contentMaxWidth,
-                alignSelf: 'center',
-            })}>
+            <View key={index} style={tabletStyle(isTablet, styles.fileRow, contentFill)}>
                 <TextInput style={styles.input} value={urlTitle} numberOfLines={1} placeholder='Enter URL Name...' onChangeText={e => setUrlTitle(e)}/>
                 <TouchableOpacity title='Delete' onPress={() => deleteFunc(url)}>
                     <View style={styles.iconHolderSM}>

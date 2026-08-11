@@ -816,7 +816,6 @@ const tabletStyles = StyleSheet.create({
         marginTop: 48,
     },
     actionButton: {
-        width: '100%',
-        maxWidth: 360,
+        maxWidth: '100%',
     },
 })

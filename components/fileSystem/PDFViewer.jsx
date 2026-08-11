@@ -5,7 +5,7 @@ import * as FileSystem from 'expo-file-system';
 import { tabletStyle, useResponsiveLayout } from '../../hooks/useResponsiveLayout';
 
 const PDFViewer = ({ fileURL }) => {
-  const { isTablet, contentMaxWidth } = useResponsiveLayout();
+  const { isTablet, contentFill } = useResponsiveLayout();
   const [pdfUri, setPdfUri] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -54,11 +54,7 @@ const PDFViewer = ({ fileURL }) => {
   }
 
   return (
-    <View style={tabletStyle(isTablet, styles.container, {
-      width: '100%',
-      maxWidth: contentMaxWidth,
-      alignSelf: 'center',
-    })}>
+    <View style={tabletStyle(isTablet, styles.container, contentFill)}>
       {pdfUri && (
         <PDFReader
           source={{ uri: pdfUri }}

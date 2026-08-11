@@ -33,8 +33,9 @@ const notesShadow = Platform.select({
 })
 
 export default function DashCollectContainer({ navigate }) {
-  const { isTablet, isLargeTablet } = useResponsiveLayout()
+  const { isTablet, isLargeTablet, isLandscape } = useResponsiveLayout()
   const iconSize = isTablet ? 34 : 30
+  const landscapeGrid = isTablet && isLandscape
 
   const tile = (testID, label, a11y, route, icon) => (
     <Pressable
@@ -44,6 +45,7 @@ export default function DashCollectContainer({ navigate }) {
       onPress={() => navigate(route)}
       style={({ pressed }) => [
         tabletStyle(isTablet, styles.buttonWrapper, tabletStyles.buttonWrapper),
+        landscapeGrid && tabletStyles.buttonWrapperLandscape,
         tileShadow,
         pressed && styles.buttonPressed,
       ]}
@@ -62,7 +64,10 @@ export default function DashCollectContainer({ navigate }) {
       </Text>
 
       {isTablet ? (
-        <View style={isLargeTablet ? tabletStyles.gridLarge : tabletStyles.grid}>
+        <View style={[
+          isLargeTablet ? tabletStyles.gridLarge : tabletStyles.grid,
+          landscapeGrid && tabletStyles.gridLandscape,
+        ]}>
           {tile(TestIds.dashboard.scan, 'Scan', 'Document Scanner', 'Document Scanner', faFile)}
           {tile(TestIds.dashboard.camera, 'Cam', 'Camera', 'Camera', faCamera)}
           {tile(TestIds.dashboard.qr, 'QR', 'QR Scanner', 'QR Scanner', faQrcode)}
@@ -219,6 +224,7 @@ const styles = StyleSheet.create({
 
 const tabletStyles = StyleSheet.create({
   mainContainer: {
+    width: '100%',
     paddingHorizontal: 8,
     marginBottom: 28,
   },
@@ -246,6 +252,16 @@ const tabletStyles = StyleSheet.create({
     width: '48%',
     height: 140,
     marginBottom: 4,
+  },
+  buttonWrapperLandscape: {
+    width: '23%',
+    flexGrow: 1,
+    flexShrink: 1,
+    height: 128,
+    marginBottom: 0,
+  },
+  gridLandscape: {
+    flexWrap: 'nowrap',
   },
   iconContainer: {
     width: 72,

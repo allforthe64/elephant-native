@@ -2,6 +2,7 @@ import React from 'react'
 import { Text, View, StyleSheet, Platform } from 'react-native'
 import AppPressable from './AppPressable'
 import { Brand } from '../../constants/layout'
+import { useResponsiveLayout } from '../../hooks/useResponsiveLayout'
 
 /**
  * Yellow icon+label action button that keeps label text inside the border.
@@ -18,6 +19,7 @@ const YellowActionButton = ({
   accessibilityLabel,
   iconSize = 28,
 }) => {
+  const { isTablet } = useResponsiveLayout()
   return (
     <AppPressable
       testID={testID}
@@ -27,6 +29,7 @@ const YellowActionButton = ({
       activeOpacity={0.82}
       style={[
         styles.button,
+        isTablet && styles.buttonTablet,
         elevated && styles.elevated,
         dimmed && styles.dimmed,
         style,
@@ -56,6 +59,9 @@ const styles = StyleSheet.create({
     width: '70%',
     maxWidth: 420,
     alignSelf: 'center',
+  },
+  buttonTablet: {
+    maxWidth: '100%',
   },
   elevated: Platform.select({
     ios: {

@@ -18,7 +18,7 @@ import {
 import KeyboardSafeForm from '../ui/KeyboardSafeForm';
 
 const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolderFunc, folders, updateUser}) => {
-  const { isTablet, contentMaxWidth, modalMaxWidth } = useResponsiveLayout()
+  const { isTablet, contentFill, modalMaxWidth } = useResponsiveLayout()
   const tabletModalPanel = isTablet
     ? { width: '100%', maxWidth: modalMaxWidth, alignSelf: 'center' }
     : null
@@ -434,7 +434,7 @@ const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolder
                                                                         }
                                                                       }
                                                                       }>
-                                                                      <View style={tabletStyle(isTablet, f.id === destination.id ? styles.moveFolderWhite : styles.moveFolder, {width: '100%', maxWidth: contentMaxWidth, alignSelf: 'center'})}>
+                                                                      <View style={tabletStyle(isTablet, f.id === destination.id ? styles.moveFolderWhite : styles.moveFolder, contentFill)}>
                                                                       <View style={f.id === destination.id ? styles.iconHolderBlack : styles.iconHolderWhite}>
                                                                           <FontAwesomeIcon icon={faFolder} size={28} color={f.id === destination.id ? 'white' : '#9F37B0'}/>
                                                                       </View>
@@ -456,7 +456,7 @@ const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolder
                                                                       }
                                                                   }
                                                                   }>
-                                                                  <View style={tabletStyle(isTablet, f.id === destination.id ? styles.moveFolderWhite : styles.moveFolder, {width: '100%', maxWidth: contentMaxWidth, alignSelf: 'center'})}>
+                                                                  <View style={tabletStyle(isTablet, f.id === destination.id ? styles.moveFolderWhite : styles.moveFolder, contentFill)}>
                                                                   <View style={f.id === destination.id ? styles.iconHolderBlack : styles.iconHolderWhite}>
                                                                       <FontAwesomeIcon icon={faFolder} size={28} color={f.id === destination.id ? 'white' : '#9F37B0'}/>
                                                                   </View>
@@ -528,11 +528,7 @@ const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolder
                 }
           </Modal>
       : <></>}
-      <View style={tabletStyle(isTablet, visible ? [fileSystemRowStyles.row, fileSystemRowStyles.rowMenuOpen] : [fileSystemRowStyles.row, fileSystemRowStyles.rowFolder], {
-        width: '100%',
-        maxWidth: contentMaxWidth,
-        alignSelf: 'center',
-      })}>
+      <View style={tabletStyle(isTablet, visible ? [fileSystemRowStyles.row, fileSystemRowStyles.rowMenuOpen] : [fileSystemRowStyles.row, fileSystemRowStyles.rowFolder], contentFill)}>
         <TouchableOpacity
           onPress={() => getTargetFolder(folder)}
           activeOpacity={FILE_SYSTEM_ROW_ACTIVE_OPACITY}

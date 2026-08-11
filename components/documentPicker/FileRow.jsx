@@ -7,7 +7,7 @@ import { faTrash } from '@fortawesome/free-solid-svg-icons'
 import { tabletStyle, useResponsiveLayout } from '../../hooks/useResponsiveLayout'
 
 const FileRow = ({file, files, index, deleteFunc, setFiles}) => {
-    const { isTablet, contentMaxWidth } = useResponsiveLayout()
+    const { isTablet, contentFill } = useResponsiveLayout()
 
     const [fileTitle, setFileTitle] = useState(file.name.split('.')[0])
     const [fileExtension, setFileExtension] = useState(file.name.split('.')[1])
@@ -32,10 +32,7 @@ const FileRow = ({file, files, index, deleteFunc, setFiles}) => {
     }, [fileTitle])
 
   return (
-    <View key={index} style={tabletStyle(isTablet, styles.fileRow, {
-        maxWidth: contentMaxWidth,
-        alignSelf: 'center',
-    })}>
+    <View key={index} style={tabletStyle(isTablet, styles.fileRow, contentFill)}>
         <TextInput style={styles.input} value={fileTitle} numberOfLines={1} placeholder='Enter File Name...' onChangeText={e => setFileTitle(e)}/>
         <TouchableOpacity title='Delete' onPress={() => deleteFunc(files, file)}>
             <View style={styles.iconHolderSM}>

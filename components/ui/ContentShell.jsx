@@ -3,8 +3,9 @@ import { View, StyleSheet } from 'react-native'
 import { useResponsiveLayout } from '../../hooks/useResponsiveLayout'
 
 /**
- * Centers and caps content width on tablets / Chromebooks.
- * On phones, renders children full-width with no layout changes.
+ * Fills available width on every screen.
+ * On phones: no extra padding or max-width.
+ * On tablets: horizontal gutter + optional ultra-wide ceiling, centered.
  *
  * @param {'content' | 'form' | 'modal'} [variant='content']
  * @param {boolean} [fill=false] - stretch to fill parent height (flex: 1)
@@ -16,7 +17,7 @@ const ContentShell = ({
   variant = 'content',
   fill = false,
 }) => {
-  const { isPhone, contentMaxWidth, formMaxWidth, modalMaxWidth } =
+  const { isPhone, gutter, contentMaxWidth, formMaxWidth, modalMaxWidth } =
     useResponsiveLayout()
 
   const maxWidth =
@@ -35,13 +36,20 @@ const ContentShell = ({
   }
 
   return (
-    <View style={[styles.outer, styles.fullWidth, fill && styles.fill, style]}>
+    <View
+      style={[
+        styles.outer,
+        styles.fullWidth,
+        fill && styles.fill,
+        gutter > 0 && { paddingHorizontal: gutter },
+        style,
+      ]}
+    >
       <View
         style={[
           styles.inner,
-          styles.fullWidth,
           fill && styles.fill,
-          { maxWidth },
+          maxWidth != null && { maxWidth },
           innerStyle,
         ]}
       >
@@ -52,8 +60,6 @@ const ContentShell = ({
 }
 
 const styles = StyleSheet.create({
-  // Critical: parents often use alignItems:'center'; without this, flex children
-  // shrink-wrap and percentage widths / margins explode off to the right.
   fullWidth: {
     width: '100%',
     alignSelf: 'stretch',
@@ -61,7 +67,12 @@ const styles = StyleSheet.create({
   outer: {
     alignItems: 'center',
   },
-  inner: {},
+  // Fill the padded parent. Do not use alignSelf:'stretch' together with
+  // maxWidth — that left-aligns the column and wastes the right side.
+  inner: {
+    width: '100%',
+    alignSelf: 'center',
+  },
   fill: {
     flex: 1,
   },

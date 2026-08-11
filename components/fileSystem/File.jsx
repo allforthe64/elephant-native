@@ -19,7 +19,7 @@ const blurhash =
   '|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj[';
 
 const File = ({file, focus}) => {
-  const { isTablet, contentMaxWidth } = useResponsiveLayout()
+  const { isTablet, contentFill } = useResponsiveLayout()
 
   const [fileName, setFileName] = useState(file.fileName.split('.')[0] + (file.version > 0 ? ` (${file.version}).${file.fileName.split('.')[1]}` : '.' + file.fileName.split('.')[1]))
   const [thumbnailURL, setThumbnailURL] = useState()
@@ -65,11 +65,7 @@ const File = ({file, focus}) => {
       style={tabletStyle(
         isTablet,
         [fileSystemRowStyles.row, fileSystemRowStyles.rowFile],
-        {
-          width: '100%',
-          maxWidth: contentMaxWidth,
-          alignSelf: 'center',
-        }
+        contentFill
       )}
       onPress={() => focus(file)}
     >

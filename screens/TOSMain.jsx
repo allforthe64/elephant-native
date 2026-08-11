@@ -7,7 +7,7 @@ import { useResponsiveLayout } from '../hooks/useResponsiveLayout'
 
 const TOSMain = () => {
   const navigation = useNavigation()
-  const { isTablet, contentMaxWidth } = useResponsiveLayout()
+  const { isTablet, contentFill } = useResponsiveLayout()
 
   return (
     <ScrollView
@@ -16,7 +16,7 @@ const TOSMain = () => {
         isTablet && { paddingHorizontal: 24, alignItems: 'center' },
       ]}
     >
-      <View style={isTablet ? { width: '100%', maxWidth: contentMaxWidth } : { width: '100%' }}>
+      <View style={isTablet ? contentFill : { width: '100%' }}>
 
       {/* Top Button */}
       <TouchableOpacity style={styles.backButton} onPress={() => navigation.navigate('Home')}>

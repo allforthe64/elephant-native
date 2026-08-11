@@ -17,7 +17,7 @@ const PrivacyMain = () => {
 
   //instantiate router object
   const navigation = useNavigation()
-  const { isTablet, contentMaxWidth } = useResponsiveLayout()
+  const { isTablet, contentFill } = useResponsiveLayout()
 
   return (
     <ScrollView
@@ -28,7 +28,7 @@ const PrivacyMain = () => {
       ]}
       showsVerticalScrollIndicator={false}
     >
-      <View style={isTablet ? { width: '100%', maxWidth: contentMaxWidth } : undefined}>
+      <View style={isTablet ? contentFill : undefined}>
 
       <TouchableOpacity
         style={styles.backButton}

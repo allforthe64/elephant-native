@@ -3,7 +3,7 @@
     "name": "elephant-native",
     "slug": "elephant-native",
     "version": "1.3.4",
-    "orientation": "portrait",
+    "orientation": "default",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": false,

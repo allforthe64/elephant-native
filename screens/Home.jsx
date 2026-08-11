@@ -167,6 +167,7 @@ const styles = StyleSheet.create({
 const tabletStyles = StyleSheet.create({
   modal: {
     width: '100%',
+    maxWidth: '100%',
     paddingVertical: 24,
   },
   bigHeader: {
@@ -179,7 +180,7 @@ const tabletStyles = StyleSheet.create({
   },
   button: {
     width: '100%',
-    maxWidth: 360,
+    maxWidth: '100%',
     paddingVertical: 14,
     marginBottom: 16,
   },

@@ -37,7 +37,7 @@ import KeyboardSafeForm from '../ui/KeyboardSafeForm'
 
 
 const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFileMove}) => {
-    const { isTablet, contentMaxWidth, modalMaxWidth } = useResponsiveLayout()
+    const { isTablet, contentFill, modalMaxWidth } = useResponsiveLayout()
     const tabletModalPanel = isTablet
         ? { width: '100%', maxWidth: modalMaxWidth, alignSelf: 'center' }
         : null
@@ -643,7 +643,7 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
                                                                                             }
                                                                                         }
                                                                                         }>
-                                                                                        <View style={tabletStyle(isTablet, f.id === destination.id ? styles.folderWhite : styles.folder, {width: '100%', maxWidth: contentMaxWidth, alignSelf: 'center'})}>
+                                                                                        <View style={tabletStyle(isTablet, f.id === destination.id ? styles.folderWhite : styles.folder, contentFill)}>
                                                                                         <View style={f.id === destination.id ? styles.iconHolderBlack : styles.iconHolder}>
                                                                                             <FontAwesomeIcon icon={faFolder} size={28} color={f.id === destination.id ? 'white' : '#9F37B0'}/>
                                                                                         </View>
@@ -665,7 +665,7 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
                                                                                         }
                                                                                     }
                                                                                     }>
-                                                                                    <View style={tabletStyle(isTablet, f.id === destination.id ? styles.folderWhite : styles.folder, {width: '100%', maxWidth: contentMaxWidth, alignSelf: 'center'})}>
+                                                                                    <View style={tabletStyle(isTablet, f.id === destination.id ? styles.folderWhite : styles.folder, contentFill)}>
                                                                                     <View style={f.id === destination.id ? styles.iconHolderBlack : styles.iconHolder}>
                                                                                         <FontAwesomeIcon icon={faFolder} size={28} color={f.id === destination.id ? 'white' : '#9F37B0'}/>
                                                                                     </View>

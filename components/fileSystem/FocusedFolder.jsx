@@ -18,7 +18,7 @@ import { tabletStyle, useResponsiveLayout } from '../../hooks/useResponsiveLayou
 import KeyboardSafeForm from '../ui/KeyboardSafeForm'
 
 const FocusedFolder = ({folder, folders, clear, getTargetFolder, addFolder, renameFolder, moveFolder, deleteFolder, deleteFile, renameFile, moveFile, files, updateUser}) => {
-    const { isTablet, contentMaxWidth, modalMaxWidth } = useResponsiveLayout()
+    const { isTablet, contentFill, modalMaxWidth } = useResponsiveLayout()
 
     const [nestedFolder, setNestedFolder] = useState()
     const [loading, setLoading] = useState(true)
@@ -182,7 +182,7 @@ const FocusedFolder = ({folder, folders, clear, getTargetFolder, addFolder, rena
         : focusedFile ?
             <FocusedFileComp file={focusedFile} focus={setFocusedFile} deleteFile={deleteFile} renameFileFunction={renameFile} folders={folders} handleFileMove={moveFile} /> 
         :      
-                <View style={isTablet ? {width: '100%', maxWidth: contentMaxWidth, alignSelf: 'center'} : undefined}>
+                <View style={isTablet ? contentFill : undefined}>
 
                     <View style={styles.buttonContainer}>
                         <TouchableOpacity style={styles.backButtonContainer} onPress={folder.folder.nestedUnder === '' ? () => clear(null) : () => navigateUp()}>
@@ -244,7 +244,7 @@ const FocusedFolder = ({folder, folders, clear, getTargetFolder, addFolder, rena
                         </Modal>
                     : 
                         <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'center'}}>
-                            <TouchableOpacity style={tabletStyle(isTablet, styles.nonFolderButton65, {width: '100%', maxWidth: 360, alignSelf: 'center'})}
+                            <TouchableOpacity style={tabletStyle(isTablet, styles.nonFolderButton65, {width: '100%', maxWidth: '100%', alignSelf: 'stretch'})}
                                 onPress={() => {
                                     setAdd(true)
                                     setKeyboardClosed(false)

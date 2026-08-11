@@ -6,6 +6,11 @@ import {
   MODAL_WIDTH,
 } from '../constants/layout'
 
+function clampToWindow(cap, width, gutter) {
+  if (cap == null) return undefined
+  return Math.min(cap, Math.max(0, width - gutter * 2))
+}
+
 /**
  * Reactive layout flags for tablet / Chromebook support.
  * Below the tablet breakpoint, helpers return phone-safe values so existing
@@ -13,28 +18,45 @@ import {
  */
 export function useResponsiveLayout() {
   const { width, height } = useWindowDimensions()
-  const isTablet = width >= BREAKPOINTS.tablet
-  const isLargeTablet = width >= BREAKPOINTS.largeTablet
+  const shortest = Math.min(width, height)
+  const isTablet = shortest >= BREAKPOINTS.tablet
+  const isLargeTablet = shortest >= BREAKPOINTS.largeTablet
   const isPhone = !isTablet
   const isLandscape = width > height
+  const gutter = isPhone ? 0 : isLandscape ? 32 : 16
 
-  const contentMaxWidth = isLargeTablet
-    ? CONTENT_WIDTH.largeTablet
-    : isTablet
-      ? CONTENT_WIDTH.tablet
-      : undefined
+  const contentMaxWidth = isPhone
+    ? undefined
+    : clampToWindow(
+        isLargeTablet ? CONTENT_WIDTH.largeTablet : CONTENT_WIDTH.tablet,
+        width,
+        gutter
+      )
 
-  const formMaxWidth = isLargeTablet
-    ? FORM_WIDTH.largeTablet
-    : isTablet
-      ? FORM_WIDTH.tablet
-      : undefined
+  const formMaxWidth = isPhone
+    ? undefined
+    : clampToWindow(
+        isLargeTablet ? FORM_WIDTH.largeTablet : FORM_WIDTH.tablet,
+        width,
+        gutter
+      )
 
-  const modalMaxWidth = isLargeTablet
-    ? MODAL_WIDTH.largeTablet
-    : isTablet
-      ? MODAL_WIDTH.tablet
-      : undefined
+  const modalMaxWidth = isPhone
+    ? undefined
+    : clampToWindow(
+        isLargeTablet ? MODAL_WIDTH.largeTablet : MODAL_WIDTH.tablet,
+        width,
+        gutter
+      )
+
+  /**
+   * Fill the content column. Use on rows/lists instead of a second maxWidth
+   * cap, which left-aligns and leaves empty gutters.
+   */
+  const contentFill = {
+    width: '100%',
+    alignSelf: 'stretch',
+  }
 
   /**
    * Pick a value by form factor. Phone value is always used below tablet.
@@ -48,6 +70,7 @@ export function useResponsiveLayout() {
   return {
     width,
     height,
+    gutter,
     isPhone,
     isTablet,
     isLargeTablet,
@@ -55,6 +78,7 @@ export function useResponsiveLayout() {
     contentMaxWidth,
     formMaxWidth,
     modalMaxWidth,
+    contentFill,
     select,
   }
 }
