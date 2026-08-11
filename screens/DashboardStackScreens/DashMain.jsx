@@ -9,10 +9,13 @@ import DashCollectContainer from '../../components/dashboard/DashCollectContaine
 import FileButtons from '../../components/dashboard/FileButtons';
 import DashHeader from '../../components/dashboard/DashHeader';
 import ContentShell from '../../components/ui/ContentShell';
+import { useResponsiveLayout } from '../../hooks/useResponsiveLayout';
 
 export default function DashMain({navigation: { navigate }}) {
   const auth = firebaseAuth
   const insets = useSafeAreaInsets()
+  const { isTablet, isLandscape } = useResponsiveLayout()
+  const splitLandscape = isTablet && isLandscape
 
   useEffect(() => {
     if (!auth.currentUser) {
@@ -27,10 +30,16 @@ export default function DashMain({navigation: { navigate }}) {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        <ContentShell variant="content">
+        <ContentShell variant="content" fill={splitLandscape}>
           <DashHeader navigate={navigate}/>
-          <DashCollectContainer navigate={navigate}/>
-          <FileButtons navigate={navigate}/>
+          <View style={splitLandscape ? styles.split : undefined}>
+            <View style={splitLandscape ? styles.splitLeft : undefined}>
+              <DashCollectContainer navigate={navigate}/>
+            </View>
+            <View style={splitLandscape ? styles.splitRight : undefined}>
+              <FileButtons navigate={navigate}/>
+            </View>
+          </View>
         </ContentShell>
       </ScrollView>
       <StatusBar style='auto' />
@@ -51,5 +60,19 @@ const styles = StyleSheet.create({
     paddingBottom: 32,
     width: '100%',
     flexGrow: 1,
+  },
+  split: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    width: '100%',
+    gap: 24,
+  },
+  splitLeft: {
+    flex: 1.2,
+    minWidth: 0,
+  },
+  splitRight: {
+    flex: 1,
+    minWidth: 0,
   },
 });

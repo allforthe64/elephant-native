@@ -35,7 +35,6 @@ const notesShadow = Platform.select({
 export default function DashCollectContainer({ navigate }) {
   const { isTablet, isLargeTablet, isLandscape } = useResponsiveLayout()
   const iconSize = isTablet ? 34 : 30
-  const landscapeGrid = isTablet && isLandscape
 
   const tile = (testID, label, a11y, route, icon) => (
     <Pressable
@@ -45,7 +44,6 @@ export default function DashCollectContainer({ navigate }) {
       onPress={() => navigate(route)}
       style={({ pressed }) => [
         tabletStyle(isTablet, styles.buttonWrapper, tabletStyles.buttonWrapper),
-        landscapeGrid && tabletStyles.buttonWrapperLandscape,
         tileShadow,
         pressed && styles.buttonPressed,
       ]}
@@ -58,16 +56,16 @@ export default function DashCollectContainer({ navigate }) {
   )
 
   return (
-    <View style={tabletStyle(isTablet, styles.mainContainer, tabletStyles.mainContainer)}>
+    <View style={[
+      tabletStyle(isTablet, styles.mainContainer, tabletStyles.mainContainer),
+      isTablet && isLandscape && tabletStyles.mainContainerLandscape,
+    ]}>
       <Text style={tabletStyle(isTablet, styles.quickFilesHeading, tabletStyles.quickFilesHeading)}>
         Collect:
       </Text>
 
       {isTablet ? (
-        <View style={[
-          isLargeTablet ? tabletStyles.gridLarge : tabletStyles.grid,
-          landscapeGrid && tabletStyles.gridLandscape,
-        ]}>
+        <View style={isLargeTablet ? tabletStyles.gridLarge : tabletStyles.grid}>
           {tile(TestIds.dashboard.scan, 'Scan', 'Document Scanner', 'Document Scanner', faFile)}
           {tile(TestIds.dashboard.camera, 'Cam', 'Camera', 'Camera', faCamera)}
           {tile(TestIds.dashboard.qr, 'QR', 'QR Scanner', 'QR Scanner', faQrcode)}
@@ -253,15 +251,9 @@ const tabletStyles = StyleSheet.create({
     height: 140,
     marginBottom: 4,
   },
-  buttonWrapperLandscape: {
-    width: '23%',
-    flexGrow: 1,
-    flexShrink: 1,
-    height: 128,
+  mainContainerLandscape: {
     marginBottom: 0,
-  },
-  gridLandscape: {
-    flexWrap: 'nowrap',
+    paddingHorizontal: 0,
   },
   iconContainer: {
     width: 72,

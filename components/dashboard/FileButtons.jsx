@@ -8,7 +8,8 @@ import { TestIds } from '../../constants/testIds'
 import { useResponsiveLayout, tabletStyle } from '../../hooks/useResponsiveLayout'
 
 const FileButtons = ({ navigate }) => {
-  const { isTablet } = useResponsiveLayout()
+  const { isTablet, isLandscape } = useResponsiveLayout()
+  const landscapeColumn = isTablet && isLandscape
 
   const row = (testID, label, onPress, icon) => (
     <View style={styles.wrapperContainer}>
@@ -26,7 +27,10 @@ const FileButtons = ({ navigate }) => {
   )
 
   return (
-    <View style={tabletStyle(isTablet, styles.root, tabletStyles.root)}>
+    <View style={[
+      tabletStyle(isTablet, styles.root, tabletStyles.root),
+      landscapeColumn && tabletStyles.rootLandscape,
+    ]}>
       <Text style={tabletStyle(isTablet, styles.quickFilesHeading, tabletStyles.quickFilesHeading)}>Files</Text>
       {row(TestIds.dashboard.myFiles, 'My Files', () => navigate('Files', { staging: false }), faFolder)}
       {row(TestIds.dashboard.uploadDoc, 'Upload Doc', () => navigate('Upload Files'), faFile)}
@@ -73,5 +77,9 @@ const tabletStyles = StyleSheet.create({
     width: '100%',
     maxWidth: '100%',
     alignSelf: 'stretch',
+  },
+  rootLandscape: {
+    paddingHorizontal: 0,
+    paddingTop: 8,
   },
 })
