@@ -36,10 +36,18 @@ import { faFolder, faXmark, faFile, faArrowLeft, faFloppyDisk, faStopwatch, faPl
 //import stuff for QueueUpload
 import { UploadQueueEmitter } from '../../hooks/QueueEventEmitter'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import ContentShell from '../../components/ui/ContentShell'
+import KeyboardSafeForm from '../../components/ui/KeyboardSafeForm'
+import YellowActionButton from '../../components/ui/YellowActionButton'
+import { useResponsiveLayout, tabletStyle } from '../../hooks/useResponsiveLayout'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 const DocScanner = () => {
 
   try {
+  const { isTablet, select } = useResponsiveLayout()
+  const insets = useSafeAreaInsets()
+  const bottomPad = Math.max(insets.bottom, 16) + 48
 
   
   const [scannedImageArray, setScannedImageArray] = useState([]);
@@ -375,11 +383,12 @@ const DocScanner = () => {
                   </Pressable>
               </View>
               
+              <ContentShell variant="modal" fill>
               { 
 
               !nameGiven ?
               <>
-                  <Text style={{color: 'white', fontSize: 35, fontWeight: '700', marginTop: '35%', textAlign: 'center'}}>Name PDF:</Text>
+                  <Text style={[{color: 'white', fontSize: 35, fontWeight: '700', marginTop: '35%', textAlign: 'center'}, select(undefined, tabletStyles.modalHeading)]}>Name PDF:</Text>
                   <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', marginTop: '10%'}}>
                       <View style={styles.iconHolder}>
                         <FontAwesomeIcon icon={faFile} size={22} color='#9F37B0'/>
@@ -423,8 +432,9 @@ const DocScanner = () => {
                   </View>
               </>
               : addFolderForm ? 
+                  <KeyboardSafeForm>
                   <>
-                      <Text style={{color: 'white', fontSize: 35, fontWeight: '700', marginTop: '40%', textAlign: 'center'}}>Add A New Folder:</Text>
+                      <Text style={[{color: 'white', fontSize: 35, fontWeight: '700', marginTop: '40%', textAlign: 'center'}, select(undefined, tabletStyles.modalHeading)]}>Add A New Folder:</Text>
                       <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', marginTop: '10%'}}>
                           <View style={styles.iconHolder}> 
                               <FontAwesomeIcon icon={faFolder} size={22} color='#9F37B0'/>
@@ -446,6 +456,7 @@ const DocScanner = () => {
                             </TouchableOpacity>
                         </View>
                   </>
+                  </KeyboardSafeForm>
 
               :
 
@@ -485,7 +496,7 @@ const DocScanner = () => {
                               <ScrollView style={focusedFolder ? {paddingTop: '5%', marginTop: '2%'} : {}}>
                               {/* map over each of the folders from the filesystem and display them as a pressable element // call movefile function when one of them is pressed */}
                               {focusedFolder && !subFolders ? 
-                                  <Text style={{fontSize: 30, color: 'white', fontWeight: 'bold', marginTop: '30%', textAlign: 'center'}}>No Subfolders...</Text>
+                                  <Text style={[{fontSize: 30, color: 'white', fontWeight: 'bold', marginTop: '30%', textAlign: 'center'}, select(undefined, tabletStyles.modalHeading)]}>No Subfolders...</Text>
                               
                               :   
                                   <>
@@ -584,13 +595,14 @@ const DocScanner = () => {
                   </View>
                   
               }
+              </ContentShell>
 
           </View>
         </Modal>
       :
       
       scannedImageArray ? 
-        <>
+        <ContentShell variant="content" fill>
           {scannedImageArray.length > 1
             ?    
             <View style={{backgroundColor: '#FFFCF6',
@@ -599,7 +611,7 @@ const DocScanner = () => {
                   <Carousel
                       ref={carouselRef}
                       loop
-                      width={width}
+                      width={select(width, Math.min(width, 720), Math.min(width, 840))}
                       style={{height: '90%', paddingRight: '5%'}}
                       autoPlay
                       autoPlayInterval={2000}
@@ -656,38 +668,27 @@ const DocScanner = () => {
                       })}
                     </View> */}
                 </View>
-                <View style={{height: '20%', width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
+                <View style={{height: '20%', width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', paddingBottom: bottomPad, justifyContent: 'flex-end'}}>
                   <View style={{width: '80%', marginBottom: '4%', borderWidth: 2, borderColor: '#593060', borderRadius: 100}}></View>
                   <View style={{
                     display: 'flex',
                     alignItems: 'center',
                     width: '100%',
-                    marginBottom: '8%'
+                    marginBottom: 8,
+                    gap: 12,
                     }}>
-                          <TouchableOpacity onPress={() => scanDocument()} style={{
-                          backgroundColor: '#FFE562',
-                          paddingLeft: '2%',
-                          paddingTop: '2%',
-                          paddingBottom: '2%',
-                          paddingRight: 20,
-                          borderRadius: 100,
-                          display: 'flex',
-                          flexDirection: 'row',
-                          width: '70%',
-                          marginBottom: '4%'
-                        }}>
-                            <View style={styles.iconHolderSmall}>
-                              <FontAwesomeIcon icon={faPlus} color='#9F37B0' size={22}/>
-                            </View>
-                            <Text style={{fontSize: 18, color: '#9F37B0', fontWeight: '600', marginLeft: '15%', paddingTop: '1%'}}>Scan More Documents</Text>
-                          </TouchableOpacity>
-                      
-                        <TouchableOpacity onPress={() => setPreAdd(true)} style={styles.yellowButton}>
-                          <View style={styles.iconHolderSmall}>
-                            <FontAwesomeIcon icon={faCloudArrowUp} color='#9F37B0' size={22} />
-                          </View>
-                          <Text style={{fontSize: 18, color: '#9F37B0', fontWeight: '600', marginLeft: '15%', paddingTop: '1%'}}>Convert To PDF/Upload</Text>
-                        </TouchableOpacity>
+                          <YellowActionButton
+                            label="Scan More Documents"
+                            onPress={() => scanDocument()}
+                            style={tabletStyle(isTablet, { width: '70%', marginBottom: 0 }, tabletStyles.actionButton)}
+                            icon={<FontAwesomeIcon icon={faPlus} color='#9F37B0' size={18}/>}
+                          />
+                          <YellowActionButton
+                            label="Convert To PDF/Upload"
+                            onPress={() => setPreAdd(true)}
+                            style={tabletStyle(isTablet, { width: '70%', marginBottom: 0 }, tabletStyles.actionButton)}
+                            icon={<FontAwesomeIcon icon={faCloudArrowUp} color='#9F37B0' size={18} />}
+                          />
                   </View>
                 </View>
             </View>
@@ -701,41 +702,33 @@ const DocScanner = () => {
                     source={{uri: scannedImageArray[0]}}
                   />
                 </View>  
-                <View style={{height: '25%'}}>
+                <View style={{height: '25%', paddingBottom: bottomPad, justifyContent: 'flex-end'}}>
                   <View style={{
                     display: 'flex',
                     flexDirection: 'column',
                     alignItems: 'center',
                     width: '100%',
+                    marginBottom: 8,
+                    gap: 12,
                   }}>
-                    <TouchableOpacity onPress={() => scanDocument()} style={{backgroundColor: '#FFE562',
-                          paddingLeft: '2%',
-                          paddingTop: '2%',
-                          paddingBottom: '2%',
-                          paddingRight: 20,
-                          borderRadius: 100,
-                          display: 'flex',
-                          flexDirection: 'row',
-                          width: '70%',
-                          marginBottom: '4%'
-                        }}>
-                      <View style={styles.iconHolderSmall}>
-                        <FontAwesomeIcon icon={faPlus} color='#9F37B0' size={22}/>
-                      </View>
-                      <Text style={{fontSize: 18, color: '#9F37B0', fontWeight: '600', marginLeft: '15%', paddingTop: '1%'}}>Scan More Documents</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={() => setPreAdd(true)} style={styles.yellowButton}>
-                      <View style={styles.iconHolderSmall}>
-                          <FontAwesomeIcon icon={faCloudArrowUp} color='#9F37B0' size={22} />
-                      </View>
-                      <Text style={{fontSize: 18, color: '#9F37B0', fontWeight: '600', marginLeft: '15%', paddingTop: '1%'}}>Convert To PDF/Upload</Text>
-                    </TouchableOpacity>
+                    <YellowActionButton
+                      label="Scan More Documents"
+                      onPress={() => scanDocument()}
+                      style={tabletStyle(isTablet, { width: '70%' }, tabletStyles.actionButton)}
+                      icon={<FontAwesomeIcon icon={faPlus} color='#9F37B0' size={18}/>}
+                    />
+                    <YellowActionButton
+                      label="Convert To PDF/Upload"
+                      onPress={() => setPreAdd(true)}
+                      style={tabletStyle(isTablet, { width: '70%' }, tabletStyles.actionButton)}
+                      icon={<FontAwesomeIcon icon={faCloudArrowUp} color='#9F37B0' size={18} />}
+                    />
                   </View>
                 </View>  
               </View>      
           }  
 
-        </>
+        </ContentShell>
       :
         <></>
       }
@@ -829,13 +822,14 @@ const styles = StyleSheet.create({
   },
   yellowButton: {
     backgroundColor: '#FFE562',
-    paddingLeft: '2%',
-    paddingTop: '2%',
-    paddingBottom: '2%',
-    paddingRight: 20,
+    paddingLeft: 8,
+    paddingTop: 8,
+    paddingBottom: 8,
+    paddingRight: 14,
     borderRadius: 12,
-    display: 'flex',
     flexDirection: 'row',
+    alignItems: 'center',
+    overflow: 'hidden',
     width: '70%',
   },
   addFolderButton: {
@@ -889,5 +883,14 @@ const styles = StyleSheet.create({
       paddingLeft: '2%',
       marginBottom: '2%',
       borderRadius: 100
+  },
+})
+
+const tabletStyles = StyleSheet.create({
+  modalHeading: {
+    marginTop: 48,
+  },
+  actionButton: {
+    maxWidth: '100%',
   },
 })

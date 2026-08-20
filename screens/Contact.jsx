@@ -1,11 +1,12 @@
-import { View, Text, StyleSheet } from 'react-native'
+import { Text, StyleSheet } from 'react-native'
 import React from 'react'
+import ContentShell from '../components/ui/ContentShell'
 
 const Contact = () => {
   return (
-    <View style={styles.container}>
+    <ContentShell variant="content" fill style={styles.container} innerStyle={styles.centeredContent}>
       <Text>Contact</Text>
-    </View>
+    </ContentShell>
   )
 }
 
@@ -17,5 +18,9 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: 'Black'
+    },
+    centeredContent: {
+        justifyContent: 'center',
+        alignItems: 'center'
     }
 })

@@ -23,10 +23,15 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 //toast notification import
 import { useToast } from 'react-native-toast-notifications';
+import ContentShell from '../../components/ui/ContentShell';
+import KeyboardSafeForm from '../../components/ui/KeyboardSafeForm';
+import YellowActionButton from '../../components/ui/YellowActionButton';
+import { useResponsiveLayout, tabletStyle } from '../../hooks/useResponsiveLayout';
 
 export default function Files({navigation: { navigate }, route}) {
 
   try {
+  const { isTablet, select } = useResponsiveLayout()
 
   //initialize state 
   const [currentUser, setCurrentUser] = useState()
@@ -318,6 +323,7 @@ export default function Files({navigation: { navigate }, route}) {
 
   return ( 
       <View style={styles.container}>
+        <ContentShell variant="content" fill>
         {!loading && currentUser ? 
           focusedFolder ? 
             <FocusedFolder folder={focusedFolder} renameFolder={renameFolder} moveFolder={moveFolder} addFolder={addFolder} deleteFolder={deleteFolder} folders={currentUser.files} clear={setFocusedFolder} getTargetFolder={getTargetFolder} deleteFile={deleteFile} renameFile={renameFile} moveFile={moveFile} files={currentUser.fileRefs} updateUser={updateUser}/> 
@@ -327,18 +333,19 @@ export default function Files({navigation: { navigate }, route}) {
           <ScrollView ref={scrollRef} style={
               add && !keyBoardClosed ? {
               width: '100%', /*Expand height to allow the text input to scroll into view*/
+              alignSelf: 'stretch',
               height: '190%',
-              paddingTop: insets.top,
-              paddingBottom: insets.bottom,
-              position: 'absolute'
             } : {
             width: '100%', /* Default styling */
-            height: '100%',
-            paddingTop: insets.top,
-            paddingBottom: insets.bottom,
-            position: 'absolute'
+            alignSelf: 'stretch',
+            flex: 1,
           }}
-            scrollEnabled={add  ? true : false}
+            contentContainerStyle={{
+              width: '100%',
+              paddingTop: 8,
+              paddingBottom: Math.max(insets.bottom, 16) + 48,
+            }}
+            scrollEnabled
           >
                   <View>
                     <View style={styles.header}>
@@ -346,7 +353,7 @@ export default function Files({navigation: { navigate }, route}) {
                         <View style={styles.iconHolder}>
                           <FontAwesomeIcon icon={faBox} color='#9F37B0' size={22}/>
                         </View>
-                        <Text style={styles.subheading}>To be filed</Text>
+                        <Text style={styles.subheading} numberOfLines={1}>To be filed</Text>
                       </TouchableOpacity>
                     </View>
                     <View style={add ? {height: 300} : {height: 330, marginBottom: '6%'}}>
@@ -371,8 +378,10 @@ export default function Files({navigation: { navigate }, route}) {
                               <FontAwesomeIcon icon={faXmark} color={'white'} size={30}/>
                               </Pressable>
                           </View>
+                          <ContentShell variant="modal" fill>
+                          <KeyboardSafeForm>
                           <View style={styles.addFolderContainer}>
-                            <Text style={styles.addFolderHeading}>Add new folder:</Text>
+                            <Text style={tabletStyle(isTablet, styles.addFolderHeading, tabletStyles.modalHeading)}>Add new folder:</Text>
                             <View ref={formRef} style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-around', marginBottom: '6%'}}  
                             >
                               <View style={styles.iconHolder}>
@@ -380,7 +389,7 @@ export default function Files({navigation: { navigate }, route}) {
                               </View>
                               <TextInput value={newFolderName} placeholder='Enter new name' placeholderTextColor={'white'} style={{color: 'white', fontSize: 22, fontWeight: 'bold', borderBottomColor: 'white', borderBottomWidth: 2, width: '70%', marginLeft: '5%'}} onChangeText={(e) => setNewFolderName(e)} onFocus={() => setKeyboardClosed(false)} onBlur={() => {if (newFolderName === '') setAdd(false)}} ref={inputRef}/>
                             </View>
-                            <TouchableOpacity style={styles.nonFolderButtonSM}
+                            <TouchableOpacity style={tabletStyle(isTablet, styles.nonFolderButtonSM, tabletStyles.actionButton)}
                               onPress={() => addFolder(newFolderName, '')}
                             >
                                 <View style={styles.iconHolderSM}>
@@ -389,30 +398,27 @@ export default function Files({navigation: { navigate }, route}) {
                                 <Text style={{fontSize: 22, color: '#9F37B0', fontWeight: '600', paddingTop: '1%', marginLeft: '15%'}}>Save</Text>
                             </TouchableOpacity>
                           </View>
+                          </KeyboardSafeForm>
+                          </ContentShell>
                         </View>
                       </Modal>
                     : 
-                    <View style={{display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%'}}>
-                      <View style={{display: 'flex', flexDirection: 'row', marginBottom: 10}}>                  
-                          <TouchableOpacity style={styles.nonFolderButton80}
+                    <View style={{display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', marginTop: 8, marginBottom: 8, gap: 12}}>
+                          <YellowActionButton
+                            label="Add New Folder"
                             onPress={() => {
                               setAdd(true)
                               setKeyboardClosed(false)
                             }}
-                          >
-                              <View style={styles.iconHolderSM}>
-                                <FontAwesomeIcon icon={faPlus} size={18} color='#9F37B0'/>
-                              </View>
-                              <Text style={styles.subheadingMLLarge}>Add New Folder</Text>
-                          </TouchableOpacity>
-                      </View>
-                        <TouchableOpacity onPress={() => navigate('Upload Files')} style={styles.nonFolderButton80}>
-                            <View style={styles.iconHolderSM}>
-                              <FontAwesomeIcon icon={faFile} size={18} color='#9F37B0'/>
-                            </View>
-                            <Text style={styles.subheadingMLLarge}>Get Document</Text>
-                        </TouchableOpacity>
-                      
+                            style={tabletStyle(isTablet, { width: '80%' }, tabletStyles.actionButton)}
+                            icon={<FontAwesomeIcon icon={faPlus} size={18} color='#9F37B0'/>}
+                          />
+                          <YellowActionButton
+                            label="Get Document"
+                            onPress={() => navigate('Upload Files')}
+                            style={tabletStyle(isTablet, { width: '80%' }, tabletStyles.actionButton)}
+                            icon={<FontAwesomeIcon icon={faFile} size={18} color='#9F37B0'/>}
+                          />
                     </View>
                     }
                   </View>
@@ -422,6 +428,7 @@ export default function Files({navigation: { navigate }, route}) {
             <Text style={{color: 'white'}}>Loading...</Text>
           </>
         }
+        </ContentShell>
       <StatusBar style="auto" />
     </View>
     
@@ -435,9 +442,8 @@ export default function Files({navigation: { navigate }, route}) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    width: '100%',
     backgroundColor: '#FFFCF6',
-    alignItems: 'center',
-    justifyContent: 'center',
   },
   bigHeader: {
     color: 'white',
@@ -448,21 +454,21 @@ const styles = StyleSheet.create({
   },
   subheading: {
     color: '#9F37B0',
-    textAlign: 'center',
     fontWeight: '600',
-    fontSize: 22,
-    marginTop: 'auto',
-    marginBottom: 'auto',
-    marginLeft: '10%'
+    fontSize: 18,
+    flex: 1,
+    flexShrink: 1,
+    minWidth: 0,
+    marginLeft: 10,
   },
   subheadingMLLarge: {
     color: '#9F37B0',
-    textAlign: 'center',
     fontWeight: '600',
-    fontSize: 18,
-    marginTop: 'auto',
-    marginBottom: 'auto',
-    marginLeft: '15%'
+    fontSize: 16,
+    flex: 1,
+    flexShrink: 1,
+    minWidth: 0,
+    marginLeft: 10,
   },
   header: {
     display: 'flex', 
@@ -490,31 +496,40 @@ const styles = StyleSheet.create({
   },
   nonFolderButtonSM: {
     display: 'flex', 
-    flexDirection: 'row', 
+    flexDirection: 'row',
+    alignItems: 'center',
+    overflow: 'hidden',
     backgroundColor: '#FFE562', 
-    paddingLeft: '2%', 
-    paddingTop: '2%', 
-    paddingBottom: '2%', 
+    paddingLeft: 8, 
+    paddingTop: 8, 
+    paddingBottom: 8,
+    paddingRight: 12,
     borderRadius: 12, 
     width: '45%'
   },
   nonFolderButton65: {
     display: 'flex', 
-    flexDirection: 'row', 
+    flexDirection: 'row',
+    alignItems: 'center',
+    overflow: 'hidden',
     backgroundColor: '#FFE562', 
-    paddingLeft: '2%', 
-    paddingTop: '2%', 
-    paddingBottom: '2%', 
+    paddingLeft: 8, 
+    paddingTop: 8, 
+    paddingBottom: 8,
+    paddingRight: 12,
     borderRadius: 12, 
     width: '65%'
   },
   nonFolderButton80: {
     display: 'flex', 
-    flexDirection: 'row', 
+    flexDirection: 'row',
+    alignItems: 'center',
+    overflow: 'hidden',
     backgroundColor: '#FFE562', 
-    paddingLeft: '2%', 
-    paddingTop: '2%', 
-    paddingBottom: '2%', 
+    paddingLeft: 8, 
+    paddingTop: 8, 
+    paddingBottom: 8,
+    paddingRight: 12,
     borderRadius: 12, 
     width: '80%'
   },
@@ -526,7 +541,8 @@ const styles = StyleSheet.create({
     display: 'flex', 
     flexDirection: 'row', 
     justifyContent: 'center', 
-    alignItems: 'center'
+    alignItems: 'center',
+    flexShrink: 0,
   },
   iconHolderSM: {
     backgroundColor: 'white', 
@@ -536,7 +552,8 @@ const styles = StyleSheet.create({
     display: 'flex', 
     flexDirection: 'row', 
     justifyContent: 'center', 
-    alignItems: 'center'
+    alignItems: 'center',
+    flexShrink: 0,
   },
   addFolderContainer: {
     width: '100%',
@@ -552,4 +569,13 @@ const styles = StyleSheet.create({
     color: 'white',
     marginBottom: '10%'
   }
+});
+
+const tabletStyles = StyleSheet.create({
+  modalHeading: {
+    marginBottom: 48,
+  },
+  actionButton: {
+    maxWidth: '100%',
+  },
 });

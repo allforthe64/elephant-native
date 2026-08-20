@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'
-import { Text, View , TouchableOpacity, ScrollView, StyleSheet, Image, TextInput, Modal, Pressable} from 'react-native'
+import { Text, View , TouchableOpacity, ScrollView, StyleSheet, Image, TextInput, Modal, Pressable, Alert} from 'react-native'
 
 //fontAwesome imports
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
@@ -10,6 +10,7 @@ import AudioEditor from '../../components/audioRecorder/AudioEditor'
 
 //import expo-av Audio component
 import { Audio } from 'expo-av'
+import * as FileSystem from 'expo-file-system'
 
 //import updateUser, addfile, userListener from firestore file/firebaseAuth and storage objects from firebase config/ref, uploadBytesResumable from firebase storage
 import { updateUser, addfile, userListener } from '../../firebase/firestore'
@@ -28,10 +29,18 @@ import { useToast } from 'react-native-toast-notifications'
 //import stuff for the UploadQueue
 import { UploadQueueEmitter } from '../../hooks/QueueEventEmitter'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import AppPressable from '../../components/ui/AppPressable'
+import ContentShell from '../../components/ui/ContentShell'
+import KeyboardSafeForm from '../../components/ui/KeyboardSafeForm'
+import YellowActionButton from '../../components/ui/YellowActionButton'
+import { TestIds } from '../../constants/testIds'
+import { useResponsiveLayout, tabletStyle } from '../../hooks/useResponsiveLayout'
 
 const AudioRecorder = () => {
 
     try {
+        const { isTablet, select } = useResponsiveLayout()
+        const insets = useSafeAreaInsets()
         const [recording, setRecording] = useState()
         const [recordings, setRecordings] = useState([])
         const [userInst, setUserInst] = useState()
@@ -144,7 +153,7 @@ const AudioRecorder = () => {
     
                 setRecording(recording)
             } else {
-               setMessage('Please grant permission to Elephant App to access microphone') 
+               Alert.alert('Please grant permission to Elephant App to access microphone')
             }
 
             
@@ -154,16 +163,45 @@ const AudioRecorder = () => {
     }
 
     const stopRecording = async () => {
+        if (!recording) return
+
         setRecording(undefined)
         await recording.stopAndUnloadAsync()
+        // Required by expo-av so the recorded file can be read/uploaded after stop
+        await Audio.setAudioModeAsync({
+            allowsRecordingIOS: false,
+        })
+
+        const uri = recording.getURI()
+        if (!uri) {
+            Alert.alert('Recording failed', 'No audio file was produced.')
+            return
+        }
+
+        // Cache URIs can disappear before the upload queue runs; persist a stable copy
+        const ext = ((uri.split('.').pop() || 'm4a').split('?')[0] || 'm4a').toLowerCase()
+        const docsDir = FileSystem.documentDirectory || FileSystem.cacheDirectory
+        if (!docsDir) {
+            Alert.alert('Recording failed', 'Could not access local storage for the recording.')
+            return
+        }
+        const stableUri = `${docsDir}recording-${Date.now()}.${ext}`
+        try {
+            await FileSystem.copyAsync({ from: uri, to: stableUri })
+        } catch (copyErr) {
+            console.error('Failed to persist recording', copyErr)
+            Alert.alert('Recording failed', 'Could not save the recording file.')
+            return
+        }
+
+        const { sound, status } = await Audio.Sound.createAsync({ uri: stableUri })
 
         const updatedRecordings = [...recordings]
-        const {sound, status} = await recording.createNewLoadedSoundAsync()
-        
         updatedRecordings.push({
             sound: sound,
             duration: getDurartionFormatted(status.durationMillis),
-            file: recording.getURI(),
+            file: stableUri,
+            fileType: ext,
             name: `Recording ${recordings.length + 1}`
         })
 
@@ -241,14 +279,23 @@ const AudioRecorder = () => {
 
         setLoading(true)
 
-        const filesToAddToQueue = recordings.map(recording => {
+        try {
+        const recordingsToSave = [...recordings]
+        if (recordingsToSave.length === 0) {
+            setLoading(false)
+            Alert.alert('No recordings', 'Record audio before saving to staging.')
+            return
+        }
+
+        const filesToAddToQueue = recordingsToSave.map(rec => {
 
             let finalDestination 
             if (destination.id !== null) finalDestination = destination.id
             else if (focusedFolder) finalDestination = focusedFolder 
             else finalDestination = false
 
-            return {uri: recording.file, filename: `${recording.name}.mp3`, fileType: 'mp3', finalDestination: finalDestination}
+            const ext = rec.fileType || 'm4a'
+            return {uri: rec.file, filename: `${rec.name}.${ext}`, fileType: ext, finalDestination: finalDestination}
         })
 
         let queue = JSON.parse(await AsyncStorage.getItem('uploadQueue')) || []
@@ -259,6 +306,11 @@ const AudioRecorder = () => {
         const confirmedQueue = JSON.parse(await AsyncStorage.getItem('uploadQueue'))
 
         UploadQueueEmitter.emit('uploadQueueUpdated', confirmedQueue)
+        } catch (err) {
+            Alert.alert('Save failed', err?.message || String(err))
+            setLoading(false)
+            return
+        }
 
 
         /* const references = await Promise.all(recordings.map(async (el) => {
@@ -353,8 +405,6 @@ const AudioRecorder = () => {
           
     }
 
-    const insets = useSafeAreaInsets()
-
   return (
     <>
         {preAdd ? 
@@ -374,11 +424,13 @@ const AudioRecorder = () => {
                         </Pressable>
                     </View>
                     
+                    <ContentShell variant="modal" fill>
                     { 
     
                     addFolderForm ? 
+                        <KeyboardSafeForm>
                         <View style={{width: '100%', height: '100', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center'}}>
-                            <Text style={{color: 'white', fontSize: 35, fontWeight: '700', marginTop: '40%', textAlign: 'center'}}>Add A New Folder:</Text>
+                            <Text style={[{color: 'white', fontSize: 35, fontWeight: '700', marginTop: '40%', textAlign: 'center'}, select(undefined, tabletStyles.modalHeading)]}>Add A New Folder:</Text>
                             <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', marginTop: '10%', width: '100%'}}>
                                 <View style={styles.iconHolder}> 
                                     <FontAwesomeIcon icon={faFolder} size={22} color='#9F37B0'/>
@@ -400,6 +452,7 @@ const AudioRecorder = () => {
                                 </TouchableOpacity>
                             </View>
                         </View>
+                        </KeyboardSafeForm>
     
                     :
     
@@ -438,7 +491,7 @@ const AudioRecorder = () => {
                                     <ScrollView style={focusedFolder ? {paddingTop: '5%', marginTop: '2%'} : {}}>
                                     {/* map over each of the folders from the filesystem and display them as a pressable element // call movefile function when one of them is pressed */}
                                     {focusedFolder && !subFolders ? 
-                                        <Text style={{fontSize: 30, color: 'white', fontWeight: 'bold', marginTop: '30%', textAlign: 'center'}}>No Subfolders...</Text>
+                                        <Text style={[{fontSize: 30, color: 'white', fontWeight: 'bold', marginTop: '30%', textAlign: 'center'}, select(undefined, tabletStyles.modalHeading)]}>No Subfolders...</Text>
                                     
                                     :   
                                         <>
@@ -537,18 +590,20 @@ const AudioRecorder = () => {
                         </View>
                         
                     }
+                    </ContentShell>
     
                 </View>
             </Modal>
         :
+            <ContentShell variant="content" fill>
             <View style={{
                 width: '100%',
                 height: '100%',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                paddingTop: insets.top,
-                paddingBottom: insets.bottom
+                paddingTop: 8,
+                paddingBottom: Math.max(insets.bottom, 16) + 48,
             }}>
                 <Text style={styles.bigHeader}>Audio Recordings:</Text>
 
@@ -568,19 +623,28 @@ const AudioRecorder = () => {
                     </View>
                 }
                 <View style={styles.wrapperContainer}>
-                        <TouchableOpacity onPress={recording ? stopRecording : startRecording} style={{backgroundColor: 'transparent', borderWidth: 8, borderColor: 'white', borderRadius: 1000, width: '20%', height: 70, display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
+                        <AppPressable
+                          testID={TestIds.audio.recordToggle}
+                          accessibilityLabel={recording ? 'Stop recording' : 'Start recording'}
+                          onPress={recording ? stopRecording : startRecording}
+                          style={{backgroundColor: 'transparent', borderWidth: 8, borderColor: 'white', borderRadius: 1000, width: '20%', height: 70, display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}
+                        >
                             {recording ? <FontAwesomeIcon icon={faSquare} size={30} color='red'/> : <FontAwesomeIcon icon={faMicrophone} size={30} color='red'/>}
-                        </TouchableOpacity>
+                        </AppPressable>
                 </View>
-                <View style={styles.wrapperContainer}>
-                    <TouchableOpacity onPress={() => setPreAdd(true)} style={styles.buttonWrapper}>
-                        <View style={styles.iconHolderSmall}>
-                            <FontAwesomeIcon icon={faCloudArrowUp} color='#9F37B0' />
-                        </View>
-                        <Text style={{fontSize: 18, width: '100%', fontWeight: '600', color: '#9F37B0', paddingTop: '1%', marginLeft: '25%'}}>Save All</Text>
-                    </TouchableOpacity>
+                <View style={[styles.wrapperContainer, styles.bottomButtonWrap]}>
+                    <YellowActionButton
+                      testID={TestIds.audio.saveAll}
+                      accessibilityLabel="Save All"
+                      label="Save All"
+                      onPress={() => setPreAdd(true)}
+                      style={tabletStyle(isTablet, { width: '60%' }, tabletStyles.actionButton)}
+                      icon={<FontAwesomeIcon icon={faCloudArrowUp} color='#9F37B0' size={16} />}
+                      iconSize={28}
+                    />
                 </View>
             </View>
+            </ContentShell>
         }    
     </>
   )
@@ -629,6 +693,9 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         width: '100%',
         marginBottom: '5%'
+    },
+    bottomButtonWrap: {
+        marginBottom: 8,
     },
     buttonWrapper: {
     width: '60%',
@@ -748,6 +815,15 @@ const styles = StyleSheet.create({
         opacity: .5
     },
     
+})
+
+const tabletStyles = StyleSheet.create({
+    modalHeading: {
+        marginTop: 48,
+    },
+    actionButton: {
+        maxWidth: '100%',
+    },
 })
 
 export default AudioRecorder

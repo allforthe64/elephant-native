@@ -9,12 +9,34 @@
       "distribution": "internal"
     },
     "preview": {
-      "distribution": "internal"
+      "distribution": "internal",
+      "android": {
+        "buildType": "apk"
+      },
+      "env": {
+        "EXPO_PUBLIC_TEST_EMAIL": "myelephanttesting@gmail.com",
+        "EXPO_PUBLIC_TEST_PASSWORD": "myelephanttest1234",
+        "SENTRY_DISABLE_AUTO_UPLOAD": "true",
+        "SENTRY_ALLOW_FAILURE": "true"
+      }
+    },
+    "testlab": {
+      "extends": "preview",
+      "env": {
+        "EXPO_PUBLIC_DISABLE_APP_CHECK": "true",
+        "EXPO_PUBLIC_TEST_EMAIL": "myelephanttesting@gmail.com",
+        "EXPO_PUBLIC_TEST_PASSWORD": "myelephanttest1234",
+        "SENTRY_DISABLE_AUTO_UPLOAD": "true",
+        "SENTRY_ALLOW_FAILURE": "true"
+      }
     },
     "production": {
       "autoIncrement": true,
       "android": {
         "buildType": "app-bundle"
+      },
+      "env": {
+        "SENTRY_ALLOW_FAILURE": "true"
       }
     }
   },

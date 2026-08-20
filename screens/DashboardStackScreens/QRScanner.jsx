@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Image, TouchableOpacity, Modal, Pressable, TextInput, Button } from 'react-native'
+import { StyleSheet, Text, View, Image, TouchableOpacity, Modal, Pressable, TextInput, Button, Linking } from 'react-native'
 import React, { useState, useEffect } from 'react'
 
 import { CameraView, useCameraPermissions } from 'expo-camera' 
@@ -27,10 +27,15 @@ import { faXmark, faFolder, faArrowLeft, faCloudArrowUp, faQrcode, faPlus, faChe
 //import stuff for QueueUpload
 import { UploadQueueEmitter } from '../../hooks/QueueEventEmitter'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import ContentShell from '../../components/ui/ContentShell'
+import KeyboardSafeForm from '../../components/ui/KeyboardSafeForm'
+import { useResponsiveLayout, tabletStyle } from '../../hooks/useResponsiveLayout'
 
 const Scanner = () => {
 
   try {
+    const { isTablet, select } = useResponsiveLayout()
+    const insets = useSafeAreaInsets()
     const [scanData, setScanData] = useState()
     const [urls, setUrls] = useState([])
     const [userInst, setUserInst] = useState()
@@ -41,7 +46,7 @@ const Scanner = () => {
     const [folders, setFolders] = useState([])
     const [newFolderName, setNewFolderName] = useState('')
     const [destination, setDestination] = useState({id: null, fileName: null, nestedUnder: null})
-    const [hasPermission, setHasPermission] = useCameraPermissions()
+    const [permission, requestPermission] = useCameraPermissions()
     const [scanned, setScanned] = useState(false);
     const [focusedFolderInst, setFocusedFolderInst] = useState()
 
@@ -134,16 +139,38 @@ const Scanner = () => {
         })()
     }, []) */
 
+    const handleGrantCameraPermission = async () => {
+        try {
+            const result = await requestPermission()
+            if (result?.granted) return
+            if (result && result.canAskAgain === false) {
+                await Linking.openSettings()
+            }
+        } catch (err) {
+            console.warn('Camera permission request failed:', err)
+            alert(err?.message || String(err))
+        }
+    }
 
-    if (hasPermission === null) {
+    if (!permission) {
       return <Text>Requesting for camera permission</Text>;
     }
-    if (hasPermission === false) {
-      return <Text>No access to camera</Text>;
+    if (!permission.granted) {
+      return (
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 24, backgroundColor: '#FFFCF6' }}>
+          <Text style={{ color: '#593060', fontSize: 18, textAlign: 'center', marginBottom: 16 }}>
+            We need your permission to use the camera for QR scanning
+          </Text>
+          <TouchableOpacity onPress={handleGrantCameraPermission} style={{ backgroundColor: '#FFE562', paddingVertical: 12, paddingHorizontal: 20, borderRadius: 12 }}>
+            <Text style={{ color: '#9F37B0', fontSize: 18, fontWeight: '600' }}>Grant permission</Text>
+          </TouchableOpacity>
+        </View>
+      );
     }
 
     const handleBarCodeScanned = ({data}) => {
-        
+        if (scanned) return
+        setScanned(true)
         let arr = [...urls]
         setScanData(data)
         arr.push({data: data, title: ''})
@@ -203,13 +230,22 @@ const Scanner = () => {
 
     
     const submit = async () => {
+        const urlsToSave = [...urls]
+        if (urlsToSave.length === 0) {
+            alert('No QR codes to save')
+            return
+        }
+
         setPreAdd(false)
         try {
 
-        const filesToAddToQueue = urls.map(url => {
+        const filesToAddToQueue = urlsToSave.map(url => {
 
-            //generate filename
-            const filename = url.title ? `URL for: ${url.title}.txt` : `URL for: ${url.data}.txt`
+            // Keep filename free of URL dots so extension parsing stays ".txt"
+            const label = (url.title && String(url.title).trim())
+                ? String(url.title).trim().replace(/[^\w\s-]/g, '').slice(0, 40)
+                : 'QR Code'
+            const filename = `URL for ${label || 'QR Code'}.txt`
 
             let finalDestination 
             if (destination.id !== null) finalDestination = destination.id
@@ -218,7 +254,7 @@ const Scanner = () => {
 
             const randomString = [...Array(10)].map(() => (Math.random().toString(36)[Math.random() < 0.5 ? 'toUpperCase' : 'toLowerCase']()) ).join('')
 
-            return {uri: `${randomString} - qrcode.txt`, filename: filename, fileType: 'txt', finalDestination: finalDestination, noteBody: url.data, linksTo: url.data}
+            return {uri: `${randomString} - qrcode.txt`, filename: filename, fileType: 'txt', finalDestination: finalDestination, noteBody: String(url.data ?? ''), linksTo: String(url.data ?? '')}
 
         })
 
@@ -301,16 +337,15 @@ const Scanner = () => {
         } */
 
         setUrls([])
+        setScanData(undefined)
+        setScanned(false)
         setDestination({id: null, fileName: null, nestedUnder: null})
         setFocusedFolder(null)
 
         } catch (err) {
-            alert('errL ', err.message)
+            alert('Save failed: ' + (err?.message || String(err)))
         }
     }
-
-    const insets = useSafeAreaInsets()
-
 
 return (
     <>
@@ -331,10 +366,12 @@ return (
                         </Pressable>
                     </View>
                     
+                    <ContentShell variant="modal" fill>
                     { 
                     addFolderForm ? 
+                        <KeyboardSafeForm>
                         <>
-                            <Text style={{color: 'white', fontSize: 35, fontWeight: '700', marginTop: '40%', textAlign: 'center'}}>Add A New Folder:</Text>
+                            <Text style={[{color: 'white', fontSize: 35, fontWeight: '700', marginTop: '40%', textAlign: 'center'}, select(undefined, tabletStyles.modalHeading)]}>Add A New Folder:</Text>
                             <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', marginTop: '10%'}}>
                                 <View style={styles.iconHolder}>
                                     <FontAwesomeIcon icon={faFolder} size={22} color='#9F37B0'/>
@@ -356,6 +393,7 @@ return (
                                 </TouchableOpacity>
                             </View>
                         </>
+                        </KeyboardSafeForm>
 
                     :
 
@@ -394,7 +432,7 @@ return (
                                     <ScrollView style={focusedFolder ? {paddingTop: '5%', marginTop: '2%'} : {}}>
                                     {/* map over each of the folders from the filesystem and display them as a pressable element // call movefile function when one of them is pressed */}
                                     {focusedFolder && !subFolders ? 
-                                        <Text style={{fontSize: 30, color: 'white', fontWeight: 'bold', marginTop: '30%', textAlign: 'center'}}>No Subfolders...</Text>
+                                        <Text style={[{fontSize: 30, color: 'white', fontWeight: 'bold', marginTop: '30%', textAlign: 'center'}, select(undefined, tabletStyles.modalHeading)]}>No Subfolders...</Text>
                                     
                                     :   
                                         <>
@@ -491,6 +529,7 @@ return (
                         </View>
                         
                     }
+                    </ContentShell>
 
                 </View>
             </Modal>
@@ -498,6 +537,7 @@ return (
         <>
           {scanData ?
             <>
+              <ContentShell variant="content" fill>
               <View style={{
                   backgroundColor: '#FFFCF6',
                   flex: 1,
@@ -521,7 +561,10 @@ return (
                             </ScrollView>
                         </View> 
                         <View style={styles.wrapperContainer}>
-                            <TouchableOpacity onPress={() => setScanData(undefined)} style={styles.buttonWrapper}>
+                            <TouchableOpacity onPress={() => {
+                                setScanData(undefined)
+                                setScanned(false)
+                            }} style={tabletStyle(isTablet, styles.buttonWrapper, tabletStyles.actionButton)}>
                                 <View style={styles.iconHolderSmall}>
                                     <FontAwesomeIcon icon={faQrcode} color='#9F37B0' />
                                 </View>
@@ -529,7 +572,7 @@ return (
                             </TouchableOpacity>
                         </View>
                         <View style={styles.wrapperContainer}>
-                            <TouchableOpacity onPress={() => setPreAdd(true)} style={styles.buttonWrapper}>
+                            <TouchableOpacity onPress={() => setPreAdd(true)} style={tabletStyle(isTablet, styles.buttonWrapper, tabletStyles.actionButton)}>
                                 <View style={styles.iconHolderSmall}>
                                     <FontAwesomeIcon icon={faCloudArrowUp} color='#9F37B0' />
                                 </View>
@@ -541,13 +584,14 @@ return (
                   <></>
                 }
               </View>
+              </ContentShell>
             </>
           :
             <View style={styles.container}>
               <CameraView
                 style={{flex: 1}}
                 facing='back'
-                onBarcodeScanned={handleBarCodeScanned}
+                onBarcodeScanned={scanned ? undefined : handleBarCodeScanned}
                 barcodeScannerSettings={{
                   barcodeTypes: ["qr", "pdf417"],
                 }}
@@ -713,5 +757,14 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         width: '47%',
         opacity: .5
+    },
+})
+
+const tabletStyles = StyleSheet.create({
+    modalHeading: {
+        marginTop: 48,
+    },
+    actionButton: {
+        maxWidth: '100%',
     },
 })

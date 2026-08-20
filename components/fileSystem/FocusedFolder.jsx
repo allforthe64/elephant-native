@@ -14,8 +14,11 @@ import FocusedFileComp from './FocusedFileComp'
 
 //safe area context imports
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { tabletStyle, useResponsiveLayout } from '../../hooks/useResponsiveLayout'
+import KeyboardSafeForm from '../ui/KeyboardSafeForm'
 
 const FocusedFolder = ({folder, folders, clear, getTargetFolder, addFolder, renameFolder, moveFolder, deleteFolder, deleteFile, renameFile, moveFile, files, updateUser}) => {
+    const { isTablet, contentFill, modalMaxWidth } = useResponsiveLayout()
 
     const [nestedFolder, setNestedFolder] = useState()
     const [loading, setLoading] = useState(true)
@@ -150,7 +153,7 @@ const FocusedFolder = ({folder, folders, clear, getTargetFolder, addFolder, rena
     }, [])
 
   return (
-    <View style={add && !keybaordClosed
+    <View style={tabletStyle(isTablet, add && !keybaordClosed
         ? {
             height: '180%',
             width: '100%',
@@ -170,12 +173,16 @@ const FocusedFolder = ({folder, folders, clear, getTargetFolder, addFolder, rena
             backgroundColor: '#FFFCF6',
             paddingTop: insets.top,
             paddingBottom: insets.bottom
-        }}>
+        }, {
+            flex: 1,
+            height: '100%',
+            width: '100%',
+        })}>
         {loading ? <></> 
         : focusedFile ?
             <FocusedFileComp file={focusedFile} focus={setFocusedFile} deleteFile={deleteFile} renameFileFunction={renameFile} folders={folders} handleFileMove={moveFile} /> 
         :      
-                <View>
+                <View style={isTablet ? contentFill : undefined}>
 
                     <View style={styles.buttonContainer}>
                         <TouchableOpacity style={styles.backButtonContainer} onPress={folder.folder.nestedUnder === '' ? () => clear(null) : () => navigateUp()}>
@@ -200,7 +207,7 @@ const FocusedFolder = ({folder, folders, clear, getTargetFolder, addFolder, rena
                         <Modal presentationStyle='pageSheet' animationType='slide' onShow={() => setTimeout(()=>{
                             folderRef.current.focus()
                         }, 200)}>
-                            <View style={{height: '100%', width: '100%', backgroundColor: '#593060'}}>
+                            <View style={tabletStyle(isTablet, {height: '100%', width: '100%', backgroundColor: '#593060'}, {maxWidth: modalMaxWidth, alignSelf: 'center'})}>
                                 <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', paddingRight: '5%', paddingTop: '10%',width: '100%'}}>
                                     <Pressable onPress={() => {
                                         setAdd(false)
@@ -209,6 +216,7 @@ const FocusedFolder = ({folder, folders, clear, getTargetFolder, addFolder, rena
                                     <FontAwesomeIcon icon={faXmark} color={'white'} size={30}/>
                                     </Pressable>
                                 </View>
+                                <KeyboardSafeForm>
                                 <View style={styles.addFolderContainer}>
                                     <Text style={styles.addFolderHeading}>Add new folder:</Text>
                                     <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-around', marginBottom: '6%'}}  
@@ -231,11 +239,12 @@ const FocusedFolder = ({folder, folders, clear, getTargetFolder, addFolder, rena
                                         <Text style={{fontSize: 22, color: '#9F37B0', fontWeight: '600', paddingTop: '1%', marginLeft: '15%'}}>Save</Text>
                                     </Pressable>
                                 </View>
+                                </KeyboardSafeForm>
                             </View>
                         </Modal>
                     : 
                         <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'center'}}>
-                            <TouchableOpacity style={styles.nonFolderButton65}
+                            <TouchableOpacity style={tabletStyle(isTablet, styles.nonFolderButton65, {width: '100%', maxWidth: '100%', alignSelf: 'stretch'})}
                                 onPress={() => {
                                     setAdd(true)
                                     setKeyboardClosed(false)

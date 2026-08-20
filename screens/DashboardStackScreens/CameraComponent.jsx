@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useContext } from 'react';
-import { View, Text, StatusBar, StyleSheet, Animated, Image, TouchableOpacity, Platform, Pressable, TextInput, Modal, ScrollView, Button } from 'react-native'
+import { View, Text, StatusBar, StyleSheet, Animated, Image, TouchableOpacity, Platform, Pressable, TextInput, Modal, ScrollView, Linking } from 'react-native'
 
 //fontAwesome imports
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
@@ -8,7 +8,6 @@ import { faCircle } from '@fortawesome/free-regular-svg-icons'
 import { faCircle as solidCircle } from '@fortawesome/free-solid-svg-icons'
 
 //import expo Camera api
-import { Camera } from 'expo-camera'
 import { CameraView, useCameraPermissions } from 'expo-camera';
 
 //import Video and Audio components from expo-av
@@ -38,16 +37,22 @@ import { QueContext } from '../../context/QueContext';
 
 //import stuff for the Queue
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import AppPressable from '../../components/ui/AppPressable'
+import ContentShell from '../../components/ui/ContentShell'
+import KeyboardSafeForm from '../../components/ui/KeyboardSafeForm'
+import { TestIds } from '../../constants/testIds'
 import { UploadQueueEmitter } from '../../hooks/QueueEventEmitter';
+import { useResponsiveLayout, tabletStyle } from '../../hooks/useResponsiveLayout'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 
 export default function CameraComponent() {
 try {
+    const { isTablet, select } = useResponsiveLayout()
+    const insets = useSafeAreaInsets()
     const [facing, setFacing] = useState('back');
     const [permission, requestPermission] = useCameraPermissions();
-    const [hasCameraPermission, setHasCameraPermission] = useState()
-    const [hasMediaLibraryPermission, setHasMediaLibraryPermission] = useState()
-    const [hasAudioRecordingPermission, setHasAudioRecordingPermission] = useState()
+    const [hasMediaLibraryPermission, setHasMediaLibraryPermission] = useState(false)
     const [photo, setPhoto] = useState()
     const [session, setSession] = useState(true)
     const [userInst, setUserInst] = useState()
@@ -118,17 +123,39 @@ try {
         
     }, [firebaseAuth])
 
-    //get camera permissions
+    // Request media library / mic after camera is granted (non-blocking for CameraView)
     useEffect(() => {
-        (async () => {
-            const cameraPermission = await Camera.requestCameraPermissionsAsync()
-            const mediaLibraryPermission = await MediaLibrary.requestPermissionsAsync()
-            const {status} = await Audio.requestPermissionsAsync() 
-            setHasCameraPermission(cameraPermission.status === "granted")
-            setHasMediaLibraryPermission(mediaLibraryPermission.status === "granted")
-            setHasAudioRecordingPermission(status === "granted")
+        if (!permission?.granted) return
+
+        let cancelled = false
+        ;(async () => {
+            try {
+                const mediaLibraryPermission = await MediaLibrary.requestPermissionsAsync()
+                await Audio.requestPermissionsAsync()
+                if (cancelled) return
+                setHasMediaLibraryPermission(mediaLibraryPermission.status === 'granted')
+            } catch (err) {
+                console.warn('Secondary camera permissions error:', err)
+            }
         })()
-    }, [])
+
+        return () => {
+            cancelled = true
+        }
+    }, [permission?.granted])
+
+    const handleGrantCameraPermission = async () => {
+        try {
+            const result = await requestPermission()
+            if (result?.granted) return
+            if (result && result.canAskAgain === false) {
+                await Linking.openSettings()
+            }
+        } catch (err) {
+            console.warn('Camera permission request failed:', err)
+            alert(err?.message || String(err))
+        }
+    }
 
     useEffect(() => {
         //Will change fadeAnim value to 0 in 3 seconds
@@ -220,13 +247,6 @@ try {
         }
     }
     
-
-    //render content based on permissions
-    if (hasCameraPermission === undefined || hasMediaLibraryPermission === undefined || hasAudioRecordingPermission === undefined) {
-        return <Text>Requesting permissions...</Text>
-    } else if (!hasCameraPermission) {
-        return <Text>Permission for camera not granted. Please change this in settings.</Text>
-    }
 
     //take photo using takePictureAsync method
     const takePic = async () => {
@@ -434,18 +454,32 @@ try {
 
   if (!permission) {
     // Camera permissions are still loading.
-    return <View />;
+    return (
+      <View style={styles.permissionContainer}>
+        <Text style={styles.message}>Loading camera permissions...</Text>
+      </View>
+    );
   }
 
   if (!permission.granted) {
     // Camera permissions are not granted yet.
     return (
-      <View style={styles.container}>
+      <View style={styles.permissionContainer}>
         <Text style={styles.message}>We need your permission to show the camera</Text>
-        <Button onPress={requestPermission} title="grant permission" />
+        <AppPressable
+          testID={TestIds.camera.grantPermission}
+          accessibilityLabel="Grant camera permission"
+          onPress={handleGrantCameraPermission}
+          style={styles.grantButton}
+        >
+          <Text style={styles.grantButtonText}>Grant permission</Text>
+        </AppPressable>
       </View>
     );
   }
+
+  // Don't block the live camera on media-library / mic prompts.
+  // Those are requested in the background after camera is granted.
 
   //if velocity of pinch event is positive increase zoom, if it is negative decrease zoom
   const onPinchEvent = (event) => {
@@ -496,11 +530,12 @@ try {
                     </Pressable>
                 </View>
                 
+                <ContentShell variant="modal" fill>
                 { 
 
                 !nameGiven ?
                 <>
-                    <Text style={{color: 'white', fontSize: 35, fontWeight: '700', marginTop: '30%', textAlign: 'center'}}>{photo ? 'Name Photo' : 'Name Video: '}</Text>
+                    <Text style={[{color: 'white', fontSize: 35, fontWeight: '700', marginTop: '30%', textAlign: 'center'}, select(undefined, tabletStyles.modalHeading)]}>{photo ? 'Name Photo' : 'Name Video: '}</Text>
                     <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', marginTop: '10%'}}>
                         <View style={styles.iconHolder}>
                             <FontAwesomeIcon icon={faFile} size={22} color='#9F37B0'/>
@@ -544,8 +579,9 @@ try {
                     </View>
                 </>
                 : addFolderForm ? 
+                    <KeyboardSafeForm>
                     <View style={{width: '100%', height: '100', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center'}}>
-                        <Text style={{color: 'white', fontSize: 35, fontWeight: '700', marginTop: '40%', textAlign: 'center'}}>Add A New Folder:</Text>
+                        <Text style={[{color: 'white', fontSize: 35, fontWeight: '700', marginTop: '40%', textAlign: 'center'}, select(undefined, tabletStyles.modalHeading)]}>Add A New Folder:</Text>
                         <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', marginTop: '10%', width: '100%'}}>
                             <View style={styles.iconHolder}> 
                                 <FontAwesomeIcon icon={faFolder} size={22} color='#9F37B0'/>
@@ -567,6 +603,7 @@ try {
                             </TouchableOpacity>
                         </View>
                     </View>
+                    </KeyboardSafeForm>
 
                 :
 
@@ -605,7 +642,7 @@ try {
                                 <ScrollView style={focusedFolder ? {paddingTop: '5%', marginTop: '2%'} : {}}>
                                 {/* map over each of the folders from the filesystem and display them as a pressable element // call movefile function when one of them is pressed */}
                                 {focusedFolder && !subFolders ? 
-                                    <Text style={{fontSize: 30, color: 'white', fontWeight: 'bold', marginTop: '30%', textAlign: 'center'}}>No Subfolders...</Text>
+                                    <Text style={[{fontSize: 30, color: 'white', fontWeight: 'bold', marginTop: '30%', textAlign: 'center'}, select(undefined, tabletStyles.modalHeading)]}>No Subfolders...</Text>
                                 
                                 :   
                                     <>
@@ -704,6 +741,7 @@ try {
                     </View>
                     
                 }
+                </ContentShell>
 
             </View>
         </Modal>
@@ -715,7 +753,7 @@ try {
             justifyContent: 'flex-end'
         }}>
             <Image style={styles.preview} source={{ uri: "data:image/jpg;base64," + photo.base64}}/>
-            <View style={{position: 'absolute', top: '8%', right: '2.5%'}} >
+            <ContentShell variant="modal" style={[styles.reviewActions, select(undefined, {top: insets.top + 24, right: 24})]}>
                 <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', paddingRight: '2%'}}>
                     <Animated.View style={{display: 'flex', flexDirection: 'coloumn', alignItems: 'flex-end', marginRight: 10, paddingTop: 20, opacity: fadeAnim}} onLayout={() => fadeOut()}>
                         <View style={{backgroundColor: '#DDCADB',  marginBottom: 25, paddingTop: 2, paddingBottom: 2, borderRadius: 17, width: '50%', marginTop: '2%'}}>
@@ -750,7 +788,7 @@ try {
                         </TouchableOpacity>
                     </View>
                 </View>
-            </View>
+            </ContentShell>
         </View>
 : videoObj ? 
     <>
@@ -761,7 +799,7 @@ try {
             justifyContent: 'flex-end',
         }}>
             <Video style={{flex: 1, alignSelf: 'stretch', height: '100%'}} source={{uri: videoObj.uri}} useNativeControls resizeMode='contain' isLooping onError={(error) => alert(error)}/>
-            <View style={{position: 'absolute', top: '8%', right: '2.5%'}} >
+            <ContentShell variant="modal" style={[styles.reviewActions, select(undefined, {top: insets.top + 24, right: 24})]}>
                 <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', paddingRight: '2%'}}>
                     <Animated.View style={{display: 'flex', flexDirection: 'coloumn', alignItems: 'flex-end', marginRight: 10, paddingTop: 20, opacity: fadeAnim}} onLayout={() => fadeOut()}>
                         <View style={{backgroundColor: '#DDCADB',  marginBottom: 25, paddingTop: 2, paddingBottom: 2, borderRadius: 17, width: '50%', marginTop: '2%'}}>
@@ -796,12 +834,13 @@ try {
                         </TouchableOpacity>
                     </View>
                 </View>
-            </View>
+            </ContentShell>
         </View>
     </>
     :
-    <View style={styles.container}>
+    <View style={styles.cameraContainer}>
         <PinchGestureHandler onGestureEvent={onPinchEvent}>
+            <View style={styles.camera}>
             <CameraView style={styles.camera} facing={facing} ref={cameraRef} mode={video ? 'video' : 'picture'} zoom={zoom}>
                 <View style={{
                     position: 'absolute',
@@ -829,34 +868,45 @@ try {
                         alignItems: 'flex-end',
                         paddingRight: '5%',
                     }}>
-                        <TouchableOpacity onPress={toggleType} style={{ width: '14%', height: '55%', borderRadius: 100, display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0, 0, 0, .5)'}}>
+                        <AppPressable
+                          testID={TestIds.camera.flip}
+                          accessibilityLabel="Flip camera"
+                          onPress={toggleType}
+                          style={{ width: '14%', height: '55%', borderRadius: 100, display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0, 0, 0, .5)'}}
+                        >
                             <FontAwesomeIcon icon={faRepeat} color={'white'} size={30} />
-                        </TouchableOpacity>
+                        </AppPressable>
                 </View>
-                <View style={styles.buttonContainer}>
-                    <TouchableOpacity onPress={() => setVideo(prev => !prev)} style={video ? {/* backgroundColor: 'white' */backgroundColor: 'rgba(0, 0, 0, .5)', width: '14%', height: '55%', borderRadius: 100, display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginRight: '10%', marginTop: '5%'} : { width: '14%', height: '55%', borderRadius: 100, display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0, 0, 0, .5)', marginRight: '10%', marginTop: '5%'}}>
+                <View style={tabletStyle(isTablet, styles.buttonContainer, tabletStyles.buttonContainer)}>
+                    <AppPressable
+                      testID={TestIds.camera.modeToggle}
+                      accessibilityLabel={video ? 'Switch to photo mode' : 'Switch to video mode'}
+                      onPress={() => setVideo(prev => !prev)}
+                      style={video ? {/* backgroundColor: 'white' */backgroundColor: 'rgba(0, 0, 0, .5)', width: '14%', height: '55%', borderRadius: 100, display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginRight: '10%', marginTop: '5%'} : { width: '14%', height: '55%', borderRadius: 100, display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0, 0, 0, .5)', marginRight: '10%', marginTop: '5%'}}
+                    >
                             <FontAwesomeIcon icon={video ? faCamera : faVideoCamera} color={/* video ? 'black' :  */'white'} size={30} />
-                    </TouchableOpacity>
+                    </AppPressable>
                     {!video ? 
-                        <TouchableOpacity onPress={takePic} style={{marginRight: '17%'}}> 
+                        <AppPressable testID={TestIds.camera.shutter} accessibilityLabel="Take photo" onPress={takePic} style={{marginRight: '17%'}}> 
                             <FontAwesomeIcon icon={faCircle} size={90} color='white'/>
-                        </TouchableOpacity>
+                        </AppPressable>
                     :   
                         <>
                             {recording ? 
-                                <TouchableOpacity onPress={stopVideo} style={{marginRight: '17%', backgroundColor: 'transparent', borderWidth: 8, borderColor: 'white', borderRadius: 1000, width: '24%', height: 90, display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}> 
+                                <AppPressable testID={TestIds.camera.shutter} accessibilityLabel="Stop video" onPress={stopVideo} style={{marginRight: '17%', backgroundColor: 'transparent', borderWidth: 8, borderColor: 'white', borderRadius: 1000, width: '24%', height: 90, display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}> 
                                     <FontAwesomeIcon icon={faSquare} size={55} color='red'/>
-                                </TouchableOpacity>
+                                </AppPressable>
                                 :
-                                <TouchableOpacity onPress={takeVideo} style={{marginRight: '17%', backgroundColor: 'transparent', borderWidth: 8, borderColor: 'white', borderRadius: 1000, width: '24%', height: 90, display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}> 
+                                <AppPressable testID={TestIds.camera.shutter} accessibilityLabel="Start video" onPress={takeVideo} style={{marginRight: '17%', backgroundColor: 'transparent', borderWidth: 8, borderColor: 'white', borderRadius: 1000, width: '24%', height: 90, display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}> 
                                     <FontAwesomeIcon icon={solidCircle} size={55} color='red'/>
-                                </TouchableOpacity>
+                                </AppPressable>
                             }
                         </>
                     }
                 </View>
                 <StatusBar style="auto" /> 
             </CameraView>
+            </View>
         </PinchGestureHandler>
     </View>
   );
@@ -866,12 +916,38 @@ try {
 }
 
 const styles = StyleSheet.create({
-  container: {
+  permissionContainer: {
     flex: 1,
     justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#FFFCF6',
+    paddingHorizontal: 24,
+  },
+  cameraContainer: {
+    flex: 1,
+    width: '100%',
+    backgroundColor: '#000',
+  },
+  message: {
+    textAlign: 'center',
+    color: '#593060',
+    fontSize: 18,
+    marginBottom: 20,
+  },
+  grantButton: {
+    backgroundColor: '#2196F3',
+    borderRadius: 8,
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+  },
+  grantButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: '600',
   },
   camera: {
     flex: 1,
+    width: '100%',
   },
   containerCenter: {
     flex: 1,
@@ -893,6 +969,11 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         width: '100%',
         justifyContent: 'center'
+    },
+    reviewActions: {
+        position: 'absolute',
+        top: '8%',
+        right: '2.5%'
     },
     preview: {
         alignSelf: 'stretch',
@@ -1029,4 +1110,13 @@ const styles = StyleSheet.create({
         borderRadius: 100
     },
   
+});
+
+const tabletStyles = StyleSheet.create({
+    modalHeading: {
+        marginTop: 48,
+    },
+    buttonContainer: {
+        bottom: 32,
+    },
 });

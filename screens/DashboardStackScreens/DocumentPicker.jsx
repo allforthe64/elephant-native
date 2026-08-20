@@ -36,8 +36,13 @@ import { UploadQueueEmitter } from '../../hooks/QueueEventEmitter'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
 import * as FileSystem from "expo-file-system"
+import ContentShell from '../../components/ui/ContentShell'
+import KeyboardSafeForm from '../../components/ui/KeyboardSafeForm'
+import YellowActionButton from '../../components/ui/YellowActionButton'
+import { useResponsiveLayout, tabletStyle } from '../../hooks/useResponsiveLayout'
 
 const DocumentPickerComp = () => {
+    const { isTablet, select } = useResponsiveLayout()
 
     const [files, setFiles] = useState([])
     const [userInst, setUserInst] = useState()
@@ -348,10 +353,12 @@ const DocumentPickerComp = () => {
                         </Pressable>
                     </View>
                     
+                    <ContentShell variant="modal" fill>
                     { 
                     addFolderForm ? 
+                        <KeyboardSafeForm>
                         <View style={{width: '100%', height: '100', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center'}}>
-                            <Text style={{color: 'white', fontSize: 35, fontWeight: '700', marginTop: '40%', textAlign: 'center'}}>Add A New Folder:</Text>
+                            <Text style={[{color: 'white', fontSize: 35, fontWeight: '700', marginTop: '40%', textAlign: 'center'}, select(undefined, tabletStyles.modalHeading)]}>Add A New Folder:</Text>
                             <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', marginTop: '10%', width: '100%'}}>
                                 <View style={styles.iconHolder}> 
                                     <FontAwesomeIcon icon={faFolder} size={22} color='#9F37B0'/>
@@ -371,6 +378,7 @@ const DocumentPickerComp = () => {
                                 </TouchableOpacity>
                             </View>
                         </View>
+                        </KeyboardSafeForm>
 
                     :
 
@@ -409,7 +417,7 @@ const DocumentPickerComp = () => {
                                     <ScrollView style={focusedFolder ? {paddingTop: '5%', marginTop: '2%'} : {}}>
                                     {/* map over each of the folders from the filesystem and display them as a pressable element // call movefile function when one of them is pressed */}
                                     {focusedFolder && !subFolders ? 
-                                        <Text style={{fontSize: 30, color: 'white', fontWeight: 'bold', marginTop: '30%', textAlign: 'center'}}>No Subfolders...</Text>
+                                        <Text style={[{fontSize: 30, color: 'white', fontWeight: 'bold', marginTop: '30%', textAlign: 'center'}, select(undefined, tabletStyles.modalHeading)]}>No Subfolders...</Text>
                                     
                                     :   
                                         <>
@@ -502,19 +510,21 @@ const DocumentPickerComp = () => {
                         </View>
                         
                     }
+                    </ContentShell>
 
                 </View>
             </Modal>
         :
             <View style={styles.container}>
+                <ContentShell variant="content" fill>
                 <View style={{
                     width: '100%',
                     height: '100%',
                     display: 'flex',
                     alignItems: 'center',
                     position: 'absolute',
-                    paddingTop: insets.top,
-                    paddingBottom: insets.bottom
+                    paddingTop: 8,
+                    paddingBottom: Math.max(insets.bottom, 16) + 48,
                 }}>
                     <Text style={styles.bigHeader}>Files to upload:</Text>
                         {loading ? 
@@ -551,56 +561,31 @@ const DocumentPickerComp = () => {
                             </>
                         }
                     <View style={styles.buttonCon}>
-
-                        <TouchableOpacity style={styles.buttonWrapperSm} onPress={() => selectFile()}>
-                            <View style={styles.iconHolderSM}>
-                              <FontAwesomeIcon icon={faFile} size={18} color='#9F37B0'/>
-                            </View>
-                            <Text style={styles.subheadingMLLarge}>Select File</Text>
-                        </TouchableOpacity>
-
-                        
-                        
-                        <TouchableOpacity style={styles.buttonWrapperSm} onPress={() => selectImage()}>
-                            <View style={styles.iconHolderSM}>
-                              <FontAwesomeIcon icon={faImage} size={18} color='#9F37B0'/>
-                            </View>
-                            <Text style={styles.subheadingMLLarge}>Select Photo</Text>
-                        </TouchableOpacity>
+                        <YellowActionButton
+                          label="Select File"
+                          onPress={() => selectFile()}
+                          style={tabletStyle(isTablet, { width: '45%' }, tabletStyles.actionButton)}
+                          icon={<FontAwesomeIcon icon={faFile} size={18} color='#9F37B0'/>}
+                        />
+                        <YellowActionButton
+                          label="Select Photo"
+                          onPress={() => selectImage()}
+                          style={tabletStyle(isTablet, { width: '45%' }, tabletStyles.actionButton)}
+                          icon={<FontAwesomeIcon icon={faImage} size={18} color='#9F37B0'/>}
+                        />
                     </View>
                     <View style={styles.wrapperContainer}>
-                        <TouchableOpacity style={files.length === 0 ? 
-                                {
-                                    width: '60%',
-                                    borderRadius: 12,
-                                    backgroundColor: '#FFE562',
-                                    paddingLeft: '2%', 
-                                    paddingTop: '2%', 
-                                    paddingBottom: '2%', 
-                                    opacity: .5,
-                                    display: 'flex',
-                                    flexDirection: 'row'
-                                }
-                            :                            
-
-                                {
-                                    width: '60%',
-                                    borderRadius: 12,
-                                    backgroundColor: '#FFE562',
-                                    paddingLeft: '2%', 
-                                    paddingTop: '2%', 
-                                    paddingBottom: '2%', 
-                                    display: 'flex',
-                                    flexDirection: 'row'
-                                }
-                            } onPress={() => setPreAdd(true)} disabled={files.length === 0 ? true : false}>
-                            <View style={styles.iconHolderSM}>
-                              <FontAwesomeIcon icon={faCloudArrowUp} size={18} color='#9F37B0'/>
-                            </View>
-                            <Text style={styles.subheadingMLXLarge}>Upload Files</Text>
-                        </TouchableOpacity>
+                        <YellowActionButton
+                          label="Upload Files"
+                          onPress={() => setPreAdd(true)}
+                          dimmed={files.length === 0}
+                          disabled={files.length === 0}
+                          style={{ width: '60%' }}
+                          icon={<FontAwesomeIcon icon={faCloudArrowUp} size={18} color='#9F37B0'/>}
+                        />
                     </View>
                 </View>
+                </ContentShell>
             </View>
         }
     </>
@@ -634,13 +619,16 @@ const styles = StyleSheet.create({
         display: 'flex',
         flexDirection: 'row',
         justifyContent: 'space-around',
+        alignItems: 'center',
         marginBottom: '3%',
-        width: '100%'
+        width: '100%',
+        paddingHorizontal: 8,
     },
     wrapperContainer: {
         display: 'flex',
         alignItems: 'center',
         width: '100%',
+        marginBottom: 8,
     },
     buttonWrapperSm: {
         backgroundColor: '#FFE562',
@@ -820,5 +808,14 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         width: '30%',
         marginLeft: '5%'
+    },
+})
+
+const tabletStyles = StyleSheet.create({
+    modalHeading: {
+        marginTop: 48,
+    },
+    actionButton: {
+        maxWidth: '100%',
     },
 })

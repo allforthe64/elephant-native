@@ -3,12 +3,20 @@ import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-nati
 import { useNavigation } from '@react-navigation/native'
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons'
+import { useResponsiveLayout } from '../hooks/useResponsiveLayout'
 
 const TOSMain = () => {
   const navigation = useNavigation()
+  const { isTablet, contentFill } = useResponsiveLayout()
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <ScrollView
+      contentContainerStyle={[
+        styles.container,
+        isTablet && { paddingHorizontal: 24, alignItems: 'center' },
+      ]}
+    >
+      <View style={isTablet ? contentFill : { width: '100%' }}>
 
       {/* Top Button */}
       <TouchableOpacity style={styles.backButton} onPress={() => navigation.navigate('Home')}>
@@ -476,7 +484,7 @@ const TOSMain = () => {
           <Text style={styles.backButtonTextLarge}>Back to home page</Text>
         </TouchableOpacity>
       </View>
-
+      </View>
     </ScrollView>
   )
 }

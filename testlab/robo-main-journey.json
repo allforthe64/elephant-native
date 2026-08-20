@@ -1,0 +1,550 @@
+[
+  {
+    "id": 1000,
+    "description": "Elephant main journey: About, sign-in, dashboard capture tools, file screens, drawer pages",
+    "crawlStage": "crawl",
+    "contextDescriptor": {
+      "condition": "app_under_test_shown"
+    },
+    "actions": [
+      {
+        "eventType": "WAIT",
+        "delayTime": 4000
+      },
+      {
+        "eventType": "PERMISSIONS_REQUEST"
+      },
+      {
+        "eventType": "DISABLE_KEYBOARD"
+      },
+
+      {
+        "eventType": "WAIT_FOR_ELEMENT",
+        "delayTime": 20000,
+        "elementDescriptors": [
+          { "contentDescription": "Sign In or Sign Up" }
+        ]
+      },
+      {
+        "eventType": "TAKE_SCREENSHOT",
+        "screenshotName": "01_home"
+      },
+
+      {
+        "eventType": "VIEW_CLICKED",
+        "elementDescriptors": [
+          { "contentDescription": "I have a question" }
+        ]
+      },
+      {
+        "eventType": "WAIT",
+        "delayTime": 2500
+      },
+      {
+        "eventType": "TAKE_SCREENSHOT",
+        "screenshotName": "02_about"
+      },
+      {
+        "eventType": "PRESSED_BACK"
+      },
+      {
+        "eventType": "WAIT",
+        "delayTime": 1500
+      },
+
+      {
+        "eventType": "VIEW_CLICKED",
+        "elementDescriptors": [
+          { "contentDescription": "Sign In or Sign Up" }
+        ]
+      },
+      {
+        "eventType": "WAIT_FOR_ELEMENT",
+        "delayTime": 15000,
+        "elementDescriptors": [
+          { "contentDescription": "Email" }
+        ]
+      },
+      {
+        "eventType": "TAKE_SCREENSHOT",
+        "screenshotName": "03_auth"
+      },
+      {
+        "eventType": "VIEW_TEXT_CHANGED",
+        "replacementText": "myelephanttesting@gmail.com",
+        "elementDescriptors": [
+          { "contentDescription": "Email" }
+        ]
+      },
+      {
+        "eventType": "VIEW_TEXT_CHANGED",
+        "replacementText": "myelephanttest1234",
+        "elementDescriptors": [
+          { "contentDescription": "Password" }
+        ]
+      },
+      {
+        "eventType": "VIEW_CLICKED",
+        "elementDescriptors": [
+          { "contentDescription": "Sign In" }
+        ]
+      },
+      {
+        "eventType": "WAIT_FOR_ELEMENT",
+        "delayTime": 30000,
+        "elementDescriptors": [
+          { "contentDescription": "Notes" }
+        ]
+      },
+      {
+        "eventType": "WAIT",
+        "delayTime": 2000
+      },
+      {
+        "eventType": "TAKE_SCREENSHOT",
+        "screenshotName": "04_dashboard"
+      },
+
+      {
+        "eventType": "VIEW_CLICKED",
+        "elementDescriptors": [
+          { "contentDescription": "Notes" }
+        ]
+      },
+      {
+        "eventType": "WAIT_FOR_ELEMENT",
+        "delayTime": 15000,
+        "elementDescriptors": [
+          { "contentDescription": "Note body" }
+        ]
+      },
+      {
+        "eventType": "VIEW_TEXT_CHANGED",
+        "replacementText": "Robo test note from Firebase Test Lab",
+        "elementDescriptors": [
+          { "contentDescription": "Note body" }
+        ]
+      },
+      {
+        "eventType": "VIEW_CLICKED",
+        "elementDescriptors": [
+          { "contentDescription": "Save note" }
+        ]
+      },
+      {
+        "eventType": "WAIT",
+        "delayTime": 2000
+      },
+      {
+        "eventType": "TAKE_SCREENSHOT",
+        "screenshotName": "05_notes"
+      },
+      {
+        "eventType": "PRESSED_BACK"
+      },
+      {
+        "eventType": "WAIT_FOR_ELEMENT",
+        "delayTime": 15000,
+        "elementDescriptors": [
+          { "contentDescription": "Notes" }
+        ]
+      },
+
+      {
+        "eventType": "VIEW_CLICKED",
+        "elementDescriptors": [
+          { "contentDescription": "Record Audio" }
+        ]
+      },
+      {
+        "eventType": "WAIT_FOR_ELEMENT",
+        "delayTime": 15000,
+        "elementDescriptors": [
+          { "contentDescription": "Start recording" }
+        ]
+      },
+      {
+        "eventType": "PERMISSIONS_REQUEST"
+      },
+      {
+        "eventType": "VIEW_CLICKED",
+        "elementDescriptors": [
+          { "contentDescription": "Start recording" }
+        ]
+      },
+      {
+        "eventType": "WAIT",
+        "delayTime": 2500
+      },
+      {
+        "eventType": "VIEW_CLICKED",
+        "elementDescriptors": [
+          { "contentDescription": "Stop recording" }
+        ]
+      },
+      {
+        "eventType": "WAIT",
+        "delayTime": 2000
+      },
+      {
+        "eventType": "TAKE_SCREENSHOT",
+        "screenshotName": "06_audio_recorder"
+      },
+      {
+        "eventType": "PRESSED_BACK"
+      },
+      {
+        "eventType": "WAIT_FOR_ELEMENT",
+        "delayTime": 15000,
+        "elementDescriptors": [
+          { "contentDescription": "Camera" }
+        ]
+      },
+
+      {
+        "eventType": "VIEW_CLICKED",
+        "elementDescriptors": [
+          { "contentDescription": "Camera" }
+        ]
+      },
+      {
+        "eventType": "WAIT",
+        "delayTime": 3000
+      },
+      {
+        "eventType": "PERMISSIONS_REQUEST"
+      },
+      {
+        "eventType": "WAIT",
+        "delayTime": 2000
+      },
+      {
+        "eventType": "VIEW_CLICKED",
+        "visionText": "grant permission"
+      },
+      {
+        "eventType": "WAIT",
+        "delayTime": 3000
+      },
+      {
+        "eventType": "WAIT_FOR_ELEMENT",
+        "delayTime": 20000,
+        "elementDescriptors": [
+          { "contentDescription": "Take photo" }
+        ]
+      },
+      {
+        "eventType": "TAKE_SCREENSHOT",
+        "screenshotName": "07_camera"
+      },
+      {
+        "eventType": "VIEW_CLICKED",
+        "elementDescriptors": [
+          { "contentDescription": "Take photo" }
+        ]
+      },
+      {
+        "eventType": "WAIT",
+        "delayTime": 3000
+      },
+      {
+        "eventType": "TAKE_SCREENSHOT",
+        "screenshotName": "08_camera_preview"
+      },
+      {
+        "eventType": "PRESSED_BACK"
+      },
+      {
+        "eventType": "WAIT",
+        "delayTime": 1500
+      },
+      {
+        "eventType": "PRESSED_BACK"
+      },
+      {
+        "eventType": "WAIT_FOR_ELEMENT",
+        "delayTime": 15000,
+        "elementDescriptors": [
+          { "contentDescription": "QR Scanner" }
+        ]
+      },
+
+      {
+        "eventType": "VIEW_CLICKED",
+        "elementDescriptors": [
+          { "contentDescription": "QR Scanner" }
+        ]
+      },
+      {
+        "eventType": "WAIT",
+        "delayTime": 3000
+      },
+      {
+        "eventType": "PERMISSIONS_REQUEST"
+      },
+      {
+        "eventType": "WAIT",
+        "delayTime": 2500
+      },
+      {
+        "eventType": "TAKE_SCREENSHOT",
+        "screenshotName": "09_qr_scanner"
+      },
+      {
+        "eventType": "PRESSED_BACK"
+      },
+      {
+        "eventType": "WAIT_FOR_ELEMENT",
+        "delayTime": 15000,
+        "elementDescriptors": [
+          { "contentDescription": "Document Scanner" }
+        ]
+      },
+
+      {
+        "eventType": "VIEW_CLICKED",
+        "elementDescriptors": [
+          { "contentDescription": "Document Scanner" }
+        ]
+      },
+      {
+        "eventType": "WAIT",
+        "delayTime": 4000
+      },
+      {
+        "eventType": "PERMISSIONS_REQUEST"
+      },
+      {
+        "eventType": "WAIT",
+        "delayTime": 2500
+      },
+      {
+        "eventType": "TAKE_SCREENSHOT",
+        "screenshotName": "10_document_scanner"
+      },
+      {
+        "eventType": "PRESSED_BACK"
+      },
+      {
+        "eventType": "WAIT",
+        "delayTime": 1500
+      },
+      {
+        "eventType": "PRESSED_BACK"
+      },
+      {
+        "eventType": "WAIT_FOR_ELEMENT",
+        "delayTime": 15000,
+        "elementDescriptors": [
+          { "contentDescription": "My Files" }
+        ]
+      },
+
+      {
+        "eventType": "VIEW_CLICKED",
+        "elementDescriptors": [
+          { "contentDescription": "My Files" }
+        ]
+      },
+      {
+        "eventType": "WAIT",
+        "delayTime": 3000
+      },
+      {
+        "eventType": "TAKE_SCREENSHOT",
+        "screenshotName": "11_my_files"
+      },
+      {
+        "eventType": "PRESSED_BACK"
+      },
+      {
+        "eventType": "WAIT_FOR_ELEMENT",
+        "delayTime": 15000,
+        "elementDescriptors": [
+          { "contentDescription": "Upload Doc" }
+        ]
+      },
+
+      {
+        "eventType": "VIEW_CLICKED",
+        "elementDescriptors": [
+          { "contentDescription": "Upload Doc" }
+        ]
+      },
+      {
+        "eventType": "WAIT",
+        "delayTime": 3000
+      },
+      {
+        "eventType": "TAKE_SCREENSHOT",
+        "screenshotName": "12_upload_doc"
+      },
+      {
+        "eventType": "PRESSED_BACK"
+      },
+      {
+        "eventType": "WAIT_FOR_ELEMENT",
+        "delayTime": 15000,
+        "elementDescriptors": [
+          { "contentDescription": "To Be Filed" }
+        ]
+      },
+
+      {
+        "eventType": "VIEW_CLICKED",
+        "elementDescriptors": [
+          { "contentDescription": "To Be Filed" }
+        ]
+      },
+      {
+        "eventType": "WAIT",
+        "delayTime": 3000
+      },
+      {
+        "eventType": "TAKE_SCREENSHOT",
+        "screenshotName": "13_to_be_filed"
+      },
+      {
+        "eventType": "PRESSED_BACK"
+      },
+      {
+        "eventType": "WAIT_FOR_ELEMENT",
+        "delayTime": 15000,
+        "elementDescriptors": [
+          { "contentDescription": "Notes" }
+        ]
+      },
+
+      {
+        "eventType": "VIEW_CLICKED",
+        "elementDescriptors": [
+          { "contentDescription": "Open navigation drawer" }
+        ]
+      },
+      {
+        "eventType": "WAIT",
+        "delayTime": 1500
+      },
+      {
+        "eventType": "VIEW_CLICKED",
+        "visionText": "FAQs"
+      },
+      {
+        "eventType": "WAIT",
+        "delayTime": 2500
+      },
+      {
+        "eventType": "TAKE_SCREENSHOT",
+        "screenshotName": "14_faqs"
+      },
+
+      {
+        "eventType": "VIEW_CLICKED",
+        "elementDescriptors": [
+          { "contentDescription": "Open navigation drawer" }
+        ]
+      },
+      {
+        "eventType": "WAIT",
+        "delayTime": 1500
+      },
+      {
+        "eventType": "VIEW_CLICKED",
+        "visionText": "Contact"
+      },
+      {
+        "eventType": "WAIT",
+        "delayTime": 2500
+      },
+      {
+        "eventType": "TAKE_SCREENSHOT",
+        "screenshotName": "15_contact"
+      },
+
+      {
+        "eventType": "VIEW_CLICKED",
+        "elementDescriptors": [
+          { "contentDescription": "Open navigation drawer" }
+        ]
+      },
+      {
+        "eventType": "WAIT",
+        "delayTime": 1500
+      },
+      {
+        "eventType": "VIEW_CLICKED",
+        "visionText": "Privacy Policy"
+      },
+      {
+        "eventType": "WAIT",
+        "delayTime": 2500
+      },
+      {
+        "eventType": "TAKE_SCREENSHOT",
+        "screenshotName": "16_privacy"
+      },
+
+      {
+        "eventType": "VIEW_CLICKED",
+        "elementDescriptors": [
+          { "contentDescription": "Open navigation drawer" }
+        ]
+      },
+      {
+        "eventType": "WAIT",
+        "delayTime": 1500
+      },
+      {
+        "eventType": "VIEW_CLICKED",
+        "visionText": "Terms Of Service"
+      },
+      {
+        "eventType": "WAIT",
+        "delayTime": 2500
+      },
+      {
+        "eventType": "TAKE_SCREENSHOT",
+        "screenshotName": "17_terms"
+      },
+
+      {
+        "eventType": "VIEW_CLICKED",
+        "elementDescriptors": [
+          { "contentDescription": "Open navigation drawer" }
+        ]
+      },
+      {
+        "eventType": "WAIT",
+        "delayTime": 1500
+      },
+      {
+        "eventType": "VIEW_CLICKED",
+        "visionText": "Dashboard"
+      },
+      {
+        "eventType": "WAIT_FOR_ELEMENT",
+        "delayTime": 15000,
+        "elementDescriptors": [
+          { "contentDescription": "Sign Out" }
+        ]
+      },
+      {
+        "eventType": "VIEW_CLICKED",
+        "elementDescriptors": [
+          { "contentDescription": "Sign Out" }
+        ]
+      },
+      {
+        "eventType": "WAIT",
+        "delayTime": 3000
+      },
+      {
+        "eventType": "TAKE_SCREENSHOT",
+        "screenshotName": "18_signed_out"
+      },
+      {
+        "eventType": "TERMINATE_CRAWL"
+      }
+    ]
+  }
+]

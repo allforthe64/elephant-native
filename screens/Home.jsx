@@ -1,73 +1,86 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react'
 
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, TouchableOpacity, Image } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { onAuthStateChanged } from 'firebase/auth'
 import { firebaseAuth } from '../firebaseConfig';
-
+import AppPressable from '../components/ui/AppPressable'
+import ContentShell from '../components/ui/ContentShell'
+import { TestIds } from '../constants/testIds'
+import { useResponsiveLayout, tabletStyle } from '../hooks/useResponsiveLayout'
 import {
   useFonts,
   Anybody_700Bold,
   Anybody_900Black,
 } from '@expo-google-fonts/anybody'
 
-
 export default function Home({navigation: {navigate}}) {
-
-  //initialize state for loading, instantiate auth object
   const [loading, setLoading] = useState(true)
-  const auth  = firebaseAuth
+  const { isTablet, select } = useResponsiveLayout()
 
   const [fontsLoaded] = useFonts({
     Anybody_700Bold,
-    Anybody_900Black
+    Anybody_900Black,
   })
 
-  if (!fontsLoaded) return null
-
-  //if user data is returned from firebaseAuth object, navigate to dashboard screen
-  auth.onAuthStateChanged(user => {
-    if (user) navigate('Dashboard')
-    else setLoading(false)
-  })
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(firebaseAuth, (user) => {
+      if (user) navigate('Dashboard')
+      else setLoading(false)
+    })
+    return unsubscribe
+  }, [navigate])
 
   const insets = useSafeAreaInsets()
+
+  if (!fontsLoaded) {
+    return (
+      <View style={styles.loadingRoot}>
+        <Text style={styles.loadingText}>Loading...</Text>
+      </View>
+    )
+  }
 
   return (
     <>
       {loading ?
-        <View style={{width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', backgroundColor: '#593060'}}>
-          <Text style={{
-            color: 'white',
-            fontWeight: '600',
-            fontSize: 25
-          }}>Loading...</Text>
+        <View style={styles.loadingRoot}>
+          <Text style={styles.loadingText}>Loading...</Text>
         </View>
       :
-        <View style={{
-          flex: 1,
-          backgroundColor: '#593060',
-          alignItems: 'center',
-          justifyContent: 'center',
+        <View style={[styles.root, {
           paddingTop: insets.top,
           paddingBottom: insets.bottom
-        }}>
-          {/* <Image source={require('../assets/elephant_bg.jpg')} style={styles.bgImg}/> */}
-          <View style={styles.modal}>
-            <Text style={[{fontFamily: 'Anybody_900Black'}, styles.bigHeader]}>ORGANIZE</Text>
-            <Text style={[{fontFamily: 'Anybody_700Bold'}, styles.subheading]}>with</Text>
-            <Text style={[{fontFamily: 'Anybody_700Bold'}, styles.subheading1]}>MyElephantApp</Text>
-            <View style={styles.wrapperContainer}>
-              <TouchableOpacity style={styles.button} onPress={() => navigate('Sign In/Sign Up')}>
-                  <Text style={[{fontFamily: 'Anybody_700Bold'}, styles.buttonText]}>Sign In/Sign Up</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.button} onPress={() => navigate('About')}>
-                  <Text style={[{fontFamily: 'Anybody_700Bold'}, styles.buttonText]}>I have a question</Text>
-              </TouchableOpacity>
+        }]}>
+          <ContentShell variant="form" style={styles.shell}>
+            <View style={tabletStyle(isTablet, styles.modal, tabletStyles.modal)}>
+              {/* Use weight-specific fontFamily only — do not also set fontWeight on Android */}
+              <Text style={[{ fontFamily: 'Anybody_900Black' }, tabletStyle(isTablet, styles.bigHeader, tabletStyles.bigHeader)]}>ORGANIZE</Text>
+              <Text style={[{ fontFamily: 'Anybody_700Bold' }, styles.subheading]}>with</Text>
+              <Text style={[{ fontFamily: 'Anybody_700Bold' }, tabletStyle(isTablet, styles.subheading1, tabletStyles.subheading1)]}>MyElephantApp</Text>
+              <View style={styles.wrapperContainer}>
+                <AppPressable
+                  testID={TestIds.home.signIn}
+                  accessibilityLabel="Sign In or Sign Up"
+                  style={tabletStyle(isTablet, styles.button, tabletStyles.button)}
+                  onPress={() => navigate('Sign In/Sign Up')}
+                >
+                    <Text style={[{ fontFamily: 'Anybody_700Bold' }, styles.buttonText]}>Sign In/Sign Up</Text>
+                </AppPressable>
+                <AppPressable
+                  testID={TestIds.home.about}
+                  accessibilityLabel="I have a question"
+                  style={tabletStyle(isTablet, styles.button, tabletStyles.button)}
+                  onPress={() => navigate('FAQs')}
+                >
+                    <Text style={[{ fontFamily: 'Anybody_700Bold' }, styles.buttonText]}>I have a question</Text>
+                </AppPressable>
+              </View>
+              <Text style={[{ fontFamily: 'Anybody_700Bold' }, styles.subheading, { marginTop: select(24, 32) }]}>Take control of your personal information</Text>
+              <Text style={[{ fontFamily: 'Anybody_700Bold' }, tabletStyle(isTablet, styles.tagline, tabletStyles.tagline)]}>*A portion of all proceeds generated by My Elephant App will be donated to saving endangered Elephants around the globe</Text>
             </View>
-            <Text style={[{fontFamily: 'Anybody_700Bold'}, styles.subheading, { marginTop: '10%' }]}>Take control of your personal information</Text>
-            <Text style={[{fontFamily: 'Anybody_700Bold'}, styles.tagline]}>*A portion of all proceeds generated by My Elephant App will be donated to saving endangered Elephants around the globe</Text>  
-          </View>
+          </ContentShell>
           <StatusBar style="auto" />
         </View>
       }
@@ -76,63 +89,105 @@ export default function Home({navigation: {navigate}}) {
 }
 
 const styles = StyleSheet.create({
-  bgImg: {
-    objectFit: 'scale-down',
-    opacity: .25
+  loadingRoot: {
+    width: '100%',
+    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#593060',
+  },
+  loadingText: {
+    color: 'white',
+    fontSize: 25,
+  },
+  root: {
+    flex: 1,
+    backgroundColor: '#593060',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  shell: {
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+    flex: 1,
   },
   modal: {
     width: '90%',
-    height: '60%',
-    paddingBottom: 10,
-    position: 'absolute',
-    display: 'flex',
+    maxWidth: 480,
+    alignSelf: 'center',
     flexDirection: 'column',
-    alignItems: 'center'
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingBottom: 10,
   },
   bigHeader: {
     color: 'white',
     fontSize: 60,
     textAlign: 'center',
-    fontWeight: '700',
-    marginBottom: '6%'
+    marginBottom: 16,
   },
   subheading: {
     color: 'white',
     textAlign: 'center',
-    fontSize: 20,
-    marginBottom: '2.5%'
+    fontSize: 22,
   },
   subheading1: {
     color: 'white',
     textAlign: 'center',
-    fontSize: 30,
-    marginBottom: '2.5%',
+    fontSize: 35,
+    marginBottom: 28,
+  },
+  tagline: {
+    color: 'white',
+    textAlign: 'center',
+    fontSize: 10,
+    marginTop: 28,
+    paddingHorizontal: 12,
   },
   wrapperContainer: {
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      width: '100%',
+    width: '100%',
+    flexDirection: 'column',
+    alignItems: 'center',
   },
   button: {
-    width: '60%',
-    borderRadius: 10,
+    width: '75%',
+    borderRadius: 25,
     backgroundColor: '#FFE562',
-    paddingTop: '2%',
-    paddingBottom: '2%',
-    marginTop: '5%',
+    paddingVertical: 10,
+    marginBottom: 14,
   },
   buttonText: {
     textAlign: 'center',
-    fontSize: 14,
+    fontSize: 22,
+    color: '#593060',
+  },
+});
+
+const tabletStyles = StyleSheet.create({
+  modal: {
     width: '100%',
-    color: '#44154B'
+    maxWidth: '100%',
+    paddingVertical: 24,
+  },
+  bigHeader: {
+    fontSize: 72,
+    marginBottom: 24,
+  },
+  subheading1: {
+    fontSize: 40,
+    marginBottom: 40,
+  },
+  button: {
+    width: '100%',
+    maxWidth: '100%',
+    paddingVertical: 14,
+    marginBottom: 16,
   },
   tagline: {
-    color: 'white', 
-    textAlign: 'center', 
-    width: '90%',
-    paddingTop: '15%',
-    fontSize: 10
-  }
-});
+    fontSize: 13,
+    marginTop: 40,
+    paddingHorizontal: 16,
+    lineHeight: 18,
+  },
+})

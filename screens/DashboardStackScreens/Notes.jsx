@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react'
-import { StyleSheet, View, Text, TextInput, TouchableOpacity, Keyboard, KeyboardAvoidingView, Modal, Pressable, ScrollView } from 'react-native'
+import { StyleSheet, View, Text, TextInput, TouchableOpacity, Keyboard, Modal, Pressable, ScrollView, Platform } from 'react-native'
 
 //fontAwesome imports
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
@@ -22,11 +22,19 @@ import { useToast } from 'react-native-toast-notifications'
 //import upload queue emitter obj
 import { UploadQueueEmitter } from '../../hooks/QueueEventEmitter'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import AppPressable from '../../components/ui/AppPressable'
+import AppTextInput from '../../components/ui/AppTextInput'
+import ContentShell from '../../components/ui/ContentShell'
+import KeyboardSafeForm from '../../components/ui/KeyboardSafeForm'
+import { TestIds } from '../../constants/testIds'
+import { useResponsiveLayout, tabletStyle } from '../../hooks/useResponsiveLayout'
 
 const Notepad = () => {
+    const { isTablet, select } = useResponsiveLayout()
 
     const [open, setOpen] = useState(true)
     const [body, setBody] = useState('')
+    const [keyboardHeight, setKeyboardHeight] = useState(0)
     const [preAdd, setPreAdd] = useState(false)
     const [destination, setDestination] = useState({id: null, fileName: null, nestedUnder: null})
     const [currentUser, setCurrentUser] = useState()
@@ -273,6 +281,21 @@ const Notepad = () => {
       else ref.current.focus() 
     },[open])
 
+    useEffect(() => {
+      const showEvent = Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow'
+      const hideEvent = Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide'
+      const onShow = Keyboard.addListener(showEvent, (e) => {
+        setKeyboardHeight(e.endCoordinates?.height || 0)
+      })
+      const onHide = Keyboard.addListener(hideEvent, () => {
+        setKeyboardHeight(0)
+      })
+      return () => {
+        onShow.remove()
+        onHide.remove()
+      }
+    }, [])
+
     const insets = useSafeAreaInsets() 
 
     useEffect(() => {
@@ -309,11 +332,12 @@ const Notepad = () => {
                   </Pressable>
               </View>
               
+              <ContentShell variant="modal" fill>
               { 
 
               !nameGiven ?
               <>
-                  <Text style={{color: 'white', fontSize: 35, fontWeight: '700', marginTop: '35%', textAlign: 'center'}}>Name Note:</Text>
+                  <Text style={[{color: 'white', fontSize: 35, fontWeight: '700', marginTop: '35%', textAlign: 'center'}, select(undefined, tabletStyles.modalHeading)]}>Name Note:</Text>
                   <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', marginTop: '10%'}}>
                       <View style={styles.iconHolder}>
                         <FontAwesomeIcon icon={faFile} size={22} color='#9F37B0'/>
@@ -357,8 +381,9 @@ const Notepad = () => {
                     </View>
               </>
               : addFolderForm ? 
+                  <KeyboardSafeForm>
                   <>
-                      <Text style={{color: 'white', fontSize: 35, fontWeight: '700', marginTop: '40%', textAlign: 'center'}}>Add A New Folder:</Text>
+                      <Text style={[{color: 'white', fontSize: 35, fontWeight: '700', marginTop: '40%', textAlign: 'center'}, select(undefined, tabletStyles.modalHeading)]}>Add A New Folder:</Text>
                       <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', marginTop: '10%'}}>
                       <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', marginTop: '10%', width: '100%'}}>
                             <View style={styles.iconHolder}> 
@@ -383,6 +408,7 @@ const Notepad = () => {
                           </TouchableOpacity>
                       </View>
                   </>
+                  </KeyboardSafeForm>
 
               :
 
@@ -422,7 +448,7 @@ const Notepad = () => {
                               <ScrollView style={focusedFolder ? {paddingTop: '5%', marginTop: '2%'} : {}}>
                               {/* map over each of the folders from the filesystem and display them as a pressable element // call movefile function when one of them is pressed */}
                               {focusedFolder && !subFolders ? 
-                                  <Text style={{fontSize: 30, color: 'white', fontWeight: 'bold', marginTop: '30%', textAlign: 'center'}}>No Subfolders...</Text>
+                                  <Text style={[{fontSize: 30, color: 'white', fontWeight: 'bold', marginTop: '30%', textAlign: 'center'}, select(undefined, tabletStyles.emptyHeading)]}>No Subfolders...</Text>
                               
                               :   
                                   <>
@@ -517,68 +543,84 @@ const Notepad = () => {
                   </View>
                   
               }
+              </ContentShell>
 
           </View>
         </Modal>
 
         
       : <>
-        <KeyboardAvoidingView behavior="padding">
-            <TextInput onChangeText={(e) => setBody(e)}
+        <ContentShell variant="content" fill>
+        <View style={styles.editorRoot}>
+            <AppTextInput
+                        testID={TestIds.notes.body}
+                        accessibilityLabel="Note body"
+                        onChangeText={(e) => setBody(e)}
                         value={body}
                         placeholder={'Add a note...'}
-                        style={open ? {
+                        style={{
+                            flex: 1,
                             backgroundColor: 'white',
                             paddingLeft: 10,
                             paddingRight: 10,
-                            paddingTop: insets.top,
-                            paddingBottom: insets.bottom,
+                            paddingTop: Math.max(insets.top, 12),
+                            // Leave room for the floating edit toolbar
+                            paddingBottom: 88 + Math.max(insets.bottom, 12),
                             fontSize: 18,
                             textAlignVertical: 'top',
                             width: '100%',
-                            height: '100%',
                             color: 'black'
-                        } : {
-                          backgroundColor: 'white',
-                          paddingLeft: 10,
-                          paddingRight: 10,
-                          paddingTop: insets.top,
-                          paddingBottom: insets.bottom,
-                          fontSize: 18,
-                          textAlignVertical: 'top',
-                          width: '100%',
-                          height: '100%',
-                          color: 'black'
-                      }}
-                        editable={open ? true : false}
+                        }}
+                        editable={!!open}
                         multiline
                         numberOfLines={2}
                         placeholderTextColor='grey'
                         ref={ref}
                         autoFocus
                         />
-          <View style={open ? styles.wrapperContainer : styles.wrapperContainerFull}>
+          <View
+            style={[
+              styles.toolbar,
+              {
+                paddingBottom: Math.max(insets.bottom, 12),
+                // iOS: lift by keyboard height. Android: window resizes (see app.json).
+                bottom: Platform.OS === 'ios' ? keyboardHeight : 0,
+              },
+            ]}
+          >
             {!open && 
-                <TouchableOpacity onPress={() => setPreAdd(true)} style={styles.buttonWrapperText}>
+                <AppPressable
+                  testID={TestIds.notes.addToStorage}
+                  accessibilityLabel="Add To Storage"
+                  onPress={() => setPreAdd(true)}
+                  style={tabletStyle(isTablet, styles.buttonWrapperText, tabletStyles.actionButton)}
+                >
                   <View style={styles.iconHolderSmall}>
                     <FontAwesomeIcon icon={faCloudArrowUp} color='#9F37B0'/>
                   </View>
-                  <Text style={{fontSize: 18, color: '#9F37B0', fontWeight: '600', marginLeft: '10%', paddingTop: '1%'}}>Add To Storage</Text>
-                </TouchableOpacity>
+                  <Text style={styles.addToStorageLabel} numberOfLines={1}>Add To Storage</Text>
+                </AppPressable>
               }
-              {/* <View style={open ? styles.buttonWrapper : styles.buttonWrapperFull}> */}
-                  <TouchableOpacity onPress={() => {open === false ? startEdit() : saveNote()}} style={styles.buttonWrapper}>
+                  <AppPressable
+                    testID={TestIds.notes.saveEdit}
+                    accessibilityLabel={open ? 'Save note' : 'Edit note'}
+                    onPress={() => {open === false ? startEdit() : saveNote()}}
+                    style={styles.buttonWrapper}
+                  >
                     {open ? (
-                        <FontAwesomeIcon icon={faCheck} color='#9F37B0' size={22}/>
+                        <FontAwesomeIcon icon={faCheck} color='#9F37B0' size={20}/>
                       )
                       : (
-                        <FontAwesomeIcon icon={faPencil} size={22} color='#9F37B0'/>
+                        <FontAwesomeIcon icon={faPencil} size={20} color='#9F37B0'/>
                       )
                     }
-                  </TouchableOpacity>
-              {/* </View> */}
+                    <Text style={styles.saveEditLabel} numberOfLines={1}>
+                      {open ? 'Save note' : 'Edit note'}
+                    </Text>
+                  </AppPressable>
           </View>
-        </KeyboardAvoidingView>
+        </View>
+        </ContentShell>
         </>
       } 
     </>
@@ -628,30 +670,66 @@ const styles = StyleSheet.create({
       justifyContent: 'flex-end',
       paddingRight: '5%',
     },
+    editorRoot: {
+      flex: 1,
+      width: '100%',
+      backgroundColor: 'white',
+    },
+    toolbar: {
+      position: 'absolute',
+      left: 0,
+      right: 0,
+      bottom: 0,
+      width: '100%',
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'flex-end',
+      paddingHorizontal: 16,
+      paddingTop: 10,
+      backgroundColor: '#FFFCF6',
+      borderTopWidth: StyleSheet.hairlineWidth,
+      borderTopColor: '#DDCADB',
+      gap: 10,
+      zIndex: 20,
+      elevation: 8,
+    },
+    addToStorageLabel: {
+      flex: 1,
+      flexShrink: 1,
+      minWidth: 0,
+      fontSize: 16,
+      color: '#9F37B0',
+      fontWeight: '600',
+      marginLeft: 10,
+    },
     buttonWrapper: {
-      width: 44,
-      height: 44,
-      display: 'flex',
+      minWidth: 48,
+      height: 48,
+      flexShrink: 0,
       flexDirection: 'row',
       justifyContent: 'center',
       alignItems: 'center',
       borderRadius: 12,
       backgroundColor: '#FFE562',
-      paddingLeft: '2%',
-      paddingTop: '2%',
-      paddingBottom: '2%',
-      paddingRight: '2%'
+      paddingHorizontal: 12,
+      gap: 8,
+    },
+    saveEditLabel: {
+      color: '#9F37B0',
+      fontSize: 15,
+      fontWeight: '700',
     },
     buttonWrapperText: {
-      width: '55%',
+      flex: 1,
+      maxWidth: 240,
       borderRadius: 12,
       backgroundColor: '#FFE562',
-      marginRight: '5%',
-      display: 'flex',
       flexDirection: 'row',
-      paddingTop: '2%',
-      paddingLeft: '2%',
-      paddingBottom: '2%'
+      alignItems: 'center',
+      overflow: 'hidden',
+      paddingVertical: 8,
+      paddingLeft: 8,
+      paddingRight: 12,
     },
     iconHolder: {
       backgroundColor: 'white', 
@@ -783,6 +861,21 @@ const styles = StyleSheet.create({
       marginBottom: '2%',
       borderRadius: 100
     },
+})
+
+const tabletStyles = StyleSheet.create({
+  fill: {
+    flex: 1,
+  },
+  modalHeading: {
+    marginTop: 48,
+  },
+  emptyHeading: {
+    marginTop: 48,
+  },
+  actionButton: {
+    maxWidth: '100%',
+  },
 })
 
 export default Notepad

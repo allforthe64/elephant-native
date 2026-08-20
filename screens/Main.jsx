@@ -13,7 +13,6 @@ import Dashboard from './Dashboard';
 import Contact from './Contact';
 import About from './About';
 import Auth from './Auth';
-import Settings from './Settings';
 import ThankYou from './ThankYou';
 
 //import firebase auth object/AuthContext/onAuthStateChanged function
@@ -65,9 +64,26 @@ const Main = () => {
   const [currentUser, setCurrentUser] = useState()
   const [screen, setScreen] = useState('')
 
-  const uploadingFiles = new Set()
+  const uploadingFiles = useRef(new Set()).current
 
   const navigationRef = useRef(null);
+
+  const readUriAsBlob = async (uri) => {
+    try {
+      const response = await fetch(uri)
+      return await response.blob()
+    } catch (fetchErr) {
+      // Fallback for file:// URIs that fetch rejects on some devices
+      return await new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest()
+        xhr.onload = () => resolve(xhr.response)
+        xhr.onerror = () => reject(new TypeError('Network request failed'))
+        xhr.responseType = 'blob'
+        xhr.open('GET', uri, true)
+        xhr.send(null)
+      })
+    }
+  }
 
   //get the current user 
   /* const currentUser = firebaseAuth.currentUser.uid */
@@ -149,6 +165,7 @@ const Main = () => {
 
     try {
       let manipResult = null
+      let didUpload = false
       if (fileType === 'jpg' || fileType === 'JPG' || fileType === 'jpeg' || fileType === 'JPEG' || fileType === 'png' || fileType === 'PNG') {
         try {
           manipResult = await manipulateAsync(
@@ -222,51 +239,61 @@ const Main = () => {
           toast.show('Upload successful', {
             type: 'success'
           })
+          didUpload = true
         } catch (error) {
           console.log('error from manipResult: ', error)
         }
       }
 
       else if (fileType === 'txt') {
-        //upload noteBody as blob
-        const textFile = new Blob([`${file.noteBody}`], {
-          type: "text/plain;charset=utf-8",
-        });
-        const fileUri = `${userId}/${file.filename}`
-        const fileRef = ref(storage, `${userId}/${formattedDate}`)
-        const result = await uploadBytesResumable(fileRef, textFile)
+        try {
+          //upload noteBody as blob (notes + QR scans)
+          const textFile = new Blob([`${file.noteBody ?? ''}`], {
+            type: "text/plain;charset=utf-8",
+          });
+          const fileUri = `${userId}/${file.filename}`
+          const fileRef = ref(storage, `${userId}/${formattedDate}`)
+          const result = await uploadBytesResumable(fileRef, textFile)
 
-        const uploadSize = result.metadata.size
+          const uploadSize = result.metadata.size
 
-        let reference
-        if (file.linksTo) {
-          reference = await addfile({
-            name: file.filename,
-            fileType: 'txt',
-            size: uploadSize,
-            uri: fileUri,
-            user: userId,
-            version: 0,
-            timeStamp: `${formattedDate}`,
-            linksTo: file.linksTo
-          }, file.finalDestination)
-        } else {
-          reference = await addfile({
-            name: file.filename,
-            fileType: 'txt',
-            size: uploadSize,
-            uri: fileUri,
-            user: userId,
-            version: 0,
-            timeStamp: `${formattedDate}`
-          }, file.finalDestination)
+          let reference
+          if (file.linksTo) {
+            reference = await addfile({
+              name: file.filename,
+              fileType: 'txt',
+              size: uploadSize,
+              uri: fileUri,
+              user: userId,
+              version: 0,
+              timeStamp: `${formattedDate}`,
+              linksTo: file.linksTo
+            }, file.finalDestination)
+          } else {
+            reference = await addfile({
+              name: file.filename,
+              fileType: 'txt',
+              size: uploadSize,
+              uri: fileUri,
+              user: userId,
+              version: 0,
+              timeStamp: `${formattedDate}`
+            }, file.finalDestination)
+          }
+
+          if (!reference) {
+            throw new Error('addfile returned no reference for txt upload')
+          }
+
+          await addFileToUser(userId, reference, uploadSize)
+
+          toast.show('Upload successful', {
+            type: 'success'
+          })
+          didUpload = true
+        } catch (error) {
+          console.log('error from txt upload: ', error)
         }
-
-        await addFileToUser(userId, reference, uploadSize)
-
-        toast.show('Upload successful', {
-          type: 'success'
-        })
       }
 
       else if (fileType === 'doc' || fileType === 'docx') {
@@ -303,23 +330,14 @@ const Main = () => {
           toast.show('Upload successful', {
             type: 'success'
           })
+          didUpload = true
         } catch (error) {
           alert('error within docx upload: ', error)
         }
       } else {
         try {
-          const blob = await new Promise(async (resolve, reject) => {
-            const xhr = new XMLHttpRequest()
-            xhr.onload = () => {
-            resolve(xhr.response) 
-            }
-            xhr.onerror = (e) => {
-                reject(new TypeError('Network request failed'))
-            }
-            xhr.responseType = 'blob'
-            xhr.open('GET', file.uri, true)
-            xhr.send(null)
-          })
+          // Audio (m4a/mp3), video, pdf, etc.
+          const blob = await readUriAsBlob(file.uri)
           const fileUri = `${userId}/${file.filename}`
           const fileRef = ref(storage, `${userId}/${formattedDate}`)
           const result = await uploadBytesResumable(fileRef, blob)
@@ -335,17 +353,25 @@ const Main = () => {
             timeStamp: `${formattedDate}`
           }, file.finalDestination)
 
+          if (!reference) {
+            throw new Error('addfile returned no reference for binary upload')
+          }
+
           await addFileToUser(userId, reference, uploadSize)
 
           toast.show('Upload successful', {
             type: 'success'
           })
+          didUpload = true
         } catch (err) {
           console.log('error from upload file: ', err)
         }
       }
 
-      await removeFromQueue(file)
+      // Only dequeue after a successful upload so failed audio/QR items can retry
+      if (didUpload) {
+        await removeFromQueue(file)
+      }
 
     } catch (err) {
       const message =
@@ -441,10 +467,10 @@ const Main = () => {
         <Drawer.Navigator initialRouteName='Home'>
             <Drawer.Screen name='Home' component={Home} options={authUser && {drawerItemStyle: {display: 'none'}, title: ''}} />
             <Drawer.Screen name="Sign In/Sign Up" component={Auth} options={authUser && {drawerItemStyle: {display: 'none'}, title: ''}}/>
+            <Drawer.Screen name='About' component={About} options={{ drawerItemStyle: { display: 'none' }, title: 'About' }} />
             <Drawer.Screen name='FAQs' component={FAQs} />
             <Drawer.Screen name='Contact' component={Contact} />
             <Drawer.Screen name="Dashboard" component={Dashboard} options={!authUser && {drawerItemStyle: {display: 'none'}, title: ''}} />
-            {/* <Drawer.Screen name="Settings" component={Settings} options={!authUser && {drawerItemStyle: {display: 'none'}, title: ''}} /> */}
             <Drawer.Screen name="Settings" component={Home} listeners={{
               drawerItemPress: (e) => {
                 e.preventDefault()

@@ -10,8 +10,18 @@ import { firebaseAuth } from '../../firebaseConfig';
 import { userListener } from '../../firebase/firestore';
 
 import { useToast } from 'react-native-toast-notifications';
+import { tabletStyle, useResponsiveLayout } from '../../hooks/useResponsiveLayout';
+import {
+  fileSystemRowStyles,
+  FILE_SYSTEM_ROW_ACTIVE_OPACITY,
+} from './fileSystemRowStyles';
+import KeyboardSafeForm from '../ui/KeyboardSafeForm';
 
 const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolderFunc, folders, updateUser}) => {
+  const { isTablet, contentFill, modalMaxWidth } = useResponsiveLayout()
+  const tabletModalPanel = isTablet
+    ? { width: '100%', maxWidth: modalMaxWidth, alignSelf: 'center' }
+    : null
 
   const [visible, setVisible] = useState(false)
   const [preDelete, setPreDelete] = useState(false)
@@ -229,7 +239,7 @@ const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolder
               {preDelete ? 
                 /*Code for deleting a folder */
                 <Modal animationType='slide' presentationStyle='pageSheet'>
-                    <View style={{height: '100%', width: '100%', backgroundColor: '#593060'}}>
+                    <View style={[{height: '100%', width: '100%', backgroundColor: '#593060'}, tabletModalPanel]}>
                     
                       <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', paddingRight: '5%', paddingTop: '10%', width: '100%'}}>
                         <Pressable onPress={() => setPreDelete(false)}>
@@ -281,7 +291,7 @@ const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolder
                   </View>
                 </Modal>
                 : 
-                  <View style={{ paddingTop: '10%', backgroundColor: '#593060', height: '100%'}}>
+                  <View style={[{ paddingTop: '10%', backgroundColor: '#593060', height: '100%'}, tabletModalPanel]}>
                     <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', paddingRight: '5%'}}>
                       <Pressable onPress={() => {
                           setEditName(false)
@@ -292,6 +302,7 @@ const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolder
                       </Pressable>
                     </View>
                     {editName ? /*Code for renaming a folder */ 
+                    <KeyboardSafeForm>
                     <View style={{paddingTop: '40%', display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%'}}>
                         <Text style={{color: 'white', fontSize: 35, fontWeight: '700'}}>Rename folder:</Text>
                         <View style={{display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center',  marginTop: '10%'}}>
@@ -314,11 +325,12 @@ const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolder
                               <Text style={{fontSize: 18, color: '#9F37B0', fontWeight: '600', paddingTop: '1%', marginLeft: '22%'}}>Cancel</Text>
                           </TouchableOpacity>
                         </View>
-                    </View> 
+                    </View>
+                    </KeyboardSafeForm>
                     /*Code for moving a folder */
                     : moveFolder ? 
                       <Modal animationType='slide' presentationStyle='pageSheet' >
-                          <View style={{height: '100%', width: '100%', backgroundColor: '#593060'}}>
+                          <View style={[{height: '100%', width: '100%', backgroundColor: '#593060'}, tabletModalPanel]}>
                           
                             <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', paddingRight: '5%', paddingTop: '10%', width: '100%'}}>
                               <Pressable onPress={() => {
@@ -340,6 +352,7 @@ const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolder
                               </>
                             }
                             {addFolderForm ? 
+                              <KeyboardSafeForm>
                               <View style={{width: '100%', height: '100%', display: 'flex', flexDirection:'column', alignItems: 'center'}}>
                                   <Text style={{color: 'white', fontSize: 35, fontWeight: '700', marginTop: '40%', textAlign: 'center'}}>Add A New Folder:</Text>
                                   <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', marginTop: '10%', width: '100%'}}>
@@ -361,6 +374,7 @@ const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolder
                                       </TouchableOpacity>
                                   </View>
                               </View>
+                              </KeyboardSafeForm>
 
                             :
       
@@ -420,7 +434,7 @@ const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolder
                                                                         }
                                                                       }
                                                                       }>
-                                                                      <View style={f.id === destination.id ? styles.moveFolderWhite : styles.moveFolder}>
+                                                                      <View style={tabletStyle(isTablet, f.id === destination.id ? styles.moveFolderWhite : styles.moveFolder, contentFill)}>
                                                                       <View style={f.id === destination.id ? styles.iconHolderBlack : styles.iconHolderWhite}>
                                                                           <FontAwesomeIcon icon={faFolder} size={28} color={f.id === destination.id ? 'white' : '#9F37B0'}/>
                                                                       </View>
@@ -442,7 +456,7 @@ const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolder
                                                                       }
                                                                   }
                                                                   }>
-                                                                  <View style={f.id === destination.id ? styles.moveFolderWhite : styles.moveFolder}>
+                                                                  <View style={tabletStyle(isTablet, f.id === destination.id ? styles.moveFolderWhite : styles.moveFolder, contentFill)}>
                                                                   <View style={f.id === destination.id ? styles.iconHolderBlack : styles.iconHolderWhite}>
                                                                       <FontAwesomeIcon icon={faFolder} size={28} color={f.id === destination.id ? 'white' : '#9F37B0'}/>
                                                                   </View>
@@ -514,17 +528,30 @@ const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolder
                 }
           </Modal>
       : <></>}
-      <View style={visible ? styles.folderVisibleMenu : styles.folder}>
-        <TouchableOpacity onPress={() => getTargetFolder(folder)} style={{width: '85%'}}>
-            <View style={styles.folderTitle}>
-                <View style={styles.iconHolder}>
-                  <FontAwesomeIcon icon={faFolder} color={'#593060'} size={22} />
-                </View>
-                <Text style={styles.folderName}>{folder.fileName}</Text>
+      <View style={tabletStyle(isTablet, visible ? [fileSystemRowStyles.row, fileSystemRowStyles.rowMenuOpen] : [fileSystemRowStyles.row, fileSystemRowStyles.rowFolder], contentFill)}>
+        <TouchableOpacity
+          onPress={() => getTargetFolder(folder)}
+          activeOpacity={FILE_SYSTEM_ROW_ACTIVE_OPACITY}
+          style={fileSystemRowStyles.main}
+        >
+            <View style={[fileSystemRowStyles.iconHolder, fileSystemRowStyles.iconHolderFolder]}>
+              <FontAwesomeIcon icon={faFolder} color={'#593060'} size={20} />
             </View>
+            <Text
+              numberOfLines={1}
+              ellipsizeMode="tail"
+              style={[fileSystemRowStyles.label, fileSystemRowStyles.labelFolder]}
+            >
+              {folder.fileName}
+            </Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => setVisible(prev => !prev)} style={visible ? {backgroundColor: 'rgba(38, 38, 38, .75)', width: '15%', display: 'flex', justifyContent: 'center', paddingBottom: '1%', flexDirection: 'row'} : {width: '15%', display: 'flex', justifyContent: 'center', flexDirection: 'row', paddingBottom: '2%'}}>
-          <FontAwesomeIcon icon={faEllipsisVertical} size={26} color={'white'} style={styles.folderArrow}/>
+        <TouchableOpacity
+          onPress={() => setVisible(prev => !prev)}
+          activeOpacity={FILE_SYSTEM_ROW_ACTIVE_OPACITY}
+          style={[fileSystemRowStyles.trailing, visible && fileSystemRowStyles.trailingActive]}
+          accessibilityLabel="Folder options"
+        >
+          <FontAwesomeIcon icon={faEllipsisVertical} size={22} color={'white'} />
         </TouchableOpacity>
       </View>
     </View>
