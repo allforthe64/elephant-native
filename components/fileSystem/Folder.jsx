@@ -157,7 +157,10 @@ const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolder
   //pass an object containing data from the current file obj + the new filename to the main component 
   const handleNameChange = () => {
 
-    if (newName === '') return
+    if (newName === '') {
+      alert('Please enter a folder name')
+      return
+    }
     else {
       const newFolder = {
         ...folder,
@@ -165,6 +168,37 @@ const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolder
       }
       renameFolder(newFolder)
       setEditName(false)
+    }
+  }
+
+  const handleRenameAndMove = () => {
+    if (newName === '') {
+      alert('Please enter a folder name')
+      return
+    }
+    if (destination.id !== null) {
+      const newFolder = {
+        ...folder,
+        fileName: newName,
+        nestedUnder: destination.id
+      }
+      setMoveFolder(false)
+      setEditName(false)
+      setVisible(false)
+      moveFolderFunc({newFolder: newFolder, target: destination.fileName || destination.folderName || 'Home'})
+      setDestination({id: null, folderName: null})
+    } else if (destination.id === null && focusedFolder !== null && focusedFolder !== undefined) {
+      const folderInst = folders.filter(f => f.id === focusedFolder)
+      const newFolder = {
+        ...folder,
+        fileName: newName,
+        nestedUnder: folderInst[0].id
+      }
+      setMoveFolder(false)
+      setEditName(false)
+      setVisible(false)
+      moveFolderFunc({newFolder: newFolder, target: folderInst[0].fileName})
+      setDestination({id: null, folderName: null})
     }
   }
 
@@ -294,41 +328,18 @@ const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolder
                   <View style={[{ paddingTop: '10%', backgroundColor: '#593060', height: '100%'}, tabletModalPanel]}>
                     <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', paddingRight: '5%'}}>
                       <Pressable onPress={() => {
-                          setEditName(false)
-                          setVisible(false)
-                          setNewName('')
+                          if (editName) {
+                            setEditName(false)
+                            setNewName('')
+                          } else {
+                            setVisible(false)
+                            setNewName('')
+                          }
                         }}>
                         <FontAwesomeIcon icon={faXmark} color={'white'} size={30}/>
                       </Pressable>
                     </View>
-                    {editName ? /*Code for renaming a folder */ 
-                    <KeyboardSafeForm>
-                    <View style={{paddingTop: '40%', display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%'}}>
-                        <Text style={{color: 'white', fontSize: 35, fontWeight: '700'}}>Rename folder:</Text>
-                        <View style={{display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center',  marginTop: '10%'}}>
-                          <View style={styles.iconHolder}>
-                              <FontAwesomeIcon icon={faFolder} size={22} color='#9F37B0'/>
-                          </View>
-                          <TextInput value={newName} style={{color: 'white', fontSize: 20, fontWeight: 'bold', borderBottomColor: 'white', borderBottomWidth: 2, width: '70%', marginLeft: '5%'}} placeholderTextColor={'white'} placeholder='Enter new name' onChangeText={(e) => setNewName(e)} autoFocus/>
-                        </View>
-                        <View style={{display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'space-around', marginTop: '4%'}}>
-                            <TouchableOpacity onPress={handleNameChange} style={styles.yellowButtonSM}>
-                                <View style={styles.iconHolderSmall}>
-                                  <FontAwesomeIcon icon={faFloppyDisk} size={18} color='#9F37B0' />
-                                </View>
-                                <Text style={{fontSize: 18, color: '#9F37B0', fontWeight: '600', paddingTop: '1%', marginLeft: '24%'}}>Save</Text>
-                            </TouchableOpacity>
-                          <TouchableOpacity onPress={() => setEditName(false)} style={styles.yellowButtonSM}>
-                              <View style={styles.iconHolderSmall}>
-                                <FontAwesomeIcon icon={faXmark} size={18} color='#9F37B0' />
-                              </View>
-                              <Text style={{fontSize: 18, color: '#9F37B0', fontWeight: '600', paddingTop: '1%', marginLeft: '22%'}}>Cancel</Text>
-                          </TouchableOpacity>
-                        </View>
-                    </View>
-                    </KeyboardSafeForm>
-                    /*Code for moving a folder */
-                    : moveFolder ? 
+                    {moveFolder ? /*Code for moving / rename+move a folder */ 
                       <Modal animationType='slide' presentationStyle='pageSheet' >
                           <View style={[{height: '100%', width: '100%', backgroundColor: '#593060'}, tabletModalPanel]}>
                           
@@ -483,17 +494,49 @@ const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolder
                                     </View>
                                     <Text style={{fontSize: 18, color: '#9F37B0', fontWeight: '600', marginLeft: '10%'}}>Add Folder</Text>
                                 </TouchableOpacity>
-                                <TouchableOpacity onPress={handleMove} style={styles.yellowButtonSM}>
+                                <TouchableOpacity onPress={editName ? handleRenameAndMove : handleMove} style={styles.yellowButtonSM}>
                                     <View style={styles.iconHolderSmall}>
                                         <FontAwesomeIcon icon={faArrowRight} color='#9F37B0'/>
                                     </View>
-                                    <Text style={{fontSize: 18, color: '#9F37B0', fontWeight: '600', marginLeft: '5%'}}>Confirm Move</Text>
+                                    <Text style={{fontSize: 18, color: '#9F37B0', fontWeight: '600', marginLeft: editName ? '6%' : '5%'}}>{editName ? 'Rename + move' : 'Confirm Move'}</Text>
                                 </TouchableOpacity>  
                             </View>
                             }
                           </View>
                         </View>
                       </Modal>
+                    : editName ? /*Code for renaming a folder */ 
+                    <KeyboardSafeForm>
+                    <View style={{paddingTop: '40%', display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%'}}>
+                        <Text style={{color: 'white', fontSize: 35, fontWeight: '700'}}>Rename folder:</Text>
+                        <View style={{display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center',  marginTop: '10%'}}>
+                          <View style={styles.iconHolder}>
+                              <FontAwesomeIcon icon={faFolder} size={22} color='#9F37B0'/>
+                          </View>
+                          <TextInput value={newName} style={{color: 'white', fontSize: 20, fontWeight: 'bold', borderBottomColor: 'white', borderBottomWidth: 2, width: '70%', marginLeft: '5%'}} placeholderTextColor={'white'} placeholder='Enter new name' onChangeText={(e) => setNewName(e)} autoFocus/>
+                        </View>
+                        <View style={{display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', marginTop: '4%'}}>
+                            <TouchableOpacity onPress={handleNameChange} style={styles.yellowButtonMed}>
+                                <View style={styles.iconHolderSmall}>
+                                  <FontAwesomeIcon icon={faPencil} size={18} color='#9F37B0' />
+                                </View>
+                                <Text style={{fontSize: 18, color: '#9F37B0', fontWeight: '600', paddingTop: '1%', marginLeft: '22%'}}>Rename</Text>
+                            </TouchableOpacity>
+                          <TouchableOpacity onPress={() => {
+                            if (newName === '') {
+                              alert('Please enter a folder name')
+                              return
+                            }
+                            setMoveFolder(true)
+                          }} style={[styles.yellowButtonMed, { marginTop: 12 }]}>
+                              <View style={styles.iconHolderSmall}>
+                                <FontAwesomeIcon icon={faArrowRight} size={18} color='#9F37B0' />
+                              </View>
+                              <Text style={{fontSize: 18, color: '#9F37B0', fontWeight: '600', paddingTop: '1%', marginLeft: '10%'}}>Rename + move</Text>
+                          </TouchableOpacity>
+                        </View>
+                    </View>
+                    </KeyboardSafeForm>
                     :
                       <View style={{paddingLeft: '5%'}}>
                         <Text style={{fontSize: 40, fontWeight: 'bold', color: 'white', marginTop: '5%'}}>{folder.fileName}</Text>

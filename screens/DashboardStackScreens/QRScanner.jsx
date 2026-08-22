@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Image, TouchableOpacity, Modal, Pressable, TextInput, Button, Linking } from 'react-native'
+import { StyleSheet, Text, View, Image, TouchableOpacity, Modal, Pressable, TextInput, Button, Linking, Platform } from 'react-native'
 import React, { useState, useEffect } from 'react'
 
 import { CameraView, useCameraPermissions } from 'expo-camera' 
@@ -29,6 +29,7 @@ import { UploadQueueEmitter } from '../../hooks/QueueEventEmitter'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import ContentShell from '../../components/ui/ContentShell'
 import KeyboardSafeForm from '../../components/ui/KeyboardSafeForm'
+import { useKeyboardHeight } from '../../hooks/useKeyboardHeight'
 import { useResponsiveLayout, tabletStyle } from '../../hooks/useResponsiveLayout'
 
 const Scanner = () => {
@@ -36,6 +37,7 @@ const Scanner = () => {
   try {
     const { isTablet, select } = useResponsiveLayout()
     const insets = useSafeAreaInsets()
+    const keyboardHeight = useKeyboardHeight()
     const [scanData, setScanData] = useState()
     const [urls, setUrls] = useState([])
     const [userInst, setUserInst] = useState()
@@ -371,7 +373,7 @@ return (
                     addFolderForm ? 
                         <KeyboardSafeForm>
                         <>
-                            <Text style={[{color: 'white', fontSize: 35, fontWeight: '700', marginTop: '40%', textAlign: 'center'}, select(undefined, tabletStyles.modalHeading)]}>Add A New Folder:</Text>
+                            <Text style={[{color: 'white', fontSize: 35, fontWeight: '700', marginTop: keyboardHeight > 0 ? 24 : '40%', textAlign: 'center'}, select(undefined, tabletStyles.modalHeading)]}>Add A New Folder:</Text>
                             <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', marginTop: '10%'}}>
                                 <View style={styles.iconHolder}>
                                     <FontAwesomeIcon icon={faFolder} size={22} color='#9F37B0'/>
@@ -541,26 +543,23 @@ return (
               <View style={{
                   backgroundColor: '#FFFCF6',
                   flex: 1,
-                  justifyContent: 'center',
                   alignItems: 'center',
               }}>
                 {scanData ? 
                     <View style={{
                             width: '100%',
-                            height: '100%',
-                            display: 'flex',
+                            flex: 1,
                             alignItems: 'center',
-                            position: 'absolute',
                             paddingTop: insets.top,
-                            paddingBottom: insets.bottom
+                            paddingBottom: Math.max(insets.bottom, 12) + (Platform.OS === 'ios' ? keyboardHeight : 0),
                         }}>
                         <Text style={styles.bigHeader}>Currently Captured QR URLS:</Text>
                         <View style={styles.scrollCon}>
-                            <ScrollView contentContainerStyle={styles.scroll}>
+                            <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
                                 {mapUrls()}
                             </ScrollView>
                         </View> 
-                        <View style={styles.wrapperContainer}>
+                        <View style={[styles.wrapperContainer, keyboardHeight > 0 && styles.wrapperContainerKeyboard]}>
                             <TouchableOpacity onPress={() => {
                                 setScanData(undefined)
                                 setScanned(false)
@@ -571,7 +570,7 @@ return (
                                 <Text style={{fontSize: 18, width: '100%', fontWeight: '600', color: '#9F37B0', paddingTop: '1%', marginLeft: '5%'}}>Scan Another Code</Text>
                             </TouchableOpacity>
                         </View>
-                        <View style={styles.wrapperContainer}>
+                        <View style={[styles.wrapperContainer, keyboardHeight > 0 && styles.wrapperContainerKeyboard]}>
                             <TouchableOpacity onPress={() => setPreAdd(true)} style={tabletStyle(isTablet, styles.buttonWrapper, tabletStyles.actionButton)}>
                                 <View style={styles.iconHolderSmall}>
                                     <FontAwesomeIcon icon={faCloudArrowUp} color='#9F37B0' />
@@ -621,14 +620,14 @@ const styles = StyleSheet.create({
         fontSize: 25,
         textAlign: 'center',
         fontWeight: '700',
-        marginBottom: '8%'
+        marginBottom: 16
       },
     scrollCon: {
-        height: '60%',
+        flex: 1,
         width: '95%',
         borderBottomWidth: 1,
         borderColor: 'black',
-        marginBottom: '10%'
+        marginBottom: 16
     },
     scroll: {
         paddingTop: '2%',
@@ -639,7 +638,10 @@ const styles = StyleSheet.create({
         display: 'flex',
         alignItems: 'center',
         width: '100%',
-        marginBottom: '8%'
+        marginBottom: 12
+    },
+    wrapperContainerKeyboard: {
+        marginBottom: 8
     },
     buttonWrapper: {
     width: '60%',
