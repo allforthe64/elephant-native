@@ -228,10 +228,12 @@ const FocusedFolder = ({folder, folders, clear, getTargetFolder, addFolder, rena
                                         <TextInput placeholder='Enter new name' placeholderTextColor={'white'} value={newFolderName} style={{color: 'white', fontSize: 22, fontWeight: 'bold', borderBottomColor: 'white', borderBottomWidth: 2, width: '70%', marginLeft: '5%'}} onChangeText={(e) => setNewFolderName(e)} onFocus={() => setKeyboardClosed(false)} ref={folderRef} autoFocus/>
                                     </View>
                                     <Pressable style={styles.nonFolderButtonSM}
-                                        onPress={() => {
-                                            addFolder(newFolderName, folder.folder.id)
-                                            setNewFolderName('')
-                                            setAdd(false)
+                                        onPress={async () => {
+                                            const ok = await addFolder(newFolderName, folder.folder.id)
+                                            if (ok) {
+                                                setNewFolderName('')
+                                                setAdd(false)
+                                            }
                                         }}
                                     >
                                         <View style={styles.iconHolderSM}>

@@ -8,7 +8,7 @@ import FileRow from '../../components/documentPicker/FileRow'
 import * as ImagePicker from 'expo-image-picker'
 
 
-import { addfile, updateUser, userListener } from '../../firebase/firestore'
+import { addfile, userListener, addFolderToUser } from '../../firebase/firestore'
 import { firebaseAuth, storage } from '../../firebaseConfig'
 import {ref, uploadBytesResumable} from 'firebase/storage'
 
@@ -129,7 +129,7 @@ const DocumentPickerComp = () => {
                 alert('userInst.files is not an array')
             } 
         }
-    }, [userInst, addFolderForm])
+    }, [userInst])
 
     //determine if a folder has any subfolders
     useEffect(() => {
@@ -137,7 +137,7 @@ const DocumentPickerComp = () => {
             return value.nestedUnder === focusedFolder
         })
         setSubFolders(exists)
-    }, [focusedFolder, addFolderForm])
+    }, [focusedFolder, folders])
 
     useEffect(() => {
         if (focusedFolder && folders) {
@@ -298,21 +298,14 @@ const DocumentPickerComp = () => {
 
     //add a folder
     const addFolder = async (folderName, targetNest) => {
-        if (folderName.length > 0) {
-            const folderId = Math.floor(Math.random() * 9e11) + 1e11
-            const newFile = {
-                id: folderId,
-                fileName: folderName,
-                nestedUnder: targetNest === '' ? '' : targetNest
-            }
-            const newFiles = [...(userInst?.files || []), newFile]
-            await updateUser({...userInst, files: newFiles})
+        try {
+            const { newFile, newFiles } = await addFolderToUser(userInst, folderName, targetNest)
             setNewFolderName('')
             setAddFolderForm(false)
             setFolders(newFiles)
-            setFocusedFolder(folderId)
-        } else {
-            alert('Please enter a folder name')
+            setFocusedFolder(newFile.id)
+        } catch (err) {
+            alert(err?.message || String(err))
         }
     }
 
@@ -352,9 +345,7 @@ const DocumentPickerComp = () => {
                             </View>
                             <View style={{width: '100%', paddingTop: '10%', display: 'flex', flexDirection: 'row', justifyContent: 'center'}}>
                                 <TouchableOpacity style={styles.yellowButtonSM}
-                                onPress={async () => {
-                                    addFolder(newFolderName, focusedFolder ? focusedFolder : '')
-                                }}
+                                onPress={() => addFolder(newFolderName, focusedFolder ? focusedFolder : '')}
                                 >   
                                     <View style={styles.iconHolderSmall}>
                                         <FontAwesomeIcon icon={faFloppyDisk} size={18} color='#9F37B0' />

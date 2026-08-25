@@ -77,6 +77,29 @@ export async function updateUser(updatedUser) {
     await updateDoc(userRef, {...updatedUser})
 }
 
+export function createFolderId() {
+    return Math.floor(Math.random() * 9e11) + 1e11
+}
+
+export async function addFolderToUser(userInst, folderName, targetNest = '') {
+    const name = String(folderName ?? '').trim()
+    if (!name) {
+        throw new Error('Please enter a folder name')
+    }
+    if (!userInst?.uid) {
+        throw new Error('Still loading your folders. Tap Save again.')
+    }
+    const newFile = {
+        id: createFolderId(),
+        fileName: name,
+        nestedUnder: targetNest === '' || targetNest == null ? '' : targetNest
+    }
+    const existing = Array.isArray(userInst.files) ? userInst.files : []
+    const newFiles = [...existing, newFile]
+    await updateUser({ ...userInst, files: newFiles })
+    return { newFile, newFiles }
+}
+
 //function to specifically add new files to user, using the atomic atomic updates
 export async function addFileToUser(userId, reference, fileSize) {
 

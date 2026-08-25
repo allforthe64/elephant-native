@@ -13,7 +13,7 @@ import { Audio } from 'expo-av'
 import * as FileSystem from 'expo-file-system'
 
 //import updateUser, addfile, userListener from firestore file/firebaseAuth and storage objects from firebase config/ref, uploadBytesResumable from firebase storage
-import { updateUser, addfile, userListener } from '../../firebase/firestore'
+import { updateUser, addfile, userListener, addFolderToUser } from '../../firebase/firestore'
 import { firebaseAuth, storage } from '../../firebaseConfig'
 import {ref, uploadBytesResumable} from 'firebase/storage'
 
@@ -125,14 +125,14 @@ const AudioRecorder = () => {
                     alert('userInst.files is not an array')
                 }
             }
-          }, [userInst, addFolderForm])
+          }, [userInst])
 
         useEffect(() => {
             const exists = Object.values(folders).some((value) => {
                 return value.nestedUnder === focusedFolder
             })
             setSubFolders(exists)
-        }, [focusedFolder, addFolderForm])
+        }, [focusedFolder, folders])
 
         useEffect(() => {
             if (folders && focusedFolder) {
@@ -242,21 +242,14 @@ const AudioRecorder = () => {
 
     //add a folder
     const addFolder = async (folderName, targetNest) => {
-        if (folderName.length > 0) {
-            const folderId = Math.floor(Math.random() * 9e11) + 1e11
-            const newFile = {
-                id: folderId,
-                fileName: folderName,
-                nestedUnder: targetNest === '' ? '' : targetNest
-            }
-            const newFiles = [...(userInst?.files || []), newFile]
-            await updateUser({...userInst, files: newFiles})
+        try {
+            const { newFile, newFiles } = await addFolderToUser(userInst, folderName, targetNest)
             setNewFolderName('')
             setAddFolderForm(false)
             setFolders(newFiles)
-            setFocusedFolder(folderId)
-        } else {
-            alert('Please enter a folder name')
+            setFocusedFolder(newFile.id)
+        } catch (err) {
+            alert(err?.message || String(err))
         }
     }
 
@@ -424,11 +417,7 @@ const AudioRecorder = () => {
                             </View>
                             <View style={{width: '100%', paddingTop: '10%', display: 'flex', flexDirection: 'row', justifyContent: 'center'}}>
                                 <TouchableOpacity style={styles.yellowButtonSM}
-                                onPress={() => {
-                                    addFolder(newFolderName, focusedFolder ? focusedFolder : '')
-                                    setNewFolderName('')
-                                    setAddFolderForm(false)
-                                }}
+                                onPress={() => addFolder(newFolderName, focusedFolder ? focusedFolder : '')}
                                 >
                                     <View style={styles.iconHolderSmall}>
                                         <FontAwesomeIcon icon={faFloppyDisk} size={18} color='#9F37B0' />

@@ -4,7 +4,7 @@ import { StyleSheet, Text, View, TouchableOpacity, Modal, Keyboard, Pressable } 
 import { ScrollView, TextInput } from 'react-native-gesture-handler';
 
 //firestore function imports
-import { userListener, updateUser, deleteFileObj, updateFileObj } from '../../firebase/firestore';
+import { userListener, updateUser, deleteFileObj, updateFileObj, addFolderToUser } from '../../firebase/firestore';
 
 //file system component imports
 import Folder from '../../components/fileSystem/Folder';
@@ -266,39 +266,16 @@ export default function Files({navigation: { navigate }, route}) {
   }
 
   //add a folder
-  const addFolder = (folderName, targetNest) => {
-    //if the incoming targetNest is empty string, create the new folder under the home directory
-    if (folderName.length > 0) {
-      try {
-        const folderId = Math.floor(Math.random() * 9e11) + 1e11
-        if (targetNest === '') {
-          const newFile = {
-            id: folderId,
-            fileName: folderName,
-            nestedUnder: ''
-          }
-          editUser('folder', newFile, 'add')
-          setNewFolderName('')
-          setAdd(false)
-          setFocusedFolder({folder: newFile, files: [], folders: []})
-          
-        } else {           //if the incoming targetNest has a value, create the new folder with the nestedUnder property set to targetNest
-          const newFile = {
-            id: folderId,
-            fileName: folderName,
-            nestedUnder: Number(targetNest)
-          }
-    
-          editUser('folder', newFile, 'add')
-          setNewFolderName('')
-          setAdd(false)
-          setFocusedFolder({folder: newFile, files: [], folders: []})
-        }
-      } catch (err) {
-        alert(err)
-      }
-    } else {
-      alert('Please enter a folder name')
+  const addFolder = async (folderName, targetNest) => {
+    try {
+      const { newFile } = await addFolderToUser(currentUser, folderName, targetNest)
+      setNewFolderName('')
+      setAdd(false)
+      setFocusedFolder({folder: newFile, files: [], folders: []})
+      return true
+    } catch (err) {
+      alert(err?.message || String(err))
+      return false
     }
   }
 

@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from 'react'
-import { View, StyleSheet, Platform } from 'react-native'
+import { StyleSheet, Platform, ScrollView } from 'react-native'
 import { useKeyboardHeight } from '../../hooks/useKeyboardHeight'
 
 /**
  * Keeps modal add/rename forms (input + Save) above the soft keyboard.
  * Wrap the form block only — not the entire destination picker.
  *
- * Lift is held briefly after hide so tapping Save is not lost when the
- * keyboard dismisses and the form would otherwise jump.
+ * ScrollView + keyboardShouldPersistTaps lets Save receive the tap while
+ * the keyboard is open (a View swallows that first tap to dismiss).
+ * Lift is held briefly after hide so the button does not jump mid-press.
  */
 const KeyboardSafeForm = ({ children, style }) => {
   const rawHeight = useKeyboardHeight()
@@ -30,15 +31,19 @@ const KeyboardSafeForm = ({ children, style }) => {
     : 0
 
   return (
-    <View
-      style={[
+    <ScrollView
+      keyboardShouldPersistTaps="always"
+      keyboardDismissMode="none"
+      scrollEnabled={false}
+      bounces={false}
+      contentContainerStyle={[
         styles.root,
         lift > 0 && { transform: [{ translateY: -lift }], paddingBottom: 16 },
         style,
       ]}
     >
       {children}
-    </View>
+    </ScrollView>
   )
 }
 
