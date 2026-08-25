@@ -27,6 +27,7 @@ import ContentShell from '../../components/ui/ContentShell';
 import KeyboardSafeForm from '../../components/ui/KeyboardSafeForm';
 import YellowActionButton from '../../components/ui/YellowActionButton';
 import { useResponsiveLayout, tabletStyle } from '../../hooks/useResponsiveLayout';
+import { useAutoFocusOn } from '../../hooks/useAutoFocusOn';
 
 export default function Files({navigation: { navigate }, route}) {
 
@@ -44,7 +45,7 @@ export default function Files({navigation: { navigate }, route}) {
   const [keyBoardClosed, setKeyboardClosed] = useState(true)
   const [alphaSortedFiles, setAlphaSortedFiles] = useState([])
 
-  const inputRef = useRef()
+  const inputRef = useAutoFocusOn(add)
 
   //consume toast context for notifications
   const toast = useToast()
@@ -367,7 +368,7 @@ export default function Files({navigation: { navigate }, route}) {
                     </View>
                     {add ? 
                       <Modal animationType='slide' presentationStyle='pageSheet' onShow={() => setTimeout(()=>{
-                          inputRef.current.focus()
+                          inputRef.current?.focus()
                         }, 200)}>
                         <View style={{height: '100%', width: '100%', backgroundColor: '#593060'}}>
                           <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', paddingRight: '5%', paddingTop: '10%',width: '100%'}}>
@@ -387,7 +388,7 @@ export default function Files({navigation: { navigate }, route}) {
                               <View style={styles.iconHolder}>
                                 <FontAwesomeIcon icon={faFolder} size={22} color='#9F37B0'/>
                               </View>
-                              <TextInput value={newFolderName} placeholder='Enter new name' placeholderTextColor={'white'} style={{color: 'white', fontSize: 22, fontWeight: 'bold', borderBottomColor: 'white', borderBottomWidth: 2, width: '70%', marginLeft: '5%'}} onChangeText={(e) => setNewFolderName(e)} onFocus={() => setKeyboardClosed(false)} onBlur={() => {if (newFolderName === '') setAdd(false)}} ref={inputRef}/>
+                              <TextInput value={newFolderName} placeholder='Enter new name' placeholderTextColor={'white'} style={{color: 'white', fontSize: 22, fontWeight: 'bold', borderBottomColor: 'white', borderBottomWidth: 2, width: '70%', marginLeft: '5%'}} onChangeText={(e) => setNewFolderName(e)} onFocus={() => setKeyboardClosed(false)} ref={inputRef} autoFocus/>
                             </View>
                             <TouchableOpacity style={tabletStyle(isTablet, styles.nonFolderButtonSM, tabletStyles.actionButton)}
                               onPress={() => addFolder(newFolderName, '')}

@@ -40,6 +40,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import AppPressable from '../../components/ui/AppPressable'
 import ContentShell from '../../components/ui/ContentShell'
 import KeyboardSafeForm from '../../components/ui/KeyboardSafeForm'
+import { useAutoFocusOn } from '../../hooks/useAutoFocusOn'
 import { TestIds } from '../../constants/testIds'
 import { UploadQueueEmitter } from '../../hooks/QueueEventEmitter';
 import { useResponsiveLayout, tabletStyle } from '../../hooks/useResponsiveLayout'
@@ -64,6 +65,7 @@ try {
     const [zoom, setZoom] = useState(0)
     const [preAdd, setPreAdd] = useState(false)
     const [addFolderForm, setAddFolderForm] = useState(false)
+    const addFolderInputRef = useAutoFocusOn(addFolderForm)
     const [focusedFolder, setFocusedFolder] = useState()
     const [subFolders, setSubFolders] = useState()
     const [folders, setFolders] = useState({})
@@ -210,40 +212,21 @@ try {
 
     //add a folder
     const addFolder = async (folderName, targetNest) => {
-        //if the incoming targetNest is empty string, create the new folder under the home directory
         if (folderName.length > 0) {
             const folderId = Math.floor(Math.random() * 9e11) + 1e11
-            if (targetNest === '') {
-                const newFile = {
+            const newFile = {
                 id: folderId,
                 fileName: folderName,
-                nestedUnder: ''
-                }
-        
-                const newFiles = [...userInst.files, newFile]
-                const updatedUser = {...userInst, files: newFiles}
-                await updateUser(updatedUser)
-                setNewFolderName('')
-                setFolders(newFiles)
-                setFocusedFolder(folderId)
-                
-            } else {           //if the incoming targetNest has a value, create the new folder with the nestedUnder property set to targetNest
-                const newFile = {
-                id: folderId,
-                fileName: folderName,
-                nestedUnder: targetNest
-                }
-
-                const newFiles = [...userInst.files, newFile]
-                const updatedUser = {...userInst, files: newFiles}
-        
-                updateUser(updatedUser)
-                setAddFolderForm(false)
-                setFolders(newFiles)
-                setFocusedFolder(folderId)
+                nestedUnder: targetNest === '' ? '' : targetNest
             }
+            const newFiles = [...(userInst?.files || []), newFile]
+            await updateUser({...userInst, files: newFiles})
+            setNewFolderName('')
+            setAddFolderForm(false)
+            setFolders(newFiles)
+            setFocusedFolder(folderId)
         } else {
-        alert('Please enter a folder name')
+            alert('Please enter a folder name')
         }
     }
     
@@ -534,6 +517,7 @@ try {
                 { 
 
                 !nameGiven ?
+                <KeyboardSafeForm>
                 <>
                     <Text style={[{color: 'white', fontSize: 35, fontWeight: '700', marginTop: '30%', textAlign: 'center'}, select(undefined, tabletStyles.modalHeading)]}>{photo ? 'Name Photo' : 'Name Video: '}</Text>
                     <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', marginTop: '10%'}}>
@@ -578,6 +562,7 @@ try {
                         </TouchableOpacity>
                     </View>
                 </>
+                </KeyboardSafeForm>
                 : addFolderForm ? 
                     <KeyboardSafeForm>
                     <View style={{width: '100%', height: '100', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center'}}>
@@ -586,7 +571,7 @@ try {
                             <View style={styles.iconHolder}> 
                                 <FontAwesomeIcon icon={faFolder} size={22} color='#9F37B0'/>
                             </View>
-                            <TextInput value={newFolderName} placeholder='Enter new name' placeholderTextColor={'white'} style={{color: 'white', fontSize: 20, fontWeight: 'bold', borderBottomColor: 'white', borderBottomWidth: 2, width: '70%'}} onChangeText={(e) => setNewFolderName(e)} autoFocus onBlur={() => {if (newFolderName === '') setAddFolderForm(false)}}/>
+                            <TextInput value={newFolderName} placeholder='Enter new name' placeholderTextColor={'white'} style={{color: 'white', fontSize: 20, fontWeight: 'bold', borderBottomColor: 'white', borderBottomWidth: 2, width: '70%'}} onChangeText={(e) => setNewFolderName(e)} autoFocus ref={addFolderInputRef}/>
                         </View>
                         <View style={{width: '100%', paddingTop: '10%', display: 'flex', flexDirection: 'row', justifyContent: 'center'}}>
                             <TouchableOpacity style={styles.yellowButtonSM}

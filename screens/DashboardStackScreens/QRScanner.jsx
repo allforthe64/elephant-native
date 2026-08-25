@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Image, TouchableOpacity, Modal, Pressable, TextInput, Button, Linking } from 'react-native'
+import { StyleSheet, Text, View, Image, TouchableOpacity, Modal, Pressable, TextInput, Button, Linking, Platform } from 'react-native'
 import React, { useState, useEffect } from 'react'
 
 import { CameraView, useCameraPermissions } from 'expo-camera' 
@@ -29,6 +29,8 @@ import { UploadQueueEmitter } from '../../hooks/QueueEventEmitter'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import ContentShell from '../../components/ui/ContentShell'
 import KeyboardSafeForm from '../../components/ui/KeyboardSafeForm'
+import { useKeyboardHeight } from '../../hooks/useKeyboardHeight'
+import { useAutoFocusOn } from '../../hooks/useAutoFocusOn'
 import { useResponsiveLayout, tabletStyle } from '../../hooks/useResponsiveLayout'
 
 const Scanner = () => {
@@ -36,11 +38,13 @@ const Scanner = () => {
   try {
     const { isTablet, select } = useResponsiveLayout()
     const insets = useSafeAreaInsets()
+    const keyboardHeight = useKeyboardHeight()
     const [scanData, setScanData] = useState()
     const [urls, setUrls] = useState([])
     const [userInst, setUserInst] = useState()
     const [preAdd, setPreAdd] = useState(false)
     const [addFolderForm, setAddFolderForm] = useState(false)
+    const addFolderInputRef = useAutoFocusOn(addFolderForm)
     const [focusedFolder, setFocusedFolder] = useState()
     const [subFolders, setSubFolders] = useState()
     const [folders, setFolders] = useState([])
@@ -191,40 +195,21 @@ const Scanner = () => {
 
     //add a folder
     const addFolder = async (folderName, targetNest) => {
-        //if the incoming targetNest is empty string, create the new folder under the home directory
         if (folderName.length > 0) {
             const folderId = Math.floor(Math.random() * 9e11) + 1e11
-            if (targetNest === '') {
-                const newFile = {
+            const newFile = {
                 id: folderId,
                 fileName: folderName,
-                nestedUnder: ''
-                }
-        
-                const newFiles = [...userInst.files, newFile]
-                const updatedUser = {...userInst, files: newFiles}
-                await updateUser(updatedUser)
-                setNewFolderName('')
-                setFolders(newFiles)
-                setFocusedFolder(folderId)
-                
-            } else {           //if the incoming targetNest has a value, create the new folder with the nestedUnder property set to targetNest
-                const newFile = {
-                id: folderId,
-                fileName: folderName,
-                nestedUnder: targetNest
-                }
-
-                const newFiles = [...userInst.files, newFile]
-                const updatedUser = {...userInst, files: newFiles}
-        
-                updateUser(updatedUser)
-                setAddFolderForm(false)
-                setFolders(newFiles)
-                setFocusedFolder(folderId)
+                nestedUnder: targetNest === '' ? '' : targetNest
             }
+            const newFiles = [...(userInst?.files || []), newFile]
+            await updateUser({...userInst, files: newFiles})
+            setNewFolderName('')
+            setAddFolderForm(false)
+            setFolders(newFiles)
+            setFocusedFolder(folderId)
         } else {
-        alert('Please enter a folder name')
+            alert('Please enter a folder name')
         }
     }
 
@@ -376,7 +361,7 @@ return (
                                 <View style={styles.iconHolder}>
                                     <FontAwesomeIcon icon={faFolder} size={22} color='#9F37B0'/>
                                 </View>
-                                <TextInput value={newFolderName} placeholder='Enter new name' placeholderTextColor={'white'} style={{color: 'white', fontSize: 20, fontWeight: 'bold', borderBottomColor: 'white', borderBottomWidth: 2, width: '70%'}} onChangeText={(e) => setNewFolderName(e)} autoFocus onBlur={() => {if (newFolderName === '') setAddFolderForm(false)}}/>
+                                <TextInput value={newFolderName} placeholder='Enter new name' placeholderTextColor={'white'} style={{color: 'white', fontSize: 20, fontWeight: 'bold', borderBottomColor: 'white', borderBottomWidth: 2, width: '70%'}} onChangeText={(e) => setNewFolderName(e)} autoFocus ref={addFolderInputRef}/>
                             </View>
                             <View style={{width: '100%', paddingTop: '10%', display: 'flex', flexDirection: 'row', justifyContent: 'center'}}>
                                 <TouchableOpacity style={styles.yellowButtonSM}
@@ -541,26 +526,23 @@ return (
               <View style={{
                   backgroundColor: '#FFFCF6',
                   flex: 1,
-                  justifyContent: 'center',
                   alignItems: 'center',
               }}>
                 {scanData ? 
                     <View style={{
                             width: '100%',
-                            height: '100%',
-                            display: 'flex',
+                            flex: 1,
                             alignItems: 'center',
-                            position: 'absolute',
                             paddingTop: insets.top,
-                            paddingBottom: insets.bottom
+                            paddingBottom: Math.max(insets.bottom, 12) + (Platform.OS === 'ios' ? keyboardHeight : 0),
                         }}>
                         <Text style={styles.bigHeader}>Currently Captured QR URLS:</Text>
                         <View style={styles.scrollCon}>
-                            <ScrollView contentContainerStyle={styles.scroll}>
+                            <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
                                 {mapUrls()}
                             </ScrollView>
                         </View> 
-                        <View style={styles.wrapperContainer}>
+                        <View style={[styles.wrapperContainer, keyboardHeight > 0 && styles.wrapperContainerKeyboard]}>
                             <TouchableOpacity onPress={() => {
                                 setScanData(undefined)
                                 setScanned(false)
@@ -571,7 +553,7 @@ return (
                                 <Text style={{fontSize: 18, width: '100%', fontWeight: '600', color: '#9F37B0', paddingTop: '1%', marginLeft: '5%'}}>Scan Another Code</Text>
                             </TouchableOpacity>
                         </View>
-                        <View style={styles.wrapperContainer}>
+                        <View style={[styles.wrapperContainer, keyboardHeight > 0 && styles.wrapperContainerKeyboard]}>
                             <TouchableOpacity onPress={() => setPreAdd(true)} style={tabletStyle(isTablet, styles.buttonWrapper, tabletStyles.actionButton)}>
                                 <View style={styles.iconHolderSmall}>
                                     <FontAwesomeIcon icon={faCloudArrowUp} color='#9F37B0' />
@@ -621,14 +603,14 @@ const styles = StyleSheet.create({
         fontSize: 25,
         textAlign: 'center',
         fontWeight: '700',
-        marginBottom: '8%'
+        marginBottom: 16
       },
     scrollCon: {
-        height: '60%',
+        flex: 1,
         width: '95%',
         borderBottomWidth: 1,
         borderColor: 'black',
-        marginBottom: '10%'
+        marginBottom: 16
     },
     scroll: {
         paddingTop: '2%',
@@ -639,7 +621,10 @@ const styles = StyleSheet.create({
         display: 'flex',
         alignItems: 'center',
         width: '100%',
-        marginBottom: '8%'
+        marginBottom: 12
+    },
+    wrapperContainerKeyboard: {
+        marginBottom: 8
     },
     buttonWrapper: {
     width: '60%',

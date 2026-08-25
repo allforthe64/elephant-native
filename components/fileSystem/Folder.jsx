@@ -16,6 +16,7 @@ import {
   FILE_SYSTEM_ROW_ACTIVE_OPACITY,
 } from './fileSystemRowStyles';
 import KeyboardSafeForm from '../ui/KeyboardSafeForm';
+import { useAutoFocusOn } from '../../hooks/useAutoFocusOn';
 
 const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolderFunc, folders, updateUser}) => {
   const { isTablet, contentFill, modalMaxWidth } = useResponsiveLayout()
@@ -36,6 +37,8 @@ const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolder
   const [newFolderName, setNewFolderName] = useState('')
   const [userInst, setUserInst] = useState()
   const [focusedFolderInst, setFocusedFolderInst] = useState()
+  const renameInputRef = useAutoFocusOn(editName)
+  const addFolderInputRef = useAutoFocusOn(addFolderForm)
 
   const auth = firebaseAuth
 
@@ -309,7 +312,7 @@ const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolder
                           <View style={styles.iconHolder}>
                               <FontAwesomeIcon icon={faFolder} size={22} color='#9F37B0'/>
                           </View>
-                          <TextInput value={newName} style={{color: 'white', fontSize: 20, fontWeight: 'bold', borderBottomColor: 'white', borderBottomWidth: 2, width: '70%', marginLeft: '5%'}} placeholderTextColor={'white'} placeholder='Enter new name' onChangeText={(e) => setNewName(e)} autoFocus/>
+                          <TextInput value={newName} style={{color: 'white', fontSize: 20, fontWeight: 'bold', borderBottomColor: 'white', borderBottomWidth: 2, width: '70%', marginLeft: '5%'}} placeholderTextColor={'white'} placeholder='Enter new name' onChangeText={(e) => setNewName(e)} autoFocus ref={renameInputRef}/>
                         </View>
                         <View style={{display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'space-around', marginTop: '4%'}}>
                             <TouchableOpacity onPress={handleNameChange} style={styles.yellowButtonSM}>
@@ -359,7 +362,7 @@ const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolder
                                       <View style={styles.iconHolder}> 
                                           <FontAwesomeIcon icon={faFolder} size={22} color='#9F37B0'/>
                                       </View>
-                                      <TextInput value={newFolderName} style={{color: 'white', fontSize: 20, fontWeight: 'bold', borderBottomColor: 'white', borderBottomWidth: 2, width: '75%'}} placeholder={'Enter new name'} placeholderTextColor={'white'} onChangeText={(e) => setNewFolderName(e)} autoFocus onBlur={() => {if (newFolderName === '') setAddFolderForm(false)}}/>
+                                      <TextInput value={newFolderName} style={{color: 'white', fontSize: 20, fontWeight: 'bold', borderBottomColor: 'white', borderBottomWidth: 2, width: '75%'}} placeholder={'Enter new name'} placeholderTextColor={'white'} onChangeText={(e) => setNewFolderName(e)} autoFocus ref={addFolderInputRef}/>
                                   </View>
                                   <View style={{width: '100%', paddingTop: '10%', display: 'flex', flexDirection: 'row', justifyContent: 'center'}}>
                                       <TouchableOpacity style={styles.yellowButtonSM}

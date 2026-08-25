@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View, Keyboard, Modal, Pressable } from 'react-native'
-import React, {useEffect, useState, useRef} from 'react'
+import React, {useEffect, useState} from 'react'
 import { ScrollView, TouchableOpacity, TextInput } from 'react-native-gesture-handler'
 
 //fontAwesome imports
@@ -16,6 +16,7 @@ import FocusedFileComp from './FocusedFileComp'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { tabletStyle, useResponsiveLayout } from '../../hooks/useResponsiveLayout'
 import KeyboardSafeForm from '../ui/KeyboardSafeForm'
+import { useAutoFocusOn } from '../../hooks/useAutoFocusOn'
 
 const FocusedFolder = ({folder, folders, clear, getTargetFolder, addFolder, renameFolder, moveFolder, deleteFolder, deleteFile, renameFile, moveFile, files, updateUser}) => {
     const { isTablet, contentFill, modalMaxWidth } = useResponsiveLayout()
@@ -30,7 +31,7 @@ const FocusedFolder = ({folder, folders, clear, getTargetFolder, addFolder, rena
     const [alphaSortedFolders, setAlphaSortedFolders] = useState([])
 
     //initialize ref for addFolder form
-    const folderRef = useRef()
+    const folderRef = useAutoFocusOn(add)
     
     //alpha sort helper functions
     const getSortableValue = (val) => {
@@ -205,7 +206,7 @@ const FocusedFolder = ({folder, folders, clear, getTargetFolder, addFolder, rena
                     </View>
                     {add ? 
                         <Modal presentationStyle='pageSheet' animationType='slide' onShow={() => setTimeout(()=>{
-                            folderRef.current.focus()
+                            folderRef.current?.focus()
                         }, 200)}>
                             <View style={tabletStyle(isTablet, {height: '100%', width: '100%', backgroundColor: '#593060'}, {maxWidth: modalMaxWidth, alignSelf: 'center'})}>
                                 <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', paddingRight: '5%', paddingTop: '10%',width: '100%'}}>
@@ -224,7 +225,7 @@ const FocusedFolder = ({folder, folders, clear, getTargetFolder, addFolder, rena
                                         <View style={styles.iconHolder}>
                                         <FontAwesomeIcon icon={faFolder} size={22} color='#9F37B0'/>
                                         </View>
-                                        <TextInput placeholder='Enter new name' placeholderTextColor={'white'} value={newFolderName} style={{color: 'white', fontSize: 22, fontWeight: 'bold', borderBottomColor: 'white', borderBottomWidth: 2, width: '70%', marginLeft: '5%'}} onChangeText={(e) => setNewFolderName(e)} onFocus={() => setKeyboardClosed(false)} ref={folderRef} onBlur={() => {if (newFolderName === '') setAdd(false)}}/>
+                                        <TextInput placeholder='Enter new name' placeholderTextColor={'white'} value={newFolderName} style={{color: 'white', fontSize: 22, fontWeight: 'bold', borderBottomColor: 'white', borderBottomWidth: 2, width: '70%', marginLeft: '5%'}} onChangeText={(e) => setNewFolderName(e)} onFocus={() => setKeyboardClosed(false)} ref={folderRef} autoFocus/>
                                     </View>
                                     <Pressable style={styles.nonFolderButtonSM}
                                         onPress={() => {

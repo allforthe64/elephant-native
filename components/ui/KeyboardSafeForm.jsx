@@ -1,16 +1,30 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { View, StyleSheet, Platform } from 'react-native'
 import { useKeyboardHeight } from '../../hooks/useKeyboardHeight'
 
 /**
  * Keeps modal add/rename forms (input + Save) above the soft keyboard.
  * Wrap the form block only — not the entire destination picker.
+ *
+ * Lift is held briefly after hide so tapping Save is not lost when the
+ * keyboard dismisses and the form would otherwise jump.
  */
 const KeyboardSafeForm = ({ children, style }) => {
-  const keyboardHeight = useKeyboardHeight()
-  const lift = keyboardHeight > 0
+  const rawHeight = useKeyboardHeight()
+  const [liftHeight, setLiftHeight] = useState(0)
+
+  useEffect(() => {
+    if (rawHeight > 0) {
+      setLiftHeight(rawHeight)
+      return
+    }
+    const timeout = setTimeout(() => setLiftHeight(0), 200)
+    return () => clearTimeout(timeout)
+  }, [rawHeight])
+
+  const lift = liftHeight > 0
     ? Math.min(
-        keyboardHeight * (Platform.OS === 'ios' ? 0.55 : 0.5),
+        liftHeight * (Platform.OS === 'ios' ? 0.55 : 0.5),
         Platform.OS === 'ios' ? 280 : 260,
       )
     : 0

@@ -34,6 +34,7 @@ import Constants from 'expo-constants';
 import WebView from 'react-native-webview'
 import { tabletStyle, useResponsiveLayout } from '../../hooks/useResponsiveLayout'
 import KeyboardSafeForm from '../ui/KeyboardSafeForm'
+import { useAutoFocusOn } from '../../hooks/useAutoFocusOn'
 
 
 const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFileMove}) => {
@@ -69,6 +70,8 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
     const [focusedFolderInst, setFocusedFolderInst] = useState()
     const [hasRun, setHasRun] = useState(false)
     const [convertedPDFURL, setConvertedPDFURL] = useState()
+    const renameFileInputRef = useAutoFocusOn(add)
+    const addFolderInputRef = useAutoFocusOn(addFolderForm)
 
     //gesture values
     /* const scale = useRef(new Animated.Value(1)).current
@@ -436,40 +439,19 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
 
     //add a folder
     const addFolder = async (folderName, targetNest) => {
-        //if the incoming targetNest is empty string, create the new folder under the home directory
         if (folderName.length > 0) {
             const folderId = Math.random().toString(20).toString().split('.')[1] + Math.random().toString(20).toString().split('.')[1]
-            if (targetNest === '') { 
-                const newFile = {
+            const newFile = {
                 id: folderId,
                 fileName: folderName,
-                nestedUnder: ''
-                }
-        
-                const newFiles = [...userInst.files, newFile]
-                const updatedUser = {...userInst, files: newFiles}
-                await updateUser(updatedUser)
-                setNewFolderName('')
-                setFolders(newFiles)
-                setFocusedFolder(folderId)
-                setAddFolderForm(false)
-                
-            } else {           //if the incoming targetNest has a value, create the new folder with the nestedUnder property set to targetNest
-                const newFile = {
-                id: folderId,
-                fileName: folderName,
-                nestedUnder: targetNest
-                }
-
-                const newFiles = [...userInst.files, newFile]
-                const updatedUser = {...userInst, files: newFiles}
-        
-                updateUser(updatedUser)
-                setAddFolderForm(false)
-                setFolders(newFiles)
-                setNewFolderName('')
-                setFocusedFolder(folderId)
+                nestedUnder: targetNest === '' ? '' : targetNest
             }
+            const newFiles = [...(userInst?.files || []), newFile]
+            await updateUser({...userInst, files: newFiles})
+            setNewFolderName('')
+            setAddFolderForm(false)
+            setFolders(newFiles)
+            setFocusedFolder(folderId)
         } else {
             alert('Please enter a folder name')
         }
@@ -571,7 +553,7 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
                                                 <View style={styles.iconHolder}> 
                                                     <FontAwesomeIcon icon={faFolder} size={22} color='#9F37B0'/>
                                                 </View>
-                                                <TextInput value={newFolderName} style={{color: 'white', fontSize: 20, fontWeight: 'bold', borderBottomColor: 'white', borderBottomWidth: 2, width: '70%'}} placeholderTextColor={'white'} placeholder='Enter new name' onChangeText={(e) => setNewFolderName(e)} autoFocus onBlur={() => {if (newFolderName === '') setAddFolderForm(false)}}/>
+                                                <TextInput value={newFolderName} style={{color: 'white', fontSize: 20, fontWeight: 'bold', borderBottomColor: 'white', borderBottomWidth: 2, width: '70%'}} placeholderTextColor={'white'} placeholder='Enter new name' onChangeText={(e) => setNewFolderName(e)} autoFocus ref={addFolderInputRef}/>
                                             </View>
                                             <View style={{width: '100%', paddingTop: '10%', display: 'flex', flexDirection: 'row', justifyContent: 'center'}}>
                                                 <TouchableOpacity style={styles.yellowButtonSM}
@@ -770,13 +752,15 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
                                             </Pressable>
                                         </View>
                                         <Text style={{fontSize: 40, color: 'white', fontWeight: 'bold', textAlign: 'left', width: '100%', paddingLeft: '5%', marginBottom: '10%'}}>Edit Note:</Text>
-                                        <View style={{width: '100%', height: '100%', paddingLeft: '5%', paddingRight: '5%'}}>
+                                        <KeyboardSafeForm style={{ flex: 1, width: '100%' }}>
+                                        <View style={{width: '100%', flex: 1, paddingLeft: '5%', paddingRight: '5%'}}>
                                         <TextInput 
                                             multiline={true}
                                             value={noteText}
                                             style={{
                                                 width: '100%',
-                                                height: '50%',
+                                                flex: 1,
+                                                maxHeight: '50%',
                                                 backgroundColor: 'white',
                                                 fontSize: 20,
                                                 textAlignVertical: 'top',
@@ -807,6 +791,7 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
                                                 </TouchableOpacity>
                                             </View>
                                         </View>
+                                        </KeyboardSafeForm>
                                     </View>
                                 </Modal>
                             )
@@ -830,7 +815,7 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
                                                         <View style={styles.iconHolder}>
                                                             <FontAwesomeIcon icon={faFile} size={22} color='#9F37B0'/>
                                                         </View>
-                                                        <TextInput style={{color: 'white', fontSize: 20, fontWeight: 'bold', borderBottomColor: 'white', borderBottomWidth: 2, width: '70%', marginLeft: '5%'}} placeholder='Enter new name' placeholderTextColor={'white'} onChangeText={(e) => setNewFileName(e)} autoFocus/>
+                                                        <TextInput style={{color: 'white', fontSize: 20, fontWeight: 'bold', borderBottomColor: 'white', borderBottomWidth: 2, width: '70%', marginLeft: '5%'}} placeholder='Enter new name' placeholderTextColor={'white'} onChangeText={(e) => setNewFileName(e)} autoFocus ref={renameFileInputRef}/>
                                                     </View>
                                                     <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-around', marginTop: '10%', width: '100%'}}>
                                                         <TouchableOpacity style={styles.yellowButtonSM}
