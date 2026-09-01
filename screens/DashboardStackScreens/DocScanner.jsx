@@ -71,6 +71,16 @@ const DocScanner = () => {
 
   const currentUser = firebaseAuth.currentUser.uid
 
+  const closeSaveDialog = () => {
+    setPreAdd(false)
+    setNameGiven(false)
+    setDocName('')
+    setFocusedFolder(null)
+    setDestination({id: null, fileName: null, nestedUnder: null})
+    setAddFolderForm(false)
+    setNewFolderName('')
+  }
+
   const toast = useToast()
 
   const width = Dimensions.get('window').width
@@ -220,8 +230,6 @@ const DocScanner = () => {
 
   const uploadPDF = async (path, toStaging = false) => {
     try {
-      setPreAdd(false)
-
       const modifiedPath = `file://${path}`
 
 
@@ -249,9 +257,7 @@ const DocScanner = () => {
       UploadQueueEmitter.emit('uploadQueueUpdated', confirmedQueue)
 
       setScannedImageArray([])
-      setDestination({id: null, fileName: null, nestedUnder: null})
-      setFocusedFolder(null)
-      setNameGiven(false)
+      closeSaveDialog()
     } catch (error) {
       alert('docScanner error: ' + error.message)
     }
@@ -342,19 +348,14 @@ const DocScanner = () => {
 
         <Modal animationType='slide' presentationStyle='pageSheet' onShow={() => setTimeout(()=>{
           nameRef.current.focus()
-      }, 200)}>
+      }, 200)} onRequestClose={closeSaveDialog} onDismiss={closeSaveDialog}>
           <View style={{height: '100%', width: '100%', backgroundColor: '#593060'}}>
               {/* if the moveFile state is true, display the modal with the file movement code*/}
               {/* xMark icon for closing out the moveFile modal */}
               <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', paddingRight: '5%', paddingTop: '10%', width: '100%'}}>
                   <Pressable onPress={() => {
                     if (addFolderForm) setAddFolderForm(false) 
-                    else {
-                      setPreAdd(false)
-                      setFocusedFolder(null)
-                      setNameGiven(false)
-                      setDocName('')
-                    }
+                    else closeSaveDialog()
                     }}>
                       <FontAwesomeIcon icon={faXmark} color={'white'} size={30}/>
                   </Pressable>
@@ -418,7 +419,7 @@ const DocScanner = () => {
                           <View style={styles.iconHolder}> 
                               <FontAwesomeIcon icon={faFolder} size={22} color='#9F37B0'/>
                           </View>
-                          <TextInput value={newFolderName} placeholder='Enter new name' placeholderTextColor={'white'} style={{color: 'white', fontSize: 20, fontWeight: 'bold', borderBottomColor: 'white', borderBottomWidth: 2, width: '70%'}} onChangeText={(e) => setNewFolderName(e)} autoFocus ref={addFolderInputRef}/>
+                          <TextInput value={newFolderName} placeholder='Enter new name' placeholderTextColor={'white'} style={{color: 'white', fontSize: 20, fontWeight: 'bold', borderBottomColor: 'white', borderBottomWidth: 2, width: '70%'}} onChangeText={(e) => setNewFolderName(e)} autoFocus showSoftInputOnFocus ref={addFolderInputRef} onLayout={() => addFolderInputRef.current?.focus?.()}/>
                       </View>
                       <View style={{width: '100%', paddingTop: '10%', display: 'flex', flexDirection: 'row', justifyContent: 'center'}}>
                             <TouchableOpacity style={styles.yellowButtonSM}

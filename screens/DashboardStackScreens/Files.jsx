@@ -365,7 +365,7 @@ export default function Files({navigation: { navigate }, route}) {
                               <View style={styles.iconHolder}>
                                 <FontAwesomeIcon icon={faFolder} size={22} color='#9F37B0'/>
                               </View>
-                              <TextInput value={newFolderName} placeholder='Enter new name' placeholderTextColor={'white'} style={{color: 'white', fontSize: 22, fontWeight: 'bold', borderBottomColor: 'white', borderBottomWidth: 2, width: '70%', marginLeft: '5%'}} onChangeText={(e) => setNewFolderName(e)} onFocus={() => setKeyboardClosed(false)} ref={inputRef} autoFocus/>
+                              <TextInput value={newFolderName} placeholder='Enter new name' placeholderTextColor={'white'} style={{color: 'white', fontSize: 22, fontWeight: 'bold', borderBottomColor: 'white', borderBottomWidth: 2, width: '70%', marginLeft: '5%'}} onChangeText={(e) => setNewFolderName(e)} onFocus={() => setKeyboardClosed(false)} ref={inputRef} autoFocus showSoftInputOnFocus onLayout={() => inputRef.current?.focus?.()}/>
                             </View>
                             <TouchableOpacity style={tabletStyle(isTablet, styles.nonFolderButtonSM, tabletStyles.actionButton)}
                               onPress={() => addFolder(newFolderName, '')}

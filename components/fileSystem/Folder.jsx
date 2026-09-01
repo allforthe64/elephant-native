@@ -336,7 +336,7 @@ const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolder
                                       <View style={styles.iconHolder}> 
                                           <FontAwesomeIcon icon={faFolder} size={22} color='#9F37B0'/>
                                       </View>
-                                      <TextInput value={newFolderName} style={{color: 'white', fontSize: 20, fontWeight: 'bold', borderBottomColor: 'white', borderBottomWidth: 2, width: '75%'}} placeholder={'Enter new name'} placeholderTextColor={'white'} onChangeText={(e) => setNewFolderName(e)} autoFocus ref={addFolderInputRef}/>
+                                      <TextInput value={newFolderName} style={{color: 'white', fontSize: 20, fontWeight: 'bold', borderBottomColor: 'white', borderBottomWidth: 2, width: '75%'}} placeholder={'Enter new name'} placeholderTextColor={'white'} onChangeText={(e) => setNewFolderName(e)} autoFocus showSoftInputOnFocus ref={addFolderInputRef} onLayout={() => addFolderInputRef.current?.focus?.()}/>
                                   </View>
                                   <View style={{width: '100%', paddingTop: '10%', display: 'flex', flexDirection: 'row', justifyContent: 'center'}}>
                                       <TouchableOpacity style={styles.yellowButtonSM}

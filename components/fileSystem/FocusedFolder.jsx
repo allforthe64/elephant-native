@@ -1,6 +1,6 @@
-import { StyleSheet, Text, View, Keyboard, Modal, Pressable } from 'react-native'
+import { StyleSheet, Text, View, Keyboard, Modal, Pressable, TextInput } from 'react-native'
 import React, {useEffect, useState} from 'react'
-import { ScrollView, TouchableOpacity, TextInput } from 'react-native-gesture-handler'
+import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler'
 
 //fontAwesome imports
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
@@ -31,7 +31,7 @@ const FocusedFolder = ({folder, folders, clear, getTargetFolder, addFolder, rena
     const [alphaSortedFolders, setAlphaSortedFolders] = useState([])
 
     //initialize ref for addFolder form
-    const folderRef = useAutoFocusOn(add)
+    const folderRef = useAutoFocusOn(add, 350)
     
     //alpha sort helper functions
     const getSortableValue = (val) => {
@@ -206,8 +206,8 @@ const FocusedFolder = ({folder, folders, clear, getTargetFolder, addFolder, rena
                     </View>
                     {add ? 
                         <Modal presentationStyle='pageSheet' animationType='slide' onShow={() => setTimeout(()=>{
-                            folderRef.current?.focus()
-                        }, 200)}>
+                            folderRef.current?.focus?.()
+                        }, 350)}>
                             <View style={tabletStyle(isTablet, {height: '100%', width: '100%', backgroundColor: '#593060'}, {maxWidth: modalMaxWidth, alignSelf: 'center'})}>
                                 <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', paddingRight: '5%', paddingTop: '10%',width: '100%'}}>
                                     <Pressable onPress={() => {
@@ -225,7 +225,7 @@ const FocusedFolder = ({folder, folders, clear, getTargetFolder, addFolder, rena
                                         <View style={styles.iconHolder}>
                                         <FontAwesomeIcon icon={faFolder} size={22} color='#9F37B0'/>
                                         </View>
-                                        <TextInput placeholder='Enter new name' placeholderTextColor={'white'} value={newFolderName} style={{color: 'white', fontSize: 22, fontWeight: 'bold', borderBottomColor: 'white', borderBottomWidth: 2, width: '70%', marginLeft: '5%'}} onChangeText={(e) => setNewFolderName(e)} onFocus={() => setKeyboardClosed(false)} ref={folderRef} autoFocus/>
+                                        <TextInput placeholder='Enter new name' placeholderTextColor={'white'} value={newFolderName} style={{color: 'white', fontSize: 22, fontWeight: 'bold', borderBottomColor: 'white', borderBottomWidth: 2, width: '70%', marginLeft: '5%'}} onChangeText={(e) => setNewFolderName(e)} onFocus={() => setKeyboardClosed(false)} ref={folderRef} autoFocus showSoftInputOnFocus onLayout={() => setTimeout(() => folderRef.current?.focus?.(), 50)}/>
                                     </View>
                                     <Pressable style={styles.nonFolderButtonSM}
                                         onPress={async () => {
