@@ -17,6 +17,7 @@ import {
 } from './fileSystemRowStyles';
 import KeyboardSafeForm from '../ui/KeyboardSafeForm';
 import { useAutoFocusOn } from '../../hooks/useAutoFocusOn';
+import MoveFolderDestinationRow from './MoveFolderDestinationRow';
 
 const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolderFunc, folders, updateUser}) => {
   const { isTablet, contentFill, modalMaxWidth } = useResponsiveLayout()
@@ -394,7 +395,11 @@ const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolder
                                                   if (focusedFolder) {
                                                       if (f.nestedUnder === focusedFolder) {
                                                               return (
-                                                                  <Pressable key={index} style={{display: 'flex', flexDirection: 'row', justifyContent: 'center', marginTop: '1%'}} onPress={() => {
+                                                                  <MoveFolderDestinationRow
+                                                                    key={index}
+                                                                    selected={f.id === destination.id}
+                                                                    fileName={f.fileName}
+                                                                    onPress={() => {
                                                                         if (destination.id === f.id) {
                                                                           toast.show("In order to prevent nesting a folder within itself, you are unable to view this folder's subfolders", {
                                                                             type: 'error'
@@ -407,37 +412,27 @@ const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolder
                                                                               setDestination({id: null, fileName: null, nestedUnder: null})
                                                                           }
                                                                         }
-                                                                      }
-                                                                      }>
-                                                                      <View style={tabletStyle(isTablet, f.id === destination.id ? styles.moveFolderWhite : styles.moveFolder, contentFill)}>
-                                                                      <View style={f.id === destination.id ? styles.iconHolderBlack : styles.iconHolderWhite}>
-                                                                          <FontAwesomeIcon icon={faFolder} size={28} color={f.id === destination.id ? 'white' : '#9F37B0'}/>
-                                                                      </View>
-                                                                      <Text style={f.id === destination.id ? {color: 'black', fontSize: 28, width: '80%', paddingTop: '1%'} : {color: '#9F37B0', fontSize: 28, width: '80%', textAlign: 'left', paddingTop: '1%'}}>{f.fileName}</Text>
-                                                                      </View>
-                                                                  </Pressable>
+                                                                      }}
+                                                                  />
                                                               )
                                                           
                                                       }
                                                   } else {
                                                       if (f.nestedUnder === '') {
                                                           return (
-                                                              <Pressable key={index} style={{display: 'flex', flexDirection: 'row', justifyContent: 'center', marginTop: '1%'}} onPress={() => {
+                                                              <MoveFolderDestinationRow
+                                                                key={index}
+                                                                selected={f.id === destination.id}
+                                                                fileName={f.fileName}
+                                                                onPress={() => {
                                                                       if (destination.id === null || f.id !== destination.id) {
                                                                           setDestination({id: f.id, fileName: f.fileName, nestedUnder: f.nestedUnder})
                                                                       } else {
                                                                           setFocusedFolder(f.id)
                                                                           setDestination({id: null, fileName: null, nestedUnder: null})
                                                                       }
-                                                                  }
-                                                                  }>
-                                                                  <View style={tabletStyle(isTablet, f.id === destination.id ? styles.moveFolderWhite : styles.moveFolder, contentFill)}>
-                                                                  <View style={f.id === destination.id ? styles.iconHolderBlack : styles.iconHolderWhite}>
-                                                                      <FontAwesomeIcon icon={faFolder} size={28} color={f.id === destination.id ? 'white' : '#9F37B0'}/>
-                                                                  </View>
-                                                                  <Text style={f.id === destination.id ? {color: 'black', fontSize: 28, width: '80%', paddingTop: '1%'} : {color: '#9F37B0', fontSize: 28, width: '80%', textAlign: 'left', paddingTop: '1%'}}>{f.fileName}</Text>
-                                                                  </View>
-                                                              </Pressable>
+                                                                  }}
+                                                              />
                                                               )
                                                           }
                                                       }

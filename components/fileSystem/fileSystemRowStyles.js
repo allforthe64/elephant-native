@@ -79,6 +79,22 @@ export const fileSystemRowStyles = StyleSheet.create({
   trailingActive: {
     backgroundColor: 'rgba(0, 0, 0, 0.35)',
   },
+  /** Destination picker rows on purple move/save modals */
+  rowMoveDestination: {
+    backgroundColor: Brand.lavender,
+  },
+  rowMoveDestinationSelected: {
+    backgroundColor: '#fff',
+  },
+  iconHolderMoveSelected: {
+    backgroundColor: Brand.purple,
+  },
+  labelMoveDestination: {
+    color: Brand.purple,
+  },
+  labelMoveDestinationSelected: {
+    color: Brand.purple,
+  },
   thumb: {
     width: 44,
     height: 44,
