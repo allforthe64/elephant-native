@@ -7,7 +7,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faArrowRight, faEllipsisVertical, faFloppyDisk, faFolder, faPencil, faTrash, faXmark, faArrowLeft, faPlus } from '@fortawesome/free-solid-svg-icons';
 
 import { firebaseAuth } from '../../firebaseConfig';
-import { userListener } from '../../firebase/firestore';
+import { userListener, addFolderToUser } from '../../firebase/firestore';
 
 import { useToast } from 'react-native-toast-notifications';
 import { tabletStyle, useResponsiveLayout } from '../../hooks/useResponsiveLayout';
@@ -16,6 +16,7 @@ import {
   FILE_SYSTEM_ROW_ACTIVE_OPACITY,
 } from './fileSystemRowStyles';
 import KeyboardSafeForm from '../ui/KeyboardSafeForm';
+import { useAutoFocusOn } from '../../hooks/useAutoFocusOn';
 
 const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolderFunc, folders, updateUser}) => {
   const { isTablet, contentFill, modalMaxWidth } = useResponsiveLayout()
@@ -36,6 +37,8 @@ const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolder
   const [newFolderName, setNewFolderName] = useState('')
   const [userInst, setUserInst] = useState()
   const [focusedFolderInst, setFocusedFolderInst] = useState()
+  const renameInputRef = useAutoFocusOn(editName)
+  const addFolderInputRef = useAutoFocusOn(addFolderForm)
 
   const auth = firebaseAuth
 
@@ -114,7 +117,7 @@ const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolder
         setValidFolders(sortedFolders)
       }
     }
-  }, [folders, addFolderForm])
+  }, [folders])
 
   useEffect(() => {
     if (focusedFolder && folders) {
@@ -137,14 +140,14 @@ const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolder
         } catch (err) {alert(err)}
     } else console.log('no user yet')
     
-  }, [addFolderForm])
+  }, [auth])
 
   useEffect(() => {
     const exists = Object.values(folders).some((value) => {
         return value.nestedUnder === focusedFolder
     })
     setSubFolders(exists)
-}, [focusedFolder, addFolderForm])
+}, [focusedFolder, folders])
 
 
   //call the delete folder function from the main component and hide both modals
@@ -194,39 +197,13 @@ const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolder
 
   //add a folder
   const addFolder = async (folderName, targetNest) => {
-    //if the incoming targetNest is empty string, create the new folder under the home directory
-    if (folderName.length > 0) {
-    const folderId = Math.random().toString(20).toString().split('.')[1] + Math.random().toString(20).toString().split('.')[1]
-      if (targetNest === '') {
-          const newFile = {
-          id: folderId,
-          fileName: folderName,
-          nestedUnder: ''
-          }
-
-          const newFiles = [...userInst.files, newFile]
-          const updatedUser = {...userInst, files: newFiles}
-          await updateUser(updatedUser)
-          setNewFolderName('')
-          setAddFolderForm(false)
-          setFocusedFolder(folderId)
-      } else {           //if the incoming targetNest has a value, create the new folder with the nestedUnder property set to targetNest
-          const newFile = {
-          id: folderId,
-          fileName: folderName,
-          nestedUnder: targetNest
-          }
-
-          const newFiles = [...userInst.files, newFile]
-          const updatedUser = {...userInst, files: newFiles}
-
-          await updateUser(updatedUser)
-          setNewFolderName('')
-          setAddFolderForm(false)
-          setFocusedFolder(folderId)
-      }
-    } else {
-    alert('Please enter a folder name')
+    try {
+      const { newFile } = await addFolderToUser(userInst, folderName, targetNest)
+      setNewFolderName('')
+      setAddFolderForm(false)
+      setFocusedFolder(newFile.id)
+    } catch (err) {
+      alert(err?.message || String(err))
     }
   }
 
@@ -309,7 +286,7 @@ const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolder
                           <View style={styles.iconHolder}>
                               <FontAwesomeIcon icon={faFolder} size={22} color='#9F37B0'/>
                           </View>
-                          <TextInput value={newName} style={{color: 'white', fontSize: 20, fontWeight: 'bold', borderBottomColor: 'white', borderBottomWidth: 2, width: '70%', marginLeft: '5%'}} placeholderTextColor={'white'} placeholder='Enter new name' onChangeText={(e) => setNewName(e)} autoFocus/>
+                          <TextInput value={newName} style={{color: 'white', fontSize: 20, fontWeight: 'bold', borderBottomColor: 'white', borderBottomWidth: 2, width: '70%', marginLeft: '5%'}} placeholderTextColor={'white'} placeholder='Enter new name' onChangeText={(e) => setNewName(e)} autoFocus ref={renameInputRef}/>
                         </View>
                         <View style={{display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'space-around', marginTop: '4%'}}>
                             <TouchableOpacity onPress={handleNameChange} style={styles.yellowButtonSM}>
@@ -359,13 +336,11 @@ const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolder
                                       <View style={styles.iconHolder}> 
                                           <FontAwesomeIcon icon={faFolder} size={22} color='#9F37B0'/>
                                       </View>
-                                      <TextInput value={newFolderName} style={{color: 'white', fontSize: 20, fontWeight: 'bold', borderBottomColor: 'white', borderBottomWidth: 2, width: '75%'}} placeholder={'Enter new name'} placeholderTextColor={'white'} onChangeText={(e) => setNewFolderName(e)} autoFocus onBlur={() => {if (newFolderName === '') setAddFolderForm(false)}}/>
+                                      <TextInput value={newFolderName} style={{color: 'white', fontSize: 20, fontWeight: 'bold', borderBottomColor: 'white', borderBottomWidth: 2, width: '75%'}} placeholder={'Enter new name'} placeholderTextColor={'white'} onChangeText={(e) => setNewFolderName(e)} autoFocus showSoftInputOnFocus ref={addFolderInputRef} onLayout={() => addFolderInputRef.current?.focus?.()}/>
                                   </View>
                                   <View style={{width: '100%', paddingTop: '10%', display: 'flex', flexDirection: 'row', justifyContent: 'center'}}>
                                       <TouchableOpacity style={styles.yellowButtonSM}
-                                      onPress={async () => {
-                                          addFolder(newFolderName, focusedFolder ? focusedFolder : '')
-                                      }}
+                                      onPress={() => addFolder(newFolderName, focusedFolder ? focusedFolder : '')}
                                       >   
                                           <View style={styles.iconHolderSmall}>
                                               <FontAwesomeIcon icon={faFloppyDisk} size={18} color='#9F37B0' />

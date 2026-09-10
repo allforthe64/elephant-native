@@ -7,7 +7,7 @@ import { faCheck, faPencil, faXmark, faFolder, faArrowLeft, faFile, faCloudArrow
 import { ref as refFunction, uploadBytesResumable} from 'firebase/storage'
 
 //import addfile, userListener, updateUser from firestore/import firebaseAuth, storage objects from firebase config
-import { addfile, userListener, updateUser } from '../../firebase/firestore'
+import { addfile, userListener, updateUser, addFolderToUser } from '../../firebase/firestore'
 import { firebaseAuth, storage } from '../../firebaseConfig';
 
 //import format from date-fns for file timestamps
@@ -28,6 +28,7 @@ import ContentShell from '../../components/ui/ContentShell'
 import KeyboardSafeForm from '../../components/ui/KeyboardSafeForm'
 import { TestIds } from '../../constants/testIds'
 import { useResponsiveLayout, tabletStyle } from '../../hooks/useResponsiveLayout'
+import { useAutoFocusOn } from '../../hooks/useAutoFocusOn'
 
 const Notepad = () => {
     const { isTablet, select } = useResponsiveLayout()
@@ -40,6 +41,7 @@ const Notepad = () => {
     const [currentUser, setCurrentUser] = useState()
     const [loading, setLoading] = useState(false)
     const [addFolderForm, setAddFolderForm] = useState(false)
+    const addFolderInputRef = useAutoFocusOn(addFolderForm)
     const [focusedFolder, setFocusedFolder] = useState()
     const [subFolders, setSubFolders] = useState()
     const [folders, setFolders] = useState({})
@@ -126,7 +128,7 @@ const Notepad = () => {
           alert('currentUser.files is not an array')
         }
       }
-    }, [currentUser, addFolderForm])
+    }, [currentUser])
 
 
     saveNote = () => {
@@ -151,52 +153,27 @@ const Notepad = () => {
 
     //add a folder
   const addFolder = async (folderName, targetNest) => {
-    //if the incoming targetNest is empty string, create the new folder under the home directory
-    if (folderName.length > 0) {
-      const folderId = Math.floor(Math.random() * 9e11) + 1e11
-      if (targetNest === '') {
-        const newFile = {
-          id: folderId,
-          fileName: folderName,
-          nestedUnder: ''
-        }
-  
-        const newFiles = [...currentUser.files, newFile]
-        const updatedUser = {...currentUser, files: newFiles}
-        await updateUser(updatedUser)
-        setNewFolderName('')
-        setFolders(newFiles)
-        setFocusedFolder(folderId)
-        
-      } else {           //if the incoming targetNest has a value, create the new folder with the nestedUnder property set to targetNest
-        const newFile = {
-          id: folderId,
-          fileName: folderName,
-          nestedUnder: targetNest
-        }
-
-        const newFiles = [...currentUser.files, newFile]
-        const updatedUser = {...currentUser, files: newFiles}
-  
-        updateUser(updatedUser)
-        setAddFolderForm(false)
-        setFolders(newFiles)
-        setFocusedFolder(folderId)
-      }
-    } else {
-      alert('Please enter a folder name')
+    try {
+      const { newFile, newFiles } = await addFolderToUser(currentUser, folderName, targetNest)
+      setNewFolderName('')
+      setAddFolderForm(false)
+      setFolders(newFiles)
+      setFocusedFolder(newFile.id)
+    } catch (err) {
+      alert(err?.message || String(err))
     }
   }
 
-    const addToStorage = async () => {
+    const addToStorage = async (toStaging = false) => {
 
       try {
         //generate formatted date, fileName, and upload size
         const formattedDate = format(new Date(), "yyyy-MM-dd:hh:mm:ss")
         const filename = noteName !== '' ? `${noteName}.txt` : `Note from: ${formattedDate}.txt`
 
-        let finalDestination 
-        if (destination.id !== null) finalDestination = destination.id
+        let finalDestination
+        if (toStaging) finalDestination = false
+        else if (destination.id !== null) finalDestination = destination.id
         else if (focusedFolder) finalDestination = focusedFolder 
         else finalDestination = false
 
@@ -303,7 +280,7 @@ const Notepad = () => {
           return value.nestedUnder === focusedFolder
       })
       setSubFolders(exists)
-  }, [focusedFolder, addFolderForm])
+  }, [focusedFolder, folders])
 
   console.log('folders: ', folders)
   console.log('plain ref: ', ref)
@@ -336,6 +313,7 @@ const Notepad = () => {
               { 
 
               !nameGiven ?
+              <KeyboardSafeForm>
               <>
                   <Text style={[{color: 'white', fontSize: 35, fontWeight: '700', marginTop: '35%', textAlign: 'center'}, select(undefined, tabletStyles.modalHeading)]}>Name Note:</Text>
                   <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', marginTop: '10%'}}>
@@ -380,6 +358,7 @@ const Notepad = () => {
                         </TouchableOpacity>
                     </View>
               </>
+              </KeyboardSafeForm>
               : addFolderForm ? 
                   <KeyboardSafeForm>
                   <>
@@ -389,17 +368,13 @@ const Notepad = () => {
                             <View style={styles.iconHolder}> 
                                 <FontAwesomeIcon icon={faFolder} size={22} color='#9F37B0'/>
                             </View>
-                            <TextInput value={newFolderName} placeholder='Enter new name' placeholderTextColor={'white'} style={{color: 'white', fontSize: 20, fontWeight: 'bold', borderBottomColor: 'white', borderBottomWidth: 2, width: '70%'}} onChangeText={(e) => setNewFolderName(e)} autoFocus onBlur={() => {if (newFolderName === '') setAddFolderForm(false)}}/>
+                            <TextInput value={newFolderName} placeholder='Enter new name' placeholderTextColor={'white'} style={{color: 'white', fontSize: 20, fontWeight: 'bold', borderBottomColor: 'white', borderBottomWidth: 2, width: '70%'}} onChangeText={(e) => setNewFolderName(e)} autoFocus showSoftInputOnFocus ref={addFolderInputRef} onLayout={() => addFolderInputRef.current?.focus?.()}/>
                         </View>
                           
                       </View>
                       <View style={{width: '100%', paddingTop: '10%', display: 'flex', flexDirection: 'row', justifyContent: 'center'}}>
                           <TouchableOpacity style={styles.yellowButtonSM}
-                          onPress={() => {
-                              addFolder(newFolderName, focusedFolder ? focusedFolder : '')
-                              setNewFolderName('')
-                              setAddFolderForm(false)
-                          }}
+                          onPress={() => addFolder(newFolderName, focusedFolder ? focusedFolder : '')}
                           >
                               <View style={styles.iconHolderSmall}>
                                   <FontAwesomeIcon icon={faFloppyDisk} size={18} color='#9F37B0' />
@@ -412,40 +387,37 @@ const Notepad = () => {
 
               :
 
-                  <View style={{width: '100%', height: '95%', flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+                  <View style={{width: '100%', flex: 1, alignItems: 'center'}}>
                       <Text style={{fontSize: 40, color: 'white', fontWeight: 'bold', textAlign: 'left', width: '100%', paddingLeft: '5%', marginBottom: '5%'}}>Save Note To...</Text>
                       {focusedFolderInst &&
                         <Text style={{fontSize: 20, color: 'white', fontWeight: 'bold', textAlign: 'left', width: '100%', paddingLeft: '5%', marginBottom: '5%'}}>Viewing: {focusedFolderInst.fileName}</Text>
                       }
-
-                      <View style={focusedFolder && !subFolders ? {width: '100%', height: '55%', marginBottom: '10%', display: 'flex', justifyContent: 'center'} : {width: '100%', height: '55%', marginBottom: '10%'}}>
-                              {focusedFolder ? 
-                                  <>
-                                      <TouchableOpacity style={styles.yellowButtonBack} onPress={() => {
-                                            const folderInst = folders.filter(folder => folder.id === focusedFolder) 
-                                            
-                                            const parentFolderInst = folders.filter(folder => folder.id === folderInst[0].nestedUnder)
-                                            console.log(parentFolderInst)
-                                            if (parentFolderInst.length > 0) {
-                                                console.log("we're within the first if check")
-                                                setDestination({id: parentFolderInst[0].id, fileName: parentFolderInst[0].fileName, nestedUnder: parentFolderInst[0].nestedUnder})
-                                                setFocusedFolder(folderInst[0].nestedUnder)
-                                            } else {
-                                                console.log("we're within the else check")
-                                                setDestination({id: null, fileName: null, nestedUnder: null})
-                                                setFocusedFolder(null)
-                                            }
-                                        }}>
-                                            <View style={styles.iconHolderSmall}>
-                                                    <FontAwesomeIcon icon={faArrowLeft} size={18} color='#9F37B0' /> 
-                                                </View>
-                                            <Text style={{color: '#9F37B0', fontSize: 20, marginLeft: '10%', fontWeight: '600'}}>Back</Text>
-                                        </TouchableOpacity>
-                                  </>
-                              :
-                                  <></>
-                              }
-                              <ScrollView style={focusedFolder ? {paddingTop: '5%', marginTop: '2%'} : {}}>
+                      {focusedFolder ? 
+                          <TouchableOpacity style={[styles.yellowButtonBack, {alignSelf: 'flex-start', marginBottom: 8}]} onPress={() => {
+                                const folderInst = folders.filter(folder => folder.id === focusedFolder) 
+                                
+                                const parentFolderInst = folders.filter(folder => folder.id === folderInst[0].nestedUnder)
+                                console.log(parentFolderInst)
+                                if (parentFolderInst.length > 0) {
+                                    console.log("we're within the first if check")
+                                    setDestination({id: parentFolderInst[0].id, fileName: parentFolderInst[0].fileName, nestedUnder: parentFolderInst[0].nestedUnder})
+                                    setFocusedFolder(folderInst[0].nestedUnder)
+                                } else {
+                                    console.log("we're within the else check")
+                                    setDestination({id: null, fileName: null, nestedUnder: null})
+                                    setFocusedFolder(null)
+                                }
+                            }}>
+                                <View style={styles.iconHolderSmall}>
+                                        <FontAwesomeIcon icon={faArrowLeft} size={18} color='#9F37B0' /> 
+                                    </View>
+                                <Text style={{color: '#9F37B0', fontSize: 20, marginLeft: '10%', fontWeight: '600'}}>Back</Text>
+                            </TouchableOpacity>
+                      :
+                          null
+                      }
+                      <View style={{width: '100%', flex: 1, minHeight: 0, marginBottom: 8}}>
+                              <ScrollView style={{flex: 1}} contentContainerStyle={focusedFolder && !subFolders ? {flexGrow: 1, justifyContent: 'center'} : {paddingBottom: 16}}>
                               {/* map over each of the folders from the filesystem and display them as a pressable element // call movefile function when one of them is pressed */}
                               {focusedFolder && !subFolders ? 
                                   <Text style={[{fontSize: 30, color: 'white', fontWeight: 'bold', marginTop: '30%', textAlign: 'center'}, select(undefined, tabletStyles.emptyHeading)]}>No Subfolders...</Text>
@@ -513,6 +485,7 @@ const Notepad = () => {
                                   </Pressable> */}
                               </ScrollView>
                       </View>
+                      <View style={{width: '100%', paddingTop: 8, paddingBottom: Math.max(insets.bottom, 12)}}>
                       <TouchableOpacity onPress={() => setAddFolderForm(true)} style={styles.addFolderButton}>
                           <View style={styles.iconHolderSmall}>
                               <FontAwesomeIcon icon={faPlus} color='#9F37B0'/>
@@ -521,6 +494,13 @@ const Notepad = () => {
                       </TouchableOpacity>
 
                       <View style={{display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'space-around',}}>
+                            <TouchableOpacity onPress={() => addToStorage(true)} style={styles.yellowButtonSM}>
+                                <View style={styles.iconHolderSmall}>
+                                    <FontAwesomeIcon icon={faBox} color='#9F37B0'/>
+                                </View>
+                                <Text style={{fontSize: 18, color: '#9F37B0', fontWeight: '600', marginLeft: '3%', paddingTop: '1%'}}>Save To Staging</Text>
+                            </TouchableOpacity>
+
                               <TouchableOpacity onPress={() => addToStorage()} style={ destination.id !== null || focusedFolder ? styles.yellowButtonSM : styles.yellowButtonSMDim}
                                 disabled={destination.id !== null || focusedFolder ? false : true}
                             >   
@@ -529,16 +509,7 @@ const Notepad = () => {
                                 </View>
                                 <Text style={{fontSize: 18, color: '#9F37B0', fontWeight: '600', marginLeft: '8%', paddingTop: '1%'}}>Confirm Move</Text>
                             </TouchableOpacity>
-
-                            <TouchableOpacity onPress={() => {
-                                addToStorage()
-                                setPreAdd(false)
-                            }} style={styles.yellowButtonSM}>
-                                <View style={styles.iconHolderSmall}>
-                                    <FontAwesomeIcon icon={faBox} color='#9F37B0'/>
-                                </View>
-                                <Text style={{fontSize: 18, color: '#9F37B0', fontWeight: '600', marginLeft: '3%', paddingTop: '1%'}}>Save To Staging</Text>
-                            </TouchableOpacity>
+                    </View>
                     </View>
                   </View>
                   
@@ -826,7 +797,7 @@ const styles = StyleSheet.create({
       paddingTop: '2%',
       paddingBottom: '2%',
       paddingLeft: '2%',
-      marginBottom: '5%',
+      marginBottom: 8,
       marginLeft: '2%',
       display: 'flex',
       flexDirection: 'row'

@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react'
-import {View, Text, StyleSheet, ScrollView, TouchableOpacity, Modal, Pressable, TextInput, Image} from 'react-native'
+import {View, Text, StyleSheet, ScrollView, TouchableOpacity, Modal, Pressable, TextInput, Image, Platform} from 'react-native'
 
 //FileRow component import
 import FileRow from '../../components/documentPicker/FileRow'
@@ -8,7 +8,7 @@ import FileRow from '../../components/documentPicker/FileRow'
 import * as ImagePicker from 'expo-image-picker'
 
 
-import { addfile, updateUser, userListener } from '../../firebase/firestore'
+import { addfile, userListener, addFolderToUser } from '../../firebase/firestore'
 import { firebaseAuth, storage } from '../../firebaseConfig'
 import {ref, uploadBytesResumable} from 'firebase/storage'
 
@@ -39,6 +39,8 @@ import * as FileSystem from "expo-file-system"
 import ContentShell from '../../components/ui/ContentShell'
 import KeyboardSafeForm from '../../components/ui/KeyboardSafeForm'
 import YellowActionButton from '../../components/ui/YellowActionButton'
+import { useKeyboardHeight } from '../../hooks/useKeyboardHeight'
+import { useAutoFocusOn } from '../../hooks/useAutoFocusOn'
 import { useResponsiveLayout, tabletStyle } from '../../hooks/useResponsiveLayout'
 
 const DocumentPickerComp = () => {
@@ -49,6 +51,7 @@ const DocumentPickerComp = () => {
     const [loading, setLoading] = useState(false)
     const [preAdd, setPreAdd] = useState(false)
     const [addFolderForm, setAddFolderForm] = useState(false)
+    const addFolderInputRef = useAutoFocusOn(addFolderForm)
     const [focusedFolder, setFocusedFolder] = useState()
     const [subFolders, setSubFolders] = useState()
     const [folders, setFolders] = useState([])
@@ -126,7 +129,7 @@ const DocumentPickerComp = () => {
                 alert('userInst.files is not an array')
             } 
         }
-    }, [userInst, addFolderForm])
+    }, [userInst])
 
     //determine if a folder has any subfolders
     useEffect(() => {
@@ -134,7 +137,7 @@ const DocumentPickerComp = () => {
             return value.nestedUnder === focusedFolder
         })
         setSubFolders(exists)
-    }, [focusedFolder, addFolderForm])
+    }, [focusedFolder, folders])
 
     useEffect(() => {
         if (focusedFolder && folders) {
@@ -295,44 +298,19 @@ const DocumentPickerComp = () => {
 
     //add a folder
     const addFolder = async (folderName, targetNest) => {
-        //if the incoming targetNest is empty string, create the new folder under the home directory
-        if (folderName.length > 0) {
-            const folderId = Math.floor(Math.random() * 9e11) + 1e11
-            if (targetNest === '') {
-                const newFile = {
-                id: folderId,
-                fileName: folderName,
-                nestedUnder: ''
-                }
-        
-                const newFiles = [...userInst.files, newFile]
-                const updatedUser = {...userInst, files: newFiles}
-                await updateUser(updatedUser)
-                setNewFolderName('')
-                setFolders(newFiles)
-                setFocusedFolder(folderId)
-                
-            } else {           //if the incoming targetNest has a value, create the new folder with the nestedUnder property set to targetNest
-                const newFile = {
-                    id: folderId,
-                    fileName: folderName,
-                    nestedUnder: targetNest
-                }
-
-                const newFiles = [...userInst.files, newFile]
-                const updatedUser = {...userInst, files: newFiles}
-        
-                updateUser(updatedUser)
-                setAddFolderForm(false)
-                setFolders(newFiles)
-                setFocusedFolder(folderId)
-            }
-        } else {
-        alert('Please enter a folder name')
+        try {
+            const { newFile, newFiles } = await addFolderToUser(userInst, folderName, targetNest)
+            setNewFolderName('')
+            setAddFolderForm(false)
+            setFolders(newFiles)
+            setFocusedFolder(newFile.id)
+        } catch (err) {
+            alert(err?.message || String(err))
         }
     }
 
     const insets = useSafeAreaInsets()
+    const keyboardHeight = useKeyboardHeight()
 
   return (
     <>
@@ -363,13 +341,11 @@ const DocumentPickerComp = () => {
                                 <View style={styles.iconHolder}> 
                                     <FontAwesomeIcon icon={faFolder} size={22} color='#9F37B0'/>
                                 </View>
-                                <TextInput value={newFolderName} placeholder='Enter new name' placeholderTextColor={'white'} style={{color: 'white', fontSize: 20, fontWeight: 'bold', borderBottomColor: 'white', borderBottomWidth: 2, width: '70%'}} onChangeText={(e) => setNewFolderName(e)} autoFocus onBlur={() => {if (newFolderName === '') setAddFolderForm(false)}}/>
+                                <TextInput value={newFolderName} placeholder='Enter new name' placeholderTextColor={'white'} style={{color: 'white', fontSize: 20, fontWeight: 'bold', borderBottomColor: 'white', borderBottomWidth: 2, width: '70%'}} onChangeText={(e) => setNewFolderName(e)} autoFocus showSoftInputOnFocus ref={addFolderInputRef} onLayout={() => addFolderInputRef.current?.focus?.()}/>
                             </View>
                             <View style={{width: '100%', paddingTop: '10%', display: 'flex', flexDirection: 'row', justifyContent: 'center'}}>
                                 <TouchableOpacity style={styles.yellowButtonSM}
-                                onPress={async () => {
-                                    addFolder(newFolderName, focusedFolder ? focusedFolder : '')
-                                }}
+                                onPress={() => addFolder(newFolderName, focusedFolder ? focusedFolder : '')}
                                 >   
                                     <View style={styles.iconHolderSmall}>
                                         <FontAwesomeIcon icon={faFloppyDisk} size={18} color='#9F37B0' />
@@ -519,12 +495,10 @@ const DocumentPickerComp = () => {
                 <ContentShell variant="content" fill>
                 <View style={{
                     width: '100%',
-                    height: '100%',
-                    display: 'flex',
+                    flex: 1,
                     alignItems: 'center',
-                    position: 'absolute',
                     paddingTop: 8,
-                    paddingBottom: Math.max(insets.bottom, 16) + 48,
+                    paddingBottom: Math.max(insets.bottom, 16) + 48 + (Platform.OS === 'ios' ? keyboardHeight : 0),
                 }}>
                     <Text style={styles.bigHeader}>Files to upload:</Text>
                         {loading ? 
@@ -553,7 +527,7 @@ const DocumentPickerComp = () => {
                                     </View>
                                 :
                                     <View style={styles.scrollCon}>
-                                        <ScrollView>
+                                        <ScrollView keyboardShouldPersistTaps="handled">
                                             {renderFiles()}
                                         </ScrollView>
                                     </View>
@@ -669,14 +643,14 @@ const styles = StyleSheet.create({
         marginLeft: '12%'
     },
     scrollCon: {
-        height: '60%',
+        flex: 1,
         width: '95%',
         borderBottomWidth: 1,
         borderColor: 'black',
-        marginBottom: '5%'
+        marginBottom: 16
     },
     noFileCon: {
-        height: '60%',
+        flex: 1,
         width: '95%',
         borderBottomWidth: 1,
         borderColor: 'black',
