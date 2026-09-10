@@ -606,39 +606,19 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
                                               nestedScrollEnabled
                                             >
                                                         {/* map over each of the folders from the filesystem and display them as a pressable element // call movefile function when one of them is pressed */}
-                                                        {focusedFolder && !subFolders ? 
+                                                        {focusedFolder && !subFolders ? (
                                                             <Text style={{fontSize: 30, color: 'white', fontWeight: 'bold', textAlign: 'center'}}>No Subfolders...</Text>
-                                                        
-                                                        :   
+                                                        ) : (
                                                             <>
                                                                 {folders.map((f, index) => {
                                                                     if (focusedFolder) {
                                                                         if (f.nestedUnder === focusedFolder) {
-                                                                                return (
-                                                                                    <MoveFolderDestinationRow
-                                                                                      key={index}
-                                                                                      selected={f.id === destination.id}
-                                                                                      fileName={f.fileName}
-                                                                                      onPress={() => {
-                                                                                            if (destination.id === null || f.id !== destination.id) {
-                                                                                                setDestination({id: f.id, fileName: f.fileName, nestedUnder: f.nestedUnder})
-                                                                                            } else {
-                                                                                                setFocusedFolder(f.id)
-                                                                                                setDestination({id: null, fileName: null, nestedUnder: null})
-                                                                                            }
-                                                                                        }}
-                                                                                    />
-                                                                                )
-                                                                            
-                                                                        }
-                                                                    } else {
-                                                                        if (f.id !== file.flag && f.nestedUnder === '') {
                                                                             return (
                                                                                 <MoveFolderDestinationRow
-                                                                                  key={index}
-                                                                                  selected={f.id === destination.id}
-                                                                                  fileName={f.fileName}
-                                                                                  onPress={() => {
+                                                                                    key={index}
+                                                                                    selected={f.id === destination.id}
+                                                                                    fileName={f.fileName}
+                                                                                    onPress={() => {
                                                                                         if (destination.id === null || f.id !== destination.id) {
                                                                                             setDestination({id: f.id, fileName: f.fileName, nestedUnder: f.nestedUnder})
                                                                                         } else {
@@ -647,13 +627,31 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
                                                                                         }
                                                                                     }}
                                                                                 />
-                                                                                )
-                                                                            }
+                                                                            )
                                                                         }
+                                                                        return null
                                                                     }
-                                                                })}   
+                                                                    if (f.id !== file.flag && f.nestedUnder === '') {
+                                                                        return (
+                                                                            <MoveFolderDestinationRow
+                                                                                key={index}
+                                                                                selected={f.id === destination.id}
+                                                                                fileName={f.fileName}
+                                                                                onPress={() => {
+                                                                                    if (destination.id === null || f.id !== destination.id) {
+                                                                                        setDestination({id: f.id, fileName: f.fileName, nestedUnder: f.nestedUnder})
+                                                                                    } else {
+                                                                                        setFocusedFolder(f.id)
+                                                                                        setDestination({id: null, fileName: null, nestedUnder: null})
+                                                                                    }
+                                                                                }}
+                                                                            />
+                                                                        )
+                                                                    }
+                                                                    return null
+                                                                })}
                                                             </>
-                                                        }
+                                                        )}
                                             </ScrollView>
                                             
                                             <View style={{width: '100%', flexShrink: 0, paddingTop: 8, paddingBottom: Math.max(insets.bottom, 16) + 8, backgroundColor: '#593060'}}>
