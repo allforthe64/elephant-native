@@ -35,7 +35,6 @@ import WebView from 'react-native-webview'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { tabletStyle, useResponsiveLayout } from '../../hooks/useResponsiveLayout'
 import KeyboardSafeForm from '../ui/KeyboardSafeForm'
-import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useAutoFocusOn } from '../../hooks/useAutoFocusOn'
 
 
