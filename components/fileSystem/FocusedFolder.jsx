@@ -153,36 +153,19 @@ const FocusedFolder = ({folder, folders, clear, getTargetFolder, addFolder, rena
     }, [])
 
   return (
-    <View style={tabletStyle(isTablet, add && !keybaordClosed
-        ? {
-            height: '180%',
-            width: '100%',
-            paddingTop: '5%',
-            paddingBottom: '5%',
-            position: 'absolute', 
-            backgroundColor: '#FFFCF6',
-            paddingTop: insets.top,
-            paddingBottom: insets.bottom
-        } :
-        {
-            height: '100%',
-            width: '100%',
-            paddingTop: '5%',
-            paddingBottom: '5%',
-            position: 'absolute', 
-            backgroundColor: '#FFFCF6',
-            paddingTop: insets.top,
-            paddingBottom: insets.bottom
-        }, {
-            flex: 1,
-            height: '100%',
-            width: '100%',
-        })}>
+    <View style={[
+      styles.root,
+      {
+        paddingTop: insets.top,
+        paddingBottom: Math.max(insets.bottom, 16) + 24,
+      },
+      isTablet && styles.rootTablet,
+    ]}>
         {loading ? <></> 
         : focusedFile ?
             <FocusedFileComp file={focusedFile} focus={setFocusedFile} deleteFile={deleteFile} renameFileFunction={renameFile} folders={folders} handleFileMove={moveFile} /> 
         :      
-                <View style={isTablet ? contentFill : undefined}>
+                <View style={[styles.body, isTablet && contentFill]}>
 
                     <View style={styles.buttonContainer}>
                         <TouchableOpacity style={styles.backButtonContainer} onPress={folder.folder.nestedUnder === '' ? () => clear(null) : () => navigateUp()}>
@@ -197,12 +180,15 @@ const FocusedFolder = ({folder, folders, clear, getTargetFolder, addFolder, rena
                     <View style={styles.title}>
                         <Text style={styles.header}>{folder.folder.fileName}</Text>
                     </View>
-                    <View style={add ? {height: 250} : {height: 365, marginBottom: '10%'}}>
-                        <ScrollView style={{height: '100%'}}>
+                    <ScrollView
+                      style={styles.listScroll}
+                      contentContainerStyle={styles.listContent}
+                      showsVerticalScrollIndicator={false}
+                      keyboardShouldPersistTaps="handled"
+                    >
                             {alphaSortedFolders.map((f, i) => {return <Folder key={f + i} focusedFolder={folder} getTargetFolder={getTargetFolder} folders={folders} renameFolder={renameFolder} moveFolderFunc={moveFolder} folder={f} deleteFolder={deleteFolder} updateUser={updateUser}/>})}
                             {nestedFiles.map((file, i) => {return <File key={file + i} focus={setFocusedFile} file={file} />})}
-                        </ScrollView> 
-                    </View>
+                    </ScrollView> 
                     {add ? 
                         <Modal presentationStyle='pageSheet' animationType='slide' onShow={() => setTimeout(()=>{
                             folderRef.current.focus()
@@ -243,7 +229,7 @@ const FocusedFolder = ({folder, folders, clear, getTargetFolder, addFolder, rena
                             </View>
                         </Modal>
                     : 
-                        <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'center'}}>
+                        <View style={styles.addButtonRow}>
                             <TouchableOpacity style={tabletStyle(isTablet, styles.nonFolderButton65, {width: '100%', maxWidth: '100%', alignSelf: 'stretch'})}
                                 onPress={() => {
                                     setAdd(true)
@@ -266,14 +252,44 @@ const FocusedFolder = ({folder, folders, clear, getTargetFolder, addFolder, rena
 export default FocusedFolder
 
 const styles = StyleSheet.create({
+    root: {
+        flex: 1,
+        width: '100%',
+        backgroundColor: '#FFFCF6',
+    },
+    rootTablet: {
+        height: '100%',
+    },
+    body: {
+        flex: 1,
+        width: '100%',
+    },
+    listScroll: {
+        flex: 1,
+        width: '100%',
+    },
+    listContent: {
+        paddingBottom: 16,
+        flexGrow: 1,
+    },
+    addButtonRow: {
+        width: '100%',
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingHorizontal: 16,
+        paddingTop: 8,
+        paddingBottom: 8,
+    },
     title: {
         display: 'flex', 
         flexDirection: 'row',
-        justifyContent: 'flex-end',
-        paddingTop: '2.5%',
-        paddingBottom: '2.5%',
-        paddingRight: '5%',
-        marginBottom: '15%'
+        justifyContent: 'center',
+        alignItems: 'center',
+        paddingTop: 8,
+        paddingBottom: 16,
+        paddingHorizontal: 16,
+        marginBottom: 8,
+        minHeight: 48,
     },
     buttonContainer: {
         width: '100%', 
@@ -291,11 +307,8 @@ const styles = StyleSheet.create({
         color: '#593060',
         fontSize: 30,
         fontWeight: '600',
-        position: 'absolute',
         textAlign: 'center',
         width: '100%',
-        paddingTop: '2.5%',
-        paddingRight: '5%'
     },
     smallHeader: {
         color: '#593060',
@@ -312,7 +325,7 @@ const styles = StyleSheet.create({
         paddingTop: '2%', 
         paddingBottom: '2%', 
         borderRadius: 12, 
-        width: '110%'
+        width: '90%',
       },
       iconHolder: {
         backgroundColor: 'white', 

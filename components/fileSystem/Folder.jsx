@@ -291,7 +291,7 @@ const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolder
                   </View>
                 </Modal>
                 : 
-                  <View style={[{ paddingTop: '10%', backgroundColor: '#593060', height: '100%'}, tabletModalPanel]}>
+                  <View style={[{ flex: 1, paddingTop: '10%', backgroundColor: '#593060', height: '100%'}, tabletModalPanel]}>
                     <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', paddingRight: '5%'}}>
                       <Pressable onPress={() => {
                           setEditName(false)
@@ -495,7 +495,16 @@ const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolder
                         </View>
                       </Modal>
                     :
-                      <View style={{paddingLeft: '5%'}}>
+                      <ScrollView
+                        style={{ flex: 1, width: '100%' }}
+                        contentContainerStyle={{
+                          paddingLeft: '5%',
+                          paddingRight: '5%',
+                          paddingBottom: 48,
+                          flexGrow: 1,
+                        }}
+                        showsVerticalScrollIndicator={false}
+                      >
                         <Text style={{fontSize: 40, fontWeight: 'bold', color: 'white', marginTop: '5%'}}>{folder.fileName}</Text>
                         <View style={{width: '100%', display: 'flex', flexDirection: 'row', justifyContent: 'space-around', paddingTop: '10%'}}>
                           <TouchableOpacity style={styles.yellowButtonSM} onPress={() => setEditName(true)}>
@@ -522,7 +531,7 @@ const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolder
                             <Text style={{fontSize: 18, color: 'red', paddingTop: '1%', marginLeft: '12%', fontWeight: '600'}}>Delete Folder</Text>
                           </TouchableOpacity>
                         </View>
-                      </View>
+                      </ScrollView>
                     }
                   </View>
                 }

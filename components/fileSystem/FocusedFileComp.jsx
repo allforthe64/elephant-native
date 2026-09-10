@@ -34,10 +34,12 @@ import Constants from 'expo-constants';
 import WebView from 'react-native-webview'
 import { tabletStyle, useResponsiveLayout } from '../../hooks/useResponsiveLayout'
 import KeyboardSafeForm from '../ui/KeyboardSafeForm'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 
 const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFileMove}) => {
     const { isTablet, contentFill, modalMaxWidth } = useResponsiveLayout()
+    const insets = useSafeAreaInsets()
     const tabletModalPanel = isTablet
         ? { width: '100%', maxWidth: modalMaxWidth, alignSelf: 'center' }
         : null
@@ -811,15 +813,15 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
                                 </Modal>
                             )
                         :
-                            <View style={[{ paddingTop: '10%', backgroundColor: '#593060', height: '100%', width: '100%'}, tabletModalPanel]}>
+                            <View style={[{ flex: 1, paddingTop: Math.max(insets.top, 24), backgroundColor: '#593060', height: '100%', width: '100%'}, tabletModalPanel]}>
                                     
                                     {/*x button container */}
-                                    <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', paddingRight: '5%'}}>
+                                    <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', paddingRight: '5%', paddingBottom: 8}}>
                                         <Pressable onPress={() => focus(null)}>
                                             <FontAwesomeIcon icon={faXmark} color={'white'} size={30}/>
                                         </Pressable>
                                     </View>
-                                    <View>
+                                    <View style={{ flex: 1, width: '100%' }}>
 
                                         {/* handle file rename*/}
                                         {add ?  
@@ -887,8 +889,16 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
                                                 </Modal>
 
                                                 :
-                                                    <>
-                                                        <Text style={{fontSize: 22, fontWeight: 'bold', color: 'white', marginTop: '5%', paddingLeft: '5%'}} numberOfLines={3}>{newFileName}</Text>
+                                                    <ScrollView
+                                                      style={{ flex: 1, width: '100%' }}
+                                                      contentContainerStyle={{
+                                                        paddingBottom: Math.max(insets.bottom, 16) + 40,
+                                                        flexGrow: 1,
+                                                      }}
+                                                      showsVerticalScrollIndicator={false}
+                                                      keyboardShouldPersistTaps="handled"
+                                                    >
+                                                        <Text style={{fontSize: 22, fontWeight: 'bold', color: 'white', marginTop: '5%', paddingLeft: '5%', paddingRight: '5%'}} numberOfLines={3}>{newFileName}</Text>
 
                                                         {((file.fileName.split('.')[1] === 'jpg' || file.fileName.split('.')[1] === 'png' || file.fileName.split('.')[1] === 'JPG' || file.fileName.split('.')[1] === 'PNG' || file.fileName.split('.')[1] === 'jpeg' || file.fileName.split('.')[1] === 'JPEG')) ? 
                                                             <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'center', marginTop: '10%', marginBottom: '10%'}}>
@@ -1039,7 +1049,7 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
                                                                 <Text style={{fontSize: 22, color: 'red', fontWeight: '600', paddingLeft: '22%', paddingTop: '2%'}}>Delete File</Text>
                                                             </TouchableOpacity>
                                                         </View>
-                                                    </>
+                                                    </ScrollView>
                                                 }
                                     </View>
                             </View>
