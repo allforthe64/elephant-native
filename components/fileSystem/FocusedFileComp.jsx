@@ -40,11 +40,14 @@ import MoveFolderDestinationRow from './MoveFolderDestinationRow'
 
 
 const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFileMove}) => {
-    const { isTablet, contentFill, modalMaxWidth } = useResponsiveLayout()
+    const { isTablet, contentFill, modalMaxWidth, height: windowHeight } = useResponsiveLayout()
     const insets = useSafeAreaInsets()
     const tabletModalPanel = isTablet
         ? { width: '100%', maxWidth: modalMaxWidth, alignSelf: 'center' }
         : null
+    // Nested pageSheet modals break flex height; pin the list to a real pixel height
+    // so action buttons stay on-screen and the folder list can scroll.
+    const moveFolderListHeight = Math.max(200, Math.round(windowHeight * 0.42))
 
     //initialize state
     const [userInst, setUserInst] = useState()
@@ -521,10 +524,8 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
                         :
                         moveFile ? 
                         (
-                            <Modal animationType='slide' presentationStyle='pageSheet' >
                                 <View style={[{flex: 1, height: '100%', width: '100%', backgroundColor: '#593060'}, tabletModalPanel]}>
-                                    {/* if the moveFile state is true, display the modal with the file movement code*/}
-                                    {/* xMark icon for closing out the moveFile modal */}
+                                    {/* Move UI lives in the parent Modal — nested pageSheets break flex height */}
                                     <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', paddingRight: '5%', paddingTop: Math.max(insets.top, 24), paddingBottom: 8, width: '100%'}}>
                                         <TouchableOpacity onPress={() => {
                                                 if (addFolderForm) {
@@ -566,7 +567,7 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
 
                                     :
 
-                                        <View style={{width: '100%', flex: 1, minHeight: 0}}>
+                                        <View style={{width: '100%', flex: 1}}>
                                             <Text style={{fontSize: 40, color: 'white', fontWeight: 'bold', textAlign: 'left', width: '100%', paddingLeft: '5%', marginBottom: 8}}>Move To...</Text>
                                             {focusedFolderInst &&
                                                 <Text style={{fontSize: 20, color: 'white', fontWeight: 'bold', textAlign: 'left', width: '100%', paddingLeft: '5%', marginBottom: 8}}>Viewing: {focusedFolderInst.fileName}</Text>
@@ -596,14 +597,14 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
                                             :
                                                 null
                                             }
+                                            <View style={{height: moveFolderListHeight, width: '100%', marginBottom: 8}}>
                                             <ScrollView
-                                              style={{flex: 1, width: '100%', minHeight: 0}}
+                                              style={{flex: 1, width: '100%'}}
                                               contentContainerStyle={focusedFolder && !subFolders
                                                 ? {flexGrow: 1, justifyContent: 'center', paddingBottom: 16}
                                                 : {paddingBottom: 16, paddingTop: 4}}
                                               showsVerticalScrollIndicator={true}
                                               keyboardShouldPersistTaps="handled"
-                                              nestedScrollEnabled
                                             >
                                                         {focusedFolder && !subFolders ? (
                                                             <Text style={{fontSize: 30, color: 'white', fontWeight: 'bold', textAlign: 'center'}}>No Subfolders...</Text>
@@ -652,8 +653,9 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
                                                             </>
                                                         )}
                                             </ScrollView>
+                                            </View>
                                             
-                                            <View style={{width: '100%', flexShrink: 0, paddingTop: 8, paddingBottom: Math.max(insets.bottom, 16) + 8, backgroundColor: '#593060'}}>
+                                            <View style={{width: '100%', paddingTop: 8, paddingBottom: Math.max(insets.bottom, 16) + 8, backgroundColor: '#593060'}}>
                                             {add ?
                                                 <>
                                                     <View style={{width: '100%', display: 'flex', flexDirection: 'row', justifyContent: 'space-around'}}>
@@ -712,7 +714,6 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
                                     }
 
                                 </View>
-                            </Modal>
                         )
                         : editNote ?
                             (

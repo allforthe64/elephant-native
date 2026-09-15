@@ -1,6 +1,5 @@
-import { StyleSheet, Text, View, TouchableOpacity, Modal, Pressable, TextInput } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, Modal, Pressable, TextInput, ScrollView } from 'react-native';
 import React, {useState, useEffect} from 'react'
-import { ScrollView } from 'react-native-gesture-handler';
 
 //font awesome imports
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
@@ -20,10 +19,13 @@ import { useAutoFocusOn } from '../../hooks/useAutoFocusOn';
 import MoveFolderDestinationRow from './MoveFolderDestinationRow';
 
 const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolderFunc, folders, updateUser}) => {
-  const { isTablet, contentFill, modalMaxWidth } = useResponsiveLayout()
+  const { isTablet, contentFill, modalMaxWidth, height: windowHeight } = useResponsiveLayout()
   const tabletModalPanel = isTablet
     ? { width: '100%', maxWidth: modalMaxWidth, alignSelf: 'center' }
     : null
+  // Nested pageSheet modals break flex height; pin the list to a real pixel height
+  // so action buttons stay on-screen and the folder list can scroll.
+  const moveFolderListHeight = Math.max(200, Math.round(windowHeight * 0.42))
 
   const [visible, setVisible] = useState(false)
   const [preDelete, setPreDelete] = useState(false)
@@ -272,9 +274,19 @@ const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolder
                   <View style={[{ flex: 1, paddingTop: '10%', backgroundColor: '#593060', height: '100%'}, tabletModalPanel]}>
                     <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', paddingRight: '5%'}}>
                       <Pressable onPress={() => {
-                          setEditName(false)
-                          setVisible(false)
-                          setNewName('')
+                          if (addFolderForm) {
+                            setAddFolderForm(false)
+                            setNewFolderName('')
+                          } else if (moveFolder) {
+                            setMoveFolder(false)
+                            setFocusedFolder(null)
+                            setNewFolderName('')
+                            setAddFolderForm(false)
+                          } else {
+                            setEditName(false)
+                            setVisible(false)
+                            setNewName('')
+                          }
                         }}>
                         <FontAwesomeIcon icon={faXmark} color={'white'} size={30}/>
                       </Pressable>
@@ -305,24 +317,12 @@ const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolder
                         </View>
                     </View>
                     </KeyboardSafeForm>
-                    /*Code for moving a folder */
+                    /*Code for moving a folder — no nested Modal (breaks flex/scroll height) */
                     : moveFolder ? 
-                      <Modal animationType='slide' presentationStyle='pageSheet' >
-                          <View style={[{height: '100%', width: '100%', backgroundColor: '#593060'}, tabletModalPanel]}>
-                          
-                            <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', paddingRight: '5%', paddingTop: '10%', width: '100%'}}>
-                              <Pressable onPress={() => {
-                                setMoveFolder(false)
-                                setNewFolderName('')
-                                setAddFolderForm(false)
-                              }}>
-                                <FontAwesomeIcon icon={faXmark} color={'white'} size={30}/>
-                              </Pressable>
-                            </View>
-                          <View style={{width: '100%', flex: 1, minHeight: 0}}>
+                          <View style={{width: '100%', flex: 1}}>
                             {addFolderForm ? 
                               <KeyboardSafeForm>
-                              <View style={{width: '100%', height: '100%', display: 'flex', flexDirection:'column', alignItems: 'center'}}>
+                              <View style={{width: '100%', display: 'flex', flexDirection:'column', alignItems: 'center'}}>
                                   <Text style={{color: 'white', fontSize: 35, fontWeight: '700', marginTop: '40%', textAlign: 'center'}}>Add A New Folder:</Text>
                                   <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', marginTop: '10%', width: '100%'}}>
                                       <View style={styles.iconHolder}> 
@@ -344,7 +344,7 @@ const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolder
                               </KeyboardSafeForm>
 
                             :
-                              <View style={{width: '100%', flex: 1, minHeight: 0}}>
+                              <View style={{width: '100%', flex: 1}}>
                                 <Text style={{fontSize: 40, color: 'white', fontWeight: 'bold', textAlign: 'left', width: '100%', paddingLeft: '5%', marginBottom: 8}}>Move To...</Text>
                                 {focusedFolderInst &&
                                   <Text style={{fontSize: 20, color: 'white', fontWeight: 'bold', textAlign: 'left', width: '100%', paddingLeft: '5%', marginBottom: 8}}>Viewing: {focusedFolderInst.fileName}</Text>
@@ -374,14 +374,14 @@ const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolder
                                     :
                                         null
                                     }
+                              <View style={{height: moveFolderListHeight, width: '100%', marginBottom: 8}}>
                               <ScrollView
-                                style={{width: '100%', flex: 1, minHeight: 0}}
+                                style={{width: '100%', flex: 1}}
                                 contentContainerStyle={focusedFolder && !subFolders
                                   ? {flexGrow: 1, justifyContent: 'center', paddingBottom: 16}
                                   : {paddingBottom: 16, paddingTop: 4}}
                                 showsVerticalScrollIndicator={true}
                                 keyboardShouldPersistTaps="handled"
-                                nestedScrollEnabled
                               >
                                       {focusedFolder && !subFolders ? 
                                           <Text style={{fontSize: 30, color: 'white', fontWeight: 'bold', textAlign: 'center'}}>No Subfolders...</Text>
@@ -443,7 +443,8 @@ const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolder
                                         </>
                                       }
                               </ScrollView>
-                              <View style={{display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'space-around', flexShrink: 0, paddingTop: 8, paddingBottom: 24, backgroundColor: '#593060'}}>                    
+                              </View>
+                              <View style={{display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'space-around', paddingTop: 8, paddingBottom: 24, backgroundColor: '#593060'}}>                    
                                 <TouchableOpacity onPress={() => setAddFolderForm(true)} style={styles.yellowButtonSM}>
                                     <View style={styles.iconHolderSmall}>
                                         <FontAwesomeIcon icon={faPlus} color='#9F37B0'/>
@@ -460,8 +461,6 @@ const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolder
                               </View>
                             }
                           </View>
-                        </View>
-                      </Modal>
                     :
                       <ScrollView
                         style={{ flex: 1, width: '100%' }}
