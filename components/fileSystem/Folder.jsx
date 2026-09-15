@@ -344,12 +344,7 @@ const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolder
                               </KeyboardSafeForm>
 
                             :
-                              <ScrollView
-                                style={{width: '100%', flex: 1}}
-                                contentContainerStyle={{paddingBottom: 40, flexGrow: 1}}
-                                showsVerticalScrollIndicator={true}
-                                keyboardShouldPersistTaps="handled"
-                              >
+                              <View style={{width: '100%', flex: 1, minHeight: 0}}>
                                 <Text style={{fontSize: 40, color: 'white', fontWeight: 'bold', textAlign: 'left', width: '100%', paddingLeft: '5%', marginBottom: 8}}>Move To...</Text>
                                 {focusedFolderInst &&
                                   <Text style={{fontSize: 20, color: 'white', fontWeight: 'bold', textAlign: 'left', width: '100%', paddingLeft: '5%', marginBottom: 8}}>Viewing: {focusedFolderInst.fileName}</Text>
@@ -379,8 +374,17 @@ const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolder
                                     :
                                         null
                                     }
+                              <ScrollView
+                                style={{width: '100%', flex: 1, minHeight: 0}}
+                                contentContainerStyle={focusedFolder && !subFolders
+                                  ? {flexGrow: 1, justifyContent: 'center', paddingBottom: 16}
+                                  : {paddingBottom: 16, paddingTop: 4}}
+                                showsVerticalScrollIndicator={true}
+                                keyboardShouldPersistTaps="handled"
+                                nestedScrollEnabled
+                              >
                                       {focusedFolder && !subFolders ? 
-                                          <Text style={{fontSize: 30, color: 'white', fontWeight: 'bold', marginTop: 24, textAlign: 'center'}}>No Subfolders...</Text>
+                                          <Text style={{fontSize: 30, color: 'white', fontWeight: 'bold', textAlign: 'center'}}>No Subfolders...</Text>
                                       :
                                         <>
                                           {focusedFolder && folder.nestedUnder === '' ?
@@ -438,7 +442,8 @@ const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolder
                                           }
                                         </>
                                       }
-                              <View style={{display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'space-around', paddingTop: 24}}>                    
+                              </ScrollView>
+                              <View style={{display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'space-around', flexShrink: 0, paddingTop: 8, paddingBottom: 24, backgroundColor: '#593060'}}>                    
                                 <TouchableOpacity onPress={() => setAddFolderForm(true)} style={styles.yellowButtonSM}>
                                     <View style={styles.iconHolderSmall}>
                                         <FontAwesomeIcon icon={faPlus} color='#9F37B0'/>
@@ -452,7 +457,7 @@ const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolder
                                     <Text style={{fontSize: 18, color: '#9F37B0', fontWeight: '600', marginLeft: '5%'}}>Confirm Move</Text>
                                 </TouchableOpacity>  
                             </View>
-                              </ScrollView>
+                              </View>
                             }
                           </View>
                         </View>
