@@ -85,6 +85,8 @@ export const fileSystemRowStyles = StyleSheet.create({
   },
   rowMoveDestinationSelected: {
     backgroundColor: '#fff',
+    borderWidth: 2,
+    borderColor: Brand.purple,
   },
   iconHolderMoveSelected: {
     backgroundColor: Brand.purple,

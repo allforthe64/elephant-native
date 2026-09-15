@@ -524,7 +524,7 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
                         :
                         moveFile ? 
                         (
-                                <View style={[{flex: 1, height: '100%', width: '100%', backgroundColor: '#593060'}, tabletModalPanel]}>
+                                <View style={[{flex: 1, height: '100%', width: '100%', backgroundColor: '#fff'}, tabletModalPanel]}>
                                     {/* Move UI lives in the parent Modal — nested pageSheets break flex height */}
                                     <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', paddingRight: '5%', paddingTop: Math.max(insets.top, 24), paddingBottom: 8, width: '100%'}}>
                                         <TouchableOpacity onPress={() => {
@@ -538,19 +538,19 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
                                                 }
                                             }
                                             }>
-                                            <FontAwesomeIcon icon={faXmark} color={'white'} size={30}/>
+                                            <FontAwesomeIcon icon={faXmark} color={'#593060'} size={30}/>
                                         </TouchableOpacity>
                                     </View>
                                     
                                     {addFolderForm ? 
                                         <KeyboardSafeForm>
                                         <>
-                                            <Text style={{color: 'white', fontSize: 35, fontWeight: '700', marginTop: '40%', textAlign: 'center'}}>Add A New Folder:</Text>
+                                            <Text style={{color: '#593060', fontSize: 35, fontWeight: '700', marginTop: '40%', textAlign: 'center'}}>Add A New Folder:</Text>
                                             <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', marginTop: '10%'}}>
                                                 <View style={styles.iconHolder}> 
                                                     <FontAwesomeIcon icon={faFolder} size={22} color='#9F37B0'/>
                                                 </View>
-                                                <TextInput value={newFolderName} style={{color: 'white', fontSize: 20, fontWeight: 'bold', borderBottomColor: 'white', borderBottomWidth: 2, width: '70%'}} placeholderTextColor={'white'} placeholder='Enter new name' onChangeText={(e) => setNewFolderName(e)} autoFocus showSoftInputOnFocus ref={addFolderInputRef} onLayout={() => setTimeout(() => addFolderInputRef.current?.focus?.(), 50)}/>
+                                                <TextInput value={newFolderName} style={{color: '#593060', fontSize: 20, fontWeight: 'bold', borderBottomColor: '#593060', borderBottomWidth: 2, width: '70%'}} placeholderTextColor={'#593060'} placeholder='Enter new name' onChangeText={(e) => setNewFolderName(e)} autoFocus showSoftInputOnFocus ref={addFolderInputRef} onLayout={() => setTimeout(() => addFolderInputRef.current?.focus?.(), 50)}/>
                                             </View>
                                             <View style={{width: '100%', paddingTop: '10%', display: 'flex', flexDirection: 'row', justifyContent: 'center'}}>
                                                 <TouchableOpacity style={styles.yellowButtonSM}
@@ -567,10 +567,10 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
 
                                     :
 
-                                        <View style={{width: '100%', flex: 1}}>
-                                            <Text style={{fontSize: 40, color: 'white', fontWeight: 'bold', textAlign: 'left', width: '100%', paddingLeft: '5%', marginBottom: 8}}>Move To...</Text>
+                                        <View style={{width: '100%', flex: 1, backgroundColor: '#fff'}}>
+                                            <Text style={{fontSize: 40, color: '#593060', fontWeight: 'bold', textAlign: 'left', width: '100%', paddingLeft: '5%', marginBottom: 8}}>Move To...</Text>
                                             {focusedFolderInst &&
-                                                <Text style={{fontSize: 20, color: 'white', fontWeight: 'bold', textAlign: 'left', width: '100%', paddingLeft: '5%', marginBottom: 8}}>Viewing: {focusedFolderInst.fileName}</Text>
+                                                <Text style={{fontSize: 20, color: '#593060', fontWeight: 'bold', textAlign: 'left', width: '100%', paddingLeft: '5%', marginBottom: 8}}>Viewing: {focusedFolderInst.fileName}</Text>
                                             }
                                             {focusedFolder ? 
                                                 <TouchableOpacity style={[styles.yellowButtonXS, {alignSelf: 'flex-start', marginBottom: 8, marginLeft: '5%'}]} onPress={() => {
@@ -597,7 +597,7 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
                                             :
                                                 null
                                             }
-                                            <View style={{height: moveFolderListHeight, width: '100%', marginBottom: 8}}>
+                                            <View style={{height: moveFolderListHeight, width: '100%', marginBottom: 8, backgroundColor: '#fff'}}>
                                             <ScrollView
                                               style={{flex: 1, width: '100%'}}
                                               contentContainerStyle={focusedFolder && !subFolders
@@ -607,7 +607,7 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
                                               keyboardShouldPersistTaps="handled"
                                             >
                                                         {focusedFolder && !subFolders ? (
-                                                            <Text style={{fontSize: 30, color: 'white', fontWeight: 'bold', textAlign: 'center'}}>No Subfolders...</Text>
+                                                            <Text style={{fontSize: 30, color: '#593060', fontWeight: 'bold', textAlign: 'center'}}>No Subfolders...</Text>
                                                         ) : (
                                                             <>
                                                                 {folders.map((f, index) => {
@@ -655,7 +655,7 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
                                             </ScrollView>
                                             </View>
                                             
-                                            <View style={{width: '100%', paddingTop: 8, paddingBottom: Math.max(insets.bottom, 16) + 8, backgroundColor: '#593060'}}>
+                                            <View style={{width: '100%', paddingTop: 8, paddingBottom: Math.max(insets.bottom, 16) + 8, backgroundColor: '#fff'}}>
                                             {add ?
                                                 <>
                                                     <View style={{width: '100%', display: 'flex', flexDirection: 'row', justifyContent: 'space-around'}}>
@@ -675,7 +675,7 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
                                                             <Text style={{fontSize: 18, color: '#9F37B0', fontWeight: '600', marginLeft: '10%', paddingTop: '1%'}}>Name + Move</Text>
                                                         </TouchableOpacity>
                                                     </View>
-                                                    <Text style={{color: '#FFE562', fontSize: 22, marginBottom: 10, marginTop: 10, textAlign: 'center'}}>Or</Text>
+                                                    <Text style={{color: '#593060', fontSize: 22, marginBottom: 10, marginTop: 10, textAlign: 'center'}}>Or</Text>
                                                     <View style={{width: '100%', display: 'flex', flexDirection: 'row', justifyContent: 'center'}}>
                                                         <TouchableOpacity style={styles.yellowButtonMed}
                                                         onPress={() => {
@@ -1011,7 +1011,7 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
                                                                 <View style={styles.iconHolder}>
                                                                     <FontAwesomeIcon icon={faShare} color='#9F37B0' size={22}/>
                                                                 </View>
-                                                                <Text style={{fontSize: 22, color: '#9F37B0', fontWeight: '600', marginLeft: 16, paddingTop: '1.5%'}}>Download or share file</Text>
+                                                                <Text style={{fontSize: 18, color: '#9F37B0', fontWeight: '600', marginLeft: 16, paddingTop: '1.5%'}}>Download or share file</Text>
                                                             </TouchableOpacity>
                                                         
                                                             <TouchableOpacity style={styles.deleteButton} onPress={() =>

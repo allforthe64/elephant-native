@@ -123,7 +123,7 @@ const styles = StyleSheet.create({
   },
   bigHeader: {
     color: 'white',
-    fontSize: 60,
+    fontSize: 52,
     textAlign: 'center',
     marginBottom: 16,
   },
@@ -171,7 +171,7 @@ const tabletStyles = StyleSheet.create({
     paddingVertical: 24,
   },
   bigHeader: {
-    fontSize: 72,
+    fontSize: 64,
     marginBottom: 24,
   },
   subheading1: {
