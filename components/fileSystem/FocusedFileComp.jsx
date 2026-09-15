@@ -566,7 +566,15 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
 
                                     :
 
-                                        <View style={{width: '100%', flex: 1, minHeight: 0}}>
+                                        <ScrollView
+                                          style={{width: '100%', flex: 1}}
+                                          contentContainerStyle={{
+                                            paddingBottom: Math.max(insets.bottom, 16) + 24,
+                                            flexGrow: 1,
+                                          }}
+                                          showsVerticalScrollIndicator={true}
+                                          keyboardShouldPersistTaps="handled"
+                                        >
                                             <Text style={{fontSize: 40, color: 'white', fontWeight: 'bold', textAlign: 'left', width: '100%', paddingLeft: '5%', marginBottom: 8}}>Move To...</Text>
                                             {focusedFolderInst &&
                                                 <Text style={{fontSize: 20, color: 'white', fontWeight: 'bold', textAlign: 'left', width: '100%', paddingLeft: '5%', marginBottom: 8}}>Viewing: {focusedFolderInst.fileName}</Text>
@@ -596,18 +604,8 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
                                             :
                                                 null
                                             }
-                                            <ScrollView
-                                              style={{flex: 1, width: '100%', minHeight: 0}}
-                                              contentContainerStyle={focusedFolder && !subFolders
-                                                ? {flexGrow: 1, justifyContent: 'center', paddingBottom: 16}
-                                                : {paddingBottom: 16, paddingTop: 4}}
-                                              showsVerticalScrollIndicator={true}
-                                              keyboardShouldPersistTaps="handled"
-                                              nestedScrollEnabled
-                                            >
-                                                        {/* map over each of the folders from the filesystem and display them as a pressable element // call movefile function when one of them is pressed */}
                                                         {focusedFolder && !subFolders ? (
-                                                            <Text style={{fontSize: 30, color: 'white', fontWeight: 'bold', textAlign: 'center'}}>No Subfolders...</Text>
+                                                            <Text style={{fontSize: 30, color: 'white', fontWeight: 'bold', textAlign: 'center', marginTop: 24}}>No Subfolders...</Text>
                                                         ) : (
                                                             <>
                                                                 {folders.map((f, index) => {
@@ -652,9 +650,8 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
                                                                 })}
                                                             </>
                                                         )}
-                                            </ScrollView>
                                             
-                                            <View style={{width: '100%', flexShrink: 0, paddingTop: 8, paddingBottom: Math.max(insets.bottom, 16) + 8, backgroundColor: '#593060'}}>
+                                            <View style={{width: '100%', paddingTop: 24}}>
                                             {add ?
                                                 <>
                                                     <View style={{width: '100%', display: 'flex', flexDirection: 'row', justifyContent: 'space-around'}}>
@@ -708,9 +705,7 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
                                                 </View>
                                             }
                                             </View>
-
-
-                                        </View>
+                                        </ScrollView>
                                         
                                     }
 

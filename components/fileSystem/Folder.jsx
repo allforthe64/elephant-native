@@ -319,16 +319,7 @@ const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolder
                                 <FontAwesomeIcon icon={faXmark} color={'white'} size={30}/>
                               </Pressable>
                             </View>
-                          <View style={{width: '100%', height: '95%', flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-                            {!addFolderForm &&
-                              <>
-                                <Text style={{fontSize: 40, color: 'white', fontWeight: 'bold', textAlign: 'left', width: '100%', paddingLeft: '5%', marginBottom: '5%'}}>Move To...</Text>
-                                {focusedFolderInst &&
-
-                                  <Text style={{fontSize: 20, color: 'white', fontWeight: 'bold', textAlign: 'left', width: '100%', paddingLeft: '5%', marginBottom: '5%'}}>Viewing: {focusedFolderInst.fileName}</Text>
-                                }
-                              </>
-                            }
+                          <View style={{width: '100%', flex: 1, minHeight: 0}}>
                             {addFolderForm ? 
                               <KeyboardSafeForm>
                               <View style={{width: '100%', height: '100%', display: 'flex', flexDirection:'column', alignItems: 'center'}}>
@@ -353,11 +344,18 @@ const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolder
                               </KeyboardSafeForm>
 
                             :
-      
-                              <View style={{width: '100%', height: '65%', marginBottom: '6%'}}>
+                              <ScrollView
+                                style={{width: '100%', flex: 1}}
+                                contentContainerStyle={{paddingBottom: 40, flexGrow: 1}}
+                                showsVerticalScrollIndicator={true}
+                                keyboardShouldPersistTaps="handled"
+                              >
+                                <Text style={{fontSize: 40, color: 'white', fontWeight: 'bold', textAlign: 'left', width: '100%', paddingLeft: '5%', marginBottom: 8}}>Move To...</Text>
+                                {focusedFolderInst &&
+                                  <Text style={{fontSize: 20, color: 'white', fontWeight: 'bold', textAlign: 'left', width: '100%', paddingLeft: '5%', marginBottom: 8}}>Viewing: {focusedFolderInst.fileName}</Text>
+                                }
                                       {focusedFolder ? 
-                                        <View style={{paddingLeft: '2%'}}>
-                                            <TouchableOpacity style={styles.yellowButtonSM} onPress={() => {
+                                            <TouchableOpacity style={[styles.yellowButtonSM, {alignSelf: 'flex-start', marginBottom: 8, marginLeft: '2%'}]} onPress={() => {
                                                 try {
                                                     const folderInst = folders.filter(folder => folder.id === focusedFolder) 
                                                     const parentFolderInst = folders.filter(folder => folder.id === folderInst[0].nestedUnder)
@@ -378,17 +376,15 @@ const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolder
                                                 </View>
                                                 <Text style={{fontSize: 20, color: '#9F37B0', fontWeight: '600', marginLeft: '10%'}}>Back</Text>
                                             </TouchableOpacity>
-                                        </View>
                                     :
-                                        <></>
+                                        null
                                     }
-                                    <ScrollView style={focusedFolder ? {paddingTop: '5%', marginTop: '2%'} : {}}>
                                       {focusedFolder && !subFolders ? 
-                                          <Text style={{fontSize: 30, color: 'white', fontWeight: 'bold', marginTop: '30%', textAlign: 'center'}}>No Subfolders...</Text>
+                                          <Text style={{fontSize: 30, color: 'white', fontWeight: 'bold', marginTop: 24, textAlign: 'center'}}>No Subfolders...</Text>
                                       :
                                         <>
                                           {focusedFolder && folder.nestedUnder === '' ?
-                                            <Text style={{fontSize: 14, color: 'white', fontWeight: 'bold', marginTop: '30%', textAlign: 'center'}}>No subfolders to display (Cannot move a home folder to subfolder of a home folder to prevent infinite nesting)</Text>
+                                            <Text style={{fontSize: 14, color: 'white', fontWeight: 'bold', marginTop: 24, textAlign: 'center', paddingHorizontal: '5%'}}>No subfolders to display (Cannot move a home folder to subfolder of a home folder to prevent infinite nesting)</Text>
                                           :
                                             <>
                                               {validFolders.map((f, index) => {
@@ -442,11 +438,7 @@ const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolder
                                           }
                                         </>
                                       }
-                                    </ScrollView>
-                              </View>
-                            }
-                            {!addFolderForm &&
-                              <View style={{display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'space-around'}}>                    
+                              <View style={{display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'space-around', paddingTop: 24}}>                    
                                 <TouchableOpacity onPress={() => setAddFolderForm(true)} style={styles.yellowButtonSM}>
                                     <View style={styles.iconHolderSmall}>
                                         <FontAwesomeIcon icon={faPlus} color='#9F37B0'/>
@@ -460,6 +452,7 @@ const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolder
                                     <Text style={{fontSize: 18, color: '#9F37B0', fontWeight: '600', marginLeft: '5%'}}>Confirm Move</Text>
                                 </TouchableOpacity>  
                             </View>
+                              </ScrollView>
                             }
                           </View>
                         </View>
