@@ -42,9 +42,11 @@ import YellowActionButton from '../../components/ui/YellowActionButton'
 import { useKeyboardHeight } from '../../hooks/useKeyboardHeight'
 import { useAutoFocusOn } from '../../hooks/useAutoFocusOn'
 import { useResponsiveLayout, tabletStyle } from '../../hooks/useResponsiveLayout'
+import { getMoveDestinationListHeight } from '../../constants/moveDestinationLayout'
 
 const DocumentPickerComp = () => {
-    const { isTablet, select } = useResponsiveLayout()
+    const { isTablet, select, height: windowHeight } = useResponsiveLayout()
+    const moveFolderListHeight = getMoveDestinationListHeight(windowHeight)
 
     const [files, setFiles] = useState([])
     const [userInst, setUserInst] = useState()
@@ -316,7 +318,7 @@ const DocumentPickerComp = () => {
     <>
         {preAdd ? 
             <Modal animationType='slide' presentationStyle='pageSheet'>
-                <View style={{height: '100%', width: '100%', backgroundColor: '#593060'}}>
+                <View style={{height: '100%', width: '100%', backgroundColor: !addFolderForm ? '#fff' : '#593060'}}>
                     {/* if the moveFile state is true, display the modal with the file movement code*/}
                     {/* xMark icon for closing out the moveFile modal */}
                     <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', paddingRight: '5%', paddingTop: '10%', width: '100%'}}>
@@ -327,7 +329,7 @@ const DocumentPickerComp = () => {
                             setFocusedFolder(null)
                             }
                             }}>
-                            <FontAwesomeIcon icon={faXmark} color={'white'} size={30}/>
+                            <FontAwesomeIcon icon={faXmark} color={!addFolderForm ? '#593060' : 'white'} size={30}/>
                         </Pressable>
                     </View>
                     
@@ -358,42 +360,40 @@ const DocumentPickerComp = () => {
 
                     :
 
-                        <View style={{width: '100%', height: '95%', flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-                            <Text style={{fontSize: 40, color: 'white', fontWeight: 'bold', textAlign: 'left', width: '100%', paddingLeft: '5%', marginBottom: '5%'}}>Save Files To...</Text>
+                        <View style={{width: '100%', flex: 1, alignItems: 'center', backgroundColor: '#fff'}}>
+                            <Text style={{fontSize: 40, color: '#593060', fontWeight: 'bold', textAlign: 'left', width: '100%', paddingLeft: '5%', marginBottom: 8}}>Save Files To...</Text>
                             {focusedFolderInst && 
-                                <Text style={{fontSize: 20, color: 'white', fontWeight: 'bold', textAlign: 'left', width: '100%', paddingLeft: '5%', marginBottom: '5%'}}>Viewing: {focusedFolderInst.fileName}</Text>
+                                <Text style={{fontSize: 20, color: '#593060', fontWeight: 'bold', textAlign: 'left', width: '100%', paddingLeft: '5%', marginBottom: 8}}>Viewing: {focusedFolderInst.fileName}</Text>
                             }
-                            <View style={focusedFolder && !subFolders ? {width: '100%', height: '55%', marginBottom: '5%', display: 'flex', justifyContent: 'center'} : {width: '100%', height: '55%', marginBottom: '5%'}}>
-                                    {focusedFolder ? 
-                                        <>
-                                            <TouchableOpacity style={styles.yellowButtonXS} onPress={() => {
-                                                const folderInst = folders.filter(folder => folder.id === focusedFolder) 
-                                                
-                                                const parentFolderInst = folders.filter(folder => folder.id === folderInst[0].nestedUnder)
-                                                console.log(parentFolderInst)
-                                                if (parentFolderInst.length > 0) {
-                                                    console.log("we're within the first if check")
-                                                    setDestination({id: parentFolderInst[0].id, fileName: parentFolderInst[0].fileName, nestedUnder: parentFolderInst[0].nestedUnder})
-                                                    setFocusedFolder(folderInst[0].nestedUnder)
-                                                } else {
-                                                    console.log("we're within the else check")
-                                                    setDestination({id: null, fileName: null, nestedUnder: null})
-                                                    setFocusedFolder(null)
-                                                }
-                                            }}>
-                                                <View style={styles.iconHolderSmall}>
-                                                    <FontAwesomeIcon icon={faArrowLeft} size={18} color='#9F37B0' /> 
-                                                </View>
-                                                <Text style={{fontSize: 20, color: '#9F37B0', fontWeight: '600', marginLeft: '10%'}}>Back</Text>
-                                            </TouchableOpacity>
-                                        </>
-                                    :
-                                        <></>
+                            {focusedFolder ? 
+                                <TouchableOpacity style={[styles.yellowButtonXS, {alignSelf: 'flex-start', marginBottom: 8, marginLeft: '5%'}]} onPress={() => {
+                                    const folderInst = folders.filter(folder => folder.id === focusedFolder) 
+                                    
+                                    const parentFolderInst = folders.filter(folder => folder.id === folderInst[0].nestedUnder)
+                                    console.log(parentFolderInst)
+                                    if (parentFolderInst.length > 0) {
+                                        console.log("we're within the first if check")
+                                        setDestination({id: parentFolderInst[0].id, fileName: parentFolderInst[0].fileName, nestedUnder: parentFolderInst[0].nestedUnder})
+                                        setFocusedFolder(folderInst[0].nestedUnder)
+                                    } else {
+                                        console.log("we're within the else check")
+                                        setDestination({id: null, fileName: null, nestedUnder: null})
+                                        setFocusedFolder(null)
                                     }
-                                    <ScrollView style={focusedFolder ? {paddingTop: '5%', marginTop: '2%'} : {}}>
+                                }}>
+                                    <View style={styles.iconHolderSmall}>
+                                        <FontAwesomeIcon icon={faArrowLeft} size={18} color='#9F37B0' /> 
+                                    </View>
+                                    <Text style={{fontSize: 20, color: '#9F37B0', fontWeight: '600', marginLeft: '10%'}}>Back</Text>
+                                </TouchableOpacity>
+                            :
+                                null
+                            }
+                            <View style={{height: moveFolderListHeight, width: '100%', marginBottom: 8, backgroundColor: '#fff'}}>
+                                    <ScrollView style={{flex: 1, width: '100%'}} contentContainerStyle={focusedFolder && !subFolders ? {flexGrow: 1, justifyContent: 'center', paddingBottom: 16} : {paddingBottom: 16, paddingTop: 4}}>
                                     {/* map over each of the folders from the filesystem and display them as a pressable element // call movefile function when one of them is pressed */}
                                     {focusedFolder && !subFolders ? 
-                                        <Text style={[{fontSize: 30, color: 'white', fontWeight: 'bold', marginTop: '30%', textAlign: 'center'}, select(undefined, tabletStyles.modalHeading)]}>No Subfolders...</Text>
+                                        <Text style={[{fontSize: 30, color: '#593060', fontWeight: 'bold', textAlign: 'center'}, select(undefined, tabletStyles.modalHeading)]}>No Subfolders...</Text>
                                     
                                     :   
                                         <>
@@ -459,6 +459,7 @@ const DocumentPickerComp = () => {
                                     </ScrollView>
                             </View>
                             
+                            <View style={{width: '100%', paddingTop: 8, paddingBottom: Math.max(insets.bottom, 12), backgroundColor: '#fff'}}>
                                     <TouchableOpacity onPress={() => setAddFolderForm(true)} style={styles.addFolderButton}>
                                         <View style={styles.iconHolderSmall}>
                                             <FontAwesomeIcon icon={faPlus} color='#9F37B0'/>
@@ -482,6 +483,7 @@ const DocumentPickerComp = () => {
                                         </View>
                                         <Text style={{fontSize: 18, color: '#9F37B0', fontWeight: '600', marginLeft: '3%', paddingTop: '1%'}}>Save To Staging</Text>
                                     </TouchableOpacity>
+                            </View>
                             </View>
                         </View>
                         

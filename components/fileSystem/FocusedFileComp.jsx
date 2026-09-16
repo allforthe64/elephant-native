@@ -37,6 +37,7 @@ import { tabletStyle, useResponsiveLayout } from '../../hooks/useResponsiveLayou
 import KeyboardSafeForm from '../ui/KeyboardSafeForm'
 import { useAutoFocusOn } from '../../hooks/useAutoFocusOn'
 import MoveFolderDestinationRow from './MoveFolderDestinationRow'
+import { getMoveDestinationListHeight } from '../../constants/moveDestinationLayout'
 
 
 const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFileMove}) => {
@@ -47,7 +48,7 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
         : null
     // Nested pageSheet modals break flex height; pin the list to a real pixel height
     // so action buttons stay on-screen and the folder list can scroll.
-    const moveFolderListHeight = Math.max(200, Math.round(windowHeight * 0.42))
+    const moveFolderListHeight = getMoveDestinationListHeight(windowHeight)
 
     //initialize state
     const [userInst, setUserInst] = useState()

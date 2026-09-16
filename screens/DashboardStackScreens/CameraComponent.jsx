@@ -45,11 +45,13 @@ import { TestIds } from '../../constants/testIds'
 import { UploadQueueEmitter } from '../../hooks/QueueEventEmitter';
 import { useResponsiveLayout, tabletStyle } from '../../hooks/useResponsiveLayout'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { getMoveDestinationListHeight } from '../../constants/moveDestinationLayout'
 
 
 export default function CameraComponent() {
 try {
-    const { isTablet, select } = useResponsiveLayout()
+    const { isTablet, select, height: windowHeight } = useResponsiveLayout()
+    const moveFolderListHeight = getMoveDestinationListHeight(windowHeight)
     const insets = useSafeAreaInsets()
     const [facing, setFacing] = useState('back');
     const [permission, requestPermission] = useCameraPermissions();
@@ -491,7 +493,7 @@ try {
         <Modal animationType='slide' presentationStyle='pageSheet' onShow={() => setTimeout(()=>{
             nameRef.current.focus()
         }, 200)}>
-            <View style={{height: '100%', width: '100%', backgroundColor: '#593060'}}>
+            <View style={{height: '100%', width: '100%', backgroundColor: (nameGiven && !addFolderForm) ? '#fff' : '#593060'}}>
                 {/* if the moveFile state is true, display the modal with the file movement code*/}
                 {/* xMark icon for closing out the moveFile modal */}
                 <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', paddingRight: '5%', paddingTop: '10%', width: '100%'}}>
@@ -504,7 +506,7 @@ try {
                         setMediaName('')
                     }
                     }}>
-                        <FontAwesomeIcon icon={faXmark} color={'white'} size={30}/>
+                        <FontAwesomeIcon icon={faXmark} color={(nameGiven && !addFolderForm) ? '#593060' : 'white'} size={30}/>
                     </Pressable>
                 </View>
                 
@@ -583,10 +585,10 @@ try {
 
                 :
 
-                    <View style={{width: '100%', flex: 1, alignItems: 'center'}}>
-                        <Text style={{fontSize: 40, color: 'white', fontWeight: 'bold', textAlign: 'left', width: '100%', paddingLeft: '5%', marginBottom: '5%'}}>Save Files To...</Text>
+                    <View style={{width: '100%', flex: 1, alignItems: 'center', backgroundColor: '#fff'}}>
+                        <Text style={{fontSize: 40, color: '#593060', fontWeight: 'bold', textAlign: 'left', width: '100%', paddingLeft: '5%', marginBottom: 8}}>Save Files To...</Text>
                         {focusedFolderInst &&
-                            <Text style={{fontSize: 20, color: 'white', fontWeight: 'bold', textAlign: 'left', width: '100%', paddingLeft: '5%', marginBottom: '5%'}}>Viewing: {focusedFolderInst.fileName}</Text>
+                            <Text style={{fontSize: 20, color: '#593060', fontWeight: 'bold', textAlign: 'left', width: '100%', paddingLeft: '5%', marginBottom: 8}}>Viewing: {focusedFolderInst.fileName}</Text>
                         }
                         {focusedFolder ? 
                             <TouchableOpacity style={[styles.yellowButtonBack, {alignSelf: 'flex-start', marginBottom: 8}]} onPress={() => {
@@ -612,11 +614,11 @@ try {
                         :
                             null
                         }
-                        <View style={{width: '100%', flex: 1, minHeight: 0, marginBottom: 8}}>
-                                <ScrollView style={{flex: 1}} contentContainerStyle={focusedFolder && !subFolders ? {flexGrow: 1, justifyContent: 'center'} : {paddingBottom: 16}}>
+                        <View style={{height: moveFolderListHeight, width: '100%', marginBottom: 8, backgroundColor: '#fff'}}>
+                                <ScrollView style={{flex: 1, width: '100%'}} contentContainerStyle={focusedFolder && !subFolders ? {flexGrow: 1, justifyContent: 'center'} : {paddingBottom: 16}}>
                                 {/* map over each of the folders from the filesystem and display them as a pressable element // call movefile function when one of them is pressed */}
                                 {focusedFolder && !subFolders ? 
-                                    <Text style={[{fontSize: 30, color: 'white', fontWeight: 'bold', marginTop: '30%', textAlign: 'center'}, select(undefined, tabletStyles.modalHeading)]}>No Subfolders...</Text>
+                                    <Text style={[{fontSize: 30, color: '#593060', fontWeight: 'bold', marginTop: '30%', textAlign: 'center'}, select(undefined, tabletStyles.modalHeading)]}>No Subfolders...</Text>
                                 
                                 :   
                                     <>
@@ -682,7 +684,7 @@ try {
                                 </ScrollView>
                         </View>
                         
-                        <View style={{width: '100%', paddingTop: 8, paddingBottom: Math.max(insets.bottom, 12)}}>
+                        <View style={{width: '100%', paddingTop: 8, paddingBottom: Math.max(insets.bottom, 12), backgroundColor: '#fff'}}>
                         <TouchableOpacity onPress={() => setAddFolderForm(true)} style={styles.addFolderButton}>
                             <View style={styles.iconHolderSmall}>
                                 <FontAwesomeIcon icon={faPlus} color='#9F37B0'/>
