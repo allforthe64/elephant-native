@@ -18,8 +18,9 @@ const MoveFolderDestinationRow = ({ selected, fileName, onPress }) => {
   return (
     <Pressable
       onPress={onPress}
-      activeOpacity={FILE_SYSTEM_ROW_ACTIVE_OPACITY}
-      style={{ width: '100%', alignItems: 'center' }}
+      style={({ pressed }) => [
+        { width: '100%', alignItems: 'center', opacity: pressed ? FILE_SYSTEM_ROW_ACTIVE_OPACITY : 1 },
+      ]}
     >
       <View
         style={tabletStyle(

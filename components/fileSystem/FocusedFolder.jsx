@@ -107,7 +107,7 @@ const FocusedFolder = ({folder, folders, clear, getTargetFolder, addFolder, rena
         }
 
         //alpha sorting the files
-        const sortedFiles = folder.files.sort((a, b) => {
+        const sortedFiles = [...(Array.isArray(folder.files) ? folder.files : [])].sort((a, b) => {
             const aVal = getSortableValue(a.fileName);
             const bVal = getSortableValue(b.fileName);
 

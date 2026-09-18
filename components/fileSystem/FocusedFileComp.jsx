@@ -61,7 +61,7 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
     const [sound, setSound] = useState()
     const [playing, setPlaying] = useState(false)
     const [playbackPosition, setPlaybackPosition] = useState(0)
-    const [folders, setFolders] = useState({})
+    const [folders, setFolders] = useState([])
 
     const [fileURL, setFileURL] = useState()
     const [fileObj, setFileObj] = useState()
@@ -135,25 +135,30 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
     //set the userFolders
     useEffect(() => {
         if (userInst) {
-            //sorting the subfolders
-            const sortedFolders = userInst.files.sort((a, b) => {
-                const aVal = getSortableValue(a.fileName);
-                const bVal = getSortableValue(b.fileName);
+            if (Array.isArray(userInst?.files)) {
+                //sorting the subfolders
+                const sortedFolders = [...(userInst.files || [])].sort((a, b) => {
+                    const aVal = getSortableValue(a.fileName);
+                    const bVal = getSortableValue(b.fileName);
 
-                // Numbers first (descending)
-                if (aVal.isNumber && bVal.isNumber) {
-                const numA = parseFloat(aVal.original) || 0;
-                const numB = parseFloat(bVal.original) || 0;
-                return numA - numB; // ascending
-                }
+                    // Numbers first (descending)
+                    if (aVal.isNumber && bVal.isNumber) {
+                    const numA = parseFloat(aVal.original) || 0;
+                    const numB = parseFloat(bVal.original) || 0;
+                    return numA - numB; // ascending
+                    }
 
-                if (aVal.isNumber && !bVal.isNumber) return -1; // number before non-number
-                if (!aVal.isNumber && bVal.isNumber) return 1;  // non-number after number
+                    if (aVal.isNumber && !bVal.isNumber) return -1; // number before non-number
+                    if (!aVal.isNumber && bVal.isNumber) return 1;  // non-number after number
 
-                // Both non-numbers → alphabetical (UTF-8 safe)
-                return safeLocaleCompare(aVal.firstChar, bVal.firstChar);
-            })
-            setFolders(sortedFolders)
+                    // Both non-numbers → alphabetical (UTF-8 safe)
+                    return safeLocaleCompare(aVal.firstChar, bVal.firstChar);
+                })
+                setFolders(sortedFolders)
+            } else {
+                setFolders([])
+                console.warn('userInst.files is not an array', userInst?.files)
+            }
         }
     }, [userInst])
 
@@ -206,7 +211,7 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
     }, [sound]);
 
     useEffect(() => {
-        const exists = Object.values(folders).some((value) => {
+        const exists = Array.isArray(folders) && folders.some((value) => {
             return value.nestedUnder === focusedFolder
         })
         setSubFolders(exists)
@@ -214,7 +219,7 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
     }, [focusedFolder, folders])
 
     useEffect(() => {
-        if (focusedFolder && folders) {
+        if (Array.isArray(folders) && focusedFolder) {
             setFocusedFolderInst(folders.filter(folder => folder.id === focusedFolder)[0])
         }
     }, [folders, focusedFolder])
@@ -611,7 +616,7 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
                                                             <Text style={{fontSize: 30, color: '#593060', fontWeight: 'bold', textAlign: 'center'}}>No Subfolders...</Text>
                                                         ) : (
                                                             <>
-                                                                {folders.map((f, index) => {
+                                                                {(Array.isArray(folders) ? folders : []).map((f, index) => {
                                                                     if (focusedFolder) {
                                                                         if (f.nestedUnder === focusedFolder) {
                                                                             return (

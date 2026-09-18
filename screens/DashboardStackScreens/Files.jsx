@@ -121,7 +121,8 @@ export default function Files({navigation: { navigate }, route}) {
 
           setAlphaSortedFiles(sortedFiles)
         } else {
-          alert('currentUser.files is not an array')
+          setAlphaSortedFiles([])
+          console.warn('currentUser.files is not an array', currentUser?.files)
         }
       } catch (err) {
         alert(err)
@@ -131,8 +132,10 @@ export default function Files({navigation: { navigate }, route}) {
 
   //get the files and folders nested under a particular folder
   const getTargetFolder = (input) => {
-    const targetFiles = currentUser.fileRefs.filter(file => {if (file.flag === input.id) return file})
-    const targetFolders = currentUser.files.filter(file => {if (file.nestedUnder === input.id) return file})
+    const fileRefs = Array.isArray(currentUser?.fileRefs) ? currentUser.fileRefs : []
+    const files = Array.isArray(currentUser?.files) ? currentUser.files : []
+    const targetFiles = fileRefs.filter(file => file.flag === input.id)
+    const targetFolders = files.filter(file => file.nestedUnder === input.id)
     setFocusedFolder({folder: input, files: targetFiles, folders: targetFolders})
   }
 

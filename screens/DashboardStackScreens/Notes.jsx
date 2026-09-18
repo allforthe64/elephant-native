@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react'
-import { StyleSheet, View, Text, TextInput, TouchableOpacity, Keyboard, Modal, Pressable, ScrollView, Platform } from 'react-native'
+import { StyleSheet, View, Text, TextInput, TouchableOpacity, Keyboard, Modal, Pressable, ScrollView, Platform, KeyboardAvoidingView } from 'react-native'
 
 //fontAwesome imports
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
@@ -29,15 +29,18 @@ import KeyboardSafeForm from '../../components/ui/KeyboardSafeForm'
 import { TestIds } from '../../constants/testIds'
 import { useResponsiveLayout, tabletStyle } from '../../hooks/useResponsiveLayout'
 import { useAutoFocusOn } from '../../hooks/useAutoFocusOn'
+import { useKeyboardHeight } from '../../hooks/useKeyboardHeight'
 import { getMoveDestinationListHeight } from '../../constants/moveDestinationLayout'
+import SaveDestinationActions from '../../components/fileSystem/SaveDestinationActions'
+import MoveFolderDestinationRow from '../../components/fileSystem/MoveFolderDestinationRow'
 
 const Notepad = () => {
     const { isTablet, select, height: windowHeight } = useResponsiveLayout()
     const moveFolderListHeight = getMoveDestinationListHeight(windowHeight)
+    const keyboardHeight = useKeyboardHeight()
 
     const [open, setOpen] = useState(true)
     const [body, setBody] = useState('')
-    const [keyboardHeight, setKeyboardHeight] = useState(0)
     const [preAdd, setPreAdd] = useState(false)
     const [destination, setDestination] = useState({id: null, fileName: null, nestedUnder: null})
     const [currentUser, setCurrentUser] = useState()
@@ -46,7 +49,7 @@ const Notepad = () => {
     const addFolderInputRef = useAutoFocusOn(addFolderForm)
     const [focusedFolder, setFocusedFolder] = useState()
     const [subFolders, setSubFolders] = useState()
-    const [folders, setFolders] = useState({})
+    const [folders, setFolders] = useState([])
     const [newFolderName, setNewFolderName] = useState('')
     const [nameGiven, setNameGiven] = useState(false)
     const [noteName, setNoteName] = useState('')
@@ -88,12 +91,16 @@ const Notepad = () => {
     //get the current user 
     useEffect(() => {
       setLoading(true) //prevent component to attempting to render files/folders before they exist
+      let unsubscribe = () => {}
       const getCurrentUser = async () => {
-        const unsubscribe = await userListener(setCurrentUser, false, auth.currentUser.uid)
-
-        return () => unsubscribe()
+        if (!auth.currentUser?.uid) {
+          setLoading(false)
+          return
+        }
+        unsubscribe = await userListener(setCurrentUser, false, auth.currentUser.uid)
       }
       getCurrentUser()
+      return () => unsubscribe()
     }, [auth])
 
     //once a current user has been pushed into state, allow component to render files/folders
@@ -107,7 +114,7 @@ const Notepad = () => {
       if(currentUser) {
 
         if (Array.isArray(currentUser?.files)) {
-          const sortedFiles = currentUser.files.sort((a, b) => {
+          const sortedFiles = [...currentUser.files].sort((a, b) => {
               const aVal = getSortableValue(a.fileName);
               const bVal = getSortableValue(b.fileName);
 
@@ -127,13 +134,14 @@ const Notepad = () => {
 
           setFolders(sortedFiles)
         } else {
-          alert('currentUser.files is not an array')
+          setFolders([])
+          console.warn('currentUser.files is not an array', currentUser?.files)
         }
       }
     }, [currentUser])
 
 
-    saveNote = () => {
+    const saveNote = () => {
       setOpen(false)
     
     }
@@ -148,7 +156,7 @@ const Notepad = () => {
     }, [destination, focusedFolder])
 
     useEffect(() => {
-      if (folders && focusedFolder) {
+      if (Array.isArray(folders) && focusedFolder) {
         setFocusedFolderInst(folders.filter(folder => folder.id === focusedFolder)[0])
       }
     }, [focusedFolder, folders])
@@ -260,25 +268,10 @@ const Notepad = () => {
       else ref.current.focus() 
     },[open])
 
-    useEffect(() => {
-      const showEvent = Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow'
-      const hideEvent = Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide'
-      const onShow = Keyboard.addListener(showEvent, (e) => {
-        setKeyboardHeight(e.endCoordinates?.height || 0)
-      })
-      const onHide = Keyboard.addListener(hideEvent, () => {
-        setKeyboardHeight(0)
-      })
-      return () => {
-        onShow.remove()
-        onHide.remove()
-      }
-    }, [])
-
     const insets = useSafeAreaInsets() 
 
     useEffect(() => {
-      const exists = Object.values(folders).some((value) => {
+      const exists = Array.isArray(folders) && folders.some((value) => {
           return value.nestedUnder === focusedFolder
       })
       setSubFolders(exists)
@@ -426,48 +419,42 @@ const Notepad = () => {
                               
                               :   
                                   <>
-                                      {folders.map((f, index) => {
+                                      {(Array.isArray(folders) ? folders : []).map((f, index) => {
                                           if (focusedFolder) {
                                               if (f.nestedUnder === focusedFolder) {
                                                       return (
-                                                          <Pressable key={index} style={{display: 'flex', flexDirection: 'row', justifyContent: 'center', marginTop: '1%'}} onPress={() => {
+                                                          <MoveFolderDestinationRow
+                                                            key={index}
+                                                            selected={f.id === destination.id}
+                                                            fileName={f.fileName}
+                                                            onPress={() => {
                                                               if (destination.id === null || f.id !== destination.id) {
-                                                                  setDestination({id: f.id, fileName: f.fileName, nestedUnder: f.nestedUnder})
+                                                                setDestination({id: f.id, fileName: f.fileName, nestedUnder: f.nestedUnder})
                                                               } else {
-                                                                  setFocusedFolder(f.id)
-                                                                  setDestination({id: null, fileName: null, nestedUnder: null})
+                                                                setFocusedFolder(f.id)
+                                                                setDestination({id: null, fileName: null, nestedUnder: null})
                                                               }
-                                                          }
-                                                          }>
-                                                              <View style={f.id === destination.id ? styles.folderWhite : styles.folder}>
-                                                              <View style={f.id === destination.id ? styles.iconHolderBlack : styles.iconHolder}>
-                                                                  <FontAwesomeIcon icon={faFolder} size={28} color={f.id === destination.id ? 'white' : '#9F37B0'}/>
-                                                              </View>
-                                                              <Text style={f.id === destination.id ? {color: 'black', fontSize: 28, width: '80%', paddingTop: '1%'} : {color: '#9F37B0', fontSize: 28, width: '80%', textAlign: 'left', paddingTop: '1%'}}>{f.fileName}</Text>
-                                                              </View>
-                                                          </Pressable>
+                                                            }}
+                                                          />
                                                       )
                                                   
                                               }
                                           } else {
                                               if (f.nestedUnder === '') {
                                                   return (
-                                                        <Pressable key={index} style={{display: 'flex', flexDirection: 'row', justifyContent: 'center', marginTop: '1%'}} onPress={() => {
+                                                        <MoveFolderDestinationRow
+                                                          key={index}
+                                                          selected={f.id === destination.id}
+                                                          fileName={f.fileName}
+                                                          onPress={() => {
                                                             if (destination.id === null || f.id !== destination.id) {
-                                                                setDestination({id: f.id, fileName: f.fileName, nestedUnder: f.nestedUnder})
+                                                              setDestination({id: f.id, fileName: f.fileName, nestedUnder: f.nestedUnder})
                                                             } else {
-                                                                setFocusedFolder(f.id)
-                                                                setDestination({id: null, fileName: null, nestedUnder: null})
+                                                              setFocusedFolder(f.id)
+                                                              setDestination({id: null, fileName: null, nestedUnder: null})
                                                             }
-                                                        }
-                                                        }>
-                                                            <View style={f.id === destination.id ? styles.folderWhite : styles.folder}>
-                                                            <View style={f.id === destination.id ? styles.iconHolderBlack : styles.iconHolder}>
-                                                                <FontAwesomeIcon icon={faFolder} size={28} color={f.id === destination.id ? 'white' : '#9F37B0'}/>
-                                                            </View>
-                                                            <Text style={f.id === destination.id ? {color: 'black', fontSize: 28, width: '80%', paddingTop: '1%'} : {color: '#9F37B0', fontSize: 28, width: '80%', textAlign: 'left', paddingTop: '1%'}}>{f.fileName}</Text>
-                                                            </View>
-                                                        </Pressable>
+                                                          }}
+                                                        />
                                                       )
                                                   }
                                               }
@@ -487,32 +474,13 @@ const Notepad = () => {
                                   </Pressable> */}
                               </ScrollView>
                       </View>
-                      <View style={{width: '100%', paddingTop: 8, paddingBottom: Math.max(insets.bottom, 12), backgroundColor: '#fff'}}>
-                      <TouchableOpacity onPress={() => setAddFolderForm(true)} style={styles.addFolderButton}>
-                          <View style={styles.iconHolderSmall}>
-                              <FontAwesomeIcon icon={faPlus} color='#9F37B0'/>
-                          </View>
-                          <Text style={{fontSize: 18, marginLeft: '5%', paddingTop: '1%', color: '#9F37B0', fontWeight: '600'}}>Add New Folder</Text>
-                      </TouchableOpacity>
-
-                      <View style={{display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'space-around',}}>
-                            <TouchableOpacity onPress={() => addToStorage(true)} style={styles.yellowButtonSM}>
-                                <View style={styles.iconHolderSmall}>
-                                    <FontAwesomeIcon icon={faBox} color='#9F37B0'/>
-                                </View>
-                                <Text style={{fontSize: 18, color: '#9F37B0', fontWeight: '600', marginLeft: '3%', paddingTop: '1%'}}>Save To Staging</Text>
-                            </TouchableOpacity>
-
-                              <TouchableOpacity onPress={() => addToStorage()} style={ destination.id !== null || focusedFolder ? styles.yellowButtonSM : styles.yellowButtonSMDim}
-                                disabled={destination.id !== null || focusedFolder ? false : true}
-                            >   
-                                <View style={styles.iconHolderSmall}>
-                                    <FontAwesomeIcon icon={faCheck} color='#9F37B0'/>
-                                </View>
-                                <Text style={{fontSize: 18, color: '#9F37B0', fontWeight: '600', marginLeft: '8%', paddingTop: '1%'}}>Confirm Move</Text>
-                            </TouchableOpacity>
-                    </View>
-                    </View>
+                      <SaveDestinationActions
+                        onAddFolder={() => setAddFolderForm(true)}
+                        onSaveStaging={() => addToStorage(true)}
+                        onConfirmMove={() => addToStorage()}
+                        confirmDisabled={!(destination.id !== null || focusedFolder)}
+                        paddingBottom={Math.max(insets.bottom, 12)}
+                      />
                   </View>
                   
               }
@@ -524,7 +492,18 @@ const Notepad = () => {
         
       : <>
         <ContentShell variant="content" fill>
-        <View style={styles.editorRoot}>
+        <KeyboardAvoidingView
+          style={[
+            styles.editorRoot,
+            // Android often overlays the keyboard instead of resizing this screen —
+            // pad the editor so Save note stays above it.
+            Platform.OS === 'android' && keyboardHeight > 0
+              ? { paddingBottom: keyboardHeight }
+              : null,
+          ]}
+          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+          keyboardVerticalOffset={Platform.OS === 'ios' ? insets.top + 48 : 0}
+        >
             <AppTextInput
                         testID={TestIds.notes.body}
                         accessibilityLabel="Note body"
@@ -537,8 +516,7 @@ const Notepad = () => {
                             paddingLeft: 10,
                             paddingRight: 10,
                             paddingTop: Math.max(insets.top, 12),
-                            // Leave room for the floating edit toolbar
-                            paddingBottom: 88 + Math.max(insets.bottom, 12),
+                            paddingBottom: 16,
                             fontSize: 18,
                             textAlignVertical: 'top',
                             width: '100%',
@@ -556,8 +534,6 @@ const Notepad = () => {
               styles.toolbar,
               {
                 paddingBottom: Math.max(insets.bottom, 12),
-                // iOS: lift by keyboard height. Android: window resizes (see app.json).
-                bottom: Platform.OS === 'ios' ? keyboardHeight : 0,
               },
             ]}
           >
@@ -592,7 +568,7 @@ const Notepad = () => {
                     </Text>
                   </AppPressable>
           </View>
-        </View>
+        </KeyboardAvoidingView>
         </ContentShell>
         </>
       } 
@@ -649,10 +625,6 @@ const styles = StyleSheet.create({
       backgroundColor: 'white',
     },
     toolbar: {
-      position: 'absolute',
-      left: 0,
-      right: 0,
-      bottom: 0,
       width: '100%',
       flexDirection: 'row',
       alignItems: 'center',
