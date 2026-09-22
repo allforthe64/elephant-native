@@ -311,24 +311,7 @@ export default function Files({navigation: { navigate }, route}) {
           : stagingMode ? 
             <Staging reset={setStagingMode} staging={staging} userFiles={currentUser.fileRefs} folders={currentUser.files} deleteFile={deleteFile} renameFile={renameFile} moveFile={moveFile}/> 
           :
-          <ScrollView ref={scrollRef} style={
-              add && !keyBoardClosed ? {
-              width: '100%', /*Expand height to allow the text input to scroll into view*/
-              alignSelf: 'stretch',
-              height: '190%',
-            } : {
-            width: '100%', /* Default styling */
-            alignSelf: 'stretch',
-            flex: 1,
-          }}
-            contentContainerStyle={{
-              width: '100%',
-              paddingTop: 8,
-              paddingBottom: Math.max(insets.bottom, 16) + 48,
-            }}
-            scrollEnabled
-          >
-                  <View>
+          <View style={styles.homeBody}>
                     <View style={styles.header}>
                       <TouchableOpacity style={styles.nonFolderButton65} onPress={() => setStagingMode(true)}>
                         <View style={styles.iconHolder}>
@@ -337,26 +320,29 @@ export default function Files({navigation: { navigate }, route}) {
                         <Text style={styles.subheading} numberOfLines={1}>To be filed</Text>
                       </TouchableOpacity>
                     </View>
-                    <View style={add ? {height: 300} : {height: 330, marginBottom: '6%'}}>
-                      <ScrollView>
+                    <ScrollView
+                      style={styles.listScroll}
+                      contentContainerStyle={styles.listContent}
+                      showsVerticalScrollIndicator={false}
+                      keyboardShouldPersistTaps="handled"
+                    >
                         {alphaSortedFiles.map((file, i) => {
                           if (file.nestedUnder === '') {
                             return <Folder key={i + file.fileName} files={currentUser.files} renameFolder={renameFolder} pressable={true} moveFolderFunc={moveFolder} folders={currentUser.files} folder={file} getTargetFolder={getTargetFolder} deleteFolder={deleteFolder} updateUser={updateUser}/>
                           }
                         })}
-                      </ScrollView>
-                    </View>
+                    </ScrollView>
                     {add ? 
                       <Modal animationType='slide' presentationStyle='pageSheet' onShow={() => setTimeout(()=>{
                           inputRef.current?.focus()
                         }, 200)}>
-                        <View style={{height: '100%', width: '100%', backgroundColor: '#593060'}}>
+                        <View style={{height: '100%', width: '100%', backgroundColor: '#fff'}}>
                           <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', paddingRight: '5%', paddingTop: '10%',width: '100%'}}>
                               <Pressable onPress={() => {
                                 setAdd(false)
                                 setNewFolderName('')
                               }}>
-                              <FontAwesomeIcon icon={faXmark} color={'white'} size={30}/>
+                              <FontAwesomeIcon icon={faXmark} color={'#593060'} size={30}/>
                               </Pressable>
                           </View>
                           <ContentShell variant="modal" fill>
@@ -368,7 +354,7 @@ export default function Files({navigation: { navigate }, route}) {
                               <View style={styles.iconHolder}>
                                 <FontAwesomeIcon icon={faFolder} size={22} color='#9F37B0'/>
                               </View>
-                              <TextInput value={newFolderName} placeholder='Enter new name' placeholderTextColor={'white'} style={{color: 'white', fontSize: 22, fontWeight: 'bold', borderBottomColor: 'white', borderBottomWidth: 2, width: '70%', marginLeft: '5%'}} onChangeText={(e) => setNewFolderName(e)} onFocus={() => setKeyboardClosed(false)} ref={inputRef} autoFocus showSoftInputOnFocus onLayout={() => inputRef.current?.focus?.()}/>
+                              <TextInput value={newFolderName} placeholder='Enter new name' placeholderTextColor={'#593060'} style={{color: '#593060', fontSize: 22, fontWeight: 'bold', borderBottomColor: '#593060', borderBottomWidth: 2, width: '70%', marginLeft: '5%'}} onChangeText={(e) => setNewFolderName(e)} onFocus={() => setKeyboardClosed(false)} ref={inputRef} autoFocus showSoftInputOnFocus onLayout={() => inputRef.current?.focus?.()}/>
                             </View>
                             <TouchableOpacity style={tabletStyle(isTablet, styles.nonFolderButtonSM, tabletStyles.actionButton)}
                               onPress={() => addFolder(newFolderName, '')}
@@ -384,7 +370,7 @@ export default function Files({navigation: { navigate }, route}) {
                         </View>
                       </Modal>
                     : 
-                    <View style={{display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', marginTop: 8, marginBottom: 8, gap: 12}}>
+                    <View style={styles.homeActions}>
                           <YellowActionButton
                             label="Add New Folder"
                             onPress={() => {
@@ -402,11 +388,10 @@ export default function Files({navigation: { navigate }, route}) {
                           />
                     </View>
                     }
-                  </View>
-          </ScrollView>
+          </View>
                     
         : <>
-            <Text style={{color: 'white'}}>Loading...</Text>
+            <Text style={{color: '#593060'}}>Loading...</Text>
           </>
         }
         </ContentShell>
@@ -424,7 +409,30 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     width: '100%',
-    backgroundColor: '#FFFCF6',
+    backgroundColor: '#fff',
+  },
+  homeBody: {
+    flex: 1,
+    width: '100%',
+    paddingTop: 8,
+    paddingBottom: 8,
+  },
+  listScroll: {
+    flex: 1,
+    width: '100%',
+    minHeight: 0,
+  },
+  listContent: {
+    paddingBottom: 16,
+    flexGrow: 1,
+  },
+  homeActions: {
+    width: '100%',
+    alignItems: 'center',
+    marginTop: 8,
+    marginBottom: 8,
+    gap: 12,
+    paddingHorizontal: 16,
   },
   bigHeader: {
     color: 'white',
@@ -458,7 +466,7 @@ const styles = StyleSheet.create({
     width: '90%', 
     marginLeft: 'auto', 
     marginRight: 'auto',
-    marginBottom: '10%',
+    marginBottom: 16,
   },
   wrapperContainer: {
     flex: 1,
@@ -547,7 +555,7 @@ const styles = StyleSheet.create({
   addFolderHeading: {
     fontWeight: '600',
     fontSize: 40,
-    color: 'white',
+    color: '#593060',
     marginBottom: '10%'
   }
 });

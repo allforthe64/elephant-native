@@ -244,32 +244,87 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
 
 
     //rename a file by overwriting the fileName property
-    const renameFile = () => {
-        let version = 0
-        userInst.fileRefs.forEach(fileRef => {
-            if (fileRef.fileName.split('.')[0].toLowerCase() === newFileName.toLowerCase()) version ++})
+    const getFileExtension = (name) => {
+        const parts = (name || '').split('.')
+        return parts.length > 1 ? parts[parts.length - 1] : ''
+    }
 
-        if (newFileName !== file.fileName.split('.')[0] && newFileName.length > 0) {
+    const getFileBasename = (name) => {
+        const parts = (name || '').split('.')
+        if (parts.length <= 1) return name || ''
+        return parts.slice(0, -1).join('.')
+    }
+
+    /** Strip extension and any trailing " (N)" so rename input is a clean basename. */
+    const normalizeRenameInput = (input, originalExt) => {
+        let name = (input || '').trim()
+        if (!name) return ''
+        if (originalExt) {
+            const extSuffix = `.${originalExt}`
+            if (name.toLowerCase().endsWith(extSuffix.toLowerCase())) {
+                name = name.slice(0, -extSuffix.length)
+            }
+        }
+        return name.replace(/\s\(\d+\)$/, '').trim()
+    }
+
+    /**
+     * Only assign a version when ANOTHER file already uses this basename.
+     * The file being renamed is excluded so keeping/saving the same name
+     * does not produce " (1)", " (2)", etc.
+     */
+    const getRenameVersion = (basename) => {
+        const target = basename.toLowerCase()
+        let conflicts = 0
+        ;(userInst?.fileRefs || []).forEach((fileRef) => {
+            if (fileRef.fileId === file.fileId) return
+            if (getFileBasename(fileRef.fileName).toLowerCase() === target) {
+                conflicts += 1
+            }
+        })
+        return conflicts
+    }
+
+    const buildRenamedDisplayName = (basename, ext, version) => (
+        version > 0 ? `${basename} (${version}).${ext}` : `${basename}.${ext}`
+    )
+
+    const renameFile = () => {
+        const ext = getFileExtension(file.fileName)
+        const baseName = normalizeRenameInput(newFileName, ext)
+        if (!baseName) return
+
+        const version = getRenameVersion(baseName)
+        const finalFileName = `${baseName}.${ext}`
+
+        if (baseName !== getFileBasename(file.fileName) || version !== (file.version || 0) || finalFileName !== file.fileName) {
             const newFile = {
                 ...file,
-                fileName: newFileName + '.' + file.fileName.split('.')[1],
+                fileName: finalFileName,
                 version: version
             }
             const newFileObj = {
                 ...fileObj,
-                fileName: newFileName + '.' + file.fileName.split('.')[1],
+                fileName: finalFileName,
                 fileId: file.fileId,
                 version: version
             }
             renameFileFunction({newFileRef: newFile, newFileInst: newFileObj})
-            setNewFileName(version > 0 ? newFileName + ` (${version})` + '.' + file.fileName.split('.')[1] : newFileName + '.' + file.fileName.split('.')[1])
+            setNewFileName(buildRenamedDisplayName(baseName, ext, version))
         }
     }
 
     const renameAndMove = () => {
-        let version = 0
-        userInst.fileRefs.forEach(fileRef => {
-        if (fileRef.fileName.split('.')[0].toLowerCase() === newFileName.toLowerCase()) version ++})
+        const ext = getFileExtension(file.fileName)
+        const baseName = normalizeRenameInput(newFileName, ext)
+        if (!baseName) {
+            alert('Please enter a file name')
+            return
+        }
+
+        const version = getRenameVersion(baseName)
+        const finalFileName = `${baseName}.${ext}`
+
         try {
             if (destination.id !== null) {
 
@@ -278,17 +333,17 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
                 const newFile = {
                     ...file,
                     flag: destination.id,
-                    fileName: newFileName + '.' + file.fileName.split('.')[1],
+                    fileName: finalFileName,
                     version: version
                 }
                 const newFileObj = {
                     ...fileObj,
-                    fileName: newFileName + '.' + file.fileName.split('.')[1],
+                    fileName: finalFileName,
                     fileId: file.fileId,
                     version: version
                 }
                 renameFileFunction({newFileRef: newFile, newFileInst: newFileObj})
-                setNewFileName(version > 0 ? newFileName + ` (${version})` + '.' + file.fileName.split('.')[1] : newFileName + '.' + file.fileName.split('.')[1])
+                setNewFileName(buildRenamedDisplayName(baseName, ext, version))
 
                 focus(false)
                 setDestination({id: null, fileName: null, nestedUnder: null})
@@ -305,17 +360,17 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
                 const newFile = {
                     ...file,
                     flag: folderInst[0].id,
-                    fileName: newFileName + '.' + file.fileName.split('.')[1],
+                    fileName: finalFileName,
                     version: version
                 }
                 const newFileObj = {
                     ...fileObj,
-                    fileName: newFileName + '.' + file.fileName.split('.')[1],
+                    fileName: finalFileName,
                     fileId: file.fileId,
                     version: version
                 }
                 renameFileFunction({newFileRef: newFile, newFileInst: newFileObj})
-                setNewFileName(version > 0 ? newFileName + ` (${version})` + '.' + file.fileName.split('.')[1] : newFileName + '.' + file.fileName.split('.')[1])
+                setNewFileName(buildRenamedDisplayName(baseName, ext, version))
                 focus(false)
                 setDestination({id: null, fileName: null, nestedUnder: null})
                 setMoveFile(false)
@@ -782,15 +837,21 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
                                 </Modal>
                             )
                         :
-                            <View style={[{ flex: 1, paddingTop: Math.max(insets.top, 24), backgroundColor: '#593060', height: '100%', width: '100%'}, tabletModalPanel]}>
+                            <View style={[{ flex: 1, paddingTop: Math.max(insets.top, 24), backgroundColor: '#fff', height: '100%', width: '100%'}, tabletModalPanel]}>
                                     
                                     {/*x button container */}
                                     <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', paddingRight: '5%'}}>
                                         <Pressable onPress={() => {
-                                            if (add) setAdd(false)
+                                            if (add) {
+                                                // Restore display name after cancelling a blank rename field
+                                                const ext = getFileExtension(file.fileName)
+                                                const base = getFileBasename(file.fileName)
+                                                setNewFileName(buildRenamedDisplayName(base, ext, file.version || 0))
+                                                setAdd(false)
+                                            }
                                             else focus(null)
                                         }}>
-                                            <FontAwesomeIcon icon={faXmark} color={'white'} size={30}/>
+                                            <FontAwesomeIcon icon={faXmark} color={'#593060'} size={30}/>
                                         </Pressable>
                                     </View>
                                     <View style={{ flex: 1, width: '100%' }}>
@@ -799,12 +860,20 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
                                         {add ?  
                                                 <KeyboardSafeForm>
                                                 <View style={{paddingTop: '40%', display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%'}}>
-                                                    <Text style={{color: 'white', fontSize: 35, fontWeight: '700'}}>Rename File:</Text>
+                                                    <Text style={{color: '#593060', fontSize: 35, fontWeight: '700'}}>Rename File:</Text>
                                                     <View style={{display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center',  marginTop: '10%'}}>
                                                         <View style={styles.iconHolder}>
                                                             <FontAwesomeIcon icon={faFile} size={22} color='#9F37B0'/>
                                                         </View>
-                                                        <TextInput style={{color: 'white', fontSize: 20, fontWeight: 'bold', borderBottomColor: 'white', borderBottomWidth: 2, width: '70%', marginLeft: '5%'}} placeholder='Enter new name' placeholderTextColor={'white'} onChangeText={(e) => setNewFileName(e)} autoFocus ref={renameFileInputRef}/>
+                                                        <TextInput
+                                                            value={newFileName}
+                                                            style={{color: '#593060', fontSize: 20, fontWeight: 'bold', borderBottomColor: '#593060', borderBottomWidth: 2, width: '70%', marginLeft: '5%'}}
+                                                            placeholder='Enter new name'
+                                                            placeholderTextColor={'#593060'}
+                                                            onChangeText={(e) => setNewFileName(e)}
+                                                            autoFocus
+                                                            ref={renameFileInputRef}
+                                                        />
                                                     </View>
                                                     <View style={{display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: '10%', width: '100%'}}>
                                                         <TouchableOpacity style={styles.yellowButtonMed}
@@ -877,7 +946,7 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
                                                       showsVerticalScrollIndicator={false}
                                                       keyboardShouldPersistTaps="handled"
                                                     >
-                                                        <Text style={{fontSize: 22, fontWeight: 'bold', color: 'white', marginTop: '5%', paddingLeft: '5%', paddingRight: '5%'}} numberOfLines={3}>{newFileName}</Text>
+                                                        <Text style={{fontSize: 22, fontWeight: 'bold', color: '#593060', marginTop: '5%', paddingLeft: '5%', paddingRight: '5%'}} numberOfLines={3}>{newFileName}</Text>
 
                                                         {((file.fileName.split('.')[1] === 'jpg' || file.fileName.split('.')[1] === 'png' || file.fileName.split('.')[1] === 'JPG' || file.fileName.split('.')[1] === 'PNG' || file.fileName.split('.')[1] === 'jpeg' || file.fileName.split('.')[1] === 'JPEG')) ? 
                                                             <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'center', marginTop: '10%', marginBottom: '10%'}}>
@@ -887,8 +956,8 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
                                                                     </Pressable>
                                                                 : 
                                                                     <View style={{height: 150}}>
-                                                                        <FontAwesomeIcon icon={faImage} color='white' size={125}/>
-                                                                        <Text style={{color: 'white', textAlign: 'center', marginTop: 15, fontSize: 10}}>Fetching Image...</Text>
+                                                                        <FontAwesomeIcon icon={faImage} color='#593060' size={125}/>
+                                                                        <Text style={{color: '#593060', textAlign: 'center', marginTop: 15, fontSize: 10}}>Fetching Image...</Text>
                                                                     </View>
                                                                 }
                                                             </View>
@@ -902,8 +971,8 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
                                                                         </View>
                                                                     : 
                                                                         <View style={{height: 150}}>
-                                                                            <FontAwesomeIcon icon={faImage} color='white' size={125}/>
-                                                                            <Text style={{color: 'white', textAlign: 'center', marginTop: 15, fontSize: 10}}>Fetching PDF...</Text>
+                                                                            <FontAwesomeIcon icon={faImage} color='#593060' size={125}/>
+                                                                            <Text style={{color: '#593060', textAlign: 'center', marginTop: 15, fontSize: 10}}>Fetching PDF...</Text>
                                                                         </View>
                                                                     }
                                                                 </View>
@@ -919,8 +988,8 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
                                                                     </View>
                                                                 : 
                                                                     <View style={{height: 150}}>
-                                                                        <FontAwesomeIcon icon={faImage} color='white' size={125}/>
-                                                                        <Text style={{color: 'white', textAlign: 'center', marginTop: 15, fontSize: 10}}>Fetching Document...</Text>
+                                                                        <FontAwesomeIcon icon={faImage} color='#593060' size={125}/>
+                                                                        <Text style={{color: '#593060', textAlign: 'center', marginTop: 15, fontSize: 10}}>Fetching Document...</Text>
                                                                     </View>
                                                                 }
                                                             </View>     
@@ -931,8 +1000,8 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
                                                                     <Video style={{flex: 1, alignSelf: 'stretch', height: '100%'}} source={{uri: `${fileURL}`}} useNativeControls resizeMode ='contain' isLooping onError={(error) => alert(error)}/>
                                                                 : 
                                                                     <View style={{height: 150}}>
-                                                                        <FontAwesomeIcon icon={faImage} color='white' size={125}/>
-                                                                            <Text style={{color: 'white', textAlign: 'center', marginTop: 15, fontSize: 10}}>Fetching Video...</Text>
+                                                                        <FontAwesomeIcon icon={faImage} color='#593060' size={125}/>
+                                                                            <Text style={{color: '#593060', textAlign: 'center', marginTop: 15, fontSize: 10}}>Fetching Video...</Text>
                                                                     </View>
                                                                 }
                                                             </View>
@@ -941,17 +1010,23 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
                                                         <View style={{width: '100%', marginTop: '5%'}}>
                                                             
                                                             <View style={styles.renameMoveButtonContainer}>
-                                                                <TouchableOpacity style={styles.moveRenameButtons} onPress={() => setAdd(true)}>
+                                                                <TouchableOpacity
+                                                                    style={styles.moveRenameButtons}
+                                                                    onPress={() => {
+                                                                        setNewFileName('')
+                                                                        setAdd(true)
+                                                                    }}
+                                                                >
                                                                     <View style={styles.iconHolderSmall}>
-                                                                        <FontAwesomeIcon icon={faFont} color='black' size={20}/>
+                                                                        <FontAwesomeIcon icon={faFont} color='#9F37B0' size={20}/>
                                                                     </View>
-                                                                    <Text style={{fontSize: 18, color: 'black', fontWeight: '600', marginLeft: 14, paddingTop: '.5%'}}>Rename file</Text>
+                                                                    <Text style={{fontSize: 18, color: '#9F37B0', fontWeight: '600', marginLeft: 14, paddingTop: '.5%'}}>Rename file</Text>
                                                                 </TouchableOpacity>
                                                                 <TouchableOpacity style={styles.moveRenameButtons} onPress={() => setMoveFile(true)}>
                                                                     <View style={styles.iconHolderSmall}>
-                                                                        <FontAwesomeIcon icon={faFolder} color='black' size={20}/>
+                                                                        <FontAwesomeIcon icon={faFolder} color='#9F37B0' size={20}/>
                                                                     </View>
-                                                                    <Text style={{fontSize: 18, color: 'black', fontWeight: '600', marginLeft: 14, paddingTop: '.5%'}}>Move file...</Text>
+                                                                    <Text style={{fontSize: 18, color: '#9F37B0', fontWeight: '600', marginLeft: 14, paddingTop: '.5%'}}>Move file...</Text>
                                                                 </TouchableOpacity>
                                                             </View>
                                                             
@@ -1052,7 +1127,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-around',
     },
     moveRenameButtons: {
-        backgroundColor: '#DDCADB', 
+        backgroundColor: '#FFE562', 
         paddingLeft: 4,
         paddingTop: 4,
         paddingBottom: 4, 

@@ -81,6 +81,33 @@ export function createFolderId() {
     return Math.floor(Math.random() * 9e11) + 1e11
 }
 
+/** Strip a trailing " (N)" so collision checks use the clean folder basename. */
+export function getFolderBasename(name) {
+    return String(name ?? '').trim().replace(/\s\(\d+\)$/, '')
+}
+
+/**
+ * Resolve a unique folder name within the same parent.
+ * Appends " (N)" only when another sibling already uses that basename.
+ */
+export function resolveUniqueFolderName(desiredName, folders, { parentId = '', excludeId = null } = {}) {
+    const base = getFolderBasename(desiredName)
+    if (!base) return ''
+
+    const parentKey = parentId === '' || parentId == null ? '' : String(parentId)
+    let conflicts = 0
+    ;(Array.isArray(folders) ? folders : []).forEach((f) => {
+        if (excludeId != null && String(f.id) === String(excludeId)) return
+        const fParent = f.nestedUnder === '' || f.nestedUnder == null ? '' : String(f.nestedUnder)
+        if (fParent !== parentKey) return
+        if (getFolderBasename(f.fileName).toLowerCase() === base.toLowerCase()) {
+            conflicts += 1
+        }
+    })
+
+    return conflicts > 0 ? `${base} (${conflicts})` : base
+}
+
 export async function addFolderToUser(userInst, folderName, targetNest = '') {
     const name = String(folderName ?? '').trim()
     if (!name) {
@@ -89,12 +116,14 @@ export async function addFolderToUser(userInst, folderName, targetNest = '') {
     if (!userInst?.uid) {
         throw new Error('Still loading your folders. Tap Save again.')
     }
+    const existing = Array.isArray(userInst.files) ? userInst.files : []
+    const nest = targetNest === '' || targetNest == null ? '' : targetNest
+    const resolvedName = resolveUniqueFolderName(name, existing, { parentId: nest })
     const newFile = {
         id: createFolderId(),
-        fileName: name,
-        nestedUnder: targetNest === '' || targetNest == null ? '' : targetNest
+        fileName: resolvedName,
+        nestedUnder: nest
     }
-    const existing = Array.isArray(userInst.files) ? userInst.files : []
     const newFiles = [...existing, newFile]
     await updateUser({ ...userInst, files: newFiles })
     return { newFile, newFiles }

@@ -6,7 +6,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faArrowRight, faEllipsisVertical, faFloppyDisk, faFolder, faPencil, faTrash, faXmark, faArrowLeft, faPlus } from '@fortawesome/free-solid-svg-icons';
 
 import { firebaseAuth } from '../../firebaseConfig';
-import { userListener, addFolderToUser } from '../../firebase/firestore';
+import { userListener, addFolderToUser, resolveUniqueFolderName } from '../../firebase/firestore';
 
 import { useToast } from 'react-native-toast-notifications';
 import { tabletStyle, useResponsiveLayout } from '../../hooks/useResponsiveLayout';
@@ -163,16 +163,22 @@ const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolder
 
   //pass an object containing data from the current file obj + the new filename to the main component 
   const handleNameChange = () => {
-
     if (newName === '') return
-    else {
-      const newFolder = {
-        ...folder,
-        fileName: newName
-      }
-      renameFolder(newFolder)
-      setEditName(false)
+
+    // Only append " (N)" when another sibling folder already has this name
+    const resolvedName = resolveUniqueFolderName(newName, folders, {
+      parentId: folder.nestedUnder,
+      excludeId: folder.id,
+    })
+    if (!resolvedName) return
+
+    const newFolder = {
+      ...folder,
+      fileName: resolvedName
     }
+    renameFolder(newFolder)
+    setNewName('')
+    setEditName(false)
   }
 
   //pass an object containing data from the current file obj + the new nestedUnder property to the main component 
@@ -272,7 +278,7 @@ const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolder
                   </View>
                 </Modal>
                 : 
-                  <View style={[{ flex: 1, paddingTop: '10%', backgroundColor: moveFolder ? '#fff' : '#593060', height: '100%'}, tabletModalPanel]}>
+                  <View style={[{ flex: 1, paddingTop: '10%', backgroundColor: (moveFolder || editName) ? '#fff' : '#593060', height: '100%'}, tabletModalPanel]}>
                     <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', paddingRight: '5%'}}>
                       <Pressable onPress={() => {
                           if (addFolderForm) {
@@ -289,18 +295,18 @@ const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolder
                             setNewName('')
                           }
                         }}>
-                        <FontAwesomeIcon icon={faXmark} color={moveFolder ? '#593060' : 'white'} size={30}/>
+                        <FontAwesomeIcon icon={faXmark} color={(moveFolder || editName) ? '#593060' : 'white'} size={30}/>
                       </Pressable>
                     </View>
                     {editName ? /*Code for renaming a folder */ 
                     <KeyboardSafeForm>
                     <View style={{paddingTop: '40%', display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%'}}>
-                        <Text style={{color: 'white', fontSize: 35, fontWeight: '700'}}>Rename folder:</Text>
+                        <Text style={{color: '#593060', fontSize: 35, fontWeight: '700'}}>Rename folder:</Text>
                         <View style={{display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center',  marginTop: '10%'}}>
                           <View style={styles.iconHolder}>
                               <FontAwesomeIcon icon={faFolder} size={22} color='#9F37B0'/>
                           </View>
-                          <TextInput value={newName} style={{color: 'white', fontSize: 20, fontWeight: 'bold', borderBottomColor: 'white', borderBottomWidth: 2, width: '70%', marginLeft: '5%'}} placeholderTextColor={'white'} placeholder='Enter new name' onChangeText={(e) => setNewName(e)} autoFocus ref={renameInputRef}/>
+                          <TextInput value={newName} style={{color: '#593060', fontSize: 20, fontWeight: 'bold', borderBottomColor: '#593060', borderBottomWidth: 2, width: '70%', marginLeft: '5%'}} placeholderTextColor={'#593060'} placeholder='Enter new name' onChangeText={(e) => setNewName(e)} autoFocus ref={renameInputRef}/>
                         </View>
                         <View style={{display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'space-around', marginTop: '4%'}}>
                             <TouchableOpacity onPress={handleNameChange} style={styles.yellowButtonSM}>
@@ -475,7 +481,10 @@ const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolder
                       >
                         <Text style={{fontSize: 40, fontWeight: 'bold', color: 'white', marginTop: '5%'}}>{folder.fileName}</Text>
                         <View style={{width: '100%', display: 'flex', flexDirection: 'row', justifyContent: 'space-around', paddingTop: '10%'}}>
-                          <TouchableOpacity style={styles.yellowButtonSM} onPress={() => setEditName(true)}>
+                          <TouchableOpacity style={styles.yellowButtonSM} onPress={() => {
+                            setNewName('')
+                            setEditName(true)
+                          }}>
                             <View style={styles.iconHolderSmall}>
                               <FontAwesomeIcon icon={faPencil} color='#9F37B0' size={18} />
                             </View>

@@ -78,7 +78,7 @@ const FocusedFolder = ({folder, folders, clear, getTargetFolder, addFolder, rena
         setNestedFolder(targetFolder)
         
         //sorting the subfolders
-        const sortedFolders = folder.folders.sort((a, b) => {
+        const sortedFolders = [...(Array.isArray(folder.folders) ? folder.folders : [])].sort((a, b) => {
             const aVal = getSortableValue(a.fileName);
             const bVal = getSortableValue(b.fileName);
 
@@ -194,13 +194,13 @@ const FocusedFolder = ({folder, folders, clear, getTargetFolder, addFolder, rena
                         <Modal presentationStyle='pageSheet' animationType='slide' onShow={() => setTimeout(()=>{
                             folderRef.current?.focus?.()
                         }, 350)}>
-                            <View style={tabletStyle(isTablet, {height: '100%', width: '100%', backgroundColor: '#593060'}, {maxWidth: modalMaxWidth, alignSelf: 'center'})}>
+                            <View style={tabletStyle(isTablet, {height: '100%', width: '100%', backgroundColor: '#fff'}, {maxWidth: modalMaxWidth, alignSelf: 'center'})}>
                                 <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', paddingRight: '5%', paddingTop: '10%',width: '100%'}}>
                                     <Pressable onPress={() => {
                                         setAdd(false)
                                         setNewFolderName('')
                                     }}>
-                                    <FontAwesomeIcon icon={faXmark} color={'white'} size={30}/>
+                                    <FontAwesomeIcon icon={faXmark} color={'#593060'} size={30}/>
                                     </Pressable>
                                 </View>
                                 <KeyboardSafeForm>
@@ -211,7 +211,7 @@ const FocusedFolder = ({folder, folders, clear, getTargetFolder, addFolder, rena
                                         <View style={styles.iconHolder}>
                                         <FontAwesomeIcon icon={faFolder} size={22} color='#9F37B0'/>
                                         </View>
-                                        <TextInput placeholder='Enter new name' placeholderTextColor={'white'} value={newFolderName} style={{color: 'white', fontSize: 22, fontWeight: 'bold', borderBottomColor: 'white', borderBottomWidth: 2, width: '70%', marginLeft: '5%'}} onChangeText={(e) => setNewFolderName(e)} onFocus={() => setKeyboardClosed(false)} ref={folderRef} autoFocus showSoftInputOnFocus onLayout={() => setTimeout(() => folderRef.current?.focus?.(), 50)}/>
+                                        <TextInput placeholder='Enter new name' placeholderTextColor={'#593060'} value={newFolderName} style={{color: '#593060', fontSize: 22, fontWeight: 'bold', borderBottomColor: '#593060', borderBottomWidth: 2, width: '70%', marginLeft: '5%'}} onChangeText={(e) => setNewFolderName(e)} onFocus={() => setKeyboardClosed(false)} ref={folderRef} autoFocus showSoftInputOnFocus onLayout={() => setTimeout(() => folderRef.current?.focus?.(), 50)}/>
                                     </View>
                                     <Pressable style={styles.nonFolderButtonSM}
                                         onPress={async () => {
@@ -258,7 +258,7 @@ const styles = StyleSheet.create({
     root: {
         flex: 1,
         width: '100%',
-        backgroundColor: '#FFFCF6',
+        backgroundColor: '#fff',
     },
     rootTablet: {
         height: '100%',
@@ -270,6 +270,7 @@ const styles = StyleSheet.create({
     listScroll: {
         flex: 1,
         width: '100%',
+        minHeight: 0,
     },
     listContent: {
         paddingBottom: 16,
@@ -371,7 +372,7 @@ const styles = StyleSheet.create({
     addFolderHeading: {
         fontWeight: '600',
         fontSize: 40,
-        color: 'white',
+        color: '#593060',
         marginBottom: '10%',
     }
 })
