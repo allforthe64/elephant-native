@@ -287,7 +287,7 @@ const Notepad = () => {
         <Modal animationType='slide' presentationStyle='pageSheet' onShow={() => setTimeout(()=>{
           nameRef.current.focus()
         }, 200)}>
-          <View style={{height: '100%', width: '100%', backgroundColor: (nameGiven && !addFolderForm) ? '#fff' : '#593060'}}>
+          <View style={{height: '100%', width: '100%', backgroundColor: '#fff'}}>
               {/* if the moveFile state is true, display the modal with the file movement code*/}
               {/* xMark icon for closing out the moveFile modal */}
               <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', paddingRight: '5%', paddingTop: '10%', width: '100%'}}>
@@ -300,7 +300,7 @@ const Notepad = () => {
                       setNoteName('')
                     }
                     }}>
-                      <FontAwesomeIcon icon={faXmark} color={(nameGiven && !addFolderForm) ? '#593060' : 'white'} size={30}/>
+                      <FontAwesomeIcon icon={faXmark} color={'#593060'} size={30}/>
                   </Pressable>
               </View>
               
@@ -310,12 +310,12 @@ const Notepad = () => {
               !nameGiven ?
               <KeyboardSafeForm>
               <>
-                  <Text style={[{color: 'white', fontSize: 35, fontWeight: '700', marginTop: '35%', textAlign: 'center'}, select(undefined, tabletStyles.modalHeading)]}>Name Note:</Text>
+                  <Text style={[{color: '#593060', fontSize: 35, fontWeight: '700', marginTop: '35%', textAlign: 'center'}, select(undefined, tabletStyles.modalHeading)]}>Name Note:</Text>
                   <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', marginTop: '10%'}}>
                       <View style={styles.iconHolder}>
                         <FontAwesomeIcon icon={faFile} size={22} color='#9F37B0'/>
                       </View>
-                      <TextInput value={noteName} placeholder='Enter name' placeholderTextColor={'white'} style={{color: 'white', fontSize: 20, fontWeight: 'bold', borderBottomColor: 'white', borderBottomWidth: 2, width: '70%'}} onChangeText={(e) => setNoteName(e)} ref={nameRef}/>
+                      <TextInput value={noteName} placeholder='Enter name' placeholderTextColor={'#593060'} style={{color: '#593060', fontSize: 20, fontWeight: 'bold', borderBottomColor: '#593060', borderBottomWidth: 2, width: '70%'}} onChangeText={(e) => setNoteName(e)} ref={nameRef}/>
                     </View>
                     <View style={{width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', paddingTop: '5%'}}>
                         <TouchableOpacity style={noteName === '' ? styles.yellowButtonXSDim : styles.yellowButtonXS}
@@ -329,7 +329,7 @@ const Notepad = () => {
                           </View>
                           <Text style={{fontSize: 18, color: '#9F37B0', fontWeight: '600', marginLeft: '15%', paddingTop: '1%'}}>Save</Text>
                         </TouchableOpacity>
-                        <Text style={{color: 'white', fontSize: 20, marginTop: '2%', textAlign: 'center'}}>Or</Text>
+                        <Text style={{color: '#593060', fontSize: 20, marginTop: '2%', textAlign: 'center'}}>Or</Text>
                         <TouchableOpacity style={{width: '50%',
                         borderRadius: 12,
                         backgroundColor: 'white',
@@ -357,13 +357,13 @@ const Notepad = () => {
               : addFolderForm ? 
                   <KeyboardSafeForm>
                   <>
-                      <Text style={[{color: 'white', fontSize: 35, fontWeight: '700', marginTop: '40%', textAlign: 'center'}, select(undefined, tabletStyles.modalHeading)]}>Add A New Folder:</Text>
+                      <Text style={[{color: '#593060', fontSize: 35, fontWeight: '700', marginTop: '40%', textAlign: 'center'}, select(undefined, tabletStyles.modalHeading)]}>Add A New Folder:</Text>
                       <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', marginTop: '10%'}}>
                       <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', marginTop: '10%', width: '100%'}}>
                             <View style={styles.iconHolder}> 
                                 <FontAwesomeIcon icon={faFolder} size={22} color='#9F37B0'/>
                             </View>
-                            <TextInput value={newFolderName} placeholder='Enter new name' placeholderTextColor={'white'} style={{color: 'white', fontSize: 20, fontWeight: 'bold', borderBottomColor: 'white', borderBottomWidth: 2, width: '70%'}} onChangeText={(e) => setNewFolderName(e)} autoFocus showSoftInputOnFocus ref={addFolderInputRef} onLayout={() => addFolderInputRef.current?.focus?.()}/>
+                            <TextInput value={newFolderName} placeholder='Enter new name' placeholderTextColor={'#593060'} style={{color: '#593060', fontSize: 20, fontWeight: 'bold', borderBottomColor: '#593060', borderBottomWidth: 2, width: '70%'}} onChangeText={(e) => setNewFolderName(e)} autoFocus showSoftInputOnFocus ref={addFolderInputRef} onLayout={() => addFolderInputRef.current?.focus?.()}/>
                         </View>
                           
                       </View>

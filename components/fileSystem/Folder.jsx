@@ -226,15 +226,15 @@ const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolder
               {preDelete ? 
                 /*Code for deleting a folder */
                 <Modal animationType='slide' presentationStyle='pageSheet'>
-                    <View style={[{height: '100%', width: '100%', backgroundColor: '#593060'}, tabletModalPanel]}>
+                    <View style={[{height: '100%', width: '100%', backgroundColor: '#fff'}, tabletModalPanel]}>
                     
                       <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', paddingRight: '5%', paddingTop: '10%', width: '100%'}}>
                         <Pressable onPress={() => setPreDelete(false)}>
-                          <FontAwesomeIcon icon={faXmark} color={'white'} size={30}/>
+                          <FontAwesomeIcon icon={faXmark} color={'#593060'} size={30}/>
                         </Pressable>
                       </View>
                     <View style={{width: '100%', height: '95%', flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-                      <Text style={{fontSize: 22, color: 'white', textAlign: 'center'}}>Are you sure you want to delete {folder.fileName} and all of its contents?</Text>
+                      <Text style={{fontSize: 22, color: '#593060', textAlign: 'center'}}>Are you sure you want to delete {folder.fileName} and all of its contents?</Text>
 
                       <View style={{width: '50%',
                             borderRadius: 12,
@@ -278,7 +278,7 @@ const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolder
                   </View>
                 </Modal>
                 : 
-                  <View style={[{ flex: 1, paddingTop: '10%', backgroundColor: (moveFolder || editName) ? '#fff' : '#593060', height: '100%'}, tabletModalPanel]}>
+                  <View style={[{ flex: 1, paddingTop: '10%', backgroundColor: '#fff', height: '100%'}, tabletModalPanel]}>
                     <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', paddingRight: '5%'}}>
                       <Pressable onPress={() => {
                           if (addFolderForm) {
@@ -295,7 +295,7 @@ const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolder
                             setNewName('')
                           }
                         }}>
-                        <FontAwesomeIcon icon={faXmark} color={(moveFolder || editName) ? '#593060' : 'white'} size={30}/>
+                        <FontAwesomeIcon icon={faXmark} color={'#593060'} size={30}/>
                       </Pressable>
                     </View>
                     {editName ? /*Code for renaming a folder */ 
@@ -479,7 +479,7 @@ const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolder
                         }}
                         showsVerticalScrollIndicator={false}
                       >
-                        <Text style={{fontSize: 40, fontWeight: 'bold', color: 'white', marginTop: '5%'}}>{folder.fileName}</Text>
+                        <Text style={{fontSize: 40, fontWeight: 'bold', color: '#593060', marginTop: '5%'}}>{folder.fileName}</Text>
                         <View style={{width: '100%', display: 'flex', flexDirection: 'row', justifyContent: 'space-around', paddingTop: '10%'}}>
                           <TouchableOpacity style={styles.yellowButtonSM} onPress={() => {
                             setNewName('')
@@ -505,7 +505,7 @@ const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolder
                             <View style={styles.iconHolderSmall}>
                               <FontAwesomeIcon icon={faTrash} size={18} color='red' />
                             </View>
-                            <Text style={{fontSize: 18, color: 'red', paddingTop: '1%', marginLeft: '12%', fontWeight: '600'}}>Delete Folder</Text>
+                            <Text style={{fontSize: 18, color: '#fff', paddingTop: '1%', marginLeft: '12%', fontWeight: '600'}}>Delete Folder</Text>
                           </TouchableOpacity>
                         </View>
                       </ScrollView>
@@ -636,7 +636,7 @@ const styles = StyleSheet.create({
       borderRadius: 100
     },
     deleteButton: {
-      backgroundColor: '#BCBCBC',
+      backgroundColor: 'red',
       paddingLeft: 6,
       paddingTop: 6,
       paddingBottom: 6,

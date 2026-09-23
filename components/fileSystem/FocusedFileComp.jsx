@@ -546,16 +546,16 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
                     {preDelete ? 
                             (   
                                 <Modal animationType='slide' presentationStyle='pageSheet'>
-                                    <View style={[{ paddingTop: '10%', backgroundColor: '#593060', height: '100%', width: '100%'}, tabletModalPanel]}>
+                                    <View style={[{ paddingTop: '10%', backgroundColor: '#fff', height: '100%', width: '100%'}, tabletModalPanel]}>
                                         {/* if the user hits the delete button on a file, open a modal that confirms they want to delete the file*/}
                                         <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', paddingRight: '5%', paddingTop: '10%',     width: '100%'}}>
                                             <TouchableOpacity onPress={() => setPreDelete(false)}>
-                                                <FontAwesomeIcon icon={faXmark} color={'white'} size={30}/>
+                                                <FontAwesomeIcon icon={faXmark} color={'#593060'} size={30}/>
                                             </TouchableOpacity>
                                         </View>
                                         <View style={{width: '100%', display: 'flex', flexDirection: 'column', paddingTop: '10%', justifyContent: 'center', alignItems: 'center'}}>
-                                        <Text style={{fontSize: 32, color: 'white', textAlign: 'center', paddingLeft: 8, paddingRight: 8, fontWeight: '600', marginBottom: '6%'}}>Are you sure you want to <Text style={{color: 'red'}}>delete</Text> the file:</Text>
-                                        <Text style={{fontSize: 18, color: 'white', textAlign: 'center', paddingLeft: 30, paddingRight: 30, fontWeight: '600'}}>{file.fileName}?</Text>
+                                        <Text style={{fontSize: 32, color: '#593060', textAlign: 'center', paddingLeft: 8, paddingRight: 8, fontWeight: '600', marginBottom: '6%'}}>Are you sure you want to <Text style={{color: 'red'}}>delete</Text> the file:</Text>
+                                        <Text style={{fontSize: 18, color: '#593060', textAlign: 'center', paddingLeft: 30, paddingRight: 30, fontWeight: '600'}}>{file.fileName}?</Text>
                                         <View style={{width: '100%', display: 'flex', flexDirection: 'row', justifyContent: 'space-around', paddingTop: '10%'}}>
                                             {/* button with onPress function to delete the file */}
                                             <TouchableOpacity onPress={() => {
@@ -566,7 +566,7 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
                                                 <View style={styles.iconHolderSmall}>
                                                     <FontAwesomeIcon icon={faTrash} size={18} color='red' />
                                                 </View>
-                                                <Text style={{fontSize: 18, color: 'red', fontWeight: '600', marginLeft: '18%'}}>Delete</Text>
+                                                <Text style={{fontSize: 18, color: '#fff', fontWeight: '600', marginLeft: '18%'}}>Delete</Text>
                                             </TouchableOpacity>
 
                                             <TouchableOpacity onPress={() => setPreDelete(false)} style={styles.yellowButtonSM}>
@@ -1100,7 +1100,7 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
                                                                 <View style={styles.iconHolder}>
                                                                     <FontAwesomeIcon icon={faTrash} color='red' size={22}/>
                                                                 </View>
-                                                                <Text style={{fontSize: 22, color: 'red', fontWeight: '600', paddingLeft: '22%', paddingTop: '2%'}}>Delete File</Text>
+                                                                <Text style={{fontSize: 22, color: '#fff', fontWeight: '600', paddingLeft: '22%', paddingTop: '2%'}}>Delete File</Text>
                                                             </TouchableOpacity>
                                                         </View>
                                                     </ScrollView>
@@ -1195,7 +1195,7 @@ const styles = StyleSheet.create({
         opacity: .5
     },
     deleteButton: {
-        backgroundColor: '#BCBCBC',
+        backgroundColor: 'red',
         paddingLeft: 6,
         paddingTop: 6,
         paddingBottom: 6,
@@ -1207,7 +1207,7 @@ const styles = StyleSheet.create({
         marginTop: '2%'
     },
     deleteButtonSM: {
-        backgroundColor: '#BCBCBC',
+        backgroundColor: 'red',
         paddingLeft: 6,
         paddingTop: 6,
         paddingBottom: 6,

@@ -321,7 +321,7 @@ const DocumentPickerComp = () => {
     <>
         {preAdd ? 
             <Modal animationType='slide' presentationStyle='pageSheet'>
-                <View style={{height: '100%', width: '100%', backgroundColor: !addFolderForm ? '#fff' : '#593060'}}>
+                <View style={{height: '100%', width: '100%', backgroundColor: '#fff'}}>
                     {/* if the moveFile state is true, display the modal with the file movement code*/}
                     {/* xMark icon for closing out the moveFile modal */}
                     <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', paddingRight: '5%', paddingTop: '10%', width: '100%'}}>
@@ -332,7 +332,7 @@ const DocumentPickerComp = () => {
                             setFocusedFolder(null)
                             }
                             }}>
-                            <FontAwesomeIcon icon={faXmark} color={!addFolderForm ? '#593060' : 'white'} size={30}/>
+                            <FontAwesomeIcon icon={faXmark} color={'#593060'} size={30}/>
                         </Pressable>
                     </View>
                     
@@ -341,12 +341,12 @@ const DocumentPickerComp = () => {
                     addFolderForm ? 
                         <KeyboardSafeForm>
                         <View style={{width: '100%', height: '100', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center'}}>
-                            <Text style={[{color: 'white', fontSize: 35, fontWeight: '700', marginTop: '40%', textAlign: 'center'}, select(undefined, tabletStyles.modalHeading)]}>Add A New Folder:</Text>
+                            <Text style={[{color: '#593060', fontSize: 35, fontWeight: '700', marginTop: '40%', textAlign: 'center'}, select(undefined, tabletStyles.modalHeading)]}>Add A New Folder:</Text>
                             <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', marginTop: '10%', width: '100%'}}>
                                 <View style={styles.iconHolder}> 
                                     <FontAwesomeIcon icon={faFolder} size={22} color='#9F37B0'/>
                                 </View>
-                                <TextInput value={newFolderName} placeholder='Enter new name' placeholderTextColor={'white'} style={{color: 'white', fontSize: 20, fontWeight: 'bold', borderBottomColor: 'white', borderBottomWidth: 2, width: '70%'}} onChangeText={(e) => setNewFolderName(e)} autoFocus showSoftInputOnFocus ref={addFolderInputRef} onLayout={() => addFolderInputRef.current?.focus?.()}/>
+                                <TextInput value={newFolderName} placeholder='Enter new name' placeholderTextColor={'#593060'} style={{color: '#593060', fontSize: 20, fontWeight: 'bold', borderBottomColor: '#593060', borderBottomWidth: 2, width: '70%'}} onChangeText={(e) => setNewFolderName(e)} autoFocus showSoftInputOnFocus ref={addFolderInputRef} onLayout={() => addFolderInputRef.current?.focus?.()}/>
                             </View>
                             <View style={{width: '100%', paddingTop: '10%', display: 'flex', flexDirection: 'row', justifyContent: 'center'}}>
                                 <TouchableOpacity style={styles.yellowButtonSM}

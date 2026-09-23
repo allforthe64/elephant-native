@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef, useCallback } from 'react'
 import { Text, View , TouchableOpacity, ScrollView, StyleSheet, Image, TextInput, Modal, Pressable, Alert, Platform} from 'react-native'
+import { useFocusEffect } from '@react-navigation/native'
 
 //fontAwesome imports
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
@@ -145,29 +146,78 @@ const AudioRecorder = () => {
             }
         }, [focusedFolder, folders])
 
+    // Camera/video can leave the shared AVAudioSession in a non-recording state.
+    // Reclaim it whenever this screen is focused so mic recording works afterward.
+    useFocusEffect(
+        useCallback(() => {
+            let cancelled = false
+            ;(async () => {
+                try {
+                    await Audio.setAudioModeAsync({
+                        allowsRecordingIOS: true,
+                        playsInSilentModeIOS: true,
+                        staysActiveInBackground: false,
+                        shouldDuckAndroid: true,
+                        playThroughEarpieceAndroid: false,
+                    })
+                } catch (err) {
+                    if (!cancelled) console.warn('Audio mode prepare failed:', err)
+                }
+            })()
+            return () => {
+                cancelled = true
+            }
+        }, [])
+    )
 
     const startRecording = async () => {
         try {
             const permission = await Audio.requestPermissionsAsync()
+            const granted = permission?.granted === true || permission?.status === 'granted'
 
-            if (permission.status === 'granted') {
+            if (!granted) {
+               Alert.alert('Please grant permission to Elephant App to access microphone')
+               return
+            }
+
+            // Force reconfigure after camera/video may have taken over the session
+            await Audio.setAudioModeAsync({
+                allowsRecordingIOS: true,
+                playsInSilentModeIOS: true,
+                staysActiveInBackground: false,
+                shouldDuckAndroid: true,
+                playThroughEarpieceAndroid: false,
+            })
+
+            const {recording} = await Audio.Recording.createAsync(
+                Audio.RecordingOptionsPresets.HIGH_QUALITY
+            )
+
+            setRecording(recording)
+        } catch (err) {
+            console.error('Failed to start recording', err)
+            // One retry after resetting audio mode — common after leaving CameraView video mode
+            try {
+                await Audio.setAudioModeAsync({
+                    allowsRecordingIOS: false,
+                })
                 await Audio.setAudioModeAsync({
                     allowsRecordingIOS: true,
-                    playsInSilentModeIOS: true
+                    playsInSilentModeIOS: true,
+                    shouldDuckAndroid: true,
+                    playThroughEarpieceAndroid: false,
                 })
-
                 const {recording} = await Audio.Recording.createAsync(
                     Audio.RecordingOptionsPresets.HIGH_QUALITY
                 )
-    
                 setRecording(recording)
-            } else {
-               Alert.alert('Please grant permission to Elephant App to access microphone')
+            } catch (retryErr) {
+                console.error('Recording retry failed', retryErr)
+                Alert.alert(
+                    'Recording failed',
+                    retryErr?.message || 'Could not start the microphone. Close the camera screen and try again.'
+                )
             }
-
-            
-        } catch (err) {
-            console.error('Failed to start recording', err)
         }
     }
 
@@ -393,7 +443,7 @@ const AudioRecorder = () => {
     <>
         {preAdd ? 
             <Modal animationType='slide' presentationStyle='pageSheet'>
-                <View style={{height: '100%', width: '100%', backgroundColor: !addFolderForm ? '#fff' : '#593060'}}>
+                <View style={{height: '100%', width: '100%', backgroundColor: '#fff'}}>
                     {/* if the moveFile state is true, display the modal with the file movement code*/}
                     {/* xMark icon for closing out the moveFile modal */}
                     <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', paddingRight: '5%', paddingTop: '10%', width: '100%'}}>
@@ -404,7 +454,7 @@ const AudioRecorder = () => {
                             setFocusedFolder(null)
                         }
                         }}>
-                            <FontAwesomeIcon icon={faXmark} color={!addFolderForm ? '#593060' : 'white'} size={30}/>
+                            <FontAwesomeIcon icon={faXmark} color={'#593060'} size={30}/>
                         </Pressable>
                     </View>
                     
@@ -414,12 +464,12 @@ const AudioRecorder = () => {
                     addFolderForm ? 
                         <KeyboardSafeForm>
                         <View style={{width: '100%', height: '100', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center'}}>
-                            <Text style={[{color: 'white', fontSize: 35, fontWeight: '700', marginTop: '40%', textAlign: 'center'}, select(undefined, tabletStyles.modalHeading)]}>Add A New Folder:</Text>
+                            <Text style={[{color: '#593060', fontSize: 35, fontWeight: '700', marginTop: '40%', textAlign: 'center'}, select(undefined, tabletStyles.modalHeading)]}>Add A New Folder:</Text>
                             <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', marginTop: '10%', width: '100%'}}>
                                 <View style={styles.iconHolder}> 
                                     <FontAwesomeIcon icon={faFolder} size={22} color='#9F37B0'/>
                                 </View>
-                                <TextInput value={newFolderName} placeholder='Enter new name' placeholderTextColor={'white'} style={{color: 'white', fontSize: 20, fontWeight: 'bold', borderBottomColor: 'white', borderBottomWidth: 2, width: '70%'}} onChangeText={(e) => setNewFolderName(e)} autoFocus showSoftInputOnFocus ref={addFolderInputRef} onLayout={() => addFolderInputRef.current?.focus?.()}/>
+                                <TextInput value={newFolderName} placeholder='Enter new name' placeholderTextColor={'#593060'} style={{color: '#593060', fontSize: 20, fontWeight: 'bold', borderBottomColor: '#593060', borderBottomWidth: 2, width: '70%'}} onChangeText={(e) => setNewFolderName(e)} autoFocus showSoftInputOnFocus ref={addFolderInputRef} onLayout={() => addFolderInputRef.current?.focus?.()}/>
                             </View>
                             <View style={{width: '100%', paddingTop: '10%', display: 'flex', flexDirection: 'row', justifyContent: 'center'}}>
                                 <TouchableOpacity style={styles.yellowButtonSM}
