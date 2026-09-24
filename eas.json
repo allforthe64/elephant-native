@@ -13,6 +13,9 @@
       "android": {
         "buildType": "apk"
       },
+      "ios": {
+        "image": "macos-sequoia-15.6-xcode-26.2"
+      },
       "env": {
         "EXPO_PUBLIC_TEST_EMAIL": "myelephanttesting@gmail.com",
         "EXPO_PUBLIC_TEST_PASSWORD": "myelephanttest1234",
@@ -34,6 +37,9 @@
       "autoIncrement": true,
       "android": {
         "buildType": "app-bundle"
+      },
+      "ios": {
+        "image": "macos-sequoia-15.6-xcode-26.2"
       },
       "env": {
         "SENTRY_ALLOW_FAILURE": "true"
