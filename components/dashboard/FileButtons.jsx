@@ -1,9 +1,8 @@
 import React from 'react'
 import { View, Text, StyleSheet } from 'react-native'
 
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
 import { faFolder, faFile, faBox } from '@fortawesome/free-solid-svg-icons'
-import YellowActionButton from '../ui/YellowActionButton'
+import YellowButton from '../ui/YellowButton'
 import { TestIds } from '../../constants/testIds'
 import { useResponsiveLayout, tabletStyle } from '../../hooks/useResponsiveLayout'
 
@@ -13,15 +12,15 @@ const FileButtons = ({ navigate }) => {
 
   const row = (testID, label, onPress, icon) => (
     <View style={styles.wrapperContainer}>
-      <YellowActionButton
+      <YellowButton
         testID={testID}
         accessibilityLabel={label}
         label={label}
         onPress={onPress}
+        size="lg"
         elevated
         style={tabletStyle(isTablet, styles.button, tabletStyles.button)}
-        iconSize={isTablet ? 52 : 44}
-        icon={<FontAwesomeIcon icon={icon} size={isTablet ? 26 : 22} style={{ color: '#9F37B0' }} />}
+        icon={icon}
       />
     </View>
   )
@@ -59,7 +58,7 @@ const styles = StyleSheet.create({
   },
   button: {
     width: '90%',
-    marginTop: 0,
+    maxWidth: '100%',
   },
 })
 

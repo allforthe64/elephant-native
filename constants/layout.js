@@ -33,6 +33,7 @@ export const Brand = {
   purple: '#593060',
   purpleBright: '#9F37B0',
   yellow: '#FFE562',
+  danger: '#871313',
   lavender: '#DDCADB',
   cream: '#FFFCF6',
   gray: '#BCBCBC',

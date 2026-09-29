@@ -36,7 +36,7 @@ const FileRow = ({file, files, index, deleteFunc, setFiles}) => {
         <TextInput style={styles.input} value={fileTitle} numberOfLines={1} placeholder='Enter File Name...' onChangeText={e => setFileTitle(e)}/>
         <TouchableOpacity title='Delete' onPress={() => deleteFunc(files, file)}>
             <View style={styles.iconHolderSM}>
-                <FontAwesomeIcon icon={faTrash} size={18} color='red'/>
+                <FontAwesomeIcon icon={faTrash} size={18} color='#871313'/>
             </View>
         </TouchableOpacity>
     </View>

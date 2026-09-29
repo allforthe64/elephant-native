@@ -45,7 +45,7 @@ const AudioEditor = ({recordingLine, index, deleteFunc, editRecordings, recordin
         <Text style={styles.fill}>{recordingLine.duration}</Text>
         <TouchableOpacity title='Delete' onPress={() => deleteFunc(recordings, recordingLine)}>
             <View style={styles.iconHolderSM}>
-                <FontAwesomeIcon icon={faTrash} size={18} color='red'/>
+                <FontAwesomeIcon icon={faTrash} size={18} color='#871313'/>
             </View>
         </TouchableOpacity>
     </View>

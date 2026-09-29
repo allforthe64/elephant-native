@@ -15,6 +15,7 @@ import {
   FILE_SYSTEM_ROW_ACTIVE_OPACITY,
 } from './fileSystemRowStyles';
 import KeyboardSafeForm from '../ui/KeyboardSafeForm';
+import YellowButton from '../ui/YellowButton';
 import { useAutoFocusOn } from '../../hooks/useAutoFocusOn';
 import MoveFolderDestinationRow from './MoveFolderDestinationRow';
 import { getMoveDestinationListHeight } from '../../constants/moveDestinationLayout';
@@ -236,42 +237,22 @@ const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolder
                     <View style={{width: '100%', height: '95%', flex: 1, justifyContent: 'center', alignItems: 'center'}}>
                       <Text style={{fontSize: 22, color: '#593060', textAlign: 'center'}}>Are you sure you want to delete {folder.fileName} and all of its contents?</Text>
 
-                      <View style={{width: '50%',
-                            borderRadius: 12,
-                            backgroundColor: 'red',
-                            paddingTop: '2%',
-                            paddingBottom: '2%',
-                            marginTop: '10%',
-                            marginLeft: '2%'}}>
-                        <TouchableOpacity onPress={deleteFolderFunction} style={{
-                          display: 'flex', 
-                          flexDirection: 'row', 
-                          width: '100%', 
-                          justifyContent: 'center',
-                        }}>
-                            <Text style={{fontSize: 15, color: 'white', fontWeight: '600'}}>Delete</Text>
-                        </TouchableOpacity>
-                      </View>
+                      <YellowButton
+                        variant="danger"
+                        size="md"
+                        icon={faTrash}
+                        label="Delete"
+                        onPress={deleteFolderFunction}
+                        style={{ marginTop: '10%' }}
+                      />
 
-                      <View style={{width: '50%',
-                          borderColor: '#777',
-                          borderRadius: 12,
-                          backgroundColor: 'white',
-                          borderWidth: 1,
-                          paddingTop: '2%',
-                          paddingBottom: '2%',
-                          marginTop: '7%',
-                          marginBottom: '10%',
-                          marginLeft: '2%'}}>
-                        <TouchableOpacity onPress={() => setPreDelete(false)} style={{
-                          display: 'flex', 
-                          flexDirection: 'row', 
-                          width: '100%', 
-                          justifyContent: 'center',
-                        }}>
-                            <Text style={{fontSize: 15, color: 'black', fontWeight: '600'}}>Cancel</Text>
-                        </TouchableOpacity>
-                      </View>
+                      <YellowButton
+                        size="md"
+                        icon={faXmark}
+                        label="Cancel"
+                        onPress={() => setPreDelete(false)}
+                        style={{ marginTop: '7%', marginBottom: '10%' }}
+                      />
 
 
                     </View>
@@ -309,18 +290,8 @@ const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolder
                           <TextInput value={newName} style={{color: '#593060', fontSize: 20, fontWeight: 'bold', borderBottomColor: '#593060', borderBottomWidth: 2, width: '70%', marginLeft: '5%'}} placeholderTextColor={'#593060'} placeholder='Enter new name' onChangeText={(e) => setNewName(e)} autoFocus ref={renameInputRef}/>
                         </View>
                         <View style={{display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'space-around', marginTop: '4%'}}>
-                            <TouchableOpacity onPress={handleNameChange} style={styles.yellowButtonSM}>
-                                <View style={styles.iconHolderSmall}>
-                                  <FontAwesomeIcon icon={faFloppyDisk} size={18} color='#9F37B0' />
-                                </View>
-                                <Text style={{fontSize: 18, color: '#9F37B0', fontWeight: '600', paddingTop: '1%', marginLeft: '24%'}}>Save</Text>
-                            </TouchableOpacity>
-                          <TouchableOpacity onPress={() => setEditName(false)} style={styles.yellowButtonSM}>
-                              <View style={styles.iconHolderSmall}>
-                                <FontAwesomeIcon icon={faXmark} size={18} color='#9F37B0' />
-                              </View>
-                              <Text style={{fontSize: 18, color: '#9F37B0', fontWeight: '600', paddingTop: '1%', marginLeft: '22%'}}>Cancel</Text>
-                          </TouchableOpacity>
+                            <YellowButton size="sm" icon={faFloppyDisk} label="Save" onPress={handleNameChange} />
+                            <YellowButton size="sm" icon={faXmark} label="Cancel" onPress={() => setEditName(false)} />
                         </View>
                     </View>
                     </KeyboardSafeForm>
@@ -338,14 +309,12 @@ const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolder
                                       <TextInput value={newFolderName} style={{color: '#593060', fontSize: 20, fontWeight: 'bold', borderBottomColor: '#593060', borderBottomWidth: 2, width: '75%'}} placeholder={'Enter new name'} placeholderTextColor={'#593060'} onChangeText={(e) => setNewFolderName(e)} autoFocus showSoftInputOnFocus ref={addFolderInputRef} onLayout={() => addFolderInputRef.current?.focus?.()}/>
                                   </View>
                                   <View style={{width: '100%', paddingTop: '10%', display: 'flex', flexDirection: 'row', justifyContent: 'center'}}>
-                                      <TouchableOpacity style={styles.yellowButtonSM}
-                                      onPress={() => addFolder(newFolderName, focusedFolder ? focusedFolder : '')}
-                                      >   
-                                          <View style={styles.iconHolderSmall}>
-                                              <FontAwesomeIcon icon={faFloppyDisk} size={18} color='#9F37B0' />
-                                          </View>
-                                          <Text style={{fontSize: 18, color: '#9F37B0', fontWeight: '600', marginLeft: '22%'}}>Save</Text>
-                                      </TouchableOpacity>
+                                      <YellowButton
+                                        size="md"
+                                        icon={faFloppyDisk}
+                                        label="Save"
+                                        onPress={() => addFolder(newFolderName, focusedFolder ? focusedFolder : '')}
+                                      />
                                   </View>
                               </View>
                               </KeyboardSafeForm>
@@ -357,7 +326,7 @@ const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolder
                                   <Text style={{fontSize: 20, color: '#593060', fontWeight: 'bold', textAlign: 'left', width: '100%', paddingLeft: '5%', marginBottom: 8}}>Viewing: {focusedFolderInst.fileName}</Text>
                                 }
                                       {focusedFolder ? 
-                                            <TouchableOpacity style={[styles.yellowButtonSM, {alignSelf: 'flex-start', marginBottom: 8, marginLeft: '2%'}]} onPress={() => {
+                                            <YellowButton size="xs" icon={faArrowLeft} label="Back" style={{ marginBottom: 8, marginLeft: '5%' }} onPress={() => {
                                                 try {
                                                     const folderInst = folders.filter(folder => folder.id === focusedFolder) 
                                                     const parentFolderInst = folders.filter(folder => folder.id === folderInst[0].nestedUnder)
@@ -372,12 +341,7 @@ const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolder
                                                 } catch (error) {
                                                     console.log('this is an error within focusedFile: ', error)
                                                 }
-                                            }}>
-                                                <View style={styles.iconHolderSmall}>
-                                                    <FontAwesomeIcon icon={faArrowLeft} size={18} color='#9F37B0' /> 
-                                                </View>
-                                                <Text style={{fontSize: 20, color: '#9F37B0', fontWeight: '600', marginLeft: '10%'}}>Back</Text>
-                                            </TouchableOpacity>
+                                            }} />
                                     :
                                         null
                                     }
@@ -452,18 +416,8 @@ const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolder
                               </ScrollView>
                               </View>
                               <View style={{display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'space-around', paddingTop: 8, paddingBottom: 24, backgroundColor: '#fff'}}>                    
-                                <TouchableOpacity onPress={() => setAddFolderForm(true)} style={styles.yellowButtonSM}>
-                                    <View style={styles.iconHolderSmall}>
-                                        <FontAwesomeIcon icon={faPlus} color='#9F37B0'/>
-                                    </View>
-                                    <Text style={{fontSize: 18, color: '#9F37B0', fontWeight: '600', marginLeft: '10%'}}>Add Folder</Text>
-                                </TouchableOpacity>
-                                <TouchableOpacity onPress={handleMove} style={styles.yellowButtonSM}>
-                                    <View style={styles.iconHolderSmall}>
-                                        <FontAwesomeIcon icon={faArrowRight} color='#9F37B0'/>
-                                    </View>
-                                    <Text style={{fontSize: 18, color: '#9F37B0', fontWeight: '600', marginLeft: '5%'}}>Confirm Move</Text>
-                                </TouchableOpacity>  
+                                <YellowButton size="sm" icon={faPlus} label="Add Folder" onPress={() => setAddFolderForm(true)} />
+                                <YellowButton size="sm" icon={faArrowRight} label="Confirm Move" onPress={handleMove} />
                             </View>
                               </View>
                             }
@@ -481,32 +435,17 @@ const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolder
                       >
                         <Text style={{fontSize: 40, fontWeight: 'bold', color: '#593060', marginTop: '5%'}}>{folder.fileName}</Text>
                         <View style={{width: '100%', display: 'flex', flexDirection: 'row', justifyContent: 'space-around', paddingTop: '10%'}}>
-                          <TouchableOpacity style={styles.yellowButtonSM} onPress={() => {
+                          <YellowButton size="sm" icon={faPencil} label="Rename" onPress={() => {
                             setNewName('')
                             setEditName(true)
-                          }}>
-                            <View style={styles.iconHolderSmall}>
-                              <FontAwesomeIcon icon={faPencil} color='#9F37B0' size={18} />
-                            </View>
-                            <Text style={{fontSize: 18, color: '#9F37B0', paddingTop: '1%', marginLeft: '16%', fontWeight: '600'}}>Rename</Text>
-                          </TouchableOpacity>
+                          }} />
                           {validFolders.length > 1 &&
-                              <TouchableOpacity style={styles.yellowButtonSM} onPress={() => setMoveFolder(true)}>
-                                <View style={styles.iconHolderSmall}>
-                                  <FontAwesomeIcon icon={faArrowRight} size={18} color='#9F37B0' />
-                                </View>
-                                <Text style={{fontSize: 18, color: '#9F37B0', paddingTop: '1%', marginLeft: '8%', fontWeight: '600'}}>Move Folder</Text>
-                              </TouchableOpacity>
+                              <YellowButton size="sm" icon={faArrowRight} label="Move Folder" onPress={() => setMoveFolder(true)} />
                           }
                         </View>
                         <View style={{width: '100%', display: 'flex', flexDirection: 'row', justifyContent: 'center', paddingTop: '4%'}}>
-                          <TouchableOpacity style={styles.deleteButton} onPress={() =>
-                            setPreDelete(true)}>
-                            <View style={styles.iconHolderSmall}>
-                              <FontAwesomeIcon icon={faTrash} size={18} color='red' />
-                            </View>
-                            <Text style={{fontSize: 18, color: '#fff', paddingTop: '1%', marginLeft: '12%', fontWeight: '600'}}>Delete Folder</Text>
-                          </TouchableOpacity>
+                          <YellowButton variant="danger" size="md" icon={faTrash} label="Delete Folder" onPress={() =>
+                            setPreDelete(true)} style={{ marginTop: '2%' }} />
                         </View>
                       </ScrollView>
                     }
@@ -614,39 +553,6 @@ const styles = StyleSheet.create({
       alignItems: 'center',
       borderRadius: 100
     },
-    yellowButtonSM: {
-      backgroundColor: '#FFE562',
-      paddingLeft: 6,
-      paddingTop: 6,
-      paddingBottom: 6,
-      paddingRight: 20,
-      borderRadius: 12,
-      display: 'flex',
-      flexDirection: 'row',
-      width: '45%',
-    },
-    iconHolderSmall: {
-      backgroundColor: 'white', 
-      width: 28, 
-      height: 28, 
-      display: 'flex', 
-      flexDirection: 'row', 
-      justifyContent: 'center', 
-      alignItems: 'center', 
-      borderRadius: 100
-    },
-    deleteButton: {
-      backgroundColor: 'red',
-      paddingLeft: 6,
-      paddingTop: 6,
-      paddingBottom: 6,
-      paddingRight: 20,
-      borderRadius: 12,
-      display: 'flex',
-      flexDirection: 'row',
-      width: '50%',
-      marginTop: '2%'
-    },
     moveFolder: {
       display: 'flex',
       justifyContent: 'space-between',
@@ -686,16 +592,5 @@ const styles = StyleSheet.create({
     justifyContent: 'center', 
     alignItems: 'center', 
     borderRadius: 100
-  },
-  yellowButtonMed: {
-    backgroundColor: '#FFE562',
-    paddingLeft: 6,
-    paddingTop: 6,
-    paddingBottom: 6,
-    paddingRight: 20,
-    borderRadius: 12,
-    display: 'flex',
-    flexDirection: 'row',
-    width: '70%',
   },
 })

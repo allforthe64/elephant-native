@@ -39,8 +39,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 import ContentShell from '../../components/ui/ContentShell'
 import KeyboardSafeForm from '../../components/ui/KeyboardSafeForm'
 import { useAutoFocusOn } from '../../hooks/useAutoFocusOn'
-import YellowActionButton from '../../components/ui/YellowActionButton'
-import { useResponsiveLayout, tabletStyle } from '../../hooks/useResponsiveLayout'
+import YellowButton from '../../components/ui/YellowButton'
+import { useResponsiveLayout } from '../../hooks/useResponsiveLayout'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { getMoveDestinationListHeight } from '../../constants/moveDestinationLayout'
 import SaveDestinationActions from '../../components/fileSystem/SaveDestinationActions'
@@ -380,39 +380,25 @@ const DocScanner = () => {
                       <TextInput value={docName} placeholder='Enter name' placeholderTextColor={'#593060'} style={{color: '#593060', fontSize: 20, fontWeight: 'bold', borderBottomColor: '#593060', borderBottomWidth: 2, width: '70%'}} onChangeText={(e) => setDocName(e)} ref={nameRef}/>
                   </View>
                   <View style={{width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', paddingTop: '5%'}}>
-                    <TouchableOpacity style={docName === '' ? styles.yellowButtonXSDim : styles.yellowButtonXS}
-                      disabled={docName === '' ? true : false}
+                    <YellowButton
+                      size="md"
+                      icon={faFloppyDisk}
+                      label="Save"
+                      dimmed={docName === ''}
                       onPress={() => {
                           setNameGiven(true)
                       }}
-                      >
-                        <View style={styles.iconHolderSmall}>
-                            <FontAwesomeIcon icon={faFloppyDisk} size={18} color='#9F37B0'/>
-                        </View>
-                        <Text style={{fontSize: 18, color: '#9F37B0', fontWeight: '600', marginLeft: '15%', paddingTop: '1%'}}>Save</Text>
-                    </TouchableOpacity>
+                    />
                     <Text style={{color: '#593060', fontSize: 20, marginTop: '2%', textAlign: 'center'}}>Or</Text>
-                    <TouchableOpacity style={{width: '50%',
-                        borderRadius: 12,
-                        backgroundColor: 'white',
-                        paddingTop: '2%',
-                        paddingBottom: '2%',
-                        paddingLeft: '2%',
-                        marginLeft: '2%',
-                        marginTop: '2%',
-                        display: 'flex',
-                        flexDirection: 'row',
-                        backgroundColor: '#FFE562'
-                      }}
+                    <YellowButton
+                      size="md"
+                      icon={faStopwatch}
+                      label="Use Timestamp"
+                      style={{ marginTop: '2%' }}
                       onPress={() => {
                           setNameGiven(true)
                       }}
-                    >
-                      <View style={styles.iconHolderSmall}>
-                          <FontAwesomeIcon icon={faStopwatch} size={18} color='#9F37B0'/>
-                      </View>
-                      <Text style={{fontSize: 18, color: '#9F37B0', fontWeight: '600', marginLeft: '7%', paddingTop: '1%'}}>Use Timestamp</Text>
-                    </TouchableOpacity>
+                    />
                   </View>
               </>
               </KeyboardSafeForm>
@@ -427,14 +413,12 @@ const DocScanner = () => {
                           <TextInput value={newFolderName} placeholder='Enter new name' placeholderTextColor={'#593060'} style={{color: '#593060', fontSize: 20, fontWeight: 'bold', borderBottomColor: '#593060', borderBottomWidth: 2, width: '70%'}} onChangeText={(e) => setNewFolderName(e)} autoFocus showSoftInputOnFocus ref={addFolderInputRef} onLayout={() => addFolderInputRef.current?.focus?.()}/>
                       </View>
                       <View style={{width: '100%', paddingTop: '10%', display: 'flex', flexDirection: 'row', justifyContent: 'center'}}>
-                            <TouchableOpacity style={styles.yellowButtonSM}
-                            onPress={() => addFolder(newFolderName, focusedFolder ? focusedFolder : '')}
-                            >
-                              <View style={styles.iconHolderSmall}>
-                                  <FontAwesomeIcon icon={faFloppyDisk} size={18} color='#9F37B0' />
-                              </View>
-                              <Text style={{fontSize: 18, color: '#9F37B0', fontWeight: '600', marginLeft: '22%'}}>Save</Text>
-                            </TouchableOpacity>
+                            <YellowButton
+                              size="md"
+                              icon={faFloppyDisk}
+                              label="Save"
+                              onPress={() => addFolder(newFolderName, focusedFolder ? focusedFolder : '')}
+                            />
                         </View>
                   </>
                   </KeyboardSafeForm>
@@ -447,7 +431,7 @@ const DocScanner = () => {
                         <Text style={{fontSize: 20, color: '#593060', fontWeight: 'bold', textAlign: 'left', width: '100%', paddingLeft: '5%', marginBottom: 8}}>Viewing: {focusedFolderInst.fileName}</Text>
                       }
                       {focusedFolder ? 
-                          <TouchableOpacity style={[styles.yellowButtonBack, {alignSelf: 'flex-start', marginBottom: 8}]} onPress={() => {
+                          <YellowButton size="xs" icon={faArrowLeft} label="Back" style={{ marginBottom: 8, marginLeft: '5%' }} onPress={() => {
                               const folderInst = folders.filter(folder => folder.id === focusedFolder) 
                               
                               const parentFolderInst = folders.filter(folder => folder.id === folderInst[0].nestedUnder)
@@ -461,12 +445,7 @@ const DocScanner = () => {
                                   setDestination({id: null, fileName: null, nestedUnder: null})
                                   setFocusedFolder(null)
                               }
-                          }}>
-                            <View style={styles.iconHolderSmall}>
-                                    <FontAwesomeIcon icon={faArrowLeft} size={18} color='#9F37B0' /> 
-                                </View>
-                            <Text style={{color: '#9F37B0', fontSize: 20, marginLeft: '10%', fontWeight: '600'}}>Back</Text>
-                          </TouchableOpacity>
+                          }} />
                       :
                           null
                       }
@@ -629,17 +608,19 @@ const DocScanner = () => {
                     marginBottom: 8,
                     gap: 12,
                     }}>
-                          <YellowActionButton
+                          <YellowButton
+                            size="md"
                             label="Scan More Documents"
                             onPress={() => scanDocument()}
-                            style={tabletStyle(isTablet, { width: '70%', marginBottom: 0 }, tabletStyles.actionButton)}
-                            icon={<FontAwesomeIcon icon={faPlus} color='#9F37B0' size={18}/>}
+                            style={isTablet ? tabletStyles.actionButton : undefined}
+                            icon={faPlus}
                           />
-                          <YellowActionButton
+                          <YellowButton
+                            size="md"
                             label="Convert To PDF/Upload"
                             onPress={() => setPreAdd(true)}
-                            style={tabletStyle(isTablet, { width: '70%', marginBottom: 0 }, tabletStyles.actionButton)}
-                            icon={<FontAwesomeIcon icon={faCloudArrowUp} color='#9F37B0' size={18} />}
+                            style={isTablet ? tabletStyles.actionButton : undefined}
+                            icon={faCloudArrowUp}
                           />
                   </View>
                 </View>
@@ -663,17 +644,19 @@ const DocScanner = () => {
                     marginBottom: 8,
                     gap: 12,
                   }}>
-                    <YellowActionButton
+                    <YellowButton
+                      size="md"
                       label="Scan More Documents"
                       onPress={() => scanDocument()}
-                      style={tabletStyle(isTablet, { width: '70%' }, tabletStyles.actionButton)}
-                      icon={<FontAwesomeIcon icon={faPlus} color='#9F37B0' size={18}/>}
+                      style={isTablet ? tabletStyles.actionButton : undefined}
+                      icon={faPlus}
                     />
-                    <YellowActionButton
+                    <YellowButton
+                      size="md"
                       label="Convert To PDF/Upload"
                       onPress={() => setPreAdd(true)}
-                      style={tabletStyle(isTablet, { width: '70%' }, tabletStyles.actionButton)}
-                      icon={<FontAwesomeIcon icon={faCloudArrowUp} color='#9F37B0' size={18} />}
+                      style={isTablet ? tabletStyles.actionButton : undefined}
+                      icon={faCloudArrowUp}
                     />
                   </View>
                 </View>  
@@ -694,16 +677,6 @@ const DocScanner = () => {
 export default DocScanner
 
 const styles = StyleSheet.create({ 
-  iconHolderSmall: {
-    backgroundColor: 'white', 
-    width: 28, 
-    height: 28, 
-    display: 'flex', 
-    flexDirection: 'row', 
-    justifyContent: 'center', 
-    alignItems: 'center', 
-    borderRadius: 100
-  },
   iconHolder: {
     backgroundColor: 'white', 
     width: 44, 
@@ -713,88 +686,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center', 
     alignItems: 'center', 
     borderRadius: 100
-  },
-  yellowButtonXS: {
-    backgroundColor: '#FFE562',
-    paddingLeft: 6,
-    paddingTop: 6,
-    paddingBottom: 6,
-    paddingRight: 20,
-    borderRadius: 12,
-    display: 'flex',
-    flexDirection: 'row',
-    width: '30%',
-  },
-  yellowButtonXSDim: {
-      backgroundColor: '#FFE562',
-      paddingLeft: 6,
-      paddingTop: 6,
-      paddingBottom: 6,
-      paddingRight: 20,
-      borderRadius: 12,
-      display: 'flex',
-      flexDirection: 'row',
-      width: '30%',
-      opacity: .5
-  },
-  yellowButtonSM: {
-    backgroundColor: '#FFE562',
-    paddingLeft: '2%',
-    paddingTop: '2%',
-    paddingBottom: '2%',
-    paddingRight: 20,
-    borderRadius: 12,
-    display: 'flex',
-    flexDirection: 'row',
-    width: '47%',
-  },
-  yellowButtonSMDim: {
-    backgroundColor: '#FFE562',
-    paddingLeft: '2%',
-    paddingTop: '2%',
-    paddingBottom: '2%',
-    paddingRight: 20,
-    borderRadius: 12,
-    display: 'flex',
-    flexDirection: 'row',
-    width: '47%',
-    opacity: .5
-  },
-  yellowButtonBack: {
-    backgroundColor: '#FFE562',
-    paddingLeft: 6,
-    paddingTop: 6,
-    paddingBottom: 6,
-    paddingRight: 20,
-    borderRadius: 12,
-    display: 'flex',
-    flexDirection: 'row',
-    width: '30%',
-    marginLeft: '5%'
-  },
-  yellowButton: {
-    backgroundColor: '#FFE562',
-    paddingLeft: 8,
-    paddingTop: 8,
-    paddingBottom: 8,
-    paddingRight: 14,
-    borderRadius: 12,
-    flexDirection: 'row',
-    alignItems: 'center',
-    overflow: 'hidden',
-    width: '70%',
-  },
-  addFolderButton: {
-    width: '50%',
-    borderRadius: 12,
-    backgroundColor: '#FFE562',
-    paddingTop: '2%',
-    paddingBottom: '2%',
-    paddingLeft: '2%',
-    marginBottom: 8,
-    marginLeft: '2%',
-    display: 'flex',
-    flexDirection: 'row'
   },
   iconHolderBlack: {
     backgroundColor: 'black', 

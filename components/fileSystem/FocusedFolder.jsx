@@ -16,6 +16,7 @@ import FocusedFileComp from './FocusedFileComp'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { tabletStyle, useResponsiveLayout } from '../../hooks/useResponsiveLayout'
 import KeyboardSafeForm from '../ui/KeyboardSafeForm'
+import YellowButton from '../ui/YellowButton'
 import { useAutoFocusOn } from '../../hooks/useAutoFocusOn'
 
 const FocusedFolder = ({folder, folders, clear, getTargetFolder, addFolder, renameFolder, moveFolder, deleteFolder, deleteFile, renameFile, moveFile, files, updateUser}) => {
@@ -213,7 +214,10 @@ const FocusedFolder = ({folder, folders, clear, getTargetFolder, addFolder, rena
                                         </View>
                                         <TextInput placeholder='Enter new name' placeholderTextColor={'#593060'} value={newFolderName} style={{color: '#593060', fontSize: 22, fontWeight: 'bold', borderBottomColor: '#593060', borderBottomWidth: 2, width: '70%', marginLeft: '5%'}} onChangeText={(e) => setNewFolderName(e)} onFocus={() => setKeyboardClosed(false)} ref={folderRef} autoFocus showSoftInputOnFocus onLayout={() => setTimeout(() => folderRef.current?.focus?.(), 50)}/>
                                     </View>
-                                    <Pressable style={styles.nonFolderButtonSM}
+                                    <YellowButton
+                                        size="md"
+                                        icon={faFloppyDisk}
+                                        label="Save"
                                         onPress={async () => {
                                             const ok = await addFolder(newFolderName, folder.folder.id)
                                             if (ok) {
@@ -221,29 +225,23 @@ const FocusedFolder = ({folder, folders, clear, getTargetFolder, addFolder, rena
                                                 setAdd(false)
                                             }
                                         }}
-                                    >
-                                        <View style={styles.iconHolderSM}>
-                                            <FontAwesomeIcon icon={faFloppyDisk} size={18} color='#9F37B0'/>
-                                        </View>
-                                        <Text style={{fontSize: 22, color: '#9F37B0', fontWeight: '600', paddingTop: '1%', marginLeft: '15%'}}>Save</Text>
-                                    </Pressable>
+                                    />
                                 </View>
                                 </KeyboardSafeForm>
                             </View>
                         </Modal>
                     : 
                         <View style={styles.addButtonRow}>
-                            <TouchableOpacity style={tabletStyle(isTablet, styles.nonFolderButton65, {width: '100%', maxWidth: '100%', alignSelf: 'stretch'})}
+                            <YellowButton
+                                size="lg"
+                                icon={faFolder}
+                                label="Add New Folder"
+                                style={isTablet ? {width: '100%', maxWidth: '100%', alignSelf: 'stretch'} : undefined}
                                 onPress={() => {
                                     setAdd(true)
                                     setKeyboardClosed(false)
                                 }}
-                            >    
-                                <View style={styles.iconHolder}>
-                                    <FontAwesomeIcon icon={faFolder} size={22} color='#9F37B0'/>
-                                </View>
-                                <Text style={{fontSize: 18, color: '#9F37B0', fontWeight: '600', marginLeft: '10%', paddingTop: '1.25%'}}>Add New Folder</Text>
-                            </TouchableOpacity>
+                            />
                         </View>
                     }
                 </View>
@@ -321,16 +319,6 @@ const styles = StyleSheet.create({
         width: '100%',
         paddingLeft: '2.5%',
     },
-    nonFolderButton65: {
-        display: 'flex', 
-        flexDirection: 'row', 
-        backgroundColor: '#FFE562', 
-        paddingLeft: '2%', 
-        paddingTop: '2%', 
-        paddingBottom: '2%', 
-        borderRadius: 12, 
-        width: '90%',
-      },
       iconHolder: {
         backgroundColor: 'white', 
         height: 36, 
@@ -340,26 +328,6 @@ const styles = StyleSheet.create({
         flexDirection: 'row', 
         justifyContent: 'center', 
         alignItems: 'center'
-      },
-        iconHolderSM: {
-            backgroundColor: 'white', 
-            height: 36, 
-            width: 36, 
-            borderRadius: 100, 
-            display: 'flex', 
-            flexDirection: 'row', 
-            justifyContent: 'center', 
-            alignItems: 'center'
-        },
-      nonFolderButtonSM: {
-        display: 'flex', 
-        flexDirection: 'row', 
-        backgroundColor: '#FFE562', 
-        paddingLeft: '2%', 
-        paddingTop: '2%', 
-        paddingBottom: '2%', 
-        borderRadius: 12, 
-        width: 180,
       },
     addFolderContainer: {
         width: '100%',

@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, TouchableOpacity, Modal, Keyboard, Pressable } from 'react-native';
+import { StyleSheet, Text, View, Modal, Keyboard, Pressable } from 'react-native';
 import { ScrollView, TextInput } from 'react-native-gesture-handler';
 
 //firestore function imports
@@ -25,7 +25,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useToast } from 'react-native-toast-notifications';
 import ContentShell from '../../components/ui/ContentShell';
 import KeyboardSafeForm from '../../components/ui/KeyboardSafeForm';
-import YellowActionButton from '../../components/ui/YellowActionButton';
+import YellowButton from '../../components/ui/YellowButton';
 import { useResponsiveLayout, tabletStyle } from '../../hooks/useResponsiveLayout';
 import { useAutoFocusOn } from '../../hooks/useAutoFocusOn';
 
@@ -313,12 +313,7 @@ export default function Files({navigation: { navigate }, route}) {
           :
           <View style={styles.homeBody}>
                     <View style={styles.header}>
-                      <TouchableOpacity style={styles.nonFolderButton65} onPress={() => setStagingMode(true)}>
-                        <View style={styles.iconHolder}>
-                          <FontAwesomeIcon icon={faBox} color='#9F37B0' size={22}/>
-                        </View>
-                        <Text style={styles.subheading} numberOfLines={1}>To be filed</Text>
-                      </TouchableOpacity>
+                      <YellowButton size="md" icon={faBox} label="To be filed" onPress={() => setStagingMode(true)} />
                     </View>
                     <ScrollView
                       style={styles.listScroll}
@@ -356,14 +351,13 @@ export default function Files({navigation: { navigate }, route}) {
                               </View>
                               <TextInput value={newFolderName} placeholder='Enter new name' placeholderTextColor={'#593060'} style={{color: '#593060', fontSize: 22, fontWeight: 'bold', borderBottomColor: '#593060', borderBottomWidth: 2, width: '70%', marginLeft: '5%'}} onChangeText={(e) => setNewFolderName(e)} onFocus={() => setKeyboardClosed(false)} ref={inputRef} autoFocus showSoftInputOnFocus onLayout={() => inputRef.current?.focus?.()}/>
                             </View>
-                            <TouchableOpacity style={tabletStyle(isTablet, styles.nonFolderButtonSM, tabletStyles.actionButton)}
+                            <YellowButton
+                              size="md"
+                              icon={faFloppyDisk}
+                              label="Save"
+                              style={isTablet ? tabletStyles.actionButton : undefined}
                               onPress={() => addFolder(newFolderName, '')}
-                            >
-                                <View style={styles.iconHolderSM}>
-                                  <FontAwesomeIcon icon={faFloppyDisk} size={18} color='#9F37B0'/>
-                                </View>
-                                <Text style={{fontSize: 22, color: '#9F37B0', fontWeight: '600', paddingTop: '1%', marginLeft: '15%'}}>Save</Text>
-                            </TouchableOpacity>
+                            />
                           </View>
                           </KeyboardSafeForm>
                           </ContentShell>
@@ -371,20 +365,22 @@ export default function Files({navigation: { navigate }, route}) {
                       </Modal>
                     : 
                     <View style={styles.homeActions}>
-                          <YellowActionButton
+                          <YellowButton
+                            size="md"
                             label="Add New Folder"
                             onPress={() => {
                               setAdd(true)
                               setKeyboardClosed(false)
                             }}
-                            style={tabletStyle(isTablet, { width: '80%' }, tabletStyles.actionButton)}
-                            icon={<FontAwesomeIcon icon={faPlus} size={18} color='#9F37B0'/>}
+                            style={isTablet ? tabletStyles.actionButton : undefined}
+                            icon={faPlus}
                           />
-                          <YellowActionButton
+                          <YellowButton
+                            size="md"
                             label="Get Document"
                             onPress={() => navigate('Upload Files')}
-                            style={tabletStyle(isTablet, { width: '80%' }, tabletStyles.actionButton)}
-                            icon={<FontAwesomeIcon icon={faFile} size={18} color='#9F37B0'/>}
+                            style={isTablet ? tabletStyles.actionButton : undefined}
+                            icon={faFile}
                           />
                     </View>
                     }
@@ -441,15 +437,6 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     marginBottom: '2.5%'
   },
-  subheading: {
-    color: '#9F37B0',
-    fontWeight: '600',
-    fontSize: 18,
-    flex: 1,
-    flexShrink: 1,
-    minWidth: 0,
-    marginLeft: 10,
-  },
   subheadingMLLarge: {
     color: '#9F37B0',
     fontWeight: '600',
@@ -483,60 +470,10 @@ const styles = StyleSheet.create({
     margin: 10,
     width: '50%'
   },
-  nonFolderButtonSM: {
-    display: 'flex', 
-    flexDirection: 'row',
-    alignItems: 'center',
-    overflow: 'hidden',
-    backgroundColor: '#FFE562', 
-    paddingLeft: 8, 
-    paddingTop: 8, 
-    paddingBottom: 8,
-    paddingRight: 12,
-    borderRadius: 12, 
-    width: '45%'
-  },
-  nonFolderButton65: {
-    display: 'flex', 
-    flexDirection: 'row',
-    alignItems: 'center',
-    overflow: 'hidden',
-    backgroundColor: '#FFE562', 
-    paddingLeft: 8, 
-    paddingTop: 8, 
-    paddingBottom: 8,
-    paddingRight: 12,
-    borderRadius: 12, 
-    width: '65%'
-  },
-  nonFolderButton80: {
-    display: 'flex', 
-    flexDirection: 'row',
-    alignItems: 'center',
-    overflow: 'hidden',
-    backgroundColor: '#FFE562', 
-    paddingLeft: 8, 
-    paddingTop: 8, 
-    paddingBottom: 8,
-    paddingRight: 12,
-    borderRadius: 12, 
-    width: '80%'
-  },
   iconHolder: {
     backgroundColor: 'white', 
     height: 44, 
     width: 44, 
-    borderRadius: 100, 
-    display: 'flex', 
-    flexDirection: 'row', 
-    justifyContent: 'center', 
-    alignItems: 'center',
-    flexShrink: 0,
-  },
-  iconHolderSM: {
-    backgroundColor: 'white', 
-    height: 36, 
-    width: 36, 
     borderRadius: 100, 
     display: 'flex', 
     flexDirection: 'row', 

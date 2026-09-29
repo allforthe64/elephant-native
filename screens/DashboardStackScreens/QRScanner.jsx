@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Image, TouchableOpacity, Modal, Pressable, TextInput, Button, Linking, Platform } from 'react-native'
+import { StyleSheet, Text, View, Image, Modal, Pressable, TextInput, Button, Linking, Platform } from 'react-native'
 import React, { useState, useEffect } from 'react'
 
 import { CameraView, useCameraPermissions } from 'expo-camera' 
@@ -29,9 +29,10 @@ import { UploadQueueEmitter } from '../../hooks/QueueEventEmitter'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import ContentShell from '../../components/ui/ContentShell'
 import KeyboardSafeForm from '../../components/ui/KeyboardSafeForm'
+import YellowButton from '../../components/ui/YellowButton'
 import { useKeyboardHeight } from '../../hooks/useKeyboardHeight'
 import { useAutoFocusOn } from '../../hooks/useAutoFocusOn'
-import { useResponsiveLayout, tabletStyle } from '../../hooks/useResponsiveLayout'
+import { useResponsiveLayout } from '../../hooks/useResponsiveLayout'
 import { getMoveDestinationListHeight } from '../../constants/moveDestinationLayout'
 import SaveDestinationActions from '../../components/fileSystem/SaveDestinationActions'
 import MoveFolderDestinationRow from '../../components/fileSystem/MoveFolderDestinationRow'
@@ -170,9 +171,7 @@ const Scanner = () => {
           <Text style={{ color: '#593060', fontSize: 18, textAlign: 'center', marginBottom: 16 }}>
             We need your permission to use the camera for QR scanning
           </Text>
-          <TouchableOpacity onPress={handleGrantCameraPermission} style={{ backgroundColor: '#FFE562', paddingVertical: 12, paddingHorizontal: 20, borderRadius: 12 }}>
-            <Text style={{ color: '#9F37B0', fontSize: 18, fontWeight: '600' }}>Grant permission</Text>
-          </TouchableOpacity>
+          <YellowButton size="md" label="Grant permission" onPress={handleGrantCameraPermission} />
         </View>
       );
     }
@@ -363,14 +362,12 @@ return (
                                 <TextInput value={newFolderName} placeholder='Enter new name' placeholderTextColor={'#593060'} style={{color: '#593060', fontSize: 20, fontWeight: 'bold', borderBottomColor: '#593060', borderBottomWidth: 2, width: '70%'}} onChangeText={(e) => setNewFolderName(e)} autoFocus showSoftInputOnFocus ref={addFolderInputRef} onLayout={() => addFolderInputRef.current?.focus?.()}/>
                             </View>
                             <View style={{width: '100%', paddingTop: '10%', display: 'flex', flexDirection: 'row', justifyContent: 'center'}}>
-                                <TouchableOpacity style={styles.yellowButtonSM}
-                                onPress={() => addFolder(newFolderName, focusedFolder ? focusedFolder : '')}
-                                >
-                                    <View style={styles.iconHolderSmall}>
-                                        <FontAwesomeIcon icon={faFloppyDisk} size={18} color='#9F37B0' />
-                                    </View>
-                                    <Text style={{fontSize: 18, color: '#9F37B0', fontWeight: '600', marginLeft: '22%'}}>Save</Text>
-                                </TouchableOpacity>
+                                <YellowButton
+                                  size="md"
+                                  icon={faFloppyDisk}
+                                  label="Save"
+                                  onPress={() => addFolder(newFolderName, focusedFolder ? focusedFolder : '')}
+                                />
                             </View>
                         </>
                         </KeyboardSafeForm>
@@ -383,7 +380,7 @@ return (
                                 <Text style={{fontSize: 20, color: '#593060', fontWeight: 'bold', textAlign: 'left', width: '100%', paddingLeft: '5%', marginBottom: 8}}>Viewing: {focusedFolderInst.fileName}</Text>
                             }
                             {focusedFolder ? 
-                                <TouchableOpacity style={[styles.yellowButtonBack, {alignSelf: 'flex-start', marginBottom: 8}]} onPress={() => {
+                                <YellowButton size="xs" icon={faArrowLeft} label="Back" style={{ marginBottom: 8, marginLeft: '5%' }} onPress={() => {
                                 const folderInst = folders.filter(folder => folder.id === focusedFolder) 
                                 
                                     const parentFolderInst = folders.filter(folder => folder.id === folderInst[0].nestedUnder)
@@ -397,12 +394,7 @@ return (
                                         setDestination({id: null, fileName: null, nestedUnder: null})
                                         setFocusedFolder(null)
                                     }
-                                }}>
-                                    <View style={styles.iconHolderSmall}>
-                                            <FontAwesomeIcon icon={faArrowLeft} size={18} color='#9F37B0' /> 
-                                        </View>
-                                    <Text style={{color: '#9F37B0', fontSize: 20, marginLeft: '10%', fontWeight: '600'}}>Back</Text>
-                                </TouchableOpacity>
+                                }} />
                             :
                                 null
                             }
@@ -512,23 +504,25 @@ return (
                             </ScrollView>
                         </View> 
                         <View style={[styles.wrapperContainer, keyboardHeight > 0 && styles.wrapperContainerKeyboard]}>
-                            <TouchableOpacity onPress={() => {
+                            <YellowButton
+                              size="md"
+                              icon={faQrcode}
+                              label="Scan Another Code"
+                              onPress={() => {
                                 setScanData(undefined)
                                 setScanned(false)
-                            }} style={tabletStyle(isTablet, styles.buttonWrapper, tabletStyles.actionButton)}>
-                                <View style={styles.iconHolderSmall}>
-                                    <FontAwesomeIcon icon={faQrcode} color='#9F37B0' />
-                                </View>
-                                <Text style={{fontSize: 18, width: '100%', fontWeight: '600', color: '#9F37B0', paddingTop: '1%', marginLeft: '5%'}}>Scan Another Code</Text>
-                            </TouchableOpacity>
+                              }}
+                              style={isTablet ? tabletStyles.actionButton : undefined}
+                            />
                         </View>
                         <View style={[styles.wrapperContainer, keyboardHeight > 0 && styles.wrapperContainerKeyboard]}>
-                            <TouchableOpacity onPress={() => setPreAdd(true)} style={tabletStyle(isTablet, styles.buttonWrapper, tabletStyles.actionButton)}>
-                                <View style={styles.iconHolderSmall}>
-                                    <FontAwesomeIcon icon={faCloudArrowUp} color='#9F37B0' />
-                                </View>
-                                <Text style={{fontSize: 18, width: '100%', fontWeight: '600', color: '#9F37B0', paddingTop: '1%', marginLeft: '25%'}}>Save All</Text>
-                            </TouchableOpacity>
+                            <YellowButton
+                              size="md"
+                              icon={faCloudArrowUp}
+                              label="Save All"
+                              onPress={() => setPreAdd(true)}
+                              style={isTablet ? tabletStyles.actionButton : undefined}
+                            />
                         </View>
                     </View>
                 :
@@ -595,26 +589,6 @@ const styles = StyleSheet.create({
     wrapperContainerKeyboard: {
         marginBottom: 8
     },
-    buttonWrapper: {
-    width: '60%',
-    borderRadius: 12,
-    backgroundColor: '#FFE562',
-    display: 'flex',
-    flexDirection: 'row',
-    paddingTop: '2%',
-    paddingBottom: '2%',
-    paddingLeft: '2%'
-    },
-    iconHolderSmall: {
-        backgroundColor: 'white', 
-        width: 28, 
-        height: 28, 
-        display: 'flex', 
-        flexDirection: 'row', 
-        justifyContent: 'center', 
-        alignItems: 'center', 
-        borderRadius: 100
-    },
     iconHolder: {
         backgroundColor: 'white', 
         width: 44, 
@@ -664,53 +638,6 @@ const styles = StyleSheet.create({
         paddingLeft: '2%',
         marginBottom: '2%',
         borderRadius: 100
-    },
-    yellowButtonBack: {
-        backgroundColor: '#FFE562',
-        paddingLeft: 6,
-        paddingTop: 6,
-        paddingBottom: 6,
-        paddingRight: 20,
-        borderRadius: 12,
-        display: 'flex',
-        flexDirection: 'row',
-        width: '30%',
-        marginLeft: '5%'
-    },
-    addFolderButton: {
-        width: '50%',
-        borderRadius: 12,
-        backgroundColor: '#FFE562',
-        paddingTop: '2%',
-        paddingBottom: '2%',
-        paddingLeft: '2%',
-        marginBottom: 8,
-        marginLeft: '2%',
-        display: 'flex',
-        flexDirection: 'row'
-    },
-    yellowButtonSM: {
-        backgroundColor: '#FFE562',
-        paddingLeft: '2%',
-        paddingTop: '2%',
-        paddingBottom: '2%',
-        paddingRight: 20,
-        borderRadius: 12,
-        display: 'flex',
-        flexDirection: 'row',
-        width: '47%',
-    },
-    yellowButtonSMDim: {
-        backgroundColor: '#FFE562',
-        paddingLeft: '2%',
-        paddingTop: '2%',
-        paddingBottom: '2%',
-        paddingRight: 20,
-        borderRadius: 12,
-        display: 'flex',
-        flexDirection: 'row',
-        width: '47%',
-        opacity: .5
     },
 })
 

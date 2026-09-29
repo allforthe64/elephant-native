@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react'
-import { StyleSheet, View, Text, TextInput, TouchableOpacity, Keyboard, Modal, Pressable, ScrollView, Platform, KeyboardAvoidingView } from 'react-native'
+import { StyleSheet, View, Text, TextInput, Keyboard, Modal, Pressable, ScrollView, Platform, KeyboardAvoidingView } from 'react-native'
 
 //fontAwesome imports
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
@@ -22,12 +22,12 @@ import { useToast } from 'react-native-toast-notifications'
 //import upload queue emitter obj
 import { UploadQueueEmitter } from '../../hooks/QueueEventEmitter'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import AppPressable from '../../components/ui/AppPressable'
+import YellowButton from '../../components/ui/YellowButton'
 import AppTextInput from '../../components/ui/AppTextInput'
 import ContentShell from '../../components/ui/ContentShell'
 import KeyboardSafeForm from '../../components/ui/KeyboardSafeForm'
 import { TestIds } from '../../constants/testIds'
-import { useResponsiveLayout, tabletStyle } from '../../hooks/useResponsiveLayout'
+import { useResponsiveLayout } from '../../hooks/useResponsiveLayout'
 import { useAutoFocusOn } from '../../hooks/useAutoFocusOn'
 import { useKeyboardHeight } from '../../hooks/useKeyboardHeight'
 import { getMoveDestinationListHeight } from '../../constants/moveDestinationLayout'
@@ -318,39 +318,25 @@ const Notepad = () => {
                       <TextInput value={noteName} placeholder='Enter name' placeholderTextColor={'#593060'} style={{color: '#593060', fontSize: 20, fontWeight: 'bold', borderBottomColor: '#593060', borderBottomWidth: 2, width: '70%'}} onChangeText={(e) => setNoteName(e)} ref={nameRef}/>
                     </View>
                     <View style={{width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', paddingTop: '5%'}}>
-                        <TouchableOpacity style={noteName === '' ? styles.yellowButtonXSDim : styles.yellowButtonXS}
-                        disabled={noteName === '' ? true : false}
-                        onPress={() => {
-                            setNameGiven(true)
-                        }}
-                        >
-                          <View style={styles.iconHolderSmall}>
-                              <FontAwesomeIcon icon={faFloppyDisk} size={18} color='#9F37B0'/>
-                          </View>
-                          <Text style={{fontSize: 18, color: '#9F37B0', fontWeight: '600', marginLeft: '15%', paddingTop: '1%'}}>Save</Text>
-                        </TouchableOpacity>
+                        <YellowButton
+                          size="md"
+                          icon={faFloppyDisk}
+                          label="Save"
+                          dimmed={noteName === ''}
+                          onPress={() => {
+                              setNameGiven(true)
+                          }}
+                        />
                         <Text style={{color: '#593060', fontSize: 20, marginTop: '2%', textAlign: 'center'}}>Or</Text>
-                        <TouchableOpacity style={{width: '50%',
-                        borderRadius: 12,
-                        backgroundColor: 'white',
-                        paddingTop: '2%',
-                        paddingBottom: '2%',
-                        paddingLeft: '2%',
-                        marginLeft: '2%',
-                        marginTop: '2%',
-                        display: 'flex',
-                        flexDirection: 'row',
-                        backgroundColor: '#FFE562'
-                        }}
-                        onPress={() => {
-                            setNameGiven(true)
-                        }}
-                        >   
-                            <View style={styles.iconHolderSmall}>
-                                <FontAwesomeIcon icon={faStopwatch} size={18} color='#9F37B0'/>
-                            </View>
-                            <Text style={{fontSize: 18, color: '#9F37B0', fontWeight: '600', marginLeft: '7%', paddingTop: '1%'}}>Use Timestamp</Text>
-                        </TouchableOpacity>
+                        <YellowButton
+                          size="md"
+                          icon={faStopwatch}
+                          label="Use Timestamp"
+                          style={{ marginTop: '2%' }}
+                          onPress={() => {
+                              setNameGiven(true)
+                          }}
+                        />
                     </View>
               </>
               </KeyboardSafeForm>
@@ -368,14 +354,12 @@ const Notepad = () => {
                           
                       </View>
                       <View style={{width: '100%', paddingTop: '10%', display: 'flex', flexDirection: 'row', justifyContent: 'center'}}>
-                          <TouchableOpacity style={styles.yellowButtonSM}
-                          onPress={() => addFolder(newFolderName, focusedFolder ? focusedFolder : '')}
-                          >
-                              <View style={styles.iconHolderSmall}>
-                                  <FontAwesomeIcon icon={faFloppyDisk} size={18} color='#9F37B0' />
-                              </View>
-                              <Text style={{fontSize: 18, color: '#9F37B0', fontWeight: '600', marginLeft: '22%'}}>Save</Text>
-                          </TouchableOpacity>
+                          <YellowButton
+                            size="md"
+                            icon={faFloppyDisk}
+                            label="Save"
+                            onPress={() => addFolder(newFolderName, focusedFolder ? focusedFolder : '')}
+                          />
                       </View>
                   </>
                   </KeyboardSafeForm>
@@ -388,7 +372,7 @@ const Notepad = () => {
                         <Text style={{fontSize: 20, color: '#593060', fontWeight: 'bold', textAlign: 'left', width: '100%', paddingLeft: '5%', marginBottom: 8}}>Viewing: {focusedFolderInst.fileName}</Text>
                       }
                       {focusedFolder ? 
-                          <TouchableOpacity style={[styles.yellowButtonBack, {alignSelf: 'flex-start', marginBottom: 8}]} onPress={() => {
+                          <YellowButton size="xs" icon={faArrowLeft} label="Back" style={{ marginBottom: 8, marginLeft: '5%' }} onPress={() => {
                                 const folderInst = folders.filter(folder => folder.id === focusedFolder) 
                                 
                                 const parentFolderInst = folders.filter(folder => folder.id === folderInst[0].nestedUnder)
@@ -402,12 +386,7 @@ const Notepad = () => {
                                     setDestination({id: null, fileName: null, nestedUnder: null})
                                     setFocusedFolder(null)
                                 }
-                            }}>
-                                <View style={styles.iconHolderSmall}>
-                                        <FontAwesomeIcon icon={faArrowLeft} size={18} color='#9F37B0' /> 
-                                    </View>
-                                <Text style={{color: '#9F37B0', fontSize: 20, marginLeft: '10%', fontWeight: '600'}}>Back</Text>
-                            </TouchableOpacity>
+                            }} />
                       :
                           null
                       }
@@ -538,35 +517,25 @@ const Notepad = () => {
             ]}
           >
             {!open && 
-                <AppPressable
+                <YellowButton
                   testID={TestIds.notes.addToStorage}
                   accessibilityLabel="Add To Storage"
+                  size="sm"
+                  icon={faCloudArrowUp}
+                  label="Add To Storage"
                   onPress={() => setPreAdd(true)}
-                  style={tabletStyle(isTablet, styles.buttonWrapperText, tabletStyles.actionButton)}
-                >
-                  <View style={styles.iconHolderSmall}>
-                    <FontAwesomeIcon icon={faCloudArrowUp} color='#9F37B0'/>
-                  </View>
-                  <Text style={styles.addToStorageLabel} numberOfLines={1}>Add To Storage</Text>
-                </AppPressable>
+                  style={isTablet ? tabletStyles.actionButton : undefined}
+                />
               }
-                  <AppPressable
+                  <YellowButton
                     testID={TestIds.notes.saveEdit}
                     accessibilityLabel={open ? 'Save note' : 'Edit note'}
+                    size="xs"
+                    icon={open ? faCheck : faPencil}
+                    label={open ? 'Save note' : 'Edit note'}
                     onPress={() => {open === false ? startEdit() : saveNote()}}
-                    style={styles.buttonWrapper}
-                  >
-                    {open ? (
-                        <FontAwesomeIcon icon={faCheck} color='#9F37B0' size={20}/>
-                      )
-                      : (
-                        <FontAwesomeIcon icon={faPencil} size={20} color='#9F37B0'/>
-                      )
-                    }
-                    <Text style={styles.saveEditLabel} numberOfLines={1}>
-                      {open ? 'Save note' : 'Edit note'}
-                    </Text>
-                  </AppPressable>
+                    style={{ alignSelf: 'center' }}
+                  />
           </View>
         </KeyboardAvoidingView>
         </ContentShell>
@@ -638,44 +607,6 @@ const styles = StyleSheet.create({
       zIndex: 20,
       elevation: 8,
     },
-    addToStorageLabel: {
-      flex: 1,
-      flexShrink: 1,
-      minWidth: 0,
-      fontSize: 16,
-      color: '#9F37B0',
-      fontWeight: '600',
-      marginLeft: 10,
-    },
-    buttonWrapper: {
-      minWidth: 48,
-      height: 48,
-      flexShrink: 0,
-      flexDirection: 'row',
-      justifyContent: 'center',
-      alignItems: 'center',
-      borderRadius: 12,
-      backgroundColor: '#FFE562',
-      paddingHorizontal: 12,
-      gap: 8,
-    },
-    saveEditLabel: {
-      color: '#9F37B0',
-      fontSize: 15,
-      fontWeight: '700',
-    },
-    buttonWrapperText: {
-      flex: 1,
-      maxWidth: 240,
-      borderRadius: 12,
-      backgroundColor: '#FFE562',
-      flexDirection: 'row',
-      alignItems: 'center',
-      overflow: 'hidden',
-      paddingVertical: 8,
-      paddingLeft: 8,
-      paddingRight: 12,
-    },
     iconHolder: {
       backgroundColor: 'white', 
       width: 44, 
@@ -696,86 +627,6 @@ const styles = StyleSheet.create({
       alignItems: 'center', 
       borderRadius: 100
   },
-    iconHolderSmall: {
-      backgroundColor: 'white', 
-      width: 28, 
-      height: 28, 
-      display: 'flex', 
-      flexDirection: 'row', 
-      justifyContent: 'center', 
-      alignItems: 'center', 
-      borderRadius: 100
-    },
-    yellowButtonXS: {
-      backgroundColor: '#FFE562',
-      paddingLeft: 6,
-      paddingTop: 6,
-      paddingBottom: 6,
-      paddingRight: 20,
-      borderRadius: 12,
-      display: 'flex',
-      flexDirection: 'row',
-      width: '30%',
-    },
-    yellowButtonXSDim: {
-      backgroundColor: '#FFE562',
-      paddingLeft: 6,
-      paddingTop: 6,
-      paddingBottom: 6,
-      paddingRight: 20,
-      borderRadius: 12,
-      display: 'flex',
-      flexDirection: 'row',
-      width: '30%',
-      opacity: .5
-    },
-    yellowButtonSM: {
-      backgroundColor: '#FFE562',
-      paddingLeft: '2%',
-      paddingTop: '2%',
-      paddingBottom: '2%',
-      paddingRight: 20,
-      borderRadius: 12,
-      display: 'flex',
-      flexDirection: 'row',
-      width: '47%',
-    },
-    yellowButtonSMDim: {
-      backgroundColor: '#FFE562',
-      paddingLeft: '2%',
-      paddingTop: '2%',
-      paddingBottom: '2%',
-      paddingRight: 20,
-      borderRadius: 12,
-      display: 'flex',
-      flexDirection: 'row',
-      width: '47%',
-      opacity: .5
-    },
-    yellowButtonBack: {
-      backgroundColor: '#FFE562',
-      paddingLeft: 6,
-      paddingTop: 6,
-      paddingBottom: 6,
-      paddingRight: 20,
-      borderRadius: 12,
-      display: 'flex',
-      flexDirection: 'row',
-      width: '30%',
-      marginLeft: '5%'
-    },
-    addFolderButton: {
-      width: '50%',
-      borderRadius: 12,
-      backgroundColor: '#FFE562',
-      paddingTop: '2%',
-      paddingBottom: '2%',
-      paddingLeft: '2%',
-      marginBottom: 8,
-      marginLeft: '2%',
-      display: 'flex',
-      flexDirection: 'row'
-    },
     folder: {
       display: 'flex',
       justifyContent: 'space-between',

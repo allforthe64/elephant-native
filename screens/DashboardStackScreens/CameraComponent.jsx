@@ -38,6 +38,7 @@ import { QueContext } from '../../context/QueContext';
 //import stuff for the Queue
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import AppPressable from '../../components/ui/AppPressable'
+import YellowButton from '../../components/ui/YellowButton'
 import ContentShell from '../../components/ui/ContentShell'
 import KeyboardSafeForm from '../../components/ui/KeyboardSafeForm'
 import { useAutoFocusOn } from '../../hooks/useAutoFocusOn'
@@ -537,39 +538,25 @@ try {
                         <TextInput value={mediaName} placeholder='Enter name' placeholderTextColor={'#593060'} style={{color: '#593060', fontSize: 20, fontWeight: 'bold', borderBottomColor: '#593060', borderBottomWidth: 2, width: '70%'}} onChangeText={(e) => setMediaName(e)} ref={nameRef}/>
                     </View>
                     <View style={{width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', paddingTop: '5%'}}>
-                        <TouchableOpacity style={mediaName === '' ? styles.yellowButtonXSDim : styles.yellowButtonXS}
-                            disabled={mediaName === '' ? true : false}
+                        <YellowButton
+                            size="md"
+                            icon={faFloppyDisk}
+                            label="Save"
+                            dimmed={mediaName === ''}
                             onPress={() => {
                                 setNameGiven(true)
                             }}
-                        >   
-                            <View style={styles.iconHolderSmall}>
-                                <FontAwesomeIcon icon={faFloppyDisk} size={18} color='#9F37B0'/>
-                            </View>
-                            <Text style={{fontSize: 18, color: '#9F37B0', fontWeight: '600', marginLeft: '15%', paddingTop: '1%'}}>Save</Text>
-                        </TouchableOpacity>
+                        />
                         <Text style={{color: '#593060', fontSize: 20, marginTop: '2%', textAlign: 'center'}}>Or</Text>
-                        <TouchableOpacity style={{width: '50%',
-                            borderRadius: 12,
-                            backgroundColor: 'white',
-                            paddingTop: '2%',
-                            paddingBottom: '2%',
-                            paddingLeft: '2%',
-                            marginLeft: '2%',
-                            marginTop: '2%',
-                            display: 'flex',
-                            flexDirection: 'row',
-                            backgroundColor: '#FFE562'
-                        }}
-                        onPress={() => {
-                            setNameGiven(true)
-                        }}
-                        >   
-                            <View style={styles.iconHolderSmall}>
-                                <FontAwesomeIcon icon={faStopwatch} size={18} color='#9F37B0'/>
-                            </View>
-                            <Text style={{fontSize: 18, color: '#9F37B0', fontWeight: '600', marginLeft: '7%', paddingTop: '1%'}}>Use Timestamp</Text>
-                        </TouchableOpacity>
+                        <YellowButton
+                            size="md"
+                            icon={faStopwatch}
+                            label="Use Timestamp"
+                            style={{ marginTop: '2%' }}
+                            onPress={() => {
+                                setNameGiven(true)
+                            }}
+                        />
                     </View>
                 </>
                 </KeyboardSafeForm>
@@ -584,14 +571,12 @@ try {
                             <TextInput value={newFolderName} placeholder='Enter new name' placeholderTextColor={'#593060'} style={{color: '#593060', fontSize: 20, fontWeight: 'bold', borderBottomColor: '#593060', borderBottomWidth: 2, width: '70%'}} onChangeText={(e) => setNewFolderName(e)} autoFocus showSoftInputOnFocus ref={addFolderInputRef} onLayout={() => addFolderInputRef.current?.focus?.()}/>
                         </View>
                         <View style={{width: '100%', paddingTop: '10%', display: 'flex', flexDirection: 'row', justifyContent: 'center'}}>
-                            <TouchableOpacity style={styles.yellowButtonSM}
-                            onPress={() => addFolder(newFolderName, focusedFolder ? focusedFolder : '')}
-                            >
-                                <View style={styles.iconHolderSmall}>
-                                    <FontAwesomeIcon icon={faFloppyDisk} size={18} color='#9F37B0' />
-                                </View>
-                                <Text style={{fontSize: 18, color: '#9F37B0', fontWeight: '600', marginLeft: '22%'}}>Save</Text>
-                            </TouchableOpacity>
+                            <YellowButton
+                                size="md"
+                                icon={faFloppyDisk}
+                                label="Save"
+                                onPress={() => addFolder(newFolderName, focusedFolder ? focusedFolder : '')}
+                            />
                         </View>
                     </View>
                     </KeyboardSafeForm>
@@ -604,7 +589,7 @@ try {
                             <Text style={{fontSize: 20, color: '#593060', fontWeight: 'bold', textAlign: 'left', width: '100%', paddingLeft: '5%', marginBottom: 8}}>Viewing: {focusedFolderInst.fileName}</Text>
                         }
                         {focusedFolder ? 
-                            <TouchableOpacity style={[styles.yellowButtonBack, {alignSelf: 'flex-start', marginBottom: 8}]} onPress={() => {
+                            <YellowButton size="xs" icon={faArrowLeft} label="Back" style={{ marginBottom: 8, marginLeft: '5%' }} onPress={() => {
                                 const folderInst = folders.filter(folder => folder.id === focusedFolder) 
                                 
                                 const parentFolderInst = folders.filter(folder => folder.id === folderInst[0].nestedUnder)
@@ -618,12 +603,7 @@ try {
                                     setDestination({id: null, fileName: null, nestedUnder: null})
                                     setFocusedFolder(null)
                                 }
-                            }}>
-                                <View style={styles.iconHolderSmall}>
-                                        <FontAwesomeIcon icon={faArrowLeft} size={18} color='#9F37B0' /> 
-                                    </View>
-                                <Text style={{color: '#9F37B0', fontSize: 20, marginLeft: '10%', fontWeight: '600'}}>Back</Text>
-                            </TouchableOpacity>
+                            }} />
                         :
                             null
                         }
@@ -746,7 +726,7 @@ try {
                         </TouchableOpacity> 
                         <TouchableOpacity onPress={() => setPhoto(undefined)}>
                             <View style={styles.iconHolder}>
-                                <FontAwesomeIcon icon={faTrash} size={22} color='red'/>
+                                <FontAwesomeIcon icon={faTrash} size={22} color='#871313'/>
                             </View>
                         </TouchableOpacity>
                     </View>
@@ -792,7 +772,7 @@ try {
                         </TouchableOpacity> 
                         <TouchableOpacity onPress={() => setVideoObj(undefined)}>
                             <View style={styles.iconHolder}>
-                                <FontAwesomeIcon icon={faTrash} size={22} color='red'/>
+                                <FontAwesomeIcon icon={faTrash} size={22} color='#871313'/>
                             </View>
                         </TouchableOpacity>
                     </View>
@@ -857,11 +837,11 @@ try {
                         <>
                             {recording ? 
                                 <AppPressable testID={TestIds.camera.shutter} accessibilityLabel="Stop video" onPress={stopVideo} style={{marginRight: '17%', backgroundColor: 'transparent', borderWidth: 8, borderColor: 'white', borderRadius: 1000, width: '24%', height: 90, display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}> 
-                                    <FontAwesomeIcon icon={faSquare} size={55} color='red'/>
+                                    <FontAwesomeIcon icon={faSquare} size={55} color='#871313'/>
                                 </AppPressable>
                                 :
                                 <AppPressable testID={TestIds.camera.shutter} accessibilityLabel="Start video" onPress={takeVideo} style={{marginRight: '17%', backgroundColor: 'transparent', borderWidth: 8, borderColor: 'white', borderRadius: 1000, width: '24%', height: 90, display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}> 
-                                    <FontAwesomeIcon icon={solidCircle} size={55} color='red'/>
+                                    <FontAwesomeIcon icon={solidCircle} size={55} color='#871313'/>
                                 </AppPressable>
                             }
                         </>
@@ -941,86 +921,6 @@ const styles = StyleSheet.create({
     preview: {
         alignSelf: 'stretch',
         flex: 1
-    },
-    yellowButtonXS: {
-        backgroundColor: '#FFE562',
-        paddingLeft: 6,
-        paddingTop: 6,
-        paddingBottom: 6,
-        paddingRight: 20,
-        borderRadius: 12,
-        display: 'flex',
-        flexDirection: 'row',
-        width: '30%',
-    },
-    yellowButtonXSDim: {
-        backgroundColor: '#FFE562',
-        paddingLeft: 6,
-        paddingTop: 6,
-        paddingBottom: 6,
-        paddingRight: 20,
-        borderRadius: 12,
-        display: 'flex',
-        flexDirection: 'row',
-        width: '30%',
-        opacity: .5
-    },
-    yellowButtonSM: {
-        backgroundColor: '#FFE562',
-        paddingLeft: '2%',
-        paddingTop: '2%',
-        paddingBottom: '2%',
-        paddingRight: 20,
-        borderRadius: 12,
-        display: 'flex',
-        flexDirection: 'row',
-        width: '47%',
-    },
-    yellowButtonSMDim: {
-        backgroundColor: '#FFE562',
-        paddingLeft: '2%',
-        paddingTop: '2%',
-        paddingBottom: '2%',
-        paddingRight: 20,
-        borderRadius: 12,
-        display: 'flex',
-        flexDirection: 'row',
-        width: '47%',
-        opacity: .5
-    },
-    yellowButtonBack: {
-        backgroundColor: '#FFE562',
-        paddingLeft: 6,
-        paddingTop: 6,
-        paddingBottom: 6,
-        paddingRight: 20,
-        borderRadius: 12,
-        display: 'flex',
-        flexDirection: 'row',
-        width: '30%',
-        marginLeft: '5%'
-    },
-    addFolderButton: {
-        width: '50%',
-        borderRadius: 12,
-        backgroundColor: '#FFE562',
-        paddingTop: '2%',
-        paddingBottom: '2%',
-        paddingLeft: '2%',
-        marginBottom: 8,
-        marginLeft: '2%',
-        display: 'flex',
-        flexDirection: 'row'
-    },
-    iconHolderSmall: {
-        backgroundColor: 'white', 
-        width: 28, 
-        height: 28, 
-        display: 'flex', 
-        flexDirection: 'row', 
-        justifyContent: 'center', 
-        alignItems: 'center', 
-        borderRadius: 100
     },
     iconHolder: {
         backgroundColor: 'white', 

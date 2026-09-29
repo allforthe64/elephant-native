@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react'
-import {View, Text, StyleSheet, ScrollView, TouchableOpacity, Modal, Pressable, TextInput, Image, Platform} from 'react-native'
+import {View, Text, StyleSheet, ScrollView, Modal, Pressable, TextInput, Image, Platform} from 'react-native'
 
 //FileRow component import
 import FileRow from '../../components/documentPicker/FileRow'
@@ -38,10 +38,10 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 import * as FileSystem from "expo-file-system"
 import ContentShell from '../../components/ui/ContentShell'
 import KeyboardSafeForm from '../../components/ui/KeyboardSafeForm'
-import YellowActionButton from '../../components/ui/YellowActionButton'
+import YellowButton from '../../components/ui/YellowButton'
 import { useKeyboardHeight } from '../../hooks/useKeyboardHeight'
 import { useAutoFocusOn } from '../../hooks/useAutoFocusOn'
-import { useResponsiveLayout, tabletStyle } from '../../hooks/useResponsiveLayout'
+import { useResponsiveLayout } from '../../hooks/useResponsiveLayout'
 import { getMoveDestinationListHeight } from '../../constants/moveDestinationLayout'
 import SaveDestinationActions from '../../components/fileSystem/SaveDestinationActions'
 import MoveFolderDestinationRow from '../../components/fileSystem/MoveFolderDestinationRow'
@@ -349,14 +349,12 @@ const DocumentPickerComp = () => {
                                 <TextInput value={newFolderName} placeholder='Enter new name' placeholderTextColor={'#593060'} style={{color: '#593060', fontSize: 20, fontWeight: 'bold', borderBottomColor: '#593060', borderBottomWidth: 2, width: '70%'}} onChangeText={(e) => setNewFolderName(e)} autoFocus showSoftInputOnFocus ref={addFolderInputRef} onLayout={() => addFolderInputRef.current?.focus?.()}/>
                             </View>
                             <View style={{width: '100%', paddingTop: '10%', display: 'flex', flexDirection: 'row', justifyContent: 'center'}}>
-                                <TouchableOpacity style={styles.yellowButtonSM}
-                                onPress={() => addFolder(newFolderName, focusedFolder ? focusedFolder : '')}
-                                >   
-                                    <View style={styles.iconHolderSmall}>
-                                        <FontAwesomeIcon icon={faFloppyDisk} size={18} color='#9F37B0' />
-                                    </View>
-                                    <Text style={{fontSize: 18, color: '#9F37B0', fontWeight: '600', marginLeft: '22%'}}>Save</Text>
-                                </TouchableOpacity>
+                                <YellowButton
+                                  size="md"
+                                  icon={faFloppyDisk}
+                                  label="Save"
+                                  onPress={() => addFolder(newFolderName, focusedFolder ? focusedFolder : '')}
+                                />
                             </View>
                         </View>
                         </KeyboardSafeForm>
@@ -369,7 +367,7 @@ const DocumentPickerComp = () => {
                                 <Text style={{fontSize: 20, color: '#593060', fontWeight: 'bold', textAlign: 'left', width: '100%', paddingLeft: '5%', marginBottom: 8}}>Viewing: {focusedFolderInst.fileName}</Text>
                             }
                             {focusedFolder ? 
-                                <TouchableOpacity style={[styles.yellowButtonXS, {alignSelf: 'flex-start', marginBottom: 8, marginLeft: '5%'}]} onPress={() => {
+                                <YellowButton size="xs" icon={faArrowLeft} label="Back" style={{ marginBottom: 8, marginLeft: '5%' }} onPress={() => {
                                     const folderInst = folders.filter(folder => folder.id === focusedFolder) 
                                     
                                     const parentFolderInst = folders.filter(folder => folder.id === folderInst[0].nestedUnder)
@@ -383,12 +381,7 @@ const DocumentPickerComp = () => {
                                         setDestination({id: null, fileName: null, nestedUnder: null})
                                         setFocusedFolder(null)
                                     }
-                                }}>
-                                    <View style={styles.iconHolderSmall}>
-                                        <FontAwesomeIcon icon={faArrowLeft} size={18} color='#9F37B0' /> 
-                                    </View>
-                                    <Text style={{fontSize: 20, color: '#9F37B0', fontWeight: '600', marginLeft: '10%'}}>Back</Text>
-                                </TouchableOpacity>
+                                }} />
                             :
                                 null
                             }
@@ -515,27 +508,29 @@ const DocumentPickerComp = () => {
                             </>
                         }
                     <View style={styles.buttonCon}>
-                        <YellowActionButton
+                        <YellowButton
+                          size="sm"
                           label="Select File"
                           onPress={() => selectFile()}
-                          style={tabletStyle(isTablet, { width: '45%' }, tabletStyles.actionButton)}
-                          icon={<FontAwesomeIcon icon={faFile} size={18} color='#9F37B0'/>}
+                          style={isTablet ? tabletStyles.actionButton : undefined}
+                          icon={faFile}
                         />
-                        <YellowActionButton
+                        <YellowButton
+                          size="sm"
                           label="Select Photo"
                           onPress={() => selectImage()}
-                          style={tabletStyle(isTablet, { width: '45%' }, tabletStyles.actionButton)}
-                          icon={<FontAwesomeIcon icon={faImage} size={18} color='#9F37B0'/>}
+                          style={isTablet ? tabletStyles.actionButton : undefined}
+                          icon={faImage}
                         />
                     </View>
                     <View style={styles.wrapperContainer}>
-                        <YellowActionButton
+                        <YellowButton
+                          size="md"
                           label="Upload Files"
                           onPress={() => setPreAdd(true)}
                           dimmed={files.length === 0}
                           disabled={files.length === 0}
-                          style={{ width: '60%' }}
-                          icon={<FontAwesomeIcon icon={faCloudArrowUp} size={18} color='#9F37B0'/>}
+                          icon={faCloudArrowUp}
                         />
                     </View>
                 </View>
@@ -583,16 +578,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         width: '100%',
         marginBottom: 8,
-    },
-    buttonWrapperSm: {
-        backgroundColor: '#FFE562',
-        paddingLeft: '2%', 
-        paddingTop: '2%', 
-        paddingBottom: '2%', 
-        borderRadius: 12, 
-        width: '45%',
-        display: 'flex',
-        flexDirection: 'row'
     },
     iconHolderSM: {
         backgroundColor: 'white', 
@@ -705,63 +690,6 @@ const styles = StyleSheet.create({
         justifyContent: 'center', 
         alignItems: 'center', 
         borderRadius: 100
-    },
-    addFolderButton: {
-        width: '50%',
-        borderRadius: 12,
-        backgroundColor: '#FFE562',
-        paddingTop: '2%',
-        paddingBottom: '2%',
-        paddingLeft: '2%',
-        marginBottom: '10%',
-        marginLeft: '2%',
-        display: 'flex',
-        flexDirection: 'row'
-    },
-    iconHolderSmall: {
-        backgroundColor: 'white', 
-        width: 28, 
-        height: 28, 
-        display: 'flex', 
-        flexDirection: 'row', 
-        justifyContent: 'center', 
-        alignItems: 'center', 
-        borderRadius: 100
-    },
-    yellowButtonSM: {
-        backgroundColor: '#FFE562',
-        paddingLeft: 6,
-        paddingTop: 6,
-        paddingBottom: 6,
-        paddingRight: 20,
-        borderRadius: 12,
-        display: 'flex',
-        flexDirection: 'row',
-        width: '45%',
-    },
-    yellowButtonSMDim: {
-        backgroundColor: '#FFE562',
-        paddingLeft: 6,
-        paddingTop: 6,
-        paddingBottom: 6,
-        paddingRight: 20,
-        borderRadius: 12,
-        display: 'flex',
-        flexDirection: 'row',
-        width: '45%',
-        opacity: .5
-    },
-    yellowButtonXS: {
-        backgroundColor: '#FFE562',
-        paddingLeft: 6,
-        paddingTop: 6,
-        paddingBottom: 6,
-        paddingRight: 20,
-        borderRadius: 12,
-        display: 'flex',
-        flexDirection: 'row',
-        width: '30%',
-        marginLeft: '5%'
     },
 })
 
