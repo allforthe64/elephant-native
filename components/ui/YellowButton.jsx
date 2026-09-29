@@ -102,17 +102,19 @@ const YellowButton = ({
       ]}
     >
       {iconContent ? (
-        <View
-          style={[
-            styles.iconHolder,
-            { width: t.icon, height: t.icon, left: t.pad, marginTop: -t.icon / 2 },
-          ]}
-        >
-          {iconContent}
+        <View style={[styles.iconSlot, { left: t.pad }]} pointerEvents="none">
+          <View style={[styles.iconHolder, { width: t.icon, height: t.icon }]}>
+            {iconContent}
+          </View>
         </View>
       ) : null}
       <Text
-        style={[styles.label, { fontSize: t.font }, isDanger && styles.labelDanger, labelStyle]}
+        style={[
+          styles.label,
+          { fontSize: t.font, lineHeight: Math.round(t.font * 1.25) },
+          isDanger && styles.labelDanger,
+          labelStyle,
+        ]}
         numberOfLines={1}
         adjustsFontSizeToFit
         minimumFontScale={0.7}
@@ -150,9 +152,13 @@ const styles = StyleSheet.create({
   dimmed: {
     opacity: 0.5,
   },
-  iconHolder: {
+  iconSlot: {
     position: 'absolute',
-    top: '50%',
+    top: 0,
+    bottom: 0,
+    justifyContent: 'center',
+  },
+  iconHolder: {
     backgroundColor: '#fff',
     borderRadius: 100,
     alignItems: 'center',
@@ -161,6 +167,8 @@ const styles = StyleSheet.create({
   label: {
     flexShrink: 1,
     textAlign: 'center',
+    textAlignVertical: 'center',
+    includeFontPadding: false,
     color: Brand.purpleBright,
     fontWeight: '600',
   },
