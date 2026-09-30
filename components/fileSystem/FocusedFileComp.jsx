@@ -35,6 +35,7 @@ import WebView from 'react-native-webview'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { tabletStyle, useResponsiveLayout } from '../../hooks/useResponsiveLayout'
 import KeyboardSafeForm from '../ui/KeyboardSafeForm'
+import { useKeyboardHeight } from '../../hooks/useKeyboardHeight'
 import { useAutoFocusOn } from '../../hooks/useAutoFocusOn'
 import MoveFolderDestinationRow from './MoveFolderDestinationRow'
 import YellowButton from '../ui/YellowButton'
@@ -74,7 +75,9 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
     const [newFolderName, setNewFolderName] = useState('')
     const [editNote, setEditNote] = useState(false)
     const [noteText, setNoteText] = useState('')
+    const [noteStatus, setNoteStatus] = useState('loading')
     const [editingMode, setEditingMode] = useState(false)
+    const keyboardHeight = useKeyboardHeight()
     const [focusedFolderInst, setFocusedFolderInst] = useState()
     const [hasRun, setHasRun] = useState(false)
     const [convertedPDFURL, setConvertedPDFURL] = useState()
@@ -228,11 +231,21 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
     useEffect(() => {
         if (fileURL && fileObj && fileObj.documentType === 'txt' && !fileObj.linksTo) {
             setEditNote(true)
-            
-            fetch(fileURL).then(result => result.text())
+            setNoteStatus('loading')
+
+            fetch(fileURL)
+            .then(result => {
+                if (!result.ok) throw new Error(`HTTP ${result.status}`)
+                return result.text()
+            })
             .then(text => {
                 setNoteText(text)
-            }) 
+                setNoteStatus('ready')
+            })
+            .catch(err => {
+                console.warn('Failed to load note', err)
+                setNoteStatus('error')
+            })
         }
     }, [fileURL, fileObj])
 
@@ -751,9 +764,10 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
                         : editNote ?
                             (
                                 <Modal animationType='slide' presentationStyle='pageSheet' onShow={() => setTimeout(()=>{
-                                    ref.current.focus()
+                                    ref.current?.focus()
                                 }, 200)}>
-                                    <View style={[{height: '100%', width: '100%', backgroundColor: '#593060'}, tabletModalPanel]}>
+                                    {/* Pad by keyboard height instead of translating: the note box starts at the top, so a lift would push it off-screen */}
+                                    <View style={[{height: '100%', width: '100%', backgroundColor: '#fff', paddingBottom: keyboardHeight > 0 ? keyboardHeight + 12 : Math.max(insets.bottom, 16)}, tabletModalPanel]}>
                                         {/* if the moveFile state is true, display the modal with the file movement code*/}
                                         {/* xMark icon for closing out the moveFile modal */}
                                         <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', paddingRight: '5%', paddingTop: '10%', width: '100%'}}>
@@ -761,34 +775,43 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
                                                     setEditNote(false)
                                                 }
                                                 }>
-                                                <FontAwesomeIcon icon={faXmark} color={'white'} size={30}/>
+                                                <FontAwesomeIcon icon={faXmark} color={'#593060'} size={30}/>
                                             </Pressable>
                                         </View>
-                                        <Text style={{fontSize: 40, color: 'white', fontWeight: 'bold', textAlign: 'left', width: '100%', paddingLeft: '5%', marginBottom: '10%'}}>Edit Note:</Text>
-                                        <KeyboardSafeForm style={{ flex: 1, width: '100%' }}>
+                                        <Text style={{fontSize: 40, color: '#593060', fontWeight: 'bold', textAlign: 'left', width: '100%', paddingLeft: '5%', marginBottom: keyboardHeight > 0 ? 12 : 24}}>Edit Note:</Text>
                                         <View style={{width: '100%', flex: 1, paddingLeft: '5%', paddingRight: '5%'}}>
                                         <TextInput 
                                             multiline={true}
                                             value={noteText}
+                                            editable={noteStatus === 'ready'}
                                             style={{
                                                 width: '100%',
                                                 flex: 1,
-                                                maxHeight: '50%',
+                                                minHeight: 160,
                                                 backgroundColor: 'white',
+                                                borderWidth: 2,
+                                                borderColor: '#593060',
+                                                borderRadius: 12,
+                                                color: '#593060',
                                                 fontSize: 20,
                                                 textAlignVertical: 'top',
                                                 padding: '3%'
                                             }}
-                                            placeholder='Enter note'
-                                            placeholderTextColor={'black'}
+                                            placeholder={
+                                                noteStatus === 'loading' ? 'Loading note...'
+                                                : noteStatus === 'error' ? "Couldn't load this note. Close and try again."
+                                                : 'Enter note'
+                                            }
+                                            placeholderTextColor={'#593060'}
                                             onChangeText={(text) => setNoteText(text)}
-                                            onFocus={() => setEditingMode(true)}
+                                            onFocus={() => { if (noteStatus === 'ready') setEditingMode(true) }}
                                             ref={ref}
                                             />
-                                            <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'center', marginTop: '5%'}}>
+                                            <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'center', marginTop: 16}}>
                                                 <YellowButton
                                                     size="md"
                                                     icon={faCheck}
+                                                    dimmed={noteStatus !== 'ready'}
                                                     label={editingMode ? 'Finished Editing' : 'Save Note'}
                                                     onPress={() => {
                                                         if (editingMode) setEditingMode(false)
@@ -802,7 +825,6 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
                                                 />
                                             </View>
                                         </View>
-                                        </KeyboardSafeForm>
                                     </View>
                                 </Modal>
                             )
