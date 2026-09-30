@@ -311,7 +311,7 @@ export default function Files({navigation: { navigate }, route}) {
           : stagingMode ? 
             <Staging reset={setStagingMode} staging={staging} userFiles={currentUser.fileRefs} folders={currentUser.files} deleteFile={deleteFile} renameFile={renameFile} moveFile={moveFile}/> 
           :
-          <View style={styles.homeBody}>
+          <View style={[styles.homeBody, { paddingBottom: Math.max(insets.bottom, 16) + 8 }]}>
                     <View style={styles.header}>
                       <YellowButton size="md" icon={faBox} label="To be filed" onPress={() => setStagingMode(true)} />
                     </View>
