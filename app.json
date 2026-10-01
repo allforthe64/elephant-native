@@ -2,7 +2,7 @@
   "expo": {
     "name": "elephant-native",
     "slug": "elephant-native",
-    "version": "1.4.1",
+    "version": "1.4.2",
     "orientation": "default",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
