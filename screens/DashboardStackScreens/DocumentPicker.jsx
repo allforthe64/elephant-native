@@ -42,14 +42,11 @@ import YellowButton from '../../components/ui/YellowButton'
 import { useKeyboardHeight } from '../../hooks/useKeyboardHeight'
 import { useAutoFocusOn } from '../../hooks/useAutoFocusOn'
 import { useResponsiveLayout } from '../../hooks/useResponsiveLayout'
-import { getMoveDestinationListHeight } from '../../constants/moveDestinationLayout'
 import SaveDestinationActions from '../../components/fileSystem/SaveDestinationActions'
 import MoveFolderDestinationRow from '../../components/fileSystem/MoveFolderDestinationRow'
 
 const DocumentPickerComp = () => {
     const { isTablet, select, height: windowHeight } = useResponsiveLayout()
-    const moveFolderListHeight = getMoveDestinationListHeight(windowHeight)
-
     const [files, setFiles] = useState([])
     const [userInst, setUserInst] = useState()
     const [loading, setLoading] = useState(false)
@@ -385,7 +382,7 @@ const DocumentPickerComp = () => {
                             :
                                 null
                             }
-                            <View style={{height: moveFolderListHeight, width: '100%', marginBottom: 8, backgroundColor: '#fff'}}>
+                            <View style={{flex: 1, minHeight: 0, width: '100%', marginBottom: 8, backgroundColor: '#fff'}}>
                                     <ScrollView style={{flex: 1, width: '100%'}} contentContainerStyle={focusedFolder && !subFolders ? {flexGrow: 1, justifyContent: 'center', paddingBottom: 16} : {paddingBottom: 16, paddingTop: 4}}>
                                     {/* map over each of the folders from the filesystem and display them as a pressable element // call movefile function when one of them is pressed */}
                                     {focusedFolder && !subFolders ? 
@@ -454,7 +451,6 @@ const DocumentPickerComp = () => {
                                 onSaveStaging={() => saveFiles()}
                                 onConfirmMove={() => saveFiles()}
                                 confirmDisabled={!(destination.id !== null || focusedFolder)}
-                                paddingBottom={Math.max(insets.bottom, 12)}
                             />
                         </View>
                         

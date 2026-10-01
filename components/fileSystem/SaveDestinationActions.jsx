@@ -2,22 +2,24 @@ import React from 'react'
 import { View, StyleSheet } from 'react-native'
 import { faPlus, faBox, faCheck } from '@fortawesome/free-solid-svg-icons'
 import YellowButton from '../ui/YellowButton'
+import StickyFooter from '../ui/StickyFooter'
 
 /**
- * Stacked equal-width actions for Save To destination pickers:
- * Add New Folder, Save To Staging, Confirm Move.
+ * Sticky footer for Save To destination pickers:
+ * Add New Folder + Save To Staging side by side, Confirm Move below.
  */
 const SaveDestinationActions = ({
   onAddFolder,
   onSaveStaging,
   onConfirmMove,
   confirmDisabled = false,
-  paddingBottom = 12,
 }) => {
   return (
-    <View style={[styles.footer, { paddingBottom }]}>
-      <YellowButton size="md" icon={faPlus} label="Add New Folder" onPress={onAddFolder} />
-      <YellowButton size="md" icon={faBox} label="Save To Staging" onPress={onSaveStaging} />
+    <StickyFooter style={styles.footer}>
+      <View style={styles.row}>
+        <YellowButton size="sm" icon={faPlus} label="Add Folder" onPress={onAddFolder} />
+        <YellowButton size="sm" icon={faBox} label="To Staging" onPress={onSaveStaging} />
+      </View>
       <YellowButton
         size="md"
         icon={faCheck}
@@ -25,17 +27,19 @@ const SaveDestinationActions = ({
         onPress={onConfirmMove}
         dimmed={confirmDisabled}
       />
-    </View>
+    </StickyFooter>
   )
 }
 
 const styles = StyleSheet.create({
   footer: {
-    width: '100%',
     alignItems: 'center',
-    paddingTop: 8,
-    backgroundColor: '#fff',
     gap: 10,
+  },
+  row: {
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'space-around',
   },
 })
 

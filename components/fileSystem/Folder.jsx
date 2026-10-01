@@ -18,16 +18,13 @@ import KeyboardSafeForm from '../ui/KeyboardSafeForm';
 import YellowButton from '../ui/YellowButton';
 import { useAutoFocusOn } from '../../hooks/useAutoFocusOn';
 import MoveFolderDestinationRow from './MoveFolderDestinationRow';
-import { getMoveDestinationListHeight } from '../../constants/moveDestinationLayout';
+import StickyFooter from '../ui/StickyFooter';
 
 const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolderFunc, folders, updateUser}) => {
-  const { isTablet, contentFill, modalMaxWidth, height: windowHeight } = useResponsiveLayout()
+  const { isTablet, contentFill, modalMaxWidth } = useResponsiveLayout()
   const tabletModalPanel = isTablet
     ? { width: '100%', maxWidth: modalMaxWidth, alignSelf: 'center' }
     : null
-  // Nested pageSheet modals break flex height; pin the list to a real pixel height
-  // so action buttons stay on-screen and the folder list can scroll.
-  const moveFolderListHeight = getMoveDestinationListHeight(windowHeight)
 
   const [visible, setVisible] = useState(false)
   const [preDelete, setPreDelete] = useState(false)
@@ -345,7 +342,7 @@ const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolder
                                     :
                                         null
                                     }
-                              <View style={{height: moveFolderListHeight, width: '100%', marginBottom: 8, backgroundColor: '#fff'}}>
+                              <View style={{flex: 1, minHeight: 0, width: '100%', marginBottom: 8, backgroundColor: '#fff'}}>
                               <ScrollView
                                 style={{width: '100%', flex: 1}}
                                 contentContainerStyle={focusedFolder && !subFolders
@@ -415,10 +412,10 @@ const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolder
                                       }
                               </ScrollView>
                               </View>
-                              <View style={{display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'space-around', paddingTop: 8, paddingBottom: 24, backgroundColor: '#fff'}}>                    
+                              <StickyFooter style={{flexDirection: 'row', justifyContent: 'space-around'}}>
                                 <YellowButton size="sm" icon={faPlus} label="Add Folder" onPress={() => setAddFolderForm(true)} />
                                 <YellowButton size="sm" icon={faArrowRight} label="Confirm Move" onPress={handleMove} />
-                            </View>
+                              </StickyFooter>
                               </View>
                             }
                           </View>

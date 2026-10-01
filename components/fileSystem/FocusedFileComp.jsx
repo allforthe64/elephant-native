@@ -39,8 +39,7 @@ import { useKeyboardHeight } from '../../hooks/useKeyboardHeight'
 import { useAutoFocusOn } from '../../hooks/useAutoFocusOn'
 import MoveFolderDestinationRow from './MoveFolderDestinationRow'
 import YellowButton from '../ui/YellowButton'
-import { getMoveDestinationListHeight } from '../../constants/moveDestinationLayout'
-
+import StickyFooter from '../ui/StickyFooter'
 
 const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFileMove}) => {
     const { isTablet, contentFill, modalMaxWidth, height: windowHeight } = useResponsiveLayout()
@@ -48,9 +47,6 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
     const tabletModalPanel = isTablet
         ? { width: '100%', maxWidth: modalMaxWidth, alignSelf: 'center' }
         : null
-    // Nested pageSheet modals break flex height; pin the list to a real pixel height
-    // so action buttons stay on-screen and the folder list can scroll.
-    const moveFolderListHeight = getMoveDestinationListHeight(windowHeight)
 
     //initialize state
     const [userInst, setUserInst] = useState()
@@ -661,7 +657,7 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
                                             :
                                                 null
                                             }
-                                            <View style={{height: moveFolderListHeight, width: '100%', marginBottom: 8, backgroundColor: '#fff'}}>
+                                            <View style={{flex: 1, minHeight: 0, width: '100%', marginBottom: 8, backgroundColor: '#fff'}}>
                                             <ScrollView
                                               style={{flex: 1, width: '100%'}}
                                               contentContainerStyle={focusedFolder && !subFolders
@@ -719,7 +715,7 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
                                             </ScrollView>
                                             </View>
                                             
-                                            <View style={{width: '100%', paddingTop: 8, paddingBottom: Math.max(insets.bottom, 16) + 8, backgroundColor: '#fff'}}>
+                                            <StickyFooter>
                                             {add ?
                                                 <>
                                                     <View style={{width: '100%', display: 'flex', flexDirection: 'row', justifyContent: 'space-around'}}>
@@ -754,7 +750,7 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
                                                     <YellowButton size="sm" icon={faArrowRight} label="Confirm Move" onPress={handleMove} />
                                                 </View>
                                             }
-                                            </View>
+                                            </StickyFooter>
                                         </View>
                                         
                                     }

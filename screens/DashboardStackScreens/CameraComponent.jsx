@@ -46,7 +46,6 @@ import { TestIds } from '../../constants/testIds'
 import { UploadQueueEmitter } from '../../hooks/QueueEventEmitter';
 import { useResponsiveLayout, tabletStyle } from '../../hooks/useResponsiveLayout'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { getMoveDestinationListHeight } from '../../constants/moveDestinationLayout'
 import SaveDestinationActions from '../../components/fileSystem/SaveDestinationActions'
 import MoveFolderDestinationRow from '../../components/fileSystem/MoveFolderDestinationRow'
 
@@ -54,7 +53,6 @@ import MoveFolderDestinationRow from '../../components/fileSystem/MoveFolderDest
 export default function CameraComponent() {
 try {
     const { isTablet, select, height: windowHeight } = useResponsiveLayout()
-    const moveFolderListHeight = getMoveDestinationListHeight(windowHeight)
     const insets = useSafeAreaInsets()
     const [facing, setFacing] = useState('back');
     const [permission, requestPermission] = useCameraPermissions();
@@ -607,7 +605,7 @@ try {
                         :
                             null
                         }
-                        <View style={{height: moveFolderListHeight, width: '100%', marginBottom: 8, backgroundColor: '#fff'}}>
+                        <View style={{flex: 1, minHeight: 0, width: '100%', marginBottom: 8, backgroundColor: '#fff'}}>
                                 <ScrollView style={{flex: 1, width: '100%'}} contentContainerStyle={focusedFolder && !subFolders ? {flexGrow: 1, justifyContent: 'center'} : {paddingBottom: 16}}>
                                 {/* map over each of the folders from the filesystem and display them as a pressable element // call movefile function when one of them is pressed */}
                                 {focusedFolder && !subFolders ? 
@@ -676,7 +674,6 @@ try {
                             onSaveStaging={() => saveToElephant(videoObj ? true : false, true)}
                             onConfirmMove={() => saveToElephant(false)}
                             confirmDisabled={!(destination.id !== null || focusedFolder)}
-                            paddingBottom={Math.max(insets.bottom, 12)}
                         />
 
 

@@ -30,13 +30,12 @@ import { TestIds } from '../../constants/testIds'
 import { useResponsiveLayout } from '../../hooks/useResponsiveLayout'
 import { useAutoFocusOn } from '../../hooks/useAutoFocusOn'
 import { useKeyboardHeight } from '../../hooks/useKeyboardHeight'
-import { getMoveDestinationListHeight } from '../../constants/moveDestinationLayout'
 import SaveDestinationActions from '../../components/fileSystem/SaveDestinationActions'
+import StickyFooter from '../../components/ui/StickyFooter'
 import MoveFolderDestinationRow from '../../components/fileSystem/MoveFolderDestinationRow'
 
 const Notepad = () => {
     const { isTablet, select, height: windowHeight } = useResponsiveLayout()
-    const moveFolderListHeight = getMoveDestinationListHeight(windowHeight)
     const keyboardHeight = useKeyboardHeight()
 
     const [open, setOpen] = useState(true)
@@ -390,7 +389,7 @@ const Notepad = () => {
                       :
                           null
                       }
-                      <View style={{height: moveFolderListHeight, width: '100%', marginBottom: 8, backgroundColor: '#fff'}}>
+                      <View style={{flex: 1, minHeight: 0, width: '100%', marginBottom: 8, backgroundColor: '#fff'}}>
                               <ScrollView style={{flex: 1, width: '100%'}} contentContainerStyle={focusedFolder && !subFolders ? {flexGrow: 1, justifyContent: 'center'} : {paddingBottom: 16}}>
                               {/* map over each of the folders from the filesystem and display them as a pressable element // call movefile function when one of them is pressed */}
                               {focusedFolder && !subFolders ? 
@@ -458,7 +457,6 @@ const Notepad = () => {
                         onSaveStaging={() => addToStorage(true)}
                         onConfirmMove={() => addToStorage()}
                         confirmDisabled={!(destination.id !== null || focusedFolder)}
-                        paddingBottom={Math.max(insets.bottom, 12)}
                       />
                   </View>
                   
@@ -508,14 +506,7 @@ const Notepad = () => {
                         ref={ref}
                         autoFocus
                         />
-          <View
-            style={[
-              styles.toolbar,
-              {
-                paddingBottom: Math.max(insets.bottom, 12),
-              },
-            ]}
-          >
+          <StickyFooter style={styles.toolbar}>
             {!open && 
                 <YellowButton
                   testID={TestIds.notes.addToStorage}
@@ -536,7 +527,7 @@ const Notepad = () => {
                     onPress={() => {open === false ? startEdit() : saveNote()}}
                     style={{ alignSelf: 'center' }}
                   />
-          </View>
+          </StickyFooter>
         </KeyboardAvoidingView>
         </ContentShell>
         </>
@@ -594,18 +585,10 @@ const styles = StyleSheet.create({
       backgroundColor: 'white',
     },
     toolbar: {
-      width: '100%',
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'flex-end',
-      paddingHorizontal: 16,
-      paddingTop: 10,
-      backgroundColor: '#FFFCF6',
-      borderTopWidth: StyleSheet.hairlineWidth,
-      borderTopColor: '#DDCADB',
       gap: 10,
-      zIndex: 20,
-      elevation: 8,
     },
     iconHolder: {
       backgroundColor: 'white', 

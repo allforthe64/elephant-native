@@ -38,7 +38,6 @@ import { TestIds } from '../../constants/testIds'
 import { useResponsiveLayout } from '../../hooks/useResponsiveLayout'
 import { useKeyboardHeight } from '../../hooks/useKeyboardHeight'
 import { useAutoFocusOn } from '../../hooks/useAutoFocusOn'
-import { getMoveDestinationListHeight } from '../../constants/moveDestinationLayout'
 import SaveDestinationActions from '../../components/fileSystem/SaveDestinationActions'
 import MoveFolderDestinationRow from '../../components/fileSystem/MoveFolderDestinationRow'
 
@@ -46,7 +45,6 @@ const AudioRecorder = () => {
 
     try {
         const { isTablet, select, height: windowHeight } = useResponsiveLayout()
-        const moveFolderListHeight = getMoveDestinationListHeight(windowHeight)
         const insets = useSafeAreaInsets()
         const keyboardHeight = useKeyboardHeight()
         const [recording, setRecording] = useState()
@@ -508,7 +506,7 @@ const AudioRecorder = () => {
                             :
                                 null
                             }
-                            <View style={{height: moveFolderListHeight, width: '100%', marginBottom: 8, backgroundColor: '#fff'}}>
+                            <View style={{flex: 1, minHeight: 0, width: '100%', marginBottom: 8, backgroundColor: '#fff'}}>
                                     <ScrollView style={{flex: 1, width: '100%'}} contentContainerStyle={focusedFolder && !subFolders ? {flexGrow: 1, justifyContent: 'center'} : {paddingBottom: 16}}>
                                     {/* map over each of the folders from the filesystem and display them as a pressable element // call movefile function when one of them is pressed */}
                                     {focusedFolder && !subFolders ? 
@@ -577,7 +575,6 @@ const AudioRecorder = () => {
                                 onSaveStaging={() => saveFiles(true)}
                                 onConfirmMove={() => saveFiles()}
                                 confirmDisabled={!(destination.id !== null || focusedFolder)}
-                                paddingBottom={Math.max(insets.bottom, 12)}
                             />
     
     
