@@ -16,6 +16,8 @@ export const TestIds = {
     signIn: 'auth-sign-in',
     sendLink: 'auth-send-link',
     switchMode: 'auth-switch-mode',
+    togglePassword: 'auth-toggle-password',
+    resetPassword: 'auth-reset-password',
   },
   dashboard: {
     signOut: 'dashboard-sign-out',

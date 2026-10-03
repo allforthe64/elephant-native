@@ -2,6 +2,8 @@ import { StyleSheet, Text, View, KeyboardAvoidingView, Platform } from 'react-na
 import React, {useState, useEffect} from 'react'
 import { firebaseAuth } from '../firebaseConfig'
 import { signInWithEmailAndPassword } from 'firebase/auth'
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
+import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons'
 import { useToast } from 'react-native-toast-notifications'
 import AppPressable from '../components/ui/AppPressable'
 import AppTextInput from '../components/ui/AppTextInput'
@@ -20,6 +22,8 @@ const Login = ({navigation: {navigate}}) => {
     const [loading, setLoading] = useState(false)
     const [validEmail, setValidEmail] = useState(false)
     const [signUpMode, setSignUpMode] = useState(false)
+    const [showPassword, setShowPassword] = useState(false)
+    const [resetSending, setResetSending] = useState(false)
     const auth = firebaseAuth
     const { isTablet } = useResponsiveLayout()
 
@@ -63,9 +67,45 @@ const Login = ({navigation: {navigate}}) => {
         setSignUpMode(false)
     }
 
+    const resetPassword = async () => {
+        if (!validEmail) {
+            toast.show('Enter your email above, then tap "Forgot password?" again.', {
+                type: 'warning'
+            })
+            return
+        }
+        setResetSending(true)
+        try {
+            const res = await fetch('https://www.myelephantapp.com/api/send-password-reset', {
+                method: 'POST',
+                headers: {
+                    'Content-type': 'application/json'
+                },
+                body: JSON.stringify({
+                    email: userEmail.trim()
+                })
+            })
+            if (res.status === 429) {
+                toast.show('Too many attempts. Please wait a bit and try again.', { type: 'danger' })
+                return
+            }
+            if (!res.ok) throw new Error(`Reset email request failed: ${res.status}`)
+            // Same message whether or not the account exists, so emails can't be probed.
+            toast.show('If an account exists for that email, a reset link is on its way.', {
+                type: 'success'
+            })
+        } catch (err) {
+            console.log(err)
+            toast.show("Couldn't send the reset email. Please try again.", { type: 'danger' })
+        } finally {
+            setResetSending(false)
+        }
+    }
+
     const switchMode = () => {
         setUserEmail('')
         setPassword('')
+        setShowPassword(false)
         setSignUpMode(prev => !prev)
     }
 
@@ -103,16 +143,38 @@ const Login = ({navigation: {navigate}}) => {
                                 />
                                 <Text style={(validEmail || userEmail === '') ? {display: 'none'} : tabletStyle(isTablet, styles.invalid, tabletStyles.subheading)}>Please Enter A Valid Email</Text>
                                 <Text style={tabletStyle(isTablet, styles.subheading, tabletStyles.subheading)}>Enter Password:</Text>
-                                <AppTextInput
-                                  testID={TestIds.auth.password}
-                                  accessibilityLabel="Password"
-                                  secureTextEntry
-                                  style={tabletStyle(isTablet, styles.input, tabletStyles.input)}
-                                  placeholder='Enter Password'
-                                  placeholderTextColor={'#593060'}
-                                  value={password}
-                                  onChangeText={setPassword}
-                                />
+                                <View style={tabletStyle(isTablet, styles.passwordRow, tabletStyles.passwordRow)}>
+                                    <AppTextInput
+                                      testID={TestIds.auth.password}
+                                      accessibilityLabel="Password"
+                                      secureTextEntry={!showPassword}
+                                      autoCapitalize='none'
+                                      autoCorrect={false}
+                                      style={[tabletStyle(isTablet, styles.input, tabletStyles.input), styles.passwordInput]}
+                                      placeholder='Enter Password'
+                                      placeholderTextColor={'#593060'}
+                                      value={password}
+                                      onChangeText={setPassword}
+                                    />
+                                    <AppPressable
+                                      testID={TestIds.auth.togglePassword}
+                                      accessibilityLabel={showPassword ? 'Hide password' : 'Show password'}
+                                      onPress={() => setShowPassword(prev => !prev)}
+                                      hitSlop={10}
+                                      style={styles.eyeButton}
+                                    >
+                                        <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} size={22} color='#593060' />
+                                    </AppPressable>
+                                </View>
+                                <AppPressable
+                                  testID={TestIds.auth.resetPassword}
+                                  accessibilityLabel="Forgot password"
+                                  disabled={resetSending}
+                                  onPress={resetPassword}
+                                  style={tabletStyle(isTablet, styles.forgotRow, tabletStyles.forgotRow)}
+                                >
+                                    <Text style={styles.switchAuthLink}>{resetSending ? 'Sending...' : 'Forgot password?'}</Text>
+                                </AppPressable>
                                 <AppPressable
                                   testID={TestIds.auth.signIn}
                                   accessibilityLabel="Sign In"
@@ -124,7 +186,7 @@ const Login = ({navigation: {navigate}}) => {
                                 </AppPressable>
                                 <View style={styles.switchAuthContainer}>
                                     <Text style={styles.switchAuthText}>
-                                        Already have an account?
+                                        Don't have an account?
                                     </Text>
                                     <AppPressable
                                       testID={TestIds.auth.switchMode}
@@ -134,7 +196,7 @@ const Login = ({navigation: {navigate}}) => {
                                         <Text style={styles.switchAuthLink}>Click here</Text>
                                     </AppPressable>
                                     <Text style={styles.switchAuthText}>
-                                        to login.
+                                        to register.
                                     </Text>
                                 </View>
                             </View>
@@ -267,6 +329,30 @@ const styles = StyleSheet.create({
         borderColor: '#593060',
         color: 'red'
     },
+    passwordRow: {
+        width: '80%',
+        justifyContent: 'center',
+        marginBottom: 8,
+    },
+    passwordInput: {
+        width: '100%',
+        marginBottom: 0,
+        paddingRight: 44,
+    },
+    eyeButton: {
+        position: 'absolute',
+        right: 4,
+        top: 0,
+        bottom: 0,
+        width: 36,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    forgotRow: {
+        width: '80%',
+        alignItems: 'flex-end',
+        marginBottom: '4%',
+    },
     inputButton: {
         textAlign: 'center',
         fontSize: 20,
@@ -313,6 +399,13 @@ const tabletStyles = StyleSheet.create({
     fontSize: 18,
     paddingVertical: 10,
     marginBottom: 20,
+  },
+  passwordRow: {
+    width: '100%',
+  },
+  forgotRow: {
+    width: '100%',
+    marginBottom: 16,
   },
   button: {
     width: '100%',
