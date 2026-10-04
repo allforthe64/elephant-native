@@ -49,6 +49,10 @@ const AudioRecorder = () => {
         const keyboardHeight = useKeyboardHeight()
         const [recording, setRecording] = useState()
         const [recordings, setRecordings] = useState([])
+        const recordingsRef = useRef([])
+        const recordingRef = useRef(null)
+        const playbackRef = useRef(null)
+        const recorderBusyRef = useRef(false)
         const [userInst, setUserInst] = useState()
         const [loading, setLoading] = useState(false)
         const [preAdd, setPreAdd] = useState(false)
@@ -144,6 +148,92 @@ const AudioRecorder = () => {
             }
         }, [focusedFolder, folders])
 
+        useEffect(() => {
+            recordingsRef.current = recordings
+        }, [recordings])
+
+    const recordingAudioMode = {
+        allowsRecordingIOS: true,
+        playsInSilentModeIOS: true,
+        staysActiveInBackground: false,
+        interruptionModeIOS: 1,
+        interruptionModeAndroid: 1,
+        shouldDuckAndroid: false,
+        playThroughEarpieceAndroid: false,
+    }
+
+    const playbackAudioMode = {
+        allowsRecordingIOS: false,
+        playsInSilentModeIOS: true,
+        staysActiveInBackground: false,
+        interruptionModeIOS: 1,
+        interruptionModeAndroid: 1,
+        shouldDuckAndroid: false,
+        playThroughEarpieceAndroid: false,
+    }
+
+    const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
+
+    const unloadPlayback = async () => {
+        const sound = playbackRef.current
+        playbackRef.current = null
+        if (!sound) return
+        try {
+            await sound.stopAsync()
+        } catch (_) { /* already stopped */ }
+        try {
+            await sound.unloadAsync()
+        } catch (_) { /* already unloaded */ }
+        await Promise.all((recordingsRef.current || []).map(async (clip) => {
+            try {
+                await clip.sound?.unloadAsync?.()
+            } catch (_) { /* already unloaded */ }
+        }))
+    }
+
+    const releaseRecording = async (rec) => {
+        if (!rec) return
+        try {
+            await rec.stopAndUnloadAsync()
+        } catch (_) {
+            try {
+                await rec._cleanupForUnloadedRecorder?.({
+                    canRecord: false,
+                    durationMillis: 0,
+                    isRecording: false,
+                    isDoneRecording: true,
+                })
+            } catch (_) { /* already released */ }
+        }
+    }
+
+    const resetNativeRecorder = async () => {
+        await unloadPlayback()
+        if (recordingRef.current) {
+            await releaseRecording(recordingRef.current)
+            recordingRef.current = null
+        }
+
+        // Android MediaRecorder stays prepared after the first clip unless the
+        // AV module is fully cycled. iOS needs the recording-mode toggle.
+        if (Platform.OS === 'android') {
+            try {
+                await Audio.setIsEnabledAsync(false)
+            } catch (_) { /* ignore */ }
+            await wait(150)
+            try {
+                await Audio.setIsEnabledAsync(true)
+            } catch (_) { /* ignore */ }
+        } else {
+            try {
+                await Audio.setAudioModeAsync(playbackAudioMode)
+            } catch (_) { /* ignore */ }
+        }
+
+        await Audio.setAudioModeAsync(recordingAudioMode)
+        await wait(Platform.OS === 'android' ? 200 : 50)
+    }
+
     // Camera/video can leave the shared AVAudioSession in a non-recording state.
     // Reclaim it whenever this screen is focused so mic recording works afterward.
     useFocusEffect(
@@ -151,24 +241,22 @@ const AudioRecorder = () => {
             let cancelled = false
             ;(async () => {
                 try {
-                    await Audio.setAudioModeAsync({
-                        allowsRecordingIOS: true,
-                        playsInSilentModeIOS: true,
-                        staysActiveInBackground: false,
-                        shouldDuckAndroid: true,
-                        playThroughEarpieceAndroid: false,
-                    })
+                    await Audio.setAudioModeAsync(recordingAudioMode)
                 } catch (err) {
                     if (!cancelled) console.warn('Audio mode prepare failed:', err)
                 }
             })()
             return () => {
                 cancelled = true
+                unloadPlayback()
             }
         }, [])
     )
 
     const startRecording = async () => {
+        if (recorderBusyRef.current || recordingRef.current) return
+        recorderBusyRef.current = true
+
         try {
             const permission = await Audio.requestPermissionsAsync()
             const granted = permission?.granted === true || permission?.status === 'granted'
@@ -178,59 +266,67 @@ const AudioRecorder = () => {
                return
             }
 
-            // Force reconfigure after camera/video may have taken over the session
-            await Audio.setAudioModeAsync({
-                allowsRecordingIOS: true,
-                playsInSilentModeIOS: true,
-                staysActiveInBackground: false,
-                shouldDuckAndroid: true,
-                playThroughEarpieceAndroid: false,
-            })
+            await resetNativeRecorder()
 
-            const {recording} = await Audio.Recording.createAsync(
+            const {recording: nextRecording} = await Audio.Recording.createAsync(
                 Audio.RecordingOptionsPresets.HIGH_QUALITY
             )
 
-            setRecording(recording)
+            recordingRef.current = nextRecording
+            setRecording(nextRecording)
         } catch (err) {
             console.error('Failed to start recording', err)
-            // One retry after resetting audio mode — common after leaving CameraView video mode
             try {
-                await Audio.setAudioModeAsync({
-                    allowsRecordingIOS: false,
-                })
-                await Audio.setAudioModeAsync({
-                    allowsRecordingIOS: true,
-                    playsInSilentModeIOS: true,
-                    shouldDuckAndroid: true,
-                    playThroughEarpieceAndroid: false,
-                })
-                const {recording} = await Audio.Recording.createAsync(
+                await resetNativeRecorder()
+                const {recording: nextRecording} = await Audio.Recording.createAsync(
                     Audio.RecordingOptionsPresets.HIGH_QUALITY
                 )
-                setRecording(recording)
+                recordingRef.current = nextRecording
+                setRecording(nextRecording)
             } catch (retryErr) {
                 console.error('Recording retry failed', retryErr)
+                recordingRef.current = null
+                setRecording(undefined)
                 Alert.alert(
                     'Recording failed',
                     retryErr?.message || 'Could not start the microphone. Close the camera screen and try again.'
                 )
             }
+        } finally {
+            recorderBusyRef.current = false
         }
     }
 
     const stopRecording = async () => {
-        if (!recording) return
+        const rec = recordingRef.current || recording
+        if (!rec || recorderBusyRef.current) return
+        recorderBusyRef.current = true
 
-        setRecording(undefined)
-        await recording.stopAndUnloadAsync()
-        // Required by expo-av so the recorded file can be read/uploaded after stop
-        await Audio.setAudioModeAsync({
-            allowsRecordingIOS: false,
-        })
+        let durationMillis = 0
+        try {
+            const status = await rec.getStatusAsync()
+            durationMillis = status?.durationMillis || 0
+        } catch (_) { /* duration falls back to 0 */ }
 
-        const uri = recording.getURI()
+        try {
+            await rec.stopAndUnloadAsync()
+        } catch (_) {
+            try {
+                await rec._cleanupForUnloadedRecorder?.({
+                    canRecord: false,
+                    durationMillis,
+                    isRecording: false,
+                    isDoneRecording: true,
+                })
+            } catch (_) { /* already released */ }
+        }
+
+        const uri = rec.getURI?.()
+        recordingRef.current = null
+
         if (!uri) {
+            setRecording(undefined)
+            recorderBusyRef.current = false
             Alert.alert('Recording failed', 'No audio file was produced.')
             return
         }
@@ -239,6 +335,8 @@ const AudioRecorder = () => {
         const ext = ((uri.split('.').pop() || 'm4a').split('?')[0] || 'm4a').toLowerCase()
         const docsDir = FileSystem.documentDirectory || FileSystem.cacheDirectory
         if (!docsDir) {
+            setRecording(undefined)
+            recorderBusyRef.current = false
             Alert.alert('Recording failed', 'Could not access local storage for the recording.')
             return
         }
@@ -247,22 +345,38 @@ const AudioRecorder = () => {
             await FileSystem.copyAsync({ from: uri, to: stableUri })
         } catch (copyErr) {
             console.error('Failed to persist recording', copyErr)
+            setRecording(undefined)
+            recorderBusyRef.current = false
             Alert.alert('Recording failed', 'Could not save the recording file.')
             return
         }
 
-        const { sound, status } = await Audio.Sound.createAsync({ uri: stableUri })
-
-        const updatedRecordings = [...recordings]
-        updatedRecordings.push({
-            sound: sound,
-            duration: getDurartionFormatted(status.durationMillis),
+        setRecordings((prev) => [...prev, {
+            duration: getDurartionFormatted(durationMillis),
             file: stableUri,
             fileType: ext,
-            name: `Recording ${recordings.length + 1}`
-        })
+            name: `Recording ${prev.length + 1}`
+        }])
+        setRecording(undefined)
+        recorderBusyRef.current = false
+    }
 
-        setRecordings(updatedRecordings)
+    const playClip = async (uri) => {
+        if (!uri || recorderBusyRef.current || recordingRef.current) return
+        try {
+            await unloadPlayback()
+            await Audio.setAudioModeAsync(playbackAudioMode)
+            const { sound } = await Audio.Sound.createAsync({ uri })
+            playbackRef.current = sound
+            sound.setOnPlaybackStatusUpdate((status) => {
+                if (status?.didJustFinish) {
+                    unloadPlayback()
+                }
+            })
+            await sound.replayAsync()
+        } catch (err) {
+            Alert.alert('Playback failed', err?.message || String(err))
+        }
     }
 
     const getDurartionFormatted = (millis) => {
@@ -276,7 +390,7 @@ const AudioRecorder = () => {
     const getRecordingLines = () => {
         return recordings.map((recordingLine, index) => {
             return (
-            <AudioEditor editRecordings={setRecordings} recordingLine={recordingLine} index={index} key={index} recordings={recordings} deleteFunc={filterRecordings} />
+            <AudioEditor editRecordings={setRecordings} recordingLine={recordingLine} index={index} key={index} recordings={recordings} deleteFunc={filterRecordings} onPlay={playClip} />
         ) 
             
         })
@@ -629,6 +743,8 @@ const AudioRecorder = () => {
                       size="md"
                       label="Save All"
                       onPress={() => setPreAdd(true)}
+                      dimmed={recordings.length === 0}
+                      disabled={recordings.length === 0}
                       style={isTablet ? tabletStyles.actionButton : undefined}
                       icon={faCloudArrowUp}
                     />

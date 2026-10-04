@@ -6,7 +6,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
 import { faPlay, faTrash } from '@fortawesome/free-solid-svg-icons'
 import { tabletStyle, useResponsiveLayout } from '../../hooks/useResponsiveLayout'
 
-const AudioEditor = ({recordingLine, index, deleteFunc, editRecordings, recordings}) => {
+const AudioEditor = ({recordingLine, index, deleteFunc, editRecordings, recordings, onPlay}) => {
     const { isTablet, contentFill } = useResponsiveLayout()
     const [recordingTitle, setRecordingTitle] = useState(recordingLine.name)
 
@@ -38,7 +38,7 @@ const AudioEditor = ({recordingLine, index, deleteFunc, editRecordings, recordin
         </View>
     </View> */
     <View key={index} style={tabletStyle(isTablet, styles.fileRow, contentFill)}>
-        <TouchableOpacity onPress={() => {recordingLine.sound.replayAsync()}}>
+        <TouchableOpacity onPress={() => onPlay?.(recordingLine.file)}>
             <FontAwesomeIcon icon={faPlay} style={{color: 'white', marginTop: '2%'}} size={18}/>
         </TouchableOpacity>
         <TextInput style={styles.input} value={recordingTitle} numberOfLines={1} placeholder='Enter Recording Name...' placeholderTextColor='#888' onChangeText={e => setRecordingTitle(e)} onFocus={() => setRecordingTitle('')}/>
