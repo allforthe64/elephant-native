@@ -26,6 +26,7 @@ const StickyFooter = ({ children, style, minBottomPadding = 12 }) => {
 const styles = StyleSheet.create({
   footer: {
     width: '100%',
+    flexShrink: 0,
     paddingHorizontal: 16,
     paddingTop: 10,
     backgroundColor: '#FFFCF6',

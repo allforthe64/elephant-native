@@ -38,6 +38,7 @@ import KeyboardSafeForm from '../ui/KeyboardSafeForm'
 import { useKeyboardHeight } from '../../hooks/useKeyboardHeight'
 import { useAutoFocusOn } from '../../hooks/useAutoFocusOn'
 import MoveFolderDestinationRow from './MoveFolderDestinationRow'
+import DestinationFolderScroller from './DestinationFolderScroller'
 import YellowButton from '../ui/YellowButton'
 import StickyFooter from '../ui/StickyFooter'
 
@@ -632,7 +633,7 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
 
                                     :
 
-                                        <View style={{width: '100%', flex: 1, backgroundColor: '#fff'}}>
+                                        <View style={{width: '100%', flex: 1, minHeight: 0, backgroundColor: '#fff'}}>
                                             <Text style={{fontSize: 40, color: '#593060', fontWeight: 'bold', textAlign: 'left', width: '100%', paddingLeft: '5%', marginBottom: 8}}>Move To...</Text>
                                             {focusedFolderInst &&
                                                 <Text style={{fontSize: 20, color: '#593060', fontWeight: 'bold', textAlign: 'left', width: '100%', paddingLeft: '5%', marginBottom: 8}}>Viewing: {focusedFolderInst.fileName}</Text>
@@ -657,15 +658,7 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
                                             :
                                                 null
                                             }
-                                            <View style={{flex: 1, minHeight: 0, width: '100%', marginBottom: 8, backgroundColor: '#fff'}}>
-                                            <ScrollView
-                                              style={{flex: 1, width: '100%'}}
-                                              contentContainerStyle={focusedFolder && !subFolders
-                                                ? {flexGrow: 1, justifyContent: 'center', paddingBottom: 16}
-                                                : {paddingBottom: 16, paddingTop: 4}}
-                                              showsVerticalScrollIndicator={true}
-                                              keyboardShouldPersistTaps="handled"
-                                            >
+                                            <DestinationFolderScroller centerEmpty={!!(focusedFolder && !subFolders)}>
                                                         {focusedFolder && !subFolders ? (
                                                             <Text style={{fontSize: 30, color: '#593060', fontWeight: 'bold', textAlign: 'center'}}>No Subfolders...</Text>
                                                         ) : (
@@ -712,8 +705,7 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
                                                                 })}
                                                             </>
                                                         )}
-                                            </ScrollView>
-                                            </View>
+                                            </DestinationFolderScroller>
                                             
                                             <StickyFooter>
                                             {add ?

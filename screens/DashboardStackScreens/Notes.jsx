@@ -31,6 +31,7 @@ import { useResponsiveLayout } from '../../hooks/useResponsiveLayout'
 import { useAutoFocusOn } from '../../hooks/useAutoFocusOn'
 import { useKeyboardHeight } from '../../hooks/useKeyboardHeight'
 import SaveDestinationActions from '../../components/fileSystem/SaveDestinationActions'
+import DestinationFolderScroller from '../../components/fileSystem/DestinationFolderScroller'
 import StickyFooter from '../../components/ui/StickyFooter'
 import MoveFolderDestinationRow from '../../components/fileSystem/MoveFolderDestinationRow'
 
@@ -286,7 +287,7 @@ const Notepad = () => {
         <Modal animationType='slide' presentationStyle='pageSheet' onShow={() => setTimeout(()=>{
           nameRef.current.focus()
         }, 200)}>
-          <View style={{height: '100%', width: '100%', backgroundColor: '#fff'}}>
+          <View style={{flex: 1, height: '100%', width: '100%', backgroundColor: '#fff', overflow: 'hidden'}}>
               {/* if the moveFile state is true, display the modal with the file movement code*/}
               {/* xMark icon for closing out the moveFile modal */}
               <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', paddingRight: '5%', paddingTop: '10%', width: '100%'}}>
@@ -365,7 +366,7 @@ const Notepad = () => {
 
               :
 
-                  <View style={{width: '100%', flex: 1, alignItems: 'center', backgroundColor: '#fff'}}>
+                  <View style={{width: '100%', flex: 1, minHeight: 0, alignItems: 'center', backgroundColor: '#fff'}}>
                       <Text style={{fontSize: 40, color: '#593060', fontWeight: 'bold', textAlign: 'left', width: '100%', paddingLeft: '5%', marginBottom: 8}}>Save Note To...</Text>
                       {focusedFolderInst &&
                         <Text style={{fontSize: 20, color: '#593060', fontWeight: 'bold', textAlign: 'left', width: '100%', paddingLeft: '5%', marginBottom: 8}}>Viewing: {focusedFolderInst.fileName}</Text>
@@ -389,8 +390,7 @@ const Notepad = () => {
                       :
                           null
                       }
-                      <View style={{flex: 1, minHeight: 0, width: '100%', marginBottom: 8, backgroundColor: '#fff'}}>
-                              <ScrollView style={{flex: 1, width: '100%'}} contentContainerStyle={focusedFolder && !subFolders ? {flexGrow: 1, justifyContent: 'center'} : {paddingBottom: 16}}>
+                      <DestinationFolderScroller centerEmpty={!!(focusedFolder && !subFolders)}>
                               {/* map over each of the folders from the filesystem and display them as a pressable element // call movefile function when one of them is pressed */}
                               {focusedFolder && !subFolders ? 
                                   <Text style={[{fontSize: 30, color: '#593060', fontWeight: 'bold', marginTop: '30%', textAlign: 'center'}, select(undefined, tabletStyles.emptyHeading)]}>No Subfolders...</Text>
@@ -450,8 +450,7 @@ const Notepad = () => {
                                       <Text style={destination === 'home' ? {color: 'black', fontSize: 30, marginLeft: '5%'} : {color: 'white', fontSize: 30, marginLeft: '5%'}}>Home</Text>
                                       </View>
                                   </Pressable> */}
-                              </ScrollView>
-                      </View>
+                      </DestinationFolderScroller>
                       <SaveDestinationActions
                         onAddFolder={() => setAddFolderForm(true)}
                         onSaveStaging={() => addToStorage(true)}
