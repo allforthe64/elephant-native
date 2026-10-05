@@ -725,15 +725,16 @@ const AudioRecorder = () => {
                         }
                     </View>
                 }
-                <View style={styles.wrapperContainer}>
-                        <AppPressable
-                          testID={TestIds.audio.recordToggle}
-                          accessibilityLabel={recording ? 'Stop recording' : 'Start recording'}
-                          onPress={recording ? stopRecording : startRecording}
-                          style={{backgroundColor: 'transparent', borderWidth: 8, borderColor: 'white', borderRadius: 1000, width: '20%', height: 70, display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}
-                        >
-                            {recording ? <FontAwesomeIcon icon={faSquare} size={30} color='#871313'/> : <FontAwesomeIcon icon={faMicrophone} size={30} color='#871313'/>}
-                        </AppPressable>
+                <View style={[styles.wrapperContainer, styles.bottomButtonWrap]}>
+                    <YellowButton
+                      testID={TestIds.audio.recordToggle}
+                      accessibilityLabel={recording ? 'Stop recording' : 'Start recording'}
+                      size="md"
+                      label={recording ? 'Stop Recording' : 'Start Recording'}
+                      onPress={recording ? stopRecording : startRecording}
+                      style={isTablet ? tabletStyles.actionButton : undefined}
+                      icon={recording ? faSquare : faMicrophone}
+                    />
                 </View>
                 <View style={[styles.wrapperContainer, styles.bottomButtonWrap]}>
                     <YellowButton
