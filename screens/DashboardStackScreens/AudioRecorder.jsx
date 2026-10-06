@@ -392,7 +392,7 @@ const AudioRecorder = () => {
     const getRecordingLines = () => {
         return recordings.map((recordingLine, index) => {
             return (
-            <AudioEditor editRecordings={setRecordings} recordingLine={recordingLine} index={index} key={index} recordings={recordings} deleteFunc={filterRecordings} onPlay={playClip} />
+            <AudioEditor editRecordings={setRecordings} recordingLine={recordingLine} index={index} key={recordingLine.file} recordings={recordings} deleteFunc={filterRecordings} onPlay={playClip} />
         ) 
             
         })
