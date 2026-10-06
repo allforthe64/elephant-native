@@ -38,6 +38,7 @@ import { TestIds } from '../../constants/testIds'
 import { useResponsiveLayout } from '../../hooks/useResponsiveLayout'
 import { useKeyboardHeight } from '../../hooks/useKeyboardHeight'
 import { useAutoFocusOn } from '../../hooks/useAutoFocusOn'
+import { ensurePermission } from '../../utils/permissions'
 import SaveDestinationActions from '../../components/fileSystem/SaveDestinationActions'
 import DestinationFolderScroller from '../../components/fileSystem/DestinationFolderScroller'
 import MoveFolderDestinationRow from '../../components/fileSystem/MoveFolderDestinationRow'
@@ -259,7 +260,7 @@ const AudioRecorder = () => {
         recorderBusyRef.current = true
 
         try {
-            const permission = await Audio.requestPermissionsAsync()
+            const permission = await ensurePermission(Audio.getPermissionsAsync, Audio.requestPermissionsAsync)
             const granted = permission?.granted === true || permission?.status === 'granted'
 
             if (!granted) {

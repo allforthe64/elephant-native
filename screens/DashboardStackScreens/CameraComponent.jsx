@@ -42,6 +42,7 @@ import YellowButton from '../../components/ui/YellowButton'
 import ContentShell from '../../components/ui/ContentShell'
 import KeyboardSafeForm from '../../components/ui/KeyboardSafeForm'
 import { useAutoFocusOn } from '../../hooks/useAutoFocusOn'
+import { ensurePermission } from '../../utils/permissions'
 import { TestIds } from '../../constants/testIds'
 import { UploadQueueEmitter } from '../../hooks/QueueEventEmitter';
 import { useResponsiveLayout, tabletStyle } from '../../hooks/useResponsiveLayout'
@@ -136,8 +137,8 @@ try {
         let cancelled = false
         ;(async () => {
             try {
-                const mediaLibraryPermission = await MediaLibrary.requestPermissionsAsync()
-                await Audio.requestPermissionsAsync()
+                const mediaLibraryPermission = await ensurePermission(MediaLibrary.getPermissionsAsync, MediaLibrary.requestPermissionsAsync)
+                await ensurePermission(Audio.getPermissionsAsync, Audio.requestPermissionsAsync)
                 if (cancelled) return
                 setHasMediaLibraryPermission(mediaLibraryPermission.status === 'granted')
             } catch (err) {

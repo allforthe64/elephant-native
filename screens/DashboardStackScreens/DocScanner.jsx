@@ -39,6 +39,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 import ContentShell from '../../components/ui/ContentShell'
 import KeyboardSafeForm from '../../components/ui/KeyboardSafeForm'
 import { useAutoFocusOn } from '../../hooks/useAutoFocusOn'
+import { ensureAndroidPermission } from '../../utils/permissions'
 import YellowButton from '../../components/ui/YellowButton'
 import { useResponsiveLayout } from '../../hooks/useResponsiveLayout'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
@@ -177,12 +178,10 @@ const DocScanner = () => {
   const scanDocument = async () => {
 
     // prompt user to accept camera permission request if they haven't already
-    if (Platform.OS === 'android' && await PermissionsAndroid.request(
-      PermissionsAndroid.PERMISSIONS.CAMERA
-    ) !== PermissionsAndroid.RESULTS.GRANTED) {
-      toast.show('File upload successful', {
-        type: 'error'
-      }) 
+    if (Platform.OS === 'android' && !(await ensureAndroidPermission(PermissionsAndroid.PERMISSIONS.CAMERA))) {
+      toast.show('Camera permission is required to scan documents', {
+        type: 'danger'
+      })
       return
     }
 
