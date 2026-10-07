@@ -137,7 +137,10 @@ try {
         let cancelled = false
         ;(async () => {
             try {
-                const mediaLibraryPermission = await ensurePermission(MediaLibrary.getPermissionsAsync, MediaLibrary.requestPermissionsAsync)
+                const mediaLibraryPermission = await ensurePermission(
+                    () => MediaLibrary.getPermissionsAsync(true),
+                    () => MediaLibrary.requestPermissionsAsync(true)
+                )
                 await ensurePermission(Audio.getPermissionsAsync, Audio.requestPermissionsAsync)
                 if (cancelled) return
                 setHasMediaLibraryPermission(mediaLibraryPermission.status === 'granted')

@@ -13,7 +13,6 @@ import { uploadBytes, ref as refFunction, deleteObject } from 'firebase/storage'
 
 //expo shareAsync, MediaLibrary, and FileSystem imports 
 import { shareAsync } from 'expo-sharing'
-import * as MediaLibrary from 'expo-media-library'
 import * as FileSystem from 'expo-file-system'
 
 //expo-av Audio, Video element imports for displaying images and photos
@@ -41,8 +40,6 @@ import MoveFolderDestinationRow from './MoveFolderDestinationRow'
 import DestinationFolderScroller from './DestinationFolderScroller'
 import YellowButton from '../ui/YellowButton'
 import StickyFooter from '../ui/StickyFooter'
-import { ensurePermission } from '../../utils/permissions'
-
 const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFileMove}) => {
     const { isTablet, contentFill, modalMaxWidth, height: windowHeight } = useResponsiveLayout()
     const insets = useSafeAreaInsets()
@@ -65,7 +62,6 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
 
     const [fileURL, setFileURL] = useState()
     const [fileObj, setFileObj] = useState()
-    const [mediaPermissions, setMediaPermissions] = useState()
     const [navigateURL, setNavigateURL] = useState()
     const [focusedFolder, setFocusedFolder] = useState()
     const [subFolders, setSubFolders] = useState()
@@ -175,13 +171,6 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
             setNavigateURL(fileInst.linksTo)
         }
         getFileDoc()
-
-        const getPermissions = async () => {
-            //get shareAsync permissions
-            const mediaLibraryPermission = await ensurePermission(MediaLibrary.getPermissionsAsync, MediaLibrary.requestPermissionsAsync)
-            setMediaPermissions(mediaLibraryPermission.status === "granted")
-        }
-        getPermissions()
     }, [])
 
     useEffect(() => {

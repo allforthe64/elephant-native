@@ -20,9 +20,6 @@ import { AuthContext } from '../firebase/auth';
 import { QueContext } from '../context/QueContext';
 import { onAuthStateChanged } from 'firebase/auth';
 
-//media library imports
-import * as MediaLibrary from 'expo-media-library'
-
 //import format from date-fns for file timestamps
 import { format } from 'date-fns'
 
