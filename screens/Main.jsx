@@ -46,7 +46,7 @@ import FAQs from './FAQs';
 import TOSMain from './TOSMain';
 import PrivacyMain from './PrivacyMain';
 
-import { Linking } from 'react-native'
+import { Alert, Linking } from 'react-native'
 
 const Main = () => {
 
@@ -293,6 +293,10 @@ const Main = () => {
           didUpload = true
         } catch (error) {
           console.log('error from txt upload: ', error)
+          Alert.alert(
+            'Note upload failed',
+            error?.message || error?.toString?.() || String(error) || 'Something went wrong'
+          )
         }
       }
 

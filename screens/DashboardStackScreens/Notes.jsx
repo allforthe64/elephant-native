@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react'
-import { StyleSheet, View, Text, TextInput, Keyboard, Modal, Pressable, ScrollView, Platform, KeyboardAvoidingView } from 'react-native'
+import { StyleSheet, View, Text, TextInput, Keyboard, Modal, Pressable, ScrollView, Platform, KeyboardAvoidingView, Alert } from 'react-native'
 
 //fontAwesome imports
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
@@ -141,9 +141,27 @@ const Notepad = () => {
     }, [currentUser])
 
 
+    const alertSaveError = (err) => {
+      const message =
+        err?.message ||
+        (typeof err === 'string' ? err : null) ||
+        err?.toString?.() ||
+        'Something went wrong'
+      Alert.alert('Save failed', message)
+    }
+
+    const withSaveErrorAlert = async (fn) => {
+      try {
+        await fn()
+      } catch (err) {
+        alertSaveError(err)
+      }
+    }
+
     const saveNote = () => {
-      setOpen(false)
-    
+      return withSaveErrorAlert(() => {
+        setOpen(false)
+      })
     }
 
     const startEdit = () => {
@@ -175,8 +193,7 @@ const Notepad = () => {
   }
 
     const addToStorage = async (toStaging = false) => {
-
-      try {
+      return withSaveErrorAlert(async () => {
         //generate formatted date, fileName, and upload size
         const formattedDate = format(new Date(), "yyyy-MM-dd:hh:mm:ss")
         const filename = noteName !== '' ? `${noteName}.txt` : `Note from: ${formattedDate}.txt`
@@ -198,9 +215,14 @@ const Notepad = () => {
         const confirmedQueue = JSON.parse(await AsyncStorage.getItem('uploadQueue'))
 
         UploadQueueEmitter.emit('uploadQueueUpdated', confirmedQueue)
-      } catch (err) {
-        alert(err)
-      }
+
+        setBody(null)
+        setDestination({id: null, fileName: null, nestedUnder: null})
+        setFocusedFolder(null)
+        setPreAdd(false)
+        setNameGiven(false)
+      })
+    }
 
       //increase version number if other files exist with the same name
       /* let versionNo = 0
@@ -253,15 +275,6 @@ const Notepad = () => {
          })
       }
  */
-      setBody(null)
-      setDestination({id: null, fileName: null, nestedUnder: null})
-      setFocusedFolder(null)
-      setPreAdd(false)
-      setNameGiven(false)
-     /*  } catch (err) {
-        console.log(err)
-      } */
-    }
 
     useEffect(() => {
       if (open === false) Keyboard.dismiss() 
