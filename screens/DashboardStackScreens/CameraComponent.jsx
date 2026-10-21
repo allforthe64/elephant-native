@@ -1,9 +1,9 @@
-import { useState, useRef, useEffect, useContext } from 'react';
-import { View, Text, StatusBar, StyleSheet, Animated, Image, TouchableOpacity, Platform, Pressable, TextInput, Modal, ScrollView, Linking } from 'react-native'
+import { useState, useRef, useEffect } from 'react';
+import { View, Text, StatusBar, StyleSheet, Animated, Image, TouchableOpacity, Platform, Linking } from 'react-native'
 
 //fontAwesome imports
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
-import { faCloudArrowUp, faEnvelope, faFolder, faTrash, faRepeat, faVideoCamera, faCamera, faSquare, faXmark, faFile, faArrowLeft, faFloppyDisk, faStopwatch, faPlus, faCheck, faBox } from '@fortawesome/free-solid-svg-icons'
+import { faCloudArrowUp, faEnvelope, faTrash, faRepeat, faVideoCamera, faCamera, faSquare } from '@fortawesome/free-solid-svg-icons'
 import { faCircle } from '@fortawesome/free-regular-svg-icons'
 import { faCircle as solidCircle } from '@fortawesome/free-solid-svg-icons'
 
@@ -20,115 +20,41 @@ import * as MediaLibrary from 'expo-media-library'
 //import format from date-fns for file timestamps
 import { format } from 'date-fns'
 
-//import addFile, updateUser, userListener from firestore/storage, firbaseAuth object from firebaseConfig/ref uploadBytesResumable from firebase storage
-import { addfile, userListener, addFolderToUser } from '../../firebase/firestore'
-import { firebaseAuth, storage } from '../../firebaseConfig'
-import {ref, uploadBytesResumable} from 'firebase/storage'
-
 //import PinchGestureHandler for zoom controls
 import { PinchGestureHandler } from 'react-native-gesture-handler'
 
-//import useToast for notifications
-import { useToast } from 'react-native-toast-notifications'
-
 //import ImageManipulator object from expo
 import { manipulateAsync, SaveFormat } from 'expo-image-manipulator';
-import { QueContext } from '../../context/QueContext';
 
-//import stuff for the Queue
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import AppPressable from '../../components/ui/AppPressable'
-import YellowButton from '../../components/ui/YellowButton'
 import ContentShell from '../../components/ui/ContentShell'
-import KeyboardSafeForm from '../../components/ui/KeyboardSafeForm'
-import { useAutoFocusOn } from '../../hooks/useAutoFocusOn'
+import SaveDestinationModal from '../../components/fileSystem/SaveDestinationModal'
 import { ensurePermission } from '../../utils/permissions'
+import { enqueueUploads, randomQueueId } from '../../utils/uploadQueue'
 import { TestIds } from '../../constants/testIds'
-import { UploadQueueEmitter } from '../../hooks/QueueEventEmitter';
 import { useResponsiveLayout, tabletStyle } from '../../hooks/useResponsiveLayout'
+import { useSaveDestination } from '../../hooks/useSaveDestination'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import SaveDestinationActions from '../../components/fileSystem/SaveDestinationActions'
-import DestinationFolderScroller from '../../components/fileSystem/DestinationFolderScroller'
-import MoveFolderDestinationRow from '../../components/fileSystem/MoveFolderDestinationRow'
 
 
 export default function CameraComponent() {
 try {
-    const { isTablet, select, height: windowHeight } = useResponsiveLayout()
+    const { isTablet, select } = useResponsiveLayout()
     const insets = useSafeAreaInsets()
+    const save = useSaveDestination()
     const [facing, setFacing] = useState('back');
     const [permission, requestPermission] = useCameraPermissions();
     const [hasMediaLibraryPermission, setHasMediaLibraryPermission] = useState(false)
     const [photo, setPhoto] = useState()
     const [session, setSession] = useState(true)
-    const [userInst, setUserInst] = useState()
-    const [loading, setLoading] = useState(true)
-    const [type, setType] = useState('back')
     const [video, setVideo] = useState(false)
     const [recording, setRecording] = useState(false)
     const [videoObj, setVideoObj] = useState()
     const [zoom, setZoom] = useState(0)
-    const [preAdd, setPreAdd] = useState(false)
-    const [addFolderForm, setAddFolderForm] = useState(false)
-    const addFolderInputRef = useAutoFocusOn(addFolderForm)
-    const [focusedFolder, setFocusedFolder] = useState()
-    const [subFolders, setSubFolders] = useState()
-    const [folders, setFolders] = useState([])
-    const [newFolderName, setNewFolderName] = useState('')
-    const [nameGiven, setNameGiven] = useState(false)
-    const [mediaName, setMediaName] = useState('')
-    const [destination, setDestination] = useState({id: null, fileName: null, nestedUnder: null})
-    const [focusedFolderInst, setFocusedFolderInst] = useState()
     const cameraRef = useRef()
-    const nameRef = useRef()
-
-    const currentUser = firebaseAuth.currentUser.uid
-
-    const {setQue} = useContext(QueContext)
-
-    const toast = useToast()
 
     //initialize animation ref
     let fadeAnim = useRef(new Animated.Value(100)).current
-
-    //alpha sort functionality
-    const getSortableValue = (val) => {
-        if (typeof val !== "string") return { original: "", isNumber: false };
-
-        const trimmed = val.trim();
-        const firstChar = trimmed.charAt(0);
-
-        const isNumber = /^[0-9]/.test(firstChar);
-
-        return {
-        original: trimmed,
-        isNumber,
-        firstChar
-        };
-    };
-
-    const safeLocaleCompare = (a, b) => {
-        try {
-        return a.localeCompare(b, undefined, { numeric: true });
-        } catch {
-        return a.localeCompare(b);
-        }
-    }
-
-    //get the current user 
-    useEffect(() => {
-        if (firebaseAuth) {
-        try {
-            const getCurrentUser = async () => {
-            const unsubscribe = await userListener(setUserInst, false, currentUser)
-        
-            return () => unsubscribe()
-            }
-            getCurrentUser()
-        } catch (err) {console.log(err)}
-        } else console.log('no user yet')
-        
-    }, [firebaseAuth])
 
     // Request media library / mic after camera is granted (non-blocking for CameraView)
     useEffect(() => {
@@ -186,63 +112,6 @@ try {
         }).start()
     }, [photo])
 
-    //set folders
-    useEffect(() => {
-        if(userInst) {
-            if (Array.isArray(userInst?.files)) {
-                const sortedFiles = [...(userInst.files || [])].sort((a, b) => {
-                    const aVal = getSortableValue(a.fileName);
-                    const bVal = getSortableValue(b.fileName);
-
-                    // Numbers first (descending)
-                    if (aVal.isNumber && bVal.isNumber) {
-                    const numA = parseFloat(aVal.original) || 0;
-                    const numB = parseFloat(bVal.original) || 0;
-                    return numA - numB; // ascending
-                    }
-
-                    if (aVal.isNumber && !bVal.isNumber) return -1; // number before non-number
-                    if (!aVal.isNumber && bVal.isNumber) return 1;  // non-number after number
-
-                    // Both non-numbers → alphabetical (UTF-8 safe)
-                    return safeLocaleCompare(aVal.firstChar, bVal.firstChar);
-                })
-                setFolders(sortedFiles)
-            } else {
-                setFolders([])
-                console.warn('userInst.files is not an array', userInst?.files)
-            }   
-        }
-    }, [userInst])
-
-    
-    useEffect(() => {
-        const exists = Array.isArray(folders) && folders.some((value) => {
-            return value.nestedUnder === focusedFolder
-        })
-        setSubFolders(exists)
-    }, [focusedFolder, folders])
-
-    useEffect(() => {
-        if (Array.isArray(folders) && focusedFolder) {
-            setFocusedFolderInst(folders.filter(folder => folder.id === focusedFolder)[0])
-        }
-    }, [folders, focusedFolder])
-
-    //add a folder
-    const addFolder = async (folderName, targetNest) => {
-        try {
-            const { newFile, newFiles } = await addFolderToUser(userInst, folderName, targetNest)
-            setNewFolderName('')
-            setAddFolderForm(false)
-            setFolders(newFiles)
-            setFocusedFolder(newFile.id)
-        } catch (err) {
-            alert(err?.message || String(err))
-        }
-    }
-    
-
     //take photo using takePictureAsync method
     const takePic = async () => {
         try {
@@ -292,102 +161,40 @@ try {
         setRecording(false)
     }
 
-    function generateRandomString(length) {
-        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-        let result = '';
-        const charactersLength = characters.length;
-    
-        for (let i = 0; i < length; i++) {
-            result += characters.charAt(Math.floor(Math.random() * charactersLength));
-        }
-    
-        return result;
-    }
-
     const saveToElephant = async (videoMode, toStaging = false) => {
+        const finalDestination = save.resolveDestination(toStaging)
+        const mediaName = save.name.trim()
 
         try {
-                //save video
             if (videoMode) {
-                
+                const capturedVideo = videoObj
                 setVideoObj(undefined)
 
-                //create new formatted date for file
                 const formattedDate = format(new Date(), "yyyy-MM-dd:hh:mm:ss")
+                const ext = Platform.OS === 'ios' ? 'mov' : 'mp4'
+                const filename = mediaName !== '' ? `${mediaName}.${ext}` : `${formattedDate}.${ext}`
 
-                try {  
-
-                    //generate a fileName and finalDestination
-                    const filename = mediaName !== '' ? `${mediaName}.${Platform.OS === 'ios' ? 'mov' : 'mp4'}` : `${formattedDate}.${Platform.OS === 'ios' ? 'mov' : 'mp4'}`
-
-                    let finalDestination
-                    if (toStaging) finalDestination = false
-                    else if (destination.id !== null) finalDestination = destination.id
-                    else if (focusedFolder) finalDestination = focusedFolder 
-                    else finalDestination = false
-
-                    //add an image into the file queue
-                    let queue = JSON.parse(await AsyncStorage.getItem('uploadQueue')) || []
-                    queue.push({uri: videoObj.uri, filename: filename, fileType: Platform.OS === 'ios' ? 'mov' : 'mp4', finalDestination: finalDestination})
-                    await AsyncStorage.setItem('uploadQueue', JSON.stringify(queue))
-
-                    //confirm the flush by immediately reading it back
-                    const confirmedQueue = JSON.parse(await AsyncStorage.getItem('uploadQueue'))
-
-                    UploadQueueEmitter.emit('uploadQueueUpdated', confirmedQueue)
-
-                    saveVideo()
-
-                } catch (err) {
-                    alert(err)
-                }
+                await enqueueUploads([{uri: capturedVideo.uri, filename, fileType: ext, finalDestination}])
+                saveToDeviceLibrary(capturedVideo.uri)
             } else {
+                const capturedPhoto = photo
                 setPhoto(undefined)
-                const randomString = generateRandomString(10);
 
-                //create new formatted date for file
-                const formattedDate = format(new Date(), "yyyy-MM-dd:hh:mm:ss") + randomString
+                const formattedDate = format(new Date(), "yyyy-MM-dd:hh:mm:ss") + randomQueueId(10)
+                const jpgImage = await manipulateAsync(
+                    capturedPhoto.uri,
+                    [],
+                    { compress: 0.9, format: SaveFormat.JPEG }
+                )
+                const filename = mediaName !== '' ? `${mediaName}.jpg` : `${formattedDate}.jpg`
 
-                try {  
-
-                    const jpgImage = await manipulateAsync(
-                        photo.uri,
-                        [],
-                        { compress: 0.9, format: SaveFormat.JPEG }
-                    )
-
-                    //generate a fileName and finalDestination
-                    const filename = mediaName !== '' ? `${mediaName}.jpg` : `${formattedDate}.jpg`
-
-                    let finalDestination
-                    if (toStaging) finalDestination = false
-                    else if (destination.id !== null) finalDestination = destination.id
-                    else if (focusedFolder) finalDestination = focusedFolder 
-                    else finalDestination = false
-
-                    //add an image into the file queue
-                    let queue = JSON.parse(await AsyncStorage.getItem('uploadQueue')) || []
-                    queue.push({uri: jpgImage.uri, filename: filename, fileType: 'jpg', finalDestination: finalDestination, metadata: {height: jpgImage.height, width: jpgImage.width}})
-                    await AsyncStorage.setItem('uploadQueue', JSON.stringify(queue))
-
-                    //confirm the flush by immediately reading it back
-                    const confirmedQueue = JSON.parse(await AsyncStorage.getItem('uploadQueue'))
-
-                    UploadQueueEmitter.emit('uploadQueueUpdated', confirmedQueue)
-
-                } catch (err) {
-                    alert(err)
-                }
+                await enqueueUploads([{uri: jpgImage.uri, filename, fileType: 'jpg', finalDestination, metadata: {height: jpgImage.height, width: jpgImage.width}}])
+                saveToDeviceLibrary(capturedPhoto.uri)
             }
-            savePhoto()
-            setMediaName('')
-            setDestination({id: null, fileName: null, nestedUnder: null})
-            setFocusedFolder(null)
-            setPreAdd(false)
-            setNameGiven(false)
-
-        } catch (error) {
-            /* alert('Error within media upload function: ', error) */
+        } catch (err) {
+            alert(err?.message || String(err))
+        } finally {
+            save.reset()
         }
     }
 
@@ -405,18 +212,11 @@ try {
         })
     }
 
-    //save photo to the phone's local storage using saveToLibraryAsync method
-    const savePhoto = () => {
-        MediaLibrary.saveToLibraryAsync(photo.uri).then((() => {
-            console.log('success')
-        }))
-    }
-
-    //save photo to the phone's local storage using saveToLibraryAsync method
-    const saveVideo = () => {
-        MediaLibrary.saveToLibraryAsync(videoObj.uri).then((() => {
-            console.log('success')
-        }))
+    //save a capture to the phone's photo library
+    const saveToDeviceLibrary = (uri) => {
+        MediaLibrary.saveToLibraryAsync(uri).catch((err) => {
+            console.warn('Save to photo library failed:', err)
+        })
     }
 
     //if session mode is turned on after picture is taken, immediately save the photo to elephant storage
@@ -506,188 +306,14 @@ try {
     }
 
   return (
-    preAdd ?
-        <Modal animationType='slide' presentationStyle='pageSheet' onShow={() => setTimeout(()=>{
-            nameRef.current.focus()
-        }, 200)}>
-            <View style={{flex: 1, height: '100%', width: '100%', backgroundColor: '#fff', overflow: 'hidden'}}>
-                {/* if the moveFile state is true, display the modal with the file movement code*/}
-                {/* xMark icon for closing out the moveFile modal */}
-                <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', paddingRight: '5%', paddingTop: '10%', width: '100%'}}>
-                    <Pressable onPress={() => {
-                    if (addFolderForm) setAddFolderForm(false) 
-                    else {
-                        setPreAdd(false)
-                        setFocusedFolder(null)
-                        setNameGiven(false)
-                        setMediaName('')
-                    }
-                    }}>
-                        <FontAwesomeIcon icon={faXmark} color={'#593060'} size={30}/>
-                    </Pressable>
-                </View>
-                
-                <ContentShell variant="modal" fill>
-                { 
-
-                !nameGiven ?
-                <KeyboardSafeForm>
-                <>
-                    <Text style={[{color: '#593060', fontSize: 35, fontWeight: '700', marginTop: '30%', textAlign: 'center'}, select(undefined, tabletStyles.modalHeading)]}>{photo ? 'Name Photo' : 'Name Video: '}</Text>
-                    <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', marginTop: '10%'}}>
-                        <View style={styles.iconHolder}>
-                            <FontAwesomeIcon icon={faFile} size={22} color='#9F37B0'/>
-                        </View>
-                        <TextInput value={mediaName} placeholder='Enter name' placeholderTextColor={'#593060'} style={{color: '#593060', fontSize: 20, fontWeight: 'bold', borderBottomColor: '#593060', borderBottomWidth: 2, width: '70%'}} onChangeText={(e) => setMediaName(e)} ref={nameRef}/>
-                    </View>
-                    <View style={{width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', paddingTop: '5%'}}>
-                        <YellowButton
-                            size="md"
-                            icon={faFloppyDisk}
-                            label="Save"
-                            dimmed={mediaName === ''}
-                            onPress={() => {
-                                setNameGiven(true)
-                            }}
-                        />
-                        <Text style={{color: '#593060', fontSize: 20, marginTop: '2%', textAlign: 'center'}}>Or</Text>
-                        <YellowButton
-                            size="md"
-                            icon={faStopwatch}
-                            label="Use Timestamp"
-                            style={{ marginTop: '2%' }}
-                            onPress={() => {
-                                setNameGiven(true)
-                            }}
-                        />
-                    </View>
-                </>
-                </KeyboardSafeForm>
-                : addFolderForm ? 
-                    <KeyboardSafeForm>
-                    <View style={{width: '100%', height: '100', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center'}}>
-                        <Text style={[{color: '#593060', fontSize: 35, fontWeight: '700', marginTop: '40%', textAlign: 'center'}, select(undefined, tabletStyles.modalHeading)]}>Add A New Folder:</Text>
-                        <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', marginTop: '10%', width: '100%'}}>
-                            <View style={styles.iconHolder}> 
-                                <FontAwesomeIcon icon={faFolder} size={22} color='#9F37B0'/>
-                            </View>
-                            <TextInput value={newFolderName} placeholder='Enter new name' placeholderTextColor={'#593060'} style={{color: '#593060', fontSize: 20, fontWeight: 'bold', borderBottomColor: '#593060', borderBottomWidth: 2, width: '70%'}} onChangeText={(e) => setNewFolderName(e)} autoFocus showSoftInputOnFocus ref={addFolderInputRef} onLayout={() => addFolderInputRef.current?.focus?.()}/>
-                        </View>
-                        <View style={{width: '100%', paddingTop: '10%', display: 'flex', flexDirection: 'row', justifyContent: 'center'}}>
-                            <YellowButton
-                                size="md"
-                                icon={faFloppyDisk}
-                                label="Save"
-                                onPress={() => addFolder(newFolderName, focusedFolder ? focusedFolder : '')}
-                            />
-                        </View>
-                    </View>
-                    </KeyboardSafeForm>
-
-                :
-
-                    <View style={{width: '100%', flex: 1, minHeight: 0, alignItems: 'center', backgroundColor: '#fff'}}>
-                        <Text style={{fontSize: 40, color: '#593060', fontWeight: 'bold', textAlign: 'left', width: '100%', paddingLeft: '5%', marginBottom: 8}}>Save Files To...</Text>
-                        {focusedFolderInst &&
-                            <Text style={{fontSize: 20, color: '#593060', fontWeight: 'bold', textAlign: 'left', width: '100%', paddingLeft: '5%', marginBottom: 8}}>Viewing: {focusedFolderInst.fileName}</Text>
-                        }
-                        {focusedFolder ? 
-                            <YellowButton size="xs" icon={faArrowLeft} label="Back" style={{ marginBottom: 8, marginLeft: '5%' }} onPress={() => {
-                                const folderInst = folders.filter(folder => folder.id === focusedFolder) 
-                                
-                                const parentFolderInst = folders.filter(folder => folder.id === folderInst[0].nestedUnder)
-                                console.log(parentFolderInst)
-                                if (parentFolderInst.length > 0) {
-                                    console.log("we're within the first if check")
-                                    setDestination({id: parentFolderInst[0].id, fileName: parentFolderInst[0].fileName, nestedUnder: parentFolderInst[0].nestedUnder})
-                                    setFocusedFolder(folderInst[0].nestedUnder)
-                                } else {
-                                    console.log("we're within the else check")
-                                    setDestination({id: null, fileName: null, nestedUnder: null})
-                                    setFocusedFolder(null)
-                                }
-                            }} />
-                        :
-                            null
-                        }
-                        <DestinationFolderScroller centerEmpty={!!(focusedFolder && !subFolders)}>
-                                {/* map over each of the folders from the filesystem and display them as a pressable element // call movefile function when one of them is pressed */}
-                                {focusedFolder && !subFolders ? 
-                                    <Text style={[{fontSize: 30, color: '#593060', fontWeight: 'bold', marginTop: '30%', textAlign: 'center'}, select(undefined, tabletStyles.modalHeading)]}>No Subfolders...</Text>
-                                
-                                :   
-                                    <>
-                                        {(Array.isArray(folders) ? folders : []).map((f, index) => {
-                                            if (focusedFolder) {
-                                                if (f.nestedUnder === focusedFolder) {
-                                                        return (
-                                                            <MoveFolderDestinationRow
-                                                              key={index}
-                                                              selected={f.id === destination.id}
-                                                              fileName={f.fileName}
-                                                              onPress={() => {
-                                                                if (destination.id === null || f.id !== destination.id) {
-                                                                  setDestination({id: f.id, fileName: f.fileName, nestedUnder: f.nestedUnder})
-                                                                } else {
-                                                                  setFocusedFolder(f.id)
-                                                                  setDestination({id: null, fileName: null, nestedUnder: null})
-                                                                }
-                                                              }}
-                                                            />
-                                                        )
-                                                    
-                                                }
-                                            } else {
-                                                if (f.nestedUnder === '') {
-                                                    return (
-                                                            <MoveFolderDestinationRow
-                                                              key={index}
-                                                              selected={f.id === destination.id}
-                                                              fileName={f.fileName}
-                                                              onPress={() => {
-                                                                if (destination.id === null || f.id !== destination.id) {
-                                                                  setDestination({id: f.id, fileName: f.fileName, nestedUnder: f.nestedUnder})
-                                                                } else {
-                                                                  setFocusedFolder(f.id)
-                                                                  setDestination({id: null, fileName: null, nestedUnder: null})
-                                                                }
-                                                              }}
-                                                            />
-                                                        )
-                                                    }
-                                                }
-                                            }
-                                        )}   
-                                    </>
-                                }
-                                {/* 
-                                
-                                    IF EVENTUALLY THE USER WILL BE ABLE TO MOVE A FILE TO THE HOMEPAGE, THIS IS WHERE THAT COULD WOULD BE
-
-                                <Pressable style={{display: 'flex', flexDirection: 'row', justifyContent: 'center', marginTop: '5%'}} onPress={() => setDestination('home')}>
-                                        <View style={destination === 'home' ? {borderBottomWidth: 2, width: '85%', backgroundColor: 'white', display: 'flex', flexDirection: 'row', paddingLeft: '2.5%', paddingTop: '2%'} : {borderBottomWidth: 2, width: '85%', borderBottomColor: 'white', display: 'flex', flexDirection: 'row', paddingLeft: '2.5%', paddingTop: '2%'}}>
-                                        <FontAwesomeIcon icon={faFolder} size={30} color={destination === 'home' ? 'black' : 'white'}/>
-                                        <Text style={destination === 'home' ? {color: 'black', fontSize: 30, marginLeft: '5%'} : {color: 'white', fontSize: 30, marginLeft: '5%'}}>Home</Text>
-                                        </View>
-                                    </Pressable> */}
-                        </DestinationFolderScroller>
-                        
-                        <SaveDestinationActions
-                            onAddFolder={() => setAddFolderForm(true)}
-                            onSaveStaging={() => saveToElephant(videoObj ? true : false, true)}
-                            onConfirmMove={() => saveToElephant(false)}
-                            confirmDisabled={!(destination.id !== null || focusedFolder)}
-                        />
-
-
-
-                    </View>
-                    
-                }
-                </ContentShell>
-
-            </View>
-        </Modal>
+    save.preAdd ?
+        <SaveDestinationModal
+            save={save}
+            title="Save Files To..."
+            nameHeading={videoObj ? 'Name Video:' : 'Name Photo:'}
+            onSaveStaging={() => saveToElephant(!!videoObj, true)}
+            onConfirm={() => saveToElephant(!!videoObj)}
+        />
     : photo ? 
         <View style={{
             flex: 1,
@@ -719,7 +345,7 @@ try {
                                 <FontAwesomeIcon icon={faEnvelope} size={22} color='#9F37B0'/>
                             </View>
                         </TouchableOpacity>
-                        <TouchableOpacity style={{marginBottom: 20}} onPress={() => setPreAdd(true)}>
+                        <TouchableOpacity style={{marginBottom: 20}} onPress={save.open}>
                             <View style={styles.iconHolder}>
                                 <FontAwesomeIcon icon={faCloudArrowUp} size={22} color='#9F37B0'/>
                             </View>
@@ -765,7 +391,7 @@ try {
                                 <FontAwesomeIcon icon={faEnvelope} size={22} color='#9F37B0'/>
                             </View>
                         </TouchableOpacity>
-                        <TouchableOpacity style={{marginBottom: 20}} onPress={() => setPreAdd(true)}>
+                        <TouchableOpacity style={{marginBottom: 20}} onPress={save.open}>
                             <View style={styles.iconHolder}>
                                 <FontAwesomeIcon icon={faCloudArrowUp} size={22} color='#9F37B0'/>
                             </View>
@@ -976,9 +602,6 @@ const styles = StyleSheet.create({
 });
 
 const tabletStyles = StyleSheet.create({
-    modalHeading: {
-        marginTop: 48,
-    },
     buttonContainer: {
         bottom: 32,
     },

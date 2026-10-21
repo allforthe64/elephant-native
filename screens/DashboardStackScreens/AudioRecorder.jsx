@@ -1,10 +1,9 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react'
-import { Text, View , ScrollView, StyleSheet, Image, TextInput, Modal, Pressable, Alert, Platform} from 'react-native'
+import { Text, View , ScrollView, StyleSheet, Alert, Platform} from 'react-native'
 import { useFocusEffect } from '@react-navigation/native'
 
 //fontAwesome imports
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
-import { faMicrophone, faSquare, faXmark, faFolder, faArrowLeft, faCloudArrowUp, faPlus, faCheck, faBox, faFloppyDisk } from '@fortawesome/free-solid-svg-icons'
+import { faMicrophone, faSquare, faCloudArrowUp } from '@fortawesome/free-solid-svg-icons'
 
 //AudioEditor component import
 import AudioEditor from '../../components/audioRecorder/AudioEditor'
@@ -13,142 +12,33 @@ import AudioEditor from '../../components/audioRecorder/AudioEditor'
 import { Audio } from 'expo-av'
 import * as FileSystem from 'expo-file-system'
 
-//import updateUser, addfile, userListener from firestore file/firebaseAuth and storage objects from firebase config/ref, uploadBytesResumable from firebase storage
-import { updateUser, addfile, userListener, addFolderToUser } from '../../firebase/firestore'
-import { firebaseAuth, storage } from '../../firebaseConfig'
-import {ref, uploadBytesResumable} from 'firebase/storage'
-
 //import safeAreInsets context
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-//import format from date-fns for file timestamps
-import { format } from 'date-fns'
-
-//import useToast for notifications
-import { useToast } from 'react-native-toast-notifications'
-
-//import stuff for the UploadQueue
-import { UploadQueueEmitter } from '../../hooks/QueueEventEmitter'
-import AsyncStorage from '@react-native-async-storage/async-storage'
-import AppPressable from '../../components/ui/AppPressable'
 import ContentShell from '../../components/ui/ContentShell'
-import KeyboardSafeForm from '../../components/ui/KeyboardSafeForm'
 import YellowButton from '../../components/ui/YellowButton'
+import SaveDestinationModal from '../../components/fileSystem/SaveDestinationModal'
 import { TestIds } from '../../constants/testIds'
 import { useResponsiveLayout } from '../../hooks/useResponsiveLayout'
 import { useKeyboardHeight } from '../../hooks/useKeyboardHeight'
-import { useAutoFocusOn } from '../../hooks/useAutoFocusOn'
+import { useSaveDestination } from '../../hooks/useSaveDestination'
 import { ensurePermission } from '../../utils/permissions'
-import SaveDestinationActions from '../../components/fileSystem/SaveDestinationActions'
-import DestinationFolderScroller from '../../components/fileSystem/DestinationFolderScroller'
-import MoveFolderDestinationRow from '../../components/fileSystem/MoveFolderDestinationRow'
+import { enqueueUploads } from '../../utils/uploadQueue'
 
 const AudioRecorder = () => {
 
     try {
-        const { isTablet, select, height: windowHeight } = useResponsiveLayout()
+        const { isTablet } = useResponsiveLayout()
         const insets = useSafeAreaInsets()
         const keyboardHeight = useKeyboardHeight()
+        const save = useSaveDestination()
         const [recording, setRecording] = useState()
         const [recordings, setRecordings] = useState([])
         const recordingsRef = useRef([])
         const recordingRef = useRef(null)
         const playbackRef = useRef(null)
         const recorderBusyRef = useRef(false)
-        const [userInst, setUserInst] = useState()
         const [loading, setLoading] = useState(false)
-        const [preAdd, setPreAdd] = useState(false)
-        const [addFolderForm, setAddFolderForm] = useState(false)
-        const addFolderInputRef = useAutoFocusOn(addFolderForm)
-        const [focusedFolder, setFocusedFolder] = useState()
-        const [subFolders, setSubFolders] = useState()
-        const [folders, setFolders] = useState([])
-        const [newFolderName, setNewFolderName] = useState('')
-        const [destination, setDestination] = useState({id: null, fileName: null, nestedUnder: null})
-        const [focusedFolderInst, setFocusedFolderInst] = useState()
-
-        const currentUser = firebaseAuth.currentUser.uid
-        const toast = useToast()
-
-        //alpha sort functionality
-        const getSortableValue = (val) => {
-            if (typeof val !== "string") return { original: "", isNumber: false };
-
-            const trimmed = val.trim();
-            const firstChar = trimmed.charAt(0);
-
-            const isNumber = /^[0-9]/.test(firstChar);
-
-            return {
-            original: trimmed,
-            isNumber,
-            firstChar
-            };
-        };
-
-        const safeLocaleCompare = (a, b) => {
-            try {
-            return a.localeCompare(b, undefined, { numeric: true });
-            } catch {
-            return a.localeCompare(b);
-            }
-        }
-        
-        //get the current user 
-        useEffect(() => {
-            if (firebaseAuth) {
-            try {
-                const getCurrentUser = async () => {
-                const unsubscribe = await userListener(setUserInst, false, currentUser)
-            
-                return () => unsubscribe()
-                }
-                getCurrentUser()
-            } catch (err) {console.log(err)}
-            } else console.log('no user yet')
-            
-        }, [firebaseAuth])
-
-        useEffect(() => {
-            if(userInst) {
-                if (Array.isArray(userInst?.files)) {
-                    const sortedFiles = [...(userInst.files || [])].sort((a, b) => {
-                        const aVal = getSortableValue(a.fileName);
-                        const bVal = getSortableValue(b.fileName);
-
-                        // Numbers first (descending)
-                        if (aVal.isNumber && bVal.isNumber) {
-                        const numA = parseFloat(aVal.original) || 0;
-                        const numB = parseFloat(bVal.original) || 0;
-                        return numA - numB; // ascending
-                        }
-
-                        if (aVal.isNumber && !bVal.isNumber) return -1; // number before non-number
-                        if (!aVal.isNumber && bVal.isNumber) return 1;  // non-number after number
-
-                        // Both non-numbers → alphabetical (UTF-8 safe)
-                        return safeLocaleCompare(aVal.firstChar, bVal.firstChar);
-                    })
-                    setFolders(sortedFiles)
-                } else {
-                    setFolders([])
-                    console.warn('userInst.files is not an array', userInst?.files)
-                }
-            }
-          }, [userInst])
-
-        useEffect(() => {
-            const exists = Array.isArray(folders) && folders.some((value) => {
-                return value.nestedUnder === focusedFolder
-            })
-            setSubFolders(exists)
-        }, [focusedFolder, folders])
-
-        useEffect(() => {
-            if (Array.isArray(folders) && focusedFolder) {
-                setFocusedFolderInst(folders.filter(folder => folder.id === focusedFolder)[0])
-            }
-        }, [focusedFolder, folders])
 
         useEffect(() => {
             recordingsRef.current = recordings
@@ -409,297 +299,40 @@ const AudioRecorder = () => {
         setRecordings(arr)
     }
 
-    //add a folder
-    const addFolder = async (folderName, targetNest) => {
-        try {
-            const { newFile, newFiles } = await addFolderToUser(userInst, folderName, targetNest)
-            setNewFolderName('')
-            setAddFolderForm(false)
-            setFolders(newFiles)
-            setFocusedFolder(newFile.id)
-        } catch (err) {
-            alert(err?.message || String(err))
-        }
-    }
-
     const saveFiles = async (toStaging = false) => {
-
-        setLoading(true)
-
-        try {
-        const recordingsToSave = [...recordings]
-        if (recordingsToSave.length === 0) {
-            setLoading(false)
+        if (recordings.length === 0) {
             Alert.alert('No recordings', 'Record audio before saving to staging.')
             return
         }
 
-        const filesToAddToQueue = recordingsToSave.map(rec => {
+        setLoading(true)
+        const finalDestination = save.resolveDestination(toStaging)
 
-            let finalDestination
-            if (toStaging) finalDestination = false
-            else if (destination.id !== null) finalDestination = destination.id
-            else if (focusedFolder) finalDestination = focusedFolder 
-            else finalDestination = false
-
-            const ext = rec.fileType || 'm4a'
-            return {uri: rec.file, filename: `${rec.name}.${ext}`, fileType: ext, finalDestination: finalDestination}
-        })
-
-        let queue = JSON.parse(await AsyncStorage.getItem('uploadQueue')) || []
-        const newQueue = [...queue, ...filesToAddToQueue]
-        await AsyncStorage.setItem('uploadQueue', JSON.stringify(newQueue))
-
-        //confirm the flush by immediately reading it back
-        const confirmedQueue = JSON.parse(await AsyncStorage.getItem('uploadQueue'))
-
-        UploadQueueEmitter.emit('uploadQueueUpdated', confirmedQueue)
+        try {
+            await enqueueUploads(recordings.map(rec => {
+                const ext = rec.fileType || 'm4a'
+                return {uri: rec.file, filename: `${rec.name}.${ext}`, fileType: ext, finalDestination}
+            }))
         } catch (err) {
             Alert.alert('Save failed', err?.message || String(err))
             setLoading(false)
             return
         }
 
-
-        /* const references = await Promise.all(recordings.map(async (el) => {
-
-            try {
-
-            
-
-            //check if a file already exists with this file's name. If it does, increase version number
-            let versionNo = 0
-            userInst.fileRefs.forEach(fileRef => {
-                if (fileRef.fileName === (el.name + '.' + el.file.split('.')[1]) && fileRef.fileName.split('.')[1] === 'mp3') {
-                    versionNo ++
-                }
-            })
-
-            //generate formatted date
-            const formattedDate = format(new Date(), `yyyy-MM-dd:hh:mm:ss::${Date.now()}`)
-
-            //upload the file
-            const blob = await new Promise(async (resolve, reject) => {
-                const xhr = new XMLHttpRequest()
-                xhr.onload = () => {
-                    resolve(xhr.response) 
-                }
-                xhr.onerror = (e) => {
-                    reject(e)
-                    reject(new TypeError('Network request failed'))
-                }
-                xhr.responseType = 'blob'
-                xhr.open('GET', el.file, true)
-                xhr.send(null)
-            })
-
-            const filename = `${currentUser}/${formattedDate}`
-            const fileRef = ref(storage, filename)
-            const result = await uploadBytesResumable(fileRef, blob)
-
-            let finalDestination 
-            if (destination.id !== null) finalDestination = destination.id
-            else if (focusedFolder) finalDestination = focusedFolder 
-            else finalDestination = false
-    
-            //create file reference
-            const reference = await addfile({
-                name: el.name + '.' + 'mp3',
-                fileType: 'mp3',
-                size: result.metadata.size,
-                uri: el.file,
-                user: currentUser, 
-                timeStamp: formattedDate, 
-                version: versionNo
-            }, finalDestination)
-
-            //increase upload size
-            uploadSize += result.metadata.size
-
-            return reference
-
-        } catch (err) {
-            alert(err)
-        }
-
-        }))
-
-        //increase the ammount of space the user is consuming and add the references to the user's staging
-        const newSpaceUsed = userInst.spaceUsed + uploadSize
-        const newUser = {...userInst, spaceUsed: newSpaceUsed, fileRefs: [...userInst.fileRefs, ...references]}
-        await updateUser(newUser)
-
-        if (destination.id !== null) {
-            toast.show(`File upload to ${destination.fileName} successful`, {
-                type: 'success'
-                })
-        } else if (focusedFolder) {
-            const fileInst = userInst.files.filter(file => file.id === focusedFolder)
-            toast.show(`File upload to ${fileInst[0].fileName} successful`, {
-                type: 'success'
-                })
-        } else {
-            toast.show(`File upload to staging successful`, {
-                type: 'success'
-                })
-        }
-
-        const empty = [] */
         setRecordings([])
         setLoading(false)
-        setDestination({id: null, fileName: null, nestedUnder: null})
-        setFocusedFolder(null)
-        setPreAdd(false)
-          
+        save.reset()
     }
 
   return (
     <>
-        {preAdd ? 
-            <Modal animationType='slide' presentationStyle='pageSheet'>
-                <View style={{flex: 1, height: '100%', width: '100%', backgroundColor: '#fff', overflow: 'hidden'}}>
-                    {/* if the moveFile state is true, display the modal with the file movement code*/}
-                    {/* xMark icon for closing out the moveFile modal */}
-                    <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', paddingRight: '5%', paddingTop: '10%', width: '100%'}}>
-                        <Pressable onPress={() => {
-                        if (addFolderForm) setAddFolderForm(false) 
-                        else {
-                            setPreAdd(false)
-                            setFocusedFolder(null)
-                        }
-                        }}>
-                            <FontAwesomeIcon icon={faXmark} color={'#593060'} size={30}/>
-                        </Pressable>
-                    </View>
-                    
-                    <ContentShell variant="modal" fill>
-                    { 
-    
-                    addFolderForm ? 
-                        <KeyboardSafeForm>
-                        <View style={{width: '100%', height: '100', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center'}}>
-                            <Text style={[{color: '#593060', fontSize: 35, fontWeight: '700', marginTop: '40%', textAlign: 'center'}, select(undefined, tabletStyles.modalHeading)]}>Add A New Folder:</Text>
-                            <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', marginTop: '10%', width: '100%'}}>
-                                <View style={styles.iconHolder}> 
-                                    <FontAwesomeIcon icon={faFolder} size={22} color='#9F37B0'/>
-                                </View>
-                                <TextInput value={newFolderName} placeholder='Enter new name' placeholderTextColor={'#593060'} style={{color: '#593060', fontSize: 20, fontWeight: 'bold', borderBottomColor: '#593060', borderBottomWidth: 2, width: '70%'}} onChangeText={(e) => setNewFolderName(e)} autoFocus showSoftInputOnFocus ref={addFolderInputRef} onLayout={() => addFolderInputRef.current?.focus?.()}/>
-                            </View>
-                            <View style={{width: '100%', paddingTop: '10%', display: 'flex', flexDirection: 'row', justifyContent: 'center'}}>
-                                <YellowButton
-                                  size="md"
-                                  icon={faFloppyDisk}
-                                  label="Save"
-                                  onPress={() => addFolder(newFolderName, focusedFolder ? focusedFolder : '')}
-                                />
-                            </View>
-                        </View>
-                        </KeyboardSafeForm>
-    
-                    :
-    
-                        <View style={{width: '100%', flex: 1, minHeight: 0, alignItems: 'center', backgroundColor: '#fff'}}>
-                            <Text style={{fontSize: 40, color: '#593060', fontWeight: 'bold', textAlign: 'left', width: '100%', paddingLeft: '5%', marginBottom: 8}}>Save Files To...</Text>
-                            {focusedFolderInst &&
-                                <Text style={{fontSize: 20, color: '#593060', fontWeight: 'bold', textAlign: 'left', width: '100%', paddingLeft: '5%', marginBottom: 8}}>Viewing: {focusedFolderInst.fileName}</Text>
-                            }
-                            {focusedFolder ? 
-                                <YellowButton size="xs" icon={faArrowLeft} label="Back" style={{ marginBottom: 8, marginLeft: '5%' }} onPress={() => {
-                                    const folderInst = folders.filter(folder => folder.id === focusedFolder) 
-                                    
-                                    const parentFolderInst = folders.filter(folder => folder.id === folderInst[0].nestedUnder)
-                                    console.log(parentFolderInst)
-                                    if (parentFolderInst.length > 0) {
-                                        console.log("we're within the first if check")
-                                        setDestination({id: parentFolderInst[0].id, fileName: parentFolderInst[0].fileName, nestedUnder: parentFolderInst[0].nestedUnder})
-                                        setFocusedFolder(folderInst[0].nestedUnder)
-                                    } else {
-                                        console.log("we're within the else check")
-                                        setDestination({id: null, fileName: null, nestedUnder: null})
-                                        setFocusedFolder(null)
-                                    }
-                                }} />
-                            :
-                                null
-                            }
-                            <DestinationFolderScroller centerEmpty={!!(focusedFolder && !subFolders)}>
-                                    {/* map over each of the folders from the filesystem and display them as a pressable element // call movefile function when one of them is pressed */}
-                                    {focusedFolder && !subFolders ? 
-                                        <Text style={[{fontSize: 30, color: '#593060', fontWeight: 'bold', marginTop: '30%', textAlign: 'center'}, select(undefined, tabletStyles.modalHeading)]}>No Subfolders...</Text>
-                                    
-                                    :   
-                                        <>
-                                            {(Array.isArray(folders) ? folders : []).map((f, index) => {
-                                                if (focusedFolder) {
-                                                    if (f.nestedUnder === focusedFolder) {
-                                                            return (
-                                                                <MoveFolderDestinationRow
-                                                                  key={index}
-                                                                  selected={f.id === destination.id}
-                                                                  fileName={f.fileName}
-                                                                  onPress={() => {
-                                                                    if (destination.id === null || f.id !== destination.id) {
-                                                                      setDestination({id: f.id, fileName: f.fileName, nestedUnder: f.nestedUnder})
-                                                                    } else {
-                                                                      setFocusedFolder(f.id)
-                                                                      setDestination({id: null, fileName: null, nestedUnder: null})
-                                                                    }
-                                                                  }}
-                                                                />
-                                                            )
-                                                        
-                                                    }
-                                                } else {
-                                                    if (f.nestedUnder === '') {
-                                                        return (
-                                                                <MoveFolderDestinationRow
-                                                                  key={index}
-                                                                  selected={f.id === destination.id}
-                                                                  fileName={f.fileName}
-                                                                  onPress={() => {
-                                                                    if (destination.id === null || f.id !== destination.id) {
-                                                                      setDestination({id: f.id, fileName: f.fileName, nestedUnder: f.nestedUnder})
-                                                                    } else {
-                                                                      setFocusedFolder(f.id)
-                                                                      setDestination({id: null, fileName: null, nestedUnder: null})
-                                                                    }
-                                                                  }}
-                                                                />
-                                                            )
-                                                        }
-                                                    }
-                                                }
-                                            )}   
-                                        </>
-                                    }
-                                    {/* 
-                                    
-                                        IF EVENTUALLY THE USER WILL BE ABLE TO MOVE A FILE TO THE HOMEPAGE, THIS IS WHERE THAT COULD WOULD BE
-    
-                                    <Pressable style={{display: 'flex', flexDirection: 'row', justifyContent: 'center', marginTop: '5%'}} onPress={() => setDestination('home')}>
-                                            <View style={destination === 'home' ? {borderBottomWidth: 2, width: '85%', backgroundColor: 'white', display: 'flex', flexDirection: 'row', paddingLeft: '2.5%', paddingTop: '2%'} : {borderBottomWidth: 2, width: '85%', borderBottomColor: 'white', display: 'flex', flexDirection: 'row', paddingLeft: '2.5%', paddingTop: '2%'}}>
-                                            <FontAwesomeIcon icon={faFolder} size={30} color={destination === 'home' ? 'black' : 'white'}/>
-                                            <Text style={destination === 'home' ? {color: 'black', fontSize: 30, marginLeft: '5%'} : {color: 'white', fontSize: 30, marginLeft: '5%'}}>Home</Text>
-                                            </View>
-                                        </Pressable> */}
-                            </DestinationFolderScroller>
-                            
-                            <SaveDestinationActions
-                                onAddFolder={() => setAddFolderForm(true)}
-                                onSaveStaging={() => saveFiles(true)}
-                                onConfirmMove={() => saveFiles()}
-                                confirmDisabled={!(destination.id !== null || focusedFolder)}
-                            />
-    
-    
-    
-                        </View>
-                        
-                    }
-                    </ContentShell>
-    
-                </View>
-            </Modal>
+        {save.preAdd ? 
+            <SaveDestinationModal
+                save={save}
+                title="Save Files To..."
+                onSaveStaging={() => saveFiles(true)}
+                onConfirm={() => saveFiles()}
+            />
         :
             <ContentShell variant="content" fill>
             <View style={{
@@ -743,7 +376,7 @@ const AudioRecorder = () => {
                       accessibilityLabel="Save All"
                       size="md"
                       label="Save All"
-                      onPress={() => setPreAdd(true)}
+                      onPress={save.open}
                       dimmed={recordings.length === 0}
                       disabled={recordings.length === 0}
                       style={isTablet ? tabletStyles.actionButton : undefined}
@@ -857,9 +490,6 @@ const styles = StyleSheet.create({
 })
 
 const tabletStyles = StyleSheet.create({
-    modalHeading: {
-        marginTop: 48,
-    },
     actionButton: {
         maxWidth: '100%',
     },

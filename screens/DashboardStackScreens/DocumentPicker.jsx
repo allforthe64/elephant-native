@@ -1,152 +1,35 @@
 import React, {useState, useEffect} from 'react'
-import {View, Text, StyleSheet, ScrollView, Modal, Pressable, TextInput, Image, Platform} from 'react-native'
+import {View, Text, StyleSheet, ScrollView, Image, Platform} from 'react-native'
 
 //FileRow component import
 import FileRow from '../../components/documentPicker/FileRow'
 
-/* import * as DocumentPicker from 'expo-document-picker' */
 import * as ImagePicker from 'expo-image-picker'
-
-
-import { addfile, userListener, addFolderToUser } from '../../firebase/firestore'
-import { firebaseAuth, storage } from '../../firebaseConfig'
-import {ref, uploadBytesResumable} from 'firebase/storage'
+import * as DocumentPicker from 'expo-document-picker'
 
 //fontAwesome imports
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
-import { faFolder, faXmark, faArrowLeft, faFile, faImage, faCloudArrowUp, faPlus, faCheck, faBox, faFloppyDisk } from '@fortawesome/free-solid-svg-icons'
+import { faFile, faImage, faCloudArrowUp } from '@fortawesome/free-solid-svg-icons'
 
 //safe area context import
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
-//useToast import
-import { useToast } from 'react-native-toast-notifications'
-
-//date format import
-import { format } from 'date-fns'
-
-//import ImageManipulator object from expo
-import { manipulateAsync, SaveFormat } from 'expo-image-manipulator';
-
-import * as DocumentPicker from 'expo-document-picker'
-
-
-//import stuff for QueueUpload
-import { UploadQueueEmitter } from '../../hooks/QueueEventEmitter'
-import AsyncStorage from '@react-native-async-storage/async-storage'
-
-import * as FileSystem from "expo-file-system"
 import ContentShell from '../../components/ui/ContentShell'
-import KeyboardSafeForm from '../../components/ui/KeyboardSafeForm'
 import YellowButton from '../../components/ui/YellowButton'
+import SaveDestinationModal from '../../components/fileSystem/SaveDestinationModal'
 import { useKeyboardHeight } from '../../hooks/useKeyboardHeight'
-import { useAutoFocusOn } from '../../hooks/useAutoFocusOn'
 import { useResponsiveLayout } from '../../hooks/useResponsiveLayout'
-import SaveDestinationActions from '../../components/fileSystem/SaveDestinationActions'
-import DestinationFolderScroller from '../../components/fileSystem/DestinationFolderScroller'
-import MoveFolderDestinationRow from '../../components/fileSystem/MoveFolderDestinationRow'
+import { useSaveDestination } from '../../hooks/useSaveDestination'
+import { enqueueUploads } from '../../utils/uploadQueue'
+import { sortByName } from '../../utils/sortByName'
 
 const DocumentPickerComp = () => {
-    const { isTablet, select, height: windowHeight } = useResponsiveLayout()
+    const { isTablet } = useResponsiveLayout()
+    const save = useSaveDestination()
     const [files, setFiles] = useState([])
-    const [userInst, setUserInst] = useState()
     const [loading, setLoading] = useState(false)
-    const [preAdd, setPreAdd] = useState(false)
-    const [addFolderForm, setAddFolderForm] = useState(false)
-    const addFolderInputRef = useAutoFocusOn(addFolderForm)
-    const [focusedFolder, setFocusedFolder] = useState()
-    const [subFolders, setSubFolders] = useState()
-    const [folders, setFolders] = useState([])
-    const [newFolderName, setNewFolderName] = useState('')
-    const [destination, setDestination] = useState({id: null, fileName: null, nestedUnder: null})
-    const [focusedFolderInst, setFocusedFolderInst] = useState()
 
-    const currentUser = firebaseAuth.currentUser.uid
-    const auth = firebaseAuth
-    const toast = useToast()
-
-    //alpha sort functionality
-    const getSortableValue = (val) => {
-        if (typeof val !== "string") return { original: "", isNumber: false };
-
-        const trimmed = val.trim();
-        const firstChar = trimmed.charAt(0);
-
-        const isNumber = /^[0-9]/.test(firstChar);
-
-        return {
-        original: trimmed,
-        isNumber,
-        firstChar
-        };
-    };
-
-    const safeLocaleCompare = (a, b) => {
-        try {
-        return a.localeCompare(b, undefined, { numeric: true });
-        } catch {
-        return a.localeCompare(b);
-        }
-    }
-
-    //get the current user 
-    useEffect(() => {
-        if (auth) {
-        try {
-            const getCurrentUser = async () => {
-            const unsubscribe = await userListener(setUserInst, false, currentUser)
-        
-            return () => unsubscribe()
-            }
-            getCurrentUser()
-        } catch (err) {console.log(err)}
-        } else console.log('no user yet')
-        
-    }, [auth])
-
-    //set folders 
-    useEffect(() => {
-        if(userInst) {
-            if (Array.isArray(userInst?.files)) {
-                const sortedFiles = [...userInst.files].sort((a, b) => {
-                    const aVal = getSortableValue(a.fileName);
-                    const bVal = getSortableValue(b.fileName);
-
-                    // Numbers first (descending)
-                    if (aVal.isNumber && bVal.isNumber) {
-                    const numA = parseFloat(aVal.original) || 0;
-                    const numB = parseFloat(bVal.original) || 0;
-                    return numA - numB; // ascending
-                    }
-
-                    if (aVal.isNumber && !bVal.isNumber) return -1; // number before non-number
-                    if (!aVal.isNumber && bVal.isNumber) return 1;  // non-number after number
-
-                    // Both non-numbers → alphabetical (UTF-8 safe)
-                    return safeLocaleCompare(aVal.firstChar, bVal.firstChar);
-                })
-
-                setFolders(sortedFiles)
-            } else {
-                setFolders([])
-                console.warn('userInst.files is not an array', userInst?.files)
-            } 
-        }
-    }, [userInst])
-
-    //determine if a folder has any subfolders
-    useEffect(() => {
-        const exists = Array.isArray(folders) && folders.some((value) => {
-            return value.nestedUnder === focusedFolder
-        })
-        setSubFolders(exists)
-    }, [focusedFolder, folders])
-
-    useEffect(() => {
-        if (Array.isArray(folders) && focusedFolder) {
-            setFocusedFolderInst(folders.filter(folder => folder.id === focusedFolder)[0])
-        }
-    }, [focusedFolder, folders])
+    // Keep `files` sorted in state: FileRow writes renames back by index.
+    const addFiles = (newFiles) => setFiles(prev => sortByName([...prev, ...newFiles], 'name'))
 
     //helper for getting image sizes if an image is returned out of the document picker
     const getImageSize = (uri) =>
@@ -193,7 +76,7 @@ const DocumentPickerComp = () => {
                 };
             }));
 
-            setFiles(prev => [...prev, ...updatedFiles])
+            addFiles(updatedFiles)
         } catch (err) {
             alert(err)
         }
@@ -201,7 +84,6 @@ const DocumentPickerComp = () => {
 
     const selectImage = async () => {
         try {
-        let updatedFiles = [...files]
         // No permissions request is necessary for launching the image library
         const imgs = await ImagePicker.launchImageLibraryAsync({
           mediaTypes: ImagePicker.MediaTypeOptions.All,
@@ -210,15 +92,10 @@ const DocumentPickerComp = () => {
           allowsMultipleSelection: true
         });
         if (!imgs.canceled) {
-            imgs.assets.forEach(img => {
+            addFiles(imgs.assets.map(img => {
                 const fileName = img.uri.substring(img.uri.lastIndexOf('/') + 1, img.uri.length)
-    
-                updatedFiles.push({name: fileName, uri: img.uri, fileType: fileName.split('.')[1], height: img.height, width: img.width})
-            })
-            
-            console.log(updatedFiles)
-    
-            setFiles(updatedFiles)
+                return {name: fileName, uri: img.uri, fileType: fileName.split('.')[1], height: img.height, width: img.width}
+            }))
         }
         
         } catch (err) {console.log(err)}
@@ -228,27 +105,9 @@ const DocumentPickerComp = () => {
     const renderFiles = () => {
 
         if (Array.isArray(files)) {
-            const sortedFileRefs = [...files].sort((a, b) => {
-                const aVal = getSortableValue(a.name);
-                const bVal = getSortableValue(b.name);
-
-                // Numbers first (descending)
-                if (aVal.isNumber && bVal.isNumber) {
-                const numA = parseFloat(aVal.original) || 0;
-                const numB = parseFloat(bVal.original) || 0;
-                return numA - numB; // ascending
-                }
-
-                if (aVal.isNumber && !bVal.isNumber) return -1; // number before non-number
-                if (!aVal.isNumber && bVal.isNumber) return 1;  // non-number after number
-
-                // Both non-numbers → alphabetical (UTF-8 safe)
-                return safeLocaleCompare(aVal.firstChar, bVal.firstChar);
-            })
-
-            return sortedFileRefs.map((file, index) => {
+            return files.map((file, index) => {
                 return (
-                    <FileRow file={file} files={files} index={index} key={index} deleteFunc={filterFiles} setFiles={setFiles}/>
+                    <FileRow file={file} files={files} index={index} key={file.uri} deleteFunc={filterFiles} setFiles={setFiles}/>
                 )
             })
         } else {
@@ -267,48 +126,26 @@ const DocumentPickerComp = () => {
         setFiles(arr)
     }
     
-    const saveFiles = async () => {
-        
+    const saveFiles = async (toStaging = false) => {
+        const finalDestination = save.resolveDestination(toStaging)
+        const filesToSave = files
+
         setLoading(true)
-        setPreAdd(false)
         setFiles([])
+        save.reset()
 
-        const filesToAddToQueue = files.map(file => {
-            let finalDestination 
-            if (destination.id !== null) finalDestination = destination.id
-            else if (focusedFolder) finalDestination = focusedFolder 
-            else finalDestination = false
-
-            if (['jpg', 'JPG', 'jpeg', 'JPEG', 'png', 'PNG'].includes(file.fileType)) {
-                return { uri: file.uri, filename: file.name, fileType: file.fileType, finalDestination: finalDestination, metadata: {width: file.width, height: file.height}}
-            } else return { uri: file.uri, filename: file.name, fileType: file.fileType, finalDestination: finalDestination }
-        })
-
-        let queue = JSON.parse(await AsyncStorage.getItem('uploadQueue')) || []
-        const newQueue = [...queue, ...filesToAddToQueue]
-        await AsyncStorage.setItem('uploadQueue', JSON.stringify(newQueue))
-
-        //confirm the flush by immediately reading it back
-        const confirmedQueue = JSON.parse(await AsyncStorage.getItem('uploadQueue'))
-
-        UploadQueueEmitter.emit('uploadQueueUpdated', confirmedQueue)
-
-        //reset the form
-        setLoading(false)
-        setDestination({id: null, fileName: null, nestedUnder: null})
-        setFocusedFolder(null)
-    }
-
-    //add a folder
-    const addFolder = async (folderName, targetNest) => {
         try {
-            const { newFile, newFiles } = await addFolderToUser(userInst, folderName, targetNest)
-            setNewFolderName('')
-            setAddFolderForm(false)
-            setFolders(newFiles)
-            setFocusedFolder(newFile.id)
+            await enqueueUploads(filesToSave.map(file => {
+                if (['jpg', 'JPG', 'jpeg', 'JPEG', 'png', 'PNG'].includes(file.fileType)) {
+                    return { uri: file.uri, filename: file.name, fileType: file.fileType, finalDestination, metadata: {width: file.width, height: file.height}}
+                }
+                return { uri: file.uri, filename: file.name, fileType: file.fileType, finalDestination }
+            }))
         } catch (err) {
-            alert(err?.message || String(err))
+            setFiles(filesToSave)
+            alert('Save failed: ' + (err?.message || String(err)))
+        } finally {
+            setLoading(false)
         }
     }
 
@@ -317,147 +154,13 @@ const DocumentPickerComp = () => {
 
   return (
     <>
-        {preAdd ? 
-            <Modal animationType='slide' presentationStyle='pageSheet'>
-                <View style={{flex: 1, height: '100%', width: '100%', backgroundColor: '#fff', overflow: 'hidden'}}>
-                    {/* if the moveFile state is true, display the modal with the file movement code*/}
-                    {/* xMark icon for closing out the moveFile modal */}
-                    <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', paddingRight: '5%', paddingTop: '10%', width: '100%'}}>
-                        <Pressable onPress={() => {
-                            if (addFolderForm) setAddFolderForm(false) 
-                            else {
-                            setPreAdd(false)
-                            setFocusedFolder(null)
-                            }
-                            }}>
-                            <FontAwesomeIcon icon={faXmark} color={'#593060'} size={30}/>
-                        </Pressable>
-                    </View>
-                    
-                    <ContentShell variant="modal" fill>
-                    { 
-                    addFolderForm ? 
-                        <KeyboardSafeForm>
-                        <View style={{width: '100%', height: '100', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center'}}>
-                            <Text style={[{color: '#593060', fontSize: 35, fontWeight: '700', marginTop: '40%', textAlign: 'center'}, select(undefined, tabletStyles.modalHeading)]}>Add A New Folder:</Text>
-                            <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', marginTop: '10%', width: '100%'}}>
-                                <View style={styles.iconHolder}> 
-                                    <FontAwesomeIcon icon={faFolder} size={22} color='#9F37B0'/>
-                                </View>
-                                <TextInput value={newFolderName} placeholder='Enter new name' placeholderTextColor={'#593060'} style={{color: '#593060', fontSize: 20, fontWeight: 'bold', borderBottomColor: '#593060', borderBottomWidth: 2, width: '70%'}} onChangeText={(e) => setNewFolderName(e)} autoFocus showSoftInputOnFocus ref={addFolderInputRef} onLayout={() => addFolderInputRef.current?.focus?.()}/>
-                            </View>
-                            <View style={{width: '100%', paddingTop: '10%', display: 'flex', flexDirection: 'row', justifyContent: 'center'}}>
-                                <YellowButton
-                                  size="md"
-                                  icon={faFloppyDisk}
-                                  label="Save"
-                                  onPress={() => addFolder(newFolderName, focusedFolder ? focusedFolder : '')}
-                                />
-                            </View>
-                        </View>
-                        </KeyboardSafeForm>
-
-                    :
-
-                        <View style={{width: '100%', flex: 1, minHeight: 0, alignItems: 'center', backgroundColor: '#fff'}}>
-                            <Text style={{fontSize: 40, color: '#593060', fontWeight: 'bold', textAlign: 'left', width: '100%', paddingLeft: '5%', marginBottom: 8}}>Save Files To...</Text>
-                            {focusedFolderInst && 
-                                <Text style={{fontSize: 20, color: '#593060', fontWeight: 'bold', textAlign: 'left', width: '100%', paddingLeft: '5%', marginBottom: 8}}>Viewing: {focusedFolderInst.fileName}</Text>
-                            }
-                            {focusedFolder ? 
-                                <YellowButton size="xs" icon={faArrowLeft} label="Back" style={{ marginBottom: 8, marginLeft: '5%' }} onPress={() => {
-                                    const folderInst = folders.filter(folder => folder.id === focusedFolder) 
-                                    
-                                    const parentFolderInst = folders.filter(folder => folder.id === folderInst[0].nestedUnder)
-                                    console.log(parentFolderInst)
-                                    if (parentFolderInst.length > 0) {
-                                        console.log("we're within the first if check")
-                                        setDestination({id: parentFolderInst[0].id, fileName: parentFolderInst[0].fileName, nestedUnder: parentFolderInst[0].nestedUnder})
-                                        setFocusedFolder(folderInst[0].nestedUnder)
-                                    } else {
-                                        console.log("we're within the else check")
-                                        setDestination({id: null, fileName: null, nestedUnder: null})
-                                        setFocusedFolder(null)
-                                    }
-                                }} />
-                            :
-                                null
-                            }
-                            <DestinationFolderScroller centerEmpty={!!(focusedFolder && !subFolders)}>
-                                    {/* map over each of the folders from the filesystem and display them as a pressable element // call movefile function when one of them is pressed */}
-                                    {focusedFolder && !subFolders ? 
-                                        <Text style={[{fontSize: 30, color: '#593060', fontWeight: 'bold', textAlign: 'center'}, select(undefined, tabletStyles.modalHeading)]}>No Subfolders...</Text>
-                                    
-                                    :   
-                                        <>
-                                            {(Array.isArray(folders) ? folders : []).map((f, index) => {
-                                                if (focusedFolder) {
-                                                    if (f.nestedUnder === focusedFolder) {
-                                                            return (
-                                                                <MoveFolderDestinationRow
-                                                                  key={index}
-                                                                  selected={f.id === destination.id}
-                                                                  fileName={f.fileName}
-                                                                  onPress={() => {
-                                                                    if (destination.id === null || f.id !== destination.id) {
-                                                                      setDestination({id: f.id, fileName: f.fileName, nestedUnder: f.nestedUnder})
-                                                                    } else {
-                                                                      setFocusedFolder(f.id)
-                                                                      setDestination({id: null, fileName: null, nestedUnder: null})
-                                                                    }
-                                                                  }}
-                                                                />
-                                                            )
-                                                        
-                                                    }
-                                                } else {
-                                                    if (f.nestedUnder === '') {
-                                                        return (
-                                                            <MoveFolderDestinationRow
-                                                              key={index}
-                                                              selected={f.id === destination.id}
-                                                              fileName={f.fileName}
-                                                              onPress={() => {
-                                                                if (destination.id === null || f.id !== destination.id) {
-                                                                  setDestination({id: f.id, fileName: f.fileName, nestedUnder: f.nestedUnder})
-                                                                } else {
-                                                                  setFocusedFolder(f.id)
-                                                                  setDestination({id: null, fileName: null, nestedUnder: null})
-                                                                }
-                                                              }}
-                                                            />
-                                                            )
-                                                        }
-                                                    }
-                                                }
-                                            )}   
-                                        </>
-                                    }
-                                    {/* 
-                                    
-                                        IF EVENTUALLY THE USER WILL BE ABLE TO MOVE A FILE TO THE HOMEPAGE, THIS IS WHERE THAT COULD WOULD BE
-
-                                    <Pressable style={{display: 'flex', flexDirection: 'row', justifyContent: 'center', marginTop: '5%'}} onPress={() => setDestination('home')}>
-                                            <View style={destination === 'home' ? {borderBottomWidth: 2, width: '85%', backgroundColor: 'white', display: 'flex', flexDirection: 'row', paddingLeft: '2.5%', paddingTop: '2%'} : {borderBottomWidth: 2, width: '85%', borderBottomColor: 'white', display: 'flex', flexDirection: 'row', paddingLeft: '2.5%', paddingTop: '2%'}}>
-                                            <FontAwesomeIcon icon={faFolder} size={30} color={destination === 'home' ? 'black' : 'white'}/>
-                                            <Text style={destination === 'home' ? {color: 'black', fontSize: 30, marginLeft: '5%'} : {color: 'white', fontSize: 30, marginLeft: '5%'}}>Home</Text>
-                                            </View>
-                                        </Pressable> */}
-                            </DestinationFolderScroller>
-                            
-                            <SaveDestinationActions
-                                onAddFolder={() => setAddFolderForm(true)}
-                                onSaveStaging={() => saveFiles()}
-                                onConfirmMove={() => saveFiles()}
-                                confirmDisabled={!(destination.id !== null || focusedFolder)}
-                            />
-                        </View>
-                        
-                    }
-                    </ContentShell>
-
-                </View>
-            </Modal>
+        {save.preAdd ? 
+            <SaveDestinationModal
+                save={save}
+                title="Save Files To..."
+                onSaveStaging={() => saveFiles(true)}
+                onConfirm={() => saveFiles()}
+            />
         :
             <View style={styles.container}>
                 <ContentShell variant="content" fill>
@@ -522,7 +225,7 @@ const DocumentPickerComp = () => {
                         <YellowButton
                           size="md"
                           label="Upload Files"
-                          onPress={() => setPreAdd(true)}
+                          onPress={save.open}
                           dimmed={files.length === 0}
                           disabled={files.length === 0}
                           icon={faCloudArrowUp}
@@ -689,9 +392,6 @@ const styles = StyleSheet.create({
 })
 
 const tabletStyles = StyleSheet.create({
-    modalHeading: {
-        marginTop: 48,
-    },
     actionButton: {
         maxWidth: '100%',
     },

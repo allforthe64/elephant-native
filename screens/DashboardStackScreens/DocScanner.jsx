@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'
-import { Image, Platform, PermissionsAndroid, Dimensions, View, TouchableOpacity, Text, Pressable, TextInput, Modal, ScrollView, StyleSheet } from 'react-native'
+import { Image, Platform, PermissionsAndroid, Dimensions, View, StyleSheet } from 'react-native'
 
 //import DocumentScanner component from react-native-document-scanner-plugin
 import DocumentScanner from 'react-native-document-scanner-plugin'
@@ -19,161 +19,31 @@ import RNBlobUtil from 'react-native-blob-util';
 //import format from date-fns for file timestamp
 import { format } from 'date-fns';
 
-//import storage and firebaseAuth objects from firebaseConfig
-import { storage, firebaseAuth } from '../../firebaseConfig';
-
-//firebase storage imports for file uploading
-import {ref, uploadBytesResumable} from 'firebase/storage'
-
-//import userListener, addfile, and update user functions from firestore
-import { userListener, addfile, updateUser, addFolderToUser } from '../../firebase/firestore';
-
 //fontAwesome imports
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faFolder, faXmark, faFile, faArrowLeft, faFloppyDisk, faStopwatch, faPlus, faCheck, faBox, faCloudArrowUp } from '@fortawesome/free-solid-svg-icons';
+import { faPlus, faCloudArrowUp } from '@fortawesome/free-solid-svg-icons';
 
-
-//import stuff for QueueUpload
-import { UploadQueueEmitter } from '../../hooks/QueueEventEmitter'
-import AsyncStorage from '@react-native-async-storage/async-storage'
 import ContentShell from '../../components/ui/ContentShell'
-import KeyboardSafeForm from '../../components/ui/KeyboardSafeForm'
-import { useAutoFocusOn } from '../../hooks/useAutoFocusOn'
-import { ensureAndroidPermission } from '../../utils/permissions'
 import YellowButton from '../../components/ui/YellowButton'
+import SaveDestinationModal from '../../components/fileSystem/SaveDestinationModal'
+import { ensureAndroidPermission } from '../../utils/permissions'
+import { enqueueUploads, randomQueueId } from '../../utils/uploadQueue'
 import { useResponsiveLayout } from '../../hooks/useResponsiveLayout'
+import { useSaveDestination } from '../../hooks/useSaveDestination'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import SaveDestinationActions from '../../components/fileSystem/SaveDestinationActions'
-import DestinationFolderScroller from '../../components/fileSystem/DestinationFolderScroller'
-import MoveFolderDestinationRow from '../../components/fileSystem/MoveFolderDestinationRow'
 
 const DocScanner = () => {
 
   try {
-  const { isTablet, select, height: windowHeight } = useResponsiveLayout()
+  const { isTablet, select } = useResponsiveLayout()
   const insets = useSafeAreaInsets()
   const bottomPad = Math.max(insets.bottom, 16) + 48
+  const save = useSaveDestination()
 
-  
   const [scannedImageArray, setScannedImageArray] = useState([]);
-  const [userInst, setUserInst] = useState()
-  const [addFolderForm, setAddFolderForm] = useState(false)
-  const addFolderInputRef = useAutoFocusOn(addFolderForm)
-  const [focusedFolder, setFocusedFolder] = useState()
-  const [subFolders, setSubFolders] = useState()
-  const [folders, setFolders] = useState([])
-  const [newFolderName, setNewFolderName] = useState('')
-  const [nameGiven, setNameGiven] = useState(false)
-  const [docName, setDocName] = useState('')
-  const [preAdd, setPreAdd] = useState(false)
-  const [destination, setDestination] = useState({id: null, fileName: null, nestedUnder: null})
-  const [PDFPath, setPDFPath] = useState()
-  const [focusedFolderInst, setFocusedFolderInst] = useState()
-
-  //initialize ref for name
-  const nameRef = useRef()
-
-  const currentUser = firebaseAuth.currentUser.uid
-
-  const closeSaveDialog = () => {
-    setPreAdd(false)
-    setNameGiven(false)
-    setDocName('')
-    setFocusedFolder(null)
-    setDestination({id: null, fileName: null, nestedUnder: null})
-    setAddFolderForm(false)
-    setNewFolderName('')
-  }
 
   const toast = useToast()
 
   const width = Dimensions.get('window').width
-  
-  //alpha sort functionality
-  const getSortableValue = (val) => {
-      if (typeof val !== "string") return { original: "", isNumber: false };
-
-      const trimmed = val.trim();
-      const firstChar = trimmed.charAt(0);
-
-      const isNumber = /^[0-9]/.test(firstChar);
-
-      return {
-      original: trimmed,
-      isNumber,
-      firstChar
-      };
-  };
-
-  const safeLocaleCompare = (a, b) => {
-      try {
-      return a.localeCompare(b, undefined, { numeric: true });
-      } catch {
-      return a.localeCompare(b);
-      }
-  }
-
-  //get the current user 
-  useEffect(() => {
-    if (firebaseAuth) {
-    try {
-        const getCurrentUser = async () => {
-        const unsubscribe = await userListener(setUserInst, false, currentUser)
-    
-        return () => unsubscribe()
-        }
-        getCurrentUser()
-    } catch (err) {console.log(err)}
-    } else console.log('no user yet')
-    
-  }, [firebaseAuth])
-
-  useEffect(() => {
-    if(userInst) {
-      if (Array.isArray(userInst?.files)) {
-          const sortedFiles = [...(userInst.files || [])].sort((a, b) => {
-            const aVal = getSortableValue(a.fileName);
-            const bVal = getSortableValue(b.fileName);
-
-            // Numbers first (descending)
-            if (aVal.isNumber && bVal.isNumber) {
-            const numA = parseFloat(aVal.original) || 0;
-            const numB = parseFloat(bVal.original) || 0;
-            return numA - numB; // ascending
-            }
-
-            if (aVal.isNumber && !bVal.isNumber) return -1; // number before non-number
-            if (!aVal.isNumber && bVal.isNumber) return 1;  // non-number after number
-
-            // Both non-numbers → alphabetical (UTF-8 safe)
-            return safeLocaleCompare(aVal.firstChar, bVal.firstChar);
-        })
-        setFolders(sortedFiles)
-      } else {
-        setFolders([])
-        console.warn('userInst.files is not an array', userInst?.files)
-      }
-    }
-  }, [userInst])
-
-  useEffect(() => {
-    if (Array.isArray(folders) && focusedFolder) {
-      setFocusedFolderInst(folders.filter(folder => folder.id === focusedFolder)[0])
-    }
-  }, [focusedFolder, folders])
-
-  //add a folder
-  const addFolder = async (folderName, targetNest) => {
-    try {
-      const { newFile, newFiles } = await addFolderToUser(userInst, folderName, targetNest)
-      setNewFolderName('')
-      setAddFolderForm(false)
-      setFolders(newFiles)
-      setFocusedFolder(newFile.id)
-    } catch (err) {
-      alert(err?.message || String(err))
-    }
-  }
 
   const scanDocument = async () => {
 
@@ -209,126 +79,34 @@ const DocScanner = () => {
 
     return createPdf({
       pages: scannedImageArray.map(imagePath => ({imagePath})),
-      outputPath: `file://${RNBlobUtil.fs.dirs.DocumentDir}/file.pdf`
+      // Unique per scan: the upload queue may still be reading an earlier PDF.
+      outputPath: `file://${RNBlobUtil.fs.dirs.DocumentDir}/scan-${Date.now()}.pdf`
     })
-    .then(path => {
-      uploadPDF(path, toStaging)
-    })
+    .then(path => uploadPDF(path, toStaging))
     .catch(error => {
       alert(`Failed to create PDF: ${error}`)
     });
   }
 
-  function generateRandomString(length) {
-    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    let result = '';
-    const charactersLength = characters.length;
-
-    for (let i = 0; i < length; i++) {
-        result += characters.charAt(Math.floor(Math.random() * charactersLength));
-    }
-
-    return result;
-  }
-
   const uploadPDF = async (path, toStaging = false) => {
     try {
-      const modifiedPath = `file://${path}`
-
-
-      //create new formatted date for file
-      const randomString = generateRandomString(10);
-      const formattedDate = format(new Date(), "yyyy-MM-dd:hh:mm:ss") + randomString
-
-      let finalDestination
-      if (toStaging) finalDestination = false
-      else if (destination.id !== null) finalDestination = destination.id
-      else if (focusedFolder) finalDestination = focusedFolder 
-      else finalDestination = false
-
-      //generate a fileName and finalDestination
+      const formattedDate = format(new Date(), "yyyy-MM-dd:hh:mm:ss") + randomQueueId(10)
+      const docName = save.name.trim()
       const filename = docName !== '' ? `${docName}.pdf` : `${formattedDate}.pdf`
 
-      //add an image into the file queue
-      let queue = JSON.parse(await AsyncStorage.getItem('uploadQueue')) || []
-      queue.push({uri: modifiedPath, filename: filename, fileType: 'pdf', finalDestination: finalDestination})
-      await AsyncStorage.setItem('uploadQueue', JSON.stringify(queue))
-      
-      //confirm the flush by immediately reading it back
-      const confirmedQueue = JSON.parse(await AsyncStorage.getItem('uploadQueue'))
-
-      UploadQueueEmitter.emit('uploadQueueUpdated', confirmedQueue)
+      await enqueueUploads([{
+        uri: `file://${path}`,
+        filename,
+        fileType: 'pdf',
+        finalDestination: save.resolveDestination(toStaging),
+      }])
 
       setScannedImageArray([])
-      closeSaveDialog()
+      save.reset()
     } catch (error) {
       alert('docScanner error: ' + error.message)
     }
-
-
-
-    //create blob and upload it into firebase storage
-    try {
-        /*const blob = await new Promise((resolve, reject) => {
-          const xhr = new XMLHttpRequest()
-          xhr.onload = () => {
-              resolve(xhr.response) 
-          }
-          xhr.onerror = (e) => {
-              reject(e)
-              reject(new TypeError('Network request failed'))
-          }
-          xhr.responseType = 'blob'
-          xhr.open('GET', modifiedPath, true)
-          xhr.send(null)
-      })
-      
-      const filename = `${currentUser}/${formattedDate}`
-      const fileRef = ref(storage, filename)
-      const result = await uploadBytesResumable(fileRef, blob)
-    
-
-      console.log('this is the result object: ', result)
-
-      let finalDestintation 
-       if (destination.id !== null) finalDestintation = destination.id
-       else if (focusedFolder) finalDestintation = focusedFolder 
-       else finalDestintation = false
-      
-      //generate references
-      const reference = await addfile({
-        name: `${docName !== '' ? docName : formattedDate}.pdf`,
-        fileType: 'pdf',
-        size: result.metadata.size,
-        uri: path,
-        user: currentUser,
-        version: 0,
-        timeStamp: formattedDate
-      }, finalDestintation)
-      
-      const updatedUser = {...userInst, fileRefs: [...userInst.fileRefs, reference], spaceUsed: userInst.spaceUsed + result.metadata.size}
-      updateUser(updatedUser)
-      toast.show('Upload successful', {
-          type: 'success'
-      }) */
-      
-    } catch ({name, message}) {
-      alert(message)
-      throw new Error(message)
-    }
-
   }
-
-  useEffect(() => {
-    const exists = Array.isArray(folders) && folders.some((value) => {
-        return value.nestedUnder === focusedFolder
-    })
-    setSubFolders(exists)
-  }, [focusedFolder, folders])
-
-  useEffect(() => {
-    console.log('ScannedImageArray: ', scannedImageArray)
-  }, scannedImageArray)
 
   //carousel
   const [progress, setProgress] = useState(0);
@@ -347,184 +125,15 @@ const DocScanner = () => {
 
   return (
     <>
-      {preAdd ? 
+      {save.preAdd ? 
 
-        <Modal animationType='slide' presentationStyle='pageSheet' onShow={() => setTimeout(()=>{
-          nameRef.current.focus()
-      }, 200)} onRequestClose={closeSaveDialog} onDismiss={closeSaveDialog}>
-          <View style={{flex: 1, height: '100%', width: '100%', backgroundColor: '#fff', overflow: 'hidden'}}>
-              {/* if the moveFile state is true, display the modal with the file movement code*/}
-              {/* xMark icon for closing out the moveFile modal */}
-              <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', paddingRight: '5%', paddingTop: '10%', width: '100%'}}>
-                  <Pressable onPress={() => {
-                    if (addFolderForm) setAddFolderForm(false) 
-                    else closeSaveDialog()
-                    }}>
-                      <FontAwesomeIcon icon={faXmark} color={'#593060'} size={30}/>
-                  </Pressable>
-              </View>
-              
-              <ContentShell variant="modal" fill>
-              { 
-
-              !nameGiven ?
-              <KeyboardSafeForm>
-              <>
-                  <Text style={[{color: '#593060', fontSize: 35, fontWeight: '700', marginTop: '35%', textAlign: 'center'}, select(undefined, tabletStyles.modalHeading)]}>Name PDF:</Text>
-                  <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', marginTop: '10%'}}>
-                      <View style={styles.iconHolder}>
-                        <FontAwesomeIcon icon={faFile} size={22} color='#9F37B0'/>
-                      </View>
-                      <TextInput value={docName} placeholder='Enter name' placeholderTextColor={'#593060'} style={{color: '#593060', fontSize: 20, fontWeight: 'bold', borderBottomColor: '#593060', borderBottomWidth: 2, width: '70%'}} onChangeText={(e) => setDocName(e)} ref={nameRef}/>
-                  </View>
-                  <View style={{width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', paddingTop: '5%'}}>
-                    <YellowButton
-                      size="md"
-                      icon={faFloppyDisk}
-                      label="Save"
-                      dimmed={docName === ''}
-                      onPress={() => {
-                          setNameGiven(true)
-                      }}
-                    />
-                    <Text style={{color: '#593060', fontSize: 20, marginTop: '2%', textAlign: 'center'}}>Or</Text>
-                    <YellowButton
-                      size="md"
-                      icon={faStopwatch}
-                      label="Use Timestamp"
-                      style={{ marginTop: '2%' }}
-                      onPress={() => {
-                          setNameGiven(true)
-                      }}
-                    />
-                  </View>
-              </>
-              </KeyboardSafeForm>
-              : addFolderForm ? 
-                  <KeyboardSafeForm>
-                  <>
-                      <Text style={[{color: '#593060', fontSize: 35, fontWeight: '700', marginTop: '40%', textAlign: 'center'}, select(undefined, tabletStyles.modalHeading)]}>Add A New Folder:</Text>
-                      <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', marginTop: '10%'}}>
-                          <View style={styles.iconHolder}> 
-                              <FontAwesomeIcon icon={faFolder} size={22} color='#9F37B0'/>
-                          </View>
-                          <TextInput value={newFolderName} placeholder='Enter new name' placeholderTextColor={'#593060'} style={{color: '#593060', fontSize: 20, fontWeight: 'bold', borderBottomColor: '#593060', borderBottomWidth: 2, width: '70%'}} onChangeText={(e) => setNewFolderName(e)} autoFocus showSoftInputOnFocus ref={addFolderInputRef} onLayout={() => addFolderInputRef.current?.focus?.()}/>
-                      </View>
-                      <View style={{width: '100%', paddingTop: '10%', display: 'flex', flexDirection: 'row', justifyContent: 'center'}}>
-                            <YellowButton
-                              size="md"
-                              icon={faFloppyDisk}
-                              label="Save"
-                              onPress={() => addFolder(newFolderName, focusedFolder ? focusedFolder : '')}
-                            />
-                        </View>
-                  </>
-                  </KeyboardSafeForm>
-
-              :
-
-                  <View style={{width: '100%', flex: 1, minHeight: 0, alignItems: 'center', backgroundColor: '#fff'}}>
-                      <Text style={{fontSize: 40, color: '#593060', fontWeight: 'bold', textAlign: 'left', width: '100%', paddingLeft: '5%', marginBottom: 8}}>Save PDF To...</Text>
-                      {focusedFolderInst &&
-                        <Text style={{fontSize: 20, color: '#593060', fontWeight: 'bold', textAlign: 'left', width: '100%', paddingLeft: '5%', marginBottom: 8}}>Viewing: {focusedFolderInst.fileName}</Text>
-                      }
-                      {focusedFolder ? 
-                          <YellowButton size="xs" icon={faArrowLeft} label="Back" style={{ marginBottom: 8, marginLeft: '5%' }} onPress={() => {
-                              const folderInst = folders.filter(folder => folder.id === focusedFolder) 
-                              
-                              const parentFolderInst = folders.filter(folder => folder.id === folderInst[0].nestedUnder)
-                              console.log(parentFolderInst)
-                              if (parentFolderInst.length > 0) {
-                                  console.log("we're within the first if check")
-                                  setDestination({id: parentFolderInst[0].id, fileName: parentFolderInst[0].fileName, nestedUnder: parentFolderInst[0].nestedUnder})
-                                  setFocusedFolder(folderInst[0].nestedUnder)
-                              } else {
-                                  console.log("we're within the else check")
-                                  setDestination({id: null, fileName: null, nestedUnder: null})
-                                  setFocusedFolder(null)
-                              }
-                          }} />
-                      :
-                          null
-                      }
-                      <DestinationFolderScroller centerEmpty={!!(focusedFolder && !subFolders)}>
-                              {/* map over each of the folders from the filesystem and display them as a pressable element // call movefile function when one of them is pressed */}
-                              {focusedFolder && !subFolders ? 
-                                  <Text style={[{fontSize: 30, color: '#593060', fontWeight: 'bold', marginTop: '30%', textAlign: 'center'}, select(undefined, tabletStyles.modalHeading)]}>No Subfolders...</Text>
-                              
-                              :   
-                                  <>
-                                      {(Array.isArray(folders) ? folders : []).map((f, index) => {
-                                          if (focusedFolder) {
-                                              if (f.nestedUnder === focusedFolder) {
-                                                      return (
-                                                          <MoveFolderDestinationRow
-                                                            key={index}
-                                                            selected={f.id === destination.id}
-                                                            fileName={f.fileName}
-                                                            onPress={() => {
-                                                              if (destination.id === null || f.id !== destination.id) {
-                                                                setDestination({id: f.id, fileName: f.fileName, nestedUnder: f.nestedUnder})
-                                                              } else {
-                                                                setFocusedFolder(f.id)
-                                                                setDestination({id: null, fileName: null, nestedUnder: null})
-                                                              }
-                                                            }}
-                                                          />
-                                                      )
-                                                  
-                                              }
-                                          } else {
-                                              if (f.nestedUnder === '') {
-                                                  return (
-                                                        <MoveFolderDestinationRow
-                                                          key={index}
-                                                          selected={f.id === destination.id}
-                                                          fileName={f.fileName}
-                                                          onPress={() => {
-                                                            if (destination.id === null || f.id !== destination.id) {
-                                                              setDestination({id: f.id, fileName: f.fileName, nestedUnder: f.nestedUnder})
-                                                            } else {
-                                                              setFocusedFolder(f.id)
-                                                              setDestination({id: null, fileName: null, nestedUnder: null})
-                                                            }
-                                                          }}
-                                                        />
-                                                      )
-                                                  }
-                                              }
-                                          }
-                                      )}   
-                                  </>
-                              }
-                              {/* 
-                              
-                                  IF EVENTUALLY THE USER WILL BE ABLE TO MOVE A FILE TO THE HOMEPAGE, THIS IS WHERE THAT COULD WOULD BE
-
-                              <Pressable style={{display: 'flex', flexDirection: 'row', justifyContent: 'center', marginTop: '5%'}} onPress={() => setDestination('home')}>
-                                      <View style={destination === 'home' ? {borderBottomWidth: 2, width: '85%', backgroundColor: 'white', display: 'flex', flexDirection: 'row', paddingLeft: '2.5%', paddingTop: '2%'} : {borderBottomWidth: 2, width: '85%', borderBottomColor: 'white', display: 'flex', flexDirection: 'row', paddingLeft: '2.5%', paddingTop: '2%'}}>
-                                      <FontAwesomeIcon icon={faFolder} size={30} color={destination === 'home' ? 'black' : 'white'}/>
-                                      <Text style={destination === 'home' ? {color: 'black', fontSize: 30, marginLeft: '5%'} : {color: 'white', fontSize: 30, marginLeft: '5%'}}>Home</Text>
-                                      </View>
-                                  </Pressable> */}
-                      </DestinationFolderScroller>
-                      
-                      <SaveDestinationActions
-                        onAddFolder={() => setAddFolderForm(true)}
-                        onSaveStaging={() => generatePDF(true)}
-                        onConfirmMove={() => generatePDF()}
-                        confirmDisabled={!(destination.id !== null || focusedFolder)}
-                      />
-
-
-
-                  </View>
-                  
-              }
-              </ContentShell>
-
-          </View>
-        </Modal>
+        <SaveDestinationModal
+          save={save}
+          title="Save PDF To..."
+          nameHeading="Name PDF:"
+          onSaveStaging={() => generatePDF(true)}
+          onConfirm={() => generatePDF()}
+        />
       :
       
       scannedImageArray ? 
@@ -613,7 +222,7 @@ const DocScanner = () => {
                           <YellowButton
                             size="md"
                             label="Convert To PDF/Upload"
-                            onPress={() => setPreAdd(true)}
+                            onPress={save.open}
                             style={isTablet ? tabletStyles.actionButton : undefined}
                             icon={faCloudArrowUp}
                           />
@@ -649,7 +258,7 @@ const DocScanner = () => {
                     <YellowButton
                       size="md"
                       label="Convert To PDF/Upload"
-                      onPress={() => setPreAdd(true)}
+                      onPress={save.open}
                       style={isTablet ? tabletStyles.actionButton : undefined}
                       icon={faCloudArrowUp}
                     />
@@ -725,9 +334,6 @@ const styles = StyleSheet.create({
 })
 
 const tabletStyles = StyleSheet.create({
-  modalHeading: {
-    marginTop: 48,
-  },
   actionButton: {
     maxWidth: '100%',
   },
