@@ -39,6 +39,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { UploadQueueEmitter } from '../hooks/QueueEventEmitter';
 
 import * as FileSystem from "expo-file-system";
+import { createTextBlob, TEXT_UPLOAD_METADATA } from '../utils/textBlob';
 import FAQs from './FAQs';
 import TOSMain from './TOSMain';
 import PrivacyMain from './PrivacyMain';
@@ -243,14 +244,14 @@ const Main = () => {
       }
 
       else if (fileType === 'txt') {
+        let cleanupText = () => {}
         try {
-          //upload noteBody as blob (notes + QR scans)
-          const textFile = new Blob([`${file.noteBody ?? ''}`], {
-            type: "text/plain;charset=utf-8",
-          });
+          //upload noteBody as text (notes + QR scans)
+          const { blob: textFile, cleanup } = await createTextBlob(file.noteBody)
+          cleanupText = cleanup
           const fileUri = `${userId}/${file.filename}`
           const fileRef = ref(storage, `${userId}/${formattedDate}`)
-          const result = await uploadBytesResumable(fileRef, textFile)
+          const result = await uploadBytesResumable(fileRef, textFile, TEXT_UPLOAD_METADATA)
 
           const uploadSize = result.metadata.size
 
@@ -290,6 +291,8 @@ const Main = () => {
           didUpload = true
         } catch (error) {
           console.log('error from txt upload: ', error)
+        } finally {
+          cleanupText()
         }
       }
 

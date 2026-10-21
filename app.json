@@ -66,6 +66,20 @@
         }
       ],
       [
+        "expo-media-library",
+        {
+          "photosPermission": "Allow $(PRODUCT_NAME) to access your photos so you can save and organize them in your account.",
+          "savePhotosPermission": "Allow $(PRODUCT_NAME) to save photos and videos you capture to your photo library.",
+          "isAccessMediaLocationEnabled": false
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Allow $(PRODUCT_NAME) to access your photos so you can upload them to your account."
+        }
+      ],
+      [
         "expo-build-properties",
         {
           "ios": {

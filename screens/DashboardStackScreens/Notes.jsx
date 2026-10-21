@@ -253,7 +253,8 @@ const Notepad = () => {
          })
       }
  */
-      setBody(null)
+      setBody('')
+      setNoteName('')
       setDestination({id: null, fileName: null, nestedUnder: null})
       setFocusedFolder(null)
       setPreAdd(false)

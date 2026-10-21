@@ -40,6 +40,7 @@ import MoveFolderDestinationRow from './MoveFolderDestinationRow'
 import DestinationFolderScroller from './DestinationFolderScroller'
 import YellowButton from '../ui/YellowButton'
 import StickyFooter from '../ui/StickyFooter'
+import { createTextBlob, TEXT_UPLOAD_METADATA } from '../../utils/textBlob'
 const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFileMove}) => {
     const { isTablet, contentFill, modalMaxWidth, height: windowHeight } = useResponsiveLayout()
     const insets = useSafeAreaInsets()
@@ -468,17 +469,18 @@ const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFil
         const fileDoc = await getFile(file.fileId)
         const formattedDate = format(new Date(), "yyyy-MM-dd:hh:mm:ss")
 
-        //delete out the old note
-        const deleteRef = refFunction(storage, fileObj.uri)
-        deleteObject(deleteRef)
-
-        //create a new note and upload it
-        const textFile = new Blob([`${noteText}`], {
-            type: "text/plain;charset=utf-8",
-            });
-            const fileUri = `${userInst.uid}/${formattedDate}`
+        //upload the new note before deleting the old one so a failed upload can't lose it
+        const fileUri = `${userInst.uid}/${formattedDate}`
         const fileRef = refFunction(storage, fileUri)
-        uploadBytes(fileRef, textFile) 
+        const { blob: textFile, cleanup } = await createTextBlob(noteText)
+        try {
+            await uploadBytes(fileRef, textFile, TEXT_UPLOAD_METADATA)
+        } finally {
+            cleanup()
+        }
+
+        const deleteRef = refFunction(storage, fileObj.uri)
+        deleteObject(deleteRef).catch((err) => console.log('old note delete failed: ', err))
 
         //create a new file object
         const newFileObj = {
