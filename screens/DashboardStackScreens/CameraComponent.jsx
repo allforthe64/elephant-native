@@ -174,8 +174,9 @@ try {
                 const ext = Platform.OS === 'ios' ? 'mov' : 'mp4'
                 const filename = mediaName !== '' ? `${mediaName}.${ext}` : `${formattedDate}.${ext}`
 
+                // The uploader deletes the file afterwards, so copy it to the library first.
+                await saveToDeviceLibrary(capturedVideo.uri)
                 await enqueueUploads([{uri: capturedVideo.uri, filename, fileType: ext, finalDestination}])
-                saveToDeviceLibrary(capturedVideo.uri)
             } else {
                 const capturedPhoto = photo
                 setPhoto(undefined)
@@ -214,7 +215,7 @@ try {
 
     //save a capture to the phone's photo library
     const saveToDeviceLibrary = (uri) => {
-        MediaLibrary.saveToLibraryAsync(uri).catch((err) => {
+        return MediaLibrary.saveToLibraryAsync(uri).catch((err) => {
             console.warn('Save to photo library failed:', err)
         })
     }

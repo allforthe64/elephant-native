@@ -8,7 +8,6 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 //import AuthContextProvider to provide auth context to the app
 import { AuthContextProvider } from './firebase/auth';
-import { QueContextProvider } from './context/QueContext';
 
 //import ToastProvider for notifications
 import { ToastProvider } from 'react-native-toast-notifications';
@@ -42,10 +41,8 @@ export default function App() {
     <SafeAreaProvider>
       <ToastProvider placement='top' offsetTop={150}>
         <AuthContextProvider>
-          <QueContextProvider>
-            <Main />
-            <StatusBar style="auto" />
-          </QueContextProvider>
+          <Main />
+          <StatusBar style="auto" />
         </AuthContextProvider>
       </ToastProvider>
     </SafeAreaProvider>

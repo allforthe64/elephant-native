@@ -95,7 +95,8 @@ const DocScanner = () => {
       const filename = docName !== '' ? `${docName}.pdf` : `${formattedDate}.pdf`
 
       await enqueueUploads([{
-        uri: `file://${path}`,
+        // iOS returns a file:// URL, Android a bare path.
+        uri: path.startsWith('file://') ? path : `file://${path}`,
         filename,
         fileType: 'pdf',
         finalDestination: save.resolveDestination(toStaging),
