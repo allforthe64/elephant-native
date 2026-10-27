@@ -1,14 +1,12 @@
 import { StyleSheet, Text, View, TouchableOpacity, Modal, Pressable, TextInput, ScrollView } from 'react-native';
-import React, {useState, useEffect} from 'react'
+import React, {useState} from 'react'
 
 //font awesome imports
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faArrowRight, faEllipsisVertical, faFloppyDisk, faFolder, faPencil, faTrash, faXmark, faArrowLeft, faPlus } from '@fortawesome/free-solid-svg-icons';
+import { faArrowRight, faEllipsisVertical, faFloppyDisk, faFolder, faPencil, faTrash, faXmark } from '@fortawesome/free-solid-svg-icons';
 
-import { firebaseAuth } from '../../firebaseConfig';
-import { userListener, addFolderToUser, resolveUniqueFolderName } from '../../firebase/firestore';
+import { resolveUniqueFolderName } from '../../firebase/firestore';
 
-import { useToast } from 'react-native-toast-notifications';
 import { tabletStyle, useResponsiveLayout } from '../../hooks/useResponsiveLayout';
 import {
   fileSystemRowStyles,
@@ -17,10 +15,9 @@ import {
 import KeyboardSafeForm from '../ui/KeyboardSafeForm';
 import YellowButton from '../ui/YellowButton';
 import { useAutoFocusOn } from '../../hooks/useAutoFocusOn';
-import MoveFolderDestinationRow from './MoveFolderDestinationRow';
-import StickyFooter from '../ui/StickyFooter';
+import MoveFolderSheet from './MoveFolderSheet';
 
-const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolderFunc, folders, updateUser}) => {
+const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolderFunc, folders}) => {
   const { isTablet, contentFill, modalMaxWidth } = useResponsiveLayout()
   const tabletModalPanel = isTablet
     ? { width: '100%', maxWidth: modalMaxWidth, alignSelf: 'center' }
@@ -31,126 +28,11 @@ const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolder
   const [editName, setEditName] = useState(false)
   const [moveFolder, setMoveFolder] = useState(false)
   const [newName, setNewName] = useState('')
-  const [destination, setDestination] = useState({id: null, folderName: null})
-  const [validFolders, setValidFolders] = useState()
-  const [focusedFolder, setFocusedFolder] = useState()
-  const [subFolders, setSubFolders] = useState()
-  const [addFolderForm, setAddFolderForm] = useState(false)
-  const [newFolderName, setNewFolderName] = useState('')
-  const [userInst, setUserInst] = useState()
-  const [focusedFolderInst, setFocusedFolderInst] = useState()
   const renameInputRef = useAutoFocusOn(editName)
-  const addFolderInputRef = useAutoFocusOn(addFolderForm)
 
-  const auth = firebaseAuth
-
-  //instantiate toast object
-  const toast = useToast()
-
-  //alpha sort functionality
-  const getSortableValue = (val) => {
-      if (typeof val !== "string") return { original: "", isNumber: false };
-
-      const trimmed = val.trim();
-      const firstChar = trimmed.charAt(0);
-
-      const isNumber = /^[0-9]/.test(firstChar);
-
-      return {
-      original: trimmed,
-      isNumber,
-      firstChar
-      };
-  };
-
-  const safeLocaleCompare = (a, b) => {
-      try {
-      return a.localeCompare(b, undefined, { numeric: true });
-      } catch {
-      return a.localeCompare(b);
-      }
-  }
-
-  useEffect(() => {
-    if (folder.nestedUnder === '' && folders) {
-      const filteredFolders = folders.filter(f => {
-        if (f.nestedUnder === '' && f.fileName !== folder.fileName) return f
-      })
-
-      const sortedFolders = filteredFolders.sort((a, b) => {
-        const aVal = getSortableValue(a.fileName);
-        const bVal = getSortableValue(b.fileName);
-
-        // Numbers first (descending)
-        if (aVal.isNumber && bVal.isNumber) {
-        const numA = parseFloat(aVal.original) || 0;
-        const numB = parseFloat(bVal.original) || 0;
-        return numA - numB; // ascending
-        }
-
-        if (aVal.isNumber && !bVal.isNumber) return -1; // number before non-number
-        if (!aVal.isNumber && bVal.isNumber) return 1;  // non-number after number
-
-        // Both non-numbers → alphabetical (UTF-8 safe)
-        return safeLocaleCompare(aVal.firstChar, bVal.firstChar);
-      })
-      setValidFolders(sortedFolders)
-    }
-    else {
-      if (folders) {
-        const sortedFolders = folders.sort((a, b) => {
-          const aVal = getSortableValue(a.fileName);
-          const bVal = getSortableValue(b.fileName);
-
-          // Numbers first (descending)
-          if (aVal.isNumber && bVal.isNumber) {
-          const numA = parseFloat(aVal.original) || 0;
-          const numB = parseFloat(bVal.original) || 0;
-          return numA - numB; // ascending
-          }
-
-          if (aVal.isNumber && !bVal.isNumber) return -1; // number before non-number
-          if (!aVal.isNumber && bVal.isNumber) return 1;  // non-number after number
-
-          // Both non-numbers → alphabetical (UTF-8 safe)
-          return safeLocaleCompare(aVal.firstChar, bVal.firstChar);
-        })
-        
-        setValidFolders(sortedFolders)
-      }
-    }
-  }, [folders])
-
-  useEffect(() => {
-    if (focusedFolder && folders) {
-      
-      setFocusedFolderInst(folders.filter(folder => folder.id === focusedFolder)[0])
-    }
-  }, [folders, focusedFolder])
-
-  //get the current user 
-  useEffect(() => {
-    if (auth) {
-        try {
-            const getCurrentUser = async () => {
-                console.log('running from FocusedFileComp')
-                const unsubscribe = await userListener(setUserInst, false, auth.currentUser.uid)
-            
-                return () => unsubscribe()
-            }
-            getCurrentUser()
-        } catch (err) {alert(err)}
-    } else console.log('no user yet')
-    
-  }, [auth])
-
-  useEffect(() => {
-    const exists = Object.values(folders).some((value) => {
-        return value.nestedUnder === focusedFolder
-    })
-    setSubFolders(exists)
-}, [focusedFolder, folders])
-
+  // A nested folder can always move up to a top-level folder; a top-level one needs another top-level folder.
+  const canMove = folder.nestedUnder !== '' ||
+    (Array.isArray(folders) && folders.some(f => f.nestedUnder === '' && f.id !== folder.id))
 
   //call the delete folder function from the main component and hide both modals
   const deleteFolderFunction = () => {
@@ -179,51 +61,25 @@ const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolder
     setEditName(false)
   }
 
-  //pass an object containing data from the current file obj + the new nestedUnder property to the main component 
-  const handleMove = () => {
-    if (destination.id !== null) {
-      const newFolder = {
-        ...folder,
-        nestedUnder: destination.id
-      }
-      setMoveFolder(false)
-      setVisible(false)
-      moveFolderFunc({newFolder: newFolder, target: 'Home'})
-      setDestination({id: null, folderName: null})
-    } else if (destination.id === null && focusedFolder !== null && focusedFolder !== undefined) {
-      const folderInst = folders.filter(folder => folder.id === focusedFolder)
-      const newFolder = {
-        ...folder,
-        nestedUnder: folderInst[0].id
-      }
-      setMoveFolder(false)
-      setVisible(false)
-      moveFolderFunc({newFolder: newFolder, target: destination.folderName})
-      setDestination({id: null, folderName: null})
-    }
+  const handleMove = (target) => {
+    setMoveFolder(false)
+    setVisible(false)
+    moveFolderFunc({newFolder: {...folder, nestedUnder: target.id}, target: target.fileName})
   }
 
-  //add a folder
-  const addFolder = async (folderName, targetNest) => {
-    try {
-      const { newFile } = await addFolderToUser(userInst, folderName, targetNest)
-      setNewFolderName('')
-      setAddFolderForm(false)
-      setFocusedFolder(newFile.id)
-    } catch (err) {
-      alert(err?.message || String(err))
-    }
+  const closeMenu = () => {
+    setEditName(false)
+    setVisible(false)
+    setNewName('')
   }
-
-
 
   return (
     <View style={{position: 'relative'}}>
       {visible ?
-          <Modal animationType='slide' presentationStyle='pageSheet'>
+          <Modal animationType='slide' presentationStyle='pageSheet' onRequestClose={moveFolder ? () => setMoveFolder(false) : closeMenu}>
               {preDelete ? 
                 /*Code for deleting a folder */
-                <Modal animationType='slide' presentationStyle='pageSheet'>
+                <Modal animationType='slide' presentationStyle='pageSheet' onRequestClose={() => setPreDelete(false)}>
                     <View style={[{height: '100%', width: '100%', backgroundColor: '#fff'}, tabletModalPanel]}>
                     
                       <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', paddingRight: '5%', paddingTop: '10%', width: '100%'}}>
@@ -255,24 +111,13 @@ const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolder
                     </View>
                   </View>
                 </Modal>
-                : 
+                : moveFolder ?
+                  /* No nested Modal here: it breaks flex/scroll height */
+                  <MoveFolderSheet folder={folder} onMove={handleMove} onClose={() => setMoveFolder(false)} />
+                :
                   <View style={[{ flex: 1, paddingTop: '10%', backgroundColor: '#fff', height: '100%'}, tabletModalPanel]}>
                     <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', paddingRight: '5%'}}>
-                      <Pressable onPress={() => {
-                          if (addFolderForm) {
-                            setAddFolderForm(false)
-                            setNewFolderName('')
-                          } else if (moveFolder) {
-                            setMoveFolder(false)
-                            setFocusedFolder(null)
-                            setNewFolderName('')
-                            setAddFolderForm(false)
-                          } else {
-                            setEditName(false)
-                            setVisible(false)
-                            setNewName('')
-                          }
-                        }}>
+                      <Pressable onPress={closeMenu}>
                         <FontAwesomeIcon icon={faXmark} color={'#593060'} size={30}/>
                       </Pressable>
                     </View>
@@ -292,133 +137,6 @@ const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolder
                         </View>
                     </View>
                     </KeyboardSafeForm>
-                    /*Code for moving a folder — no nested Modal (breaks flex/scroll height) */
-                    : moveFolder ? 
-                          <View style={{width: '100%', flex: 1}}>
-                            {addFolderForm ? 
-                              <KeyboardSafeForm>
-                              <View style={{width: '100%', display: 'flex', flexDirection:'column', alignItems: 'center'}}>
-                                  <Text style={{color: '#593060', fontSize: 35, fontWeight: '700', marginTop: '40%', textAlign: 'center'}}>Add A New Folder:</Text>
-                                  <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', marginTop: '10%', width: '100%'}}>
-                                      <View style={styles.iconHolder}> 
-                                          <FontAwesomeIcon icon={faFolder} size={22} color='#9F37B0'/>
-                                      </View>
-                                      <TextInput value={newFolderName} style={{color: '#593060', fontSize: 20, fontWeight: 'bold', borderBottomColor: '#593060', borderBottomWidth: 2, width: '75%'}} placeholder={'Enter new name'} placeholderTextColor={'#593060'} onChangeText={(e) => setNewFolderName(e)} autoFocus showSoftInputOnFocus ref={addFolderInputRef} onLayout={() => addFolderInputRef.current?.focus?.()}/>
-                                  </View>
-                                  <View style={{width: '100%', paddingTop: '10%', display: 'flex', flexDirection: 'row', justifyContent: 'center'}}>
-                                      <YellowButton
-                                        size="md"
-                                        icon={faFloppyDisk}
-                                        label="Save"
-                                        onPress={() => addFolder(newFolderName, focusedFolder ? focusedFolder : '')}
-                                      />
-                                  </View>
-                              </View>
-                              </KeyboardSafeForm>
-
-                            :
-                              <View style={{width: '100%', flex: 1, backgroundColor: '#fff'}}>
-                                <Text style={{fontSize: 40, color: '#593060', fontWeight: 'bold', textAlign: 'left', width: '100%', paddingLeft: '5%', marginBottom: 8}}>Move To...</Text>
-                                {focusedFolderInst &&
-                                  <Text style={{fontSize: 20, color: '#593060', fontWeight: 'bold', textAlign: 'left', width: '100%', paddingLeft: '5%', marginBottom: 8}}>Viewing: {focusedFolderInst.fileName}</Text>
-                                }
-                                      {focusedFolder ? 
-                                            <YellowButton size="xs" icon={faArrowLeft} label="Back" style={{ marginBottom: 8, marginLeft: '5%' }} onPress={() => {
-                                                try {
-                                                    const folderInst = folders.filter(folder => folder.id === focusedFolder) 
-                                                    const parentFolderInst = folders.filter(folder => folder.id === folderInst[0].nestedUnder)
-                                                    console.log(parentFolderInst)
-                                                    if (parentFolderInst.length > 0) {
-                                                        setDestination({id: parentFolderInst[0].id, fileName: parentFolderInst[0].fileName, nestedUnder: parentFolderInst[0].nestedUnder})
-                                                        setFocusedFolder(folderInst[0].nestedUnder)
-                                                    } else {
-                                                        setDestination({id: null, fileName: null, nestedUnder: null})
-                                                        setFocusedFolder(null)
-                                                    }
-                                                } catch (error) {
-                                                    console.log('this is an error within focusedFile: ', error)
-                                                }
-                                            }} />
-                                    :
-                                        null
-                                    }
-                              <View style={{flex: 1, minHeight: 0, width: '100%', marginBottom: 8, backgroundColor: '#fff'}}>
-                              <ScrollView
-                                style={{width: '100%', flex: 1}}
-                                contentContainerStyle={focusedFolder && !subFolders
-                                  ? {flexGrow: 1, justifyContent: 'center', paddingBottom: 16}
-                                  : {paddingBottom: 16, paddingTop: 4}}
-                                showsVerticalScrollIndicator={true}
-                                keyboardShouldPersistTaps="handled"
-                              >
-                                      {focusedFolder && !subFolders ? 
-                                          <Text style={{fontSize: 30, color: '#593060', fontWeight: 'bold', textAlign: 'center'}}>No Subfolders...</Text>
-                                      :
-                                        <>
-                                          {focusedFolder && folder.nestedUnder === '' ?
-                                            <Text style={{fontSize: 14, color: '#593060', fontWeight: 'bold', marginTop: 24, textAlign: 'center', paddingHorizontal: '5%'}}>No subfolders to display (Cannot move a home folder to subfolder of a home folder to prevent infinite nesting)</Text>
-                                          :
-                                            <>
-                                              {validFolders.map((f, index) => {
-                                                  if (focusedFolder) {
-                                                      if (f.nestedUnder === focusedFolder) {
-                                                              return (
-                                                                  <MoveFolderDestinationRow
-                                                                    key={index}
-                                                                    selected={f.id === destination.id}
-                                                                    fileName={f.fileName}
-                                                                    onPress={() => {
-                                                                        if (destination.id === f.id) {
-                                                                          toast.show("In order to prevent nesting a folder within itself, you are unable to view this folder's subfolders", {
-                                                                            type: 'error'
-                                                                          }) 
-                                                                        } else {
-                                                                          if (destination.id === null || f.id !== destination.id) {
-                                                                              setDestination({id: f.id, fileName: f.fileName, nestedUnder: f.nestedUnder})
-                                                                          } else {
-                                                                              setFocusedFolder(f.id)
-                                                                              setDestination({id: null, fileName: null, nestedUnder: null})
-                                                                          }
-                                                                        }
-                                                                      }}
-                                                                  />
-                                                              )
-                                                          
-                                                      }
-                                                  } else {
-                                                      if (f.nestedUnder === '') {
-                                                          return (
-                                                              <MoveFolderDestinationRow
-                                                                key={index}
-                                                                selected={f.id === destination.id}
-                                                                fileName={f.fileName}
-                                                                onPress={() => {
-                                                                      if (destination.id === null || f.id !== destination.id) {
-                                                                          setDestination({id: f.id, fileName: f.fileName, nestedUnder: f.nestedUnder})
-                                                                      } else {
-                                                                          setFocusedFolder(f.id)
-                                                                          setDestination({id: null, fileName: null, nestedUnder: null})
-                                                                      }
-                                                                  }}
-                                                              />
-                                                              )
-                                                          }
-                                                      }
-                                                  }
-                                              )}   
-                                            </>
-                                          }
-                                        </>
-                                      }
-                              </ScrollView>
-                              </View>
-                              <StickyFooter style={{flexDirection: 'row', justifyContent: 'space-around'}}>
-                                <YellowButton size="sm" icon={faPlus} label="Add Folder" onPress={() => setAddFolderForm(true)} />
-                                <YellowButton size="sm" icon={faArrowRight} label="Confirm Move" onPress={handleMove} />
-                              </StickyFooter>
-                              </View>
-                            }
-                          </View>
                     :
                       <ScrollView
                         style={{ flex: 1, width: '100%' }}
@@ -436,7 +154,7 @@ const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolder
                             setNewName('')
                             setEditName(true)
                           }} />
-                          {validFolders.length > 1 &&
+                          {canMove &&
                               <YellowButton size="sm" icon={faArrowRight} label="Move Folder" onPress={() => setMoveFolder(true)} />
                           }
                         </View>
@@ -483,53 +201,6 @@ const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolder
 export default Folder
 
 const styles = StyleSheet.create({
-
-    //filing styles
-    folder: {
-        display: 'flex',
-        justifyContent: 'space-between',
-        paddingRight: '2%',
-        flexDirection: 'row',
-        marginLeft: 'auto',
-        marginRight: 'auto',
-        backgroundColor: '#593060',
-        width: '90%',
-        paddingTop: '2%',
-        paddingBottom: '2%',
-        paddingLeft: '2%',
-        marginBottom: '2%',
-        borderRadius: 100
-    },
-    folderVisibleMenu: {
-      display: 'flex',
-      justifyContent: 'space-between',
-      paddingRight: '2%',
-      flexDirection: 'row',
-      marginLeft: 'auto',
-      marginRight: 'auto',
-      borderBottomWidth: 2,
-      borderBottomColor: 'white',
-      width: '90%',
-      paddingBottom: '1.5%',
-      paddingLeft: '4%',
-      marginBottom: '8%'
-  },
-    folderTitle: {
-      display: 'flex',
-      flexDirection: 'row',
-      width: '80%',
-    },
-    folderName: {
-      color: 'white',
-      textAlign: 'center',
-      fontSize: 22,
-      fontWeight: '500',
-      paddingTop: '3%',
-      marginLeft: '5%'
-    },
-    folderArrow: {
-    marginTop: 'auto'
-    },
     iconHolder: {
       backgroundColor: '#DDCADB',
       height: 44,
@@ -540,54 +211,4 @@ const styles = StyleSheet.create({
       alignItems: 'center',
       borderRadius: 100
     },
-    iconHolderWhite: {
-      backgroundColor: 'white',
-      height: 44,
-      width: 44,
-      display: 'flex',
-      flexDirection: 'row',
-      justifyContent: 'center',
-      alignItems: 'center',
-      borderRadius: 100
-    },
-    moveFolder: {
-      display: 'flex',
-      justifyContent: 'space-between',
-      paddingRight: '2%',
-      flexDirection: 'row',
-      marginLeft: 'auto',
-      marginRight: 'auto',
-      backgroundColor: '#BCBCBC',
-      width: '90%',
-      paddingTop: '2%',
-      paddingBottom: '2%',
-      paddingLeft: '2%',
-      marginBottom: '2%',
-      borderRadius: 100
-  },
-  moveFolderWhite: {
-      display: 'flex',
-      justifyContent: 'space-between',
-      paddingRight: '2%',
-      flexDirection: 'row',
-      marginLeft: 'auto',
-      marginRight: 'auto',
-      backgroundColor: 'white',
-      width: '90%',
-      paddingTop: '2%',
-      paddingBottom: '2%',
-      paddingLeft: '2%',
-      marginBottom: '2%',
-      borderRadius: 100
-  },
-  iconHolderBlack: {
-    backgroundColor: 'black', 
-    width: 44, 
-    height: 44, 
-    display: 'flex', 
-    flexDirection: 'row', 
-    justifyContent: 'center', 
-    alignItems: 'center', 
-    borderRadius: 100
-  },
 })

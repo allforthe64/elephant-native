@@ -13,10 +13,13 @@ const toDestination = (folder) => ({
 })
 
 /**
- * State and actions for the "Save To..." folder picker shared by the capture
- * screens. Pair with <SaveDestinationModal save={...} />.
+ * State and actions for the "Save To..." / "Move To..." folder picker.
+ * Pair with <SaveDestinationModal save={...} /> or <DestinationPicker save={...} />.
+ *
+ * `isHidden(folder)` removes folders from the picker (and with them, everything
+ * nested inside, since the user can't open them).
  */
-export function useSaveDestination() {
+export function useSaveDestination({ isHidden } = {}) {
   const userInst = useUserDoc()
 
   const [folders, setFolders] = useState([])
@@ -42,10 +45,14 @@ export function useSaveDestination() {
     [folders, focusedFolder]
   )
 
-  const visibleFolders = useMemo(
-    () => folders.filter((f) => (focusedFolder ? f.nestedUnder === focusedFolder : f.nestedUnder === '')),
-    [folders, focusedFolder]
+  const visibleFolders = folders.filter((f) =>
+    (focusedFolder ? f.nestedUnder === focusedFolder : f.nestedUnder === '') && !isHidden?.(f)
   )
+
+  /** The folder a confirm would use: the selected row, else the folder being viewed. */
+  const targetFolder = destination.id !== null
+    ? folders.find((f) => f.id === destination.id) || destination
+    : focusedFolderInst || null
 
   const reset = useCallback(() => {
     setPreAdd(false)
@@ -131,6 +138,7 @@ export function useSaveDestination() {
     selectFolder,
     goBack,
     resolveDestination,
-    canConfirm: destination.id !== null || !!focusedFolder,
+    targetFolder,
+    canConfirm: !!targetFolder,
   }
 }

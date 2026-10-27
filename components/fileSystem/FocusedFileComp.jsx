@@ -1,1140 +1,221 @@
-import { View, Text, Modal, TouchableOpacity, Pressable, TextInput, ScrollView, Keyboard, Image, Linking, StyleSheet} from 'react-native'
-import React, {useEffect, useState, useRef} from 'react'
-
-//fontAwesome imports
+import React, { useEffect, useState } from 'react'
+import { View, Text, Modal, Pressable, ScrollView, StyleSheet } from 'react-native'
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
-import { faXmark, faFile, faFolder, faArrowUpRightFromSquare, faImage, faPlay, faPause, faArrowLeft, faShare, faFont, faPencil, faTrash, faFloppyDisk, faPlus, faArrowRight, faCheck } from '@fortawesome/free-solid-svg-icons'
-
-//firestore and cloud storage imports
-import { getFileDownloadURL } from '../../firebase/cloudStorage'
-import { firebaseAuth, storage } from '../../firebaseConfig'
-import { userListener, updateFileObj, updateUser, getFile, addFolderToUser } from '../../firebase/firestore'
-import { uploadBytes, ref as refFunction, deleteObject } from 'firebase/storage'
-
-//expo shareAsync, MediaLibrary, and FileSystem imports 
-import { shareAsync } from 'expo-sharing'
-import * as FileSystem from 'expo-file-system'
-
-//expo-av Audio, Video element imports for displaying images and photos
-import { Audio, Video } from 'expo-av'
-
-//useToast import for displaying notifications
+import { faXmark } from '@fortawesome/free-solid-svg-icons'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useToast } from 'react-native-toast-notifications'
 
-//date-fns format function import for formatting dates for timestamps
-import { format } from 'date-fns'
-
-//gesture handler imports
-import { ReactNativeZoomableView } from '@openspacelabs/react-native-zoomable-view'
-
-import PDFViewer from './PDFViewer'
-
-import Constants from 'expo-constants';
-import WebView from 'react-native-webview'
-import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { tabletStyle, useResponsiveLayout } from '../../hooks/useResponsiveLayout'
-import KeyboardSafeForm from '../ui/KeyboardSafeForm'
-import { useKeyboardHeight } from '../../hooks/useKeyboardHeight'
+import { useResponsiveLayout } from '../../hooks/useResponsiveLayout'
 import { useAutoFocusOn } from '../../hooks/useAutoFocusOn'
-import MoveFolderDestinationRow from './MoveFolderDestinationRow'
-import DestinationFolderScroller from './DestinationFolderScroller'
-import YellowButton from '../ui/YellowButton'
-import StickyFooter from '../ui/StickyFooter'
-import { createTextBlob, TEXT_UPLOAD_METADATA } from '../../utils/textBlob'
-const FocusedFileComp = ({file, focus, deleteFile, renameFileFunction, handleFileMove}) => {
-    const { isTablet, contentFill, modalMaxWidth, height: windowHeight } = useResponsiveLayout()
-    const insets = useSafeAreaInsets()
-    const tabletModalPanel = isTablet
-        ? { width: '100%', maxWidth: modalMaxWidth, alignSelf: 'center' }
-        : null
+import { useUserDoc } from '../../hooks/useUserDoc'
+import { useFocusedFile } from '../../hooks/useFocusedFile'
+import { useNote } from '../../hooks/useNote'
+import { displayFileName, getFileKind, resolveRename } from '../../utils/fileNames'
 
-    //initialize state
-    const [userInst, setUserInst] = useState()
-    const [preDelete, setPreDelete] = useState(false)
-    const [add, setAdd] = useState(false)
-    const [newFileName, setNewFileName] = useState(file ? file.fileName.split('.')[0] + (file.version > 0 ? ` (${file.version}).${file.fileName.split('.')[1]}` : '.' + file.fileName.split('.')[1]) : '') 
-    const [moveFile, setMoveFile] = useState(false)
-    const [destination, setDestination] = useState({id: null, fileName: null, nestedUnder: null})
-    const [expanded, setExpanded] = useState(false)
-    const [sound, setSound] = useState()
-    const [playing, setPlaying] = useState(false)
-    const [playbackPosition, setPlaybackPosition] = useState(0)
-    const [folders, setFolders] = useState([])
+import FilePreview, { ExpandedPreview } from './focusedFile/FilePreview'
+import FileActions from './focusedFile/FileActions'
+import RenameFileForm from './focusedFile/RenameFileForm'
+import MoveFileSheet from './focusedFile/MoveFileSheet'
+import NoteEditor from './focusedFile/NoteEditor'
+import DeleteFileConfirm from './focusedFile/DeleteFileConfirm'
 
-    const [fileURL, setFileURL] = useState()
-    const [fileObj, setFileObj] = useState()
-    const [navigateURL, setNavigateURL] = useState()
-    const [focusedFolder, setFocusedFolder] = useState()
-    const [subFolders, setSubFolders] = useState()
-    const [addFolderForm, setAddFolderForm] = useState(false)
-    const [newFolderName, setNewFolderName] = useState('')
-    const [editNote, setEditNote] = useState(false)
-    const [noteText, setNoteText] = useState('')
-    const [noteStatus, setNoteStatus] = useState('loading')
-    const [editingMode, setEditingMode] = useState(false)
-    const keyboardHeight = useKeyboardHeight()
-    const [focusedFolderInst, setFocusedFolderInst] = useState()
-    const [hasRun, setHasRun] = useState(false)
-    const [convertedPDFURL, setConvertedPDFURL] = useState()
-    const renameFileInputRef = useAutoFocusOn(add)
-    const addFolderInputRef = useAutoFocusOn(addFolderForm, 400)
+/**
+ * Full-screen view of one file: preview, rename, move, note editing, share and delete.
+ * `view` is one of: details, rename, move, renameAndMove, note, delete.
+ */
+const FocusedFileComp = ({ file, focus, deleteFile, renameFileFunction, handleFileMove }) => {
+  const { isTablet, modalMaxWidth } = useResponsiveLayout()
+  const insets = useSafeAreaInsets()
+  const toast = useToast()
+  const userInst = useUserDoc()
+  const { fileObj, fileURL, error, convertedPDFURL, conversionFailed, reload } = useFocusedFile(file)
+  const note = useNote({ file, fileObj, fileURL, userInst })
 
-    //gesture values
-    /* const scale = useRef(new Animated.Value(1)).current
-    const translateX = useRef(new Animated.Value(0)).current
-    const translateY = useRef(new Animated.Value(0)).current */
+  const [view, setView] = useState('details')
+  const [expanded, setExpanded] = useState(null)
+  const [renameText, setRenameText] = useState('')
+  const renameInputRef = useAutoFocusOn(view === 'rename')
 
-    //consume toast context for notifications
-    const toast = useToast()
+  const kind = getFileKind(file.fileName)
 
-    const ref = useRef()
+  useEffect(() => {
+    if (!error) return
+    alert("Couldn't open this file. Please try again.")
+    focus(null)
+  }, [error])
 
-    const auth = firebaseAuth
+  // Notes open straight into the editor.
+  useEffect(() => {
+    if (note.isNote) setView('note')
+  }, [note.isNote])
 
-    //alpha sort helper functions
-    const getSortableValue = (val) => {
-        if (typeof val !== "string") return { original: "", isNumber: false };
-
-        const trimmed = val.trim();
-        const firstChar = trimmed.charAt(0);
-
-        const isNumber = /^[0-9]/.test(firstChar);
-
-        return {
-        original: trimmed,
-        isNumber,
-        firstChar
-        };
-    };
-
-    const safeLocaleCompare = (a, b) => {
-        try {
-        return a.localeCompare(b, undefined, { numeric: true });
-        } catch {
-        return a.localeCompare(b);
-        }
+  /** Rename the file, optionally moving it into `flag` in the same write. */
+  const applyRename = (flag) => {
+    const resolved = resolveRename(file, renameText, userInst?.fileRefs)
+    if (!resolved) {
+      alert('Please enter a file name')
+      return false
     }
+    const unchanged = resolved.fileName === file.fileName && resolved.version === (file.version || 0)
+    if (unchanged && flag === undefined) return true
 
-    //get the current user 
-    useEffect(() => {
-        if (auth) {
-            try {
-                const getCurrentUser = async () => {
-                    console.log('running from FocusedFileComp')
-                    const unsubscribe = await userListener(setUserInst, false, auth.currentUser.uid)
-                
-                    return () => unsubscribe()
-                }
-                getCurrentUser()
-            } catch (err) {alert(err)}
-        } else console.log('no user yet')
-        
-    }, [auth])
+    renameFileFunction({
+      newFileRef: { ...file, ...resolved, ...(flag !== undefined && { flag }) },
+      newFileInst: { ...fileObj, ...resolved, fileId: file.fileId },
+    })
+    return true
+  }
 
-    //set the userFolders
-    useEffect(() => {
-        if (userInst) {
-            if (Array.isArray(userInst?.files)) {
-                //sorting the subfolders
-                const sortedFolders = [...(userInst.files || [])].sort((a, b) => {
-                    const aVal = getSortableValue(a.fileName);
-                    const bVal = getSortableValue(b.fileName);
+  const closeRename = () => {
+    setRenameText('')
+    setView('details')
+  }
 
-                    // Numbers first (descending)
-                    if (aVal.isNumber && bVal.isNumber) {
-                    const numA = parseFloat(aVal.original) || 0;
-                    const numB = parseFloat(bVal.original) || 0;
-                    return numA - numB; // ascending
-                    }
+  const renameOnly = () => {
+    if (applyRename()) closeRename()
+  }
 
-                    if (aVal.isNumber && !bVal.isNumber) return -1; // number before non-number
-                    if (!aVal.isNumber && bVal.isNumber) return 1;  // non-number after number
+  const startRenameAndMove = () => {
+    if (renameText.trim()) setView('renameAndMove')
+    else alert('Please enter a file name')
+  }
 
-                    // Both non-numbers → alphabetical (UTF-8 safe)
-                    return safeLocaleCompare(aVal.firstChar, bVal.firstChar);
-                })
-                setFolders(sortedFolders)
-            } else {
-                setFolders([])
-                console.warn('userInst.files is not an array', userInst?.files)
-            }
-        }
-    }, [userInst])
+  const renameAndMove = (folder) => {
+    if (!applyRename(folder.id)) return
+    focus(null)
+    toast.show(`Moved file to ${folder.fileName} and renamed it`, { type: 'success' })
+  }
 
-    //get the downloadable url from firebase storage from the file doc and save it in state
-    useEffect(() => {
-        const getFileDoc = async () => {
-            const fileInst = await getFile(file.fileId)
-            const url = await getFileDownloadURL(fileInst.uri)
-            setFileURL(url)
+  const move = (folder) => {
+    focus(null)
+    handleFileMove({ ...file, flag: folder.id })
+    toast.show(`Moved file to ${folder.fileName}`, { type: 'success' })
+  }
 
-            setFileObj(fileInst)
-            setNavigateURL(fileInst.linksTo)
-        }
-        getFileDoc()
-    }, [])
-
-    useEffect(() => {
-        if (!hasRun && file && fileURL) {
-            if (file.fileName.split('.')[1] === 'docx' || file.fileName.split('.')[1] === 'doc' || file.fileName.split('.')[1] === 'docm' || file.fileName.split('.')[1] === 'dot' || file.fileName.split('.')[1] === 'dotx' || file.fileName.split('.')[1] === 'dotm') {
-                const convertToPDF = async () => {
-                    const res = await fetch('https://myelephantapp.com/api/convert-docx-to-pdf', {
-                        method: 'POST',
-                        headers: { 'Content-Type' : 'application/json' },
-                        body: JSON.stringify({ docxUrl: fileURL, fileName: file.fileName })
-                    })
-
-                    const data = await res.json()
-                    setConvertedPDFURL(data.convertedPDFURL)
-                    setHasRun(true)
-                }
-                convertToPDF()
-            }
-        }
-    }, [fileURL, file, hasRun])
-
-    //unload the sound
-    useEffect(() => {
-        return sound
-          ? () => {
-              sound.unloadAsync();
-            }
-          : undefined;
-    }, [sound]);
-
-    useEffect(() => {
-        const exists = Array.isArray(folders) && folders.some((value) => {
-            return value.nestedUnder === focusedFolder
-        })
-        setSubFolders(exists)
-        
-    }, [focusedFolder, folders])
-
-    useEffect(() => {
-        if (Array.isArray(folders) && focusedFolder) {
-            setFocusedFolderInst(folders.filter(folder => folder.id === focusedFolder)[0])
-        }
-    }, [folders, focusedFolder])
-
-    useEffect(() => {
-        if (fileURL && fileObj && fileObj.documentType === 'txt' && !fileObj.linksTo) {
-            setEditNote(true)
-            setNoteStatus('loading')
-
-            fetch(fileURL)
-            .then(result => {
-                if (!result.ok) throw new Error(`HTTP ${result.status}`)
-                return result.text()
-            })
-            .then(text => {
-                setNoteText(text)
-                setNoteStatus('ready')
-            })
-            .catch(err => {
-                console.warn('Failed to load note', err)
-                setNoteStatus('error')
-            })
-        }
-    }, [fileURL, fileObj])
-
-    useEffect(() => {
-        if (editingMode === false) Keyboard.dismiss()
-        else {
-            if (ref.current) ref.current.focus()
-        } 
-    }, [editingMode])
-
-
-    //rename a file by overwriting the fileName property
-    const getFileExtension = (name) => {
-        const parts = (name || '').split('.')
-        return parts.length > 1 ? parts[parts.length - 1] : ''
+  const saveNote = async () => {
+    try {
+      await note.save()
+      reload()
+      setView('details')
+      toast.show('Note successfully edited', { type: 'success' })
+    } catch (err) {
+      alert(err?.message || String(err))
     }
+  }
 
-    const getFileBasename = (name) => {
-        const parts = (name || '').split('.')
-        if (parts.length <= 1) return name || ''
-        return parts.slice(0, -1).join('.')
-    }
+  const handleClose = () => {
+    if (view === 'rename') closeRename()
+    else focus(null)
+  }
 
-    /** Strip extension and any trailing " (N)" so rename input is a clean basename. */
-    const normalizeRenameInput = (input, originalExt) => {
-        let name = (input || '').trim()
-        if (!name) return ''
-        if (originalExt) {
-            const extSuffix = `.${originalExt}`
-            if (name.toLowerCase().endsWith(extSuffix.toLowerCase())) {
-                name = name.slice(0, -extSuffix.length)
-            }
-        }
-        return name.replace(/\s\(\d+\)$/, '').trim()
-    }
+  if (!fileObj) return null
 
-    /**
-     * Only assign a version when ANOTHER file already uses this basename.
-     * The file being renamed is excluded so keeping/saving the same name
-     * does not produce " (1)", " (2)", etc.
-     */
-    const getRenameVersion = (basename) => {
-        const target = basename.toLowerCase()
-        let conflicts = 0
-        ;(userInst?.fileRefs || []).forEach((fileRef) => {
-            if (fileRef.fileId === file.fileId) return
-            if (getFileBasename(fileRef.fileName).toLowerCase() === target) {
-                conflicts += 1
-            }
-        })
-        return conflicts
-    }
+  const renderDetails = () => (
+    <View style={[styles.panel, { paddingTop: Math.max(insets.top, 24) }, isTablet && { maxWidth: modalMaxWidth, alignSelf: 'center' }]}>
+      <View style={styles.closeRow}>
+        <Pressable onPress={handleClose} hitSlop={10}>
+          <FontAwesomeIcon icon={faXmark} color="#593060" size={30} />
+        </Pressable>
+      </View>
+      <View style={{ flex: 1, width: '100%' }}>
+        {view === 'rename' ? (
+          <RenameFileForm
+            value={renameText}
+            onChangeText={setRenameText}
+            inputRef={renameInputRef}
+            onRename={renameOnly}
+            onRenameAndMove={startRenameAndMove}
+          />
+        ) : (
+          <ScrollView
+            style={{ flex: 1, width: '100%' }}
+            contentContainerStyle={{ paddingBottom: Math.max(insets.bottom, 16) + 40, flexGrow: 1 }}
+            showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
+          >
+            <Text style={styles.fileName} numberOfLines={3}>{displayFileName(file)}</Text>
+            <FilePreview
+              kind={kind}
+              fileURL={fileURL}
+              convertedPDFURL={convertedPDFURL}
+              conversionFailed={conversionFailed}
+              onExpand={setExpanded}
+            />
+            <FileActions
+              file={file}
+              fileObj={fileObj}
+              fileURL={fileURL}
+              kind={kind}
+              isNote={note.isNote}
+              onRename={() => setView('rename')}
+              onMove={() => setView('move')}
+              onEditNote={() => setView('note')}
+              onDelete={() => setView('delete')}
+            />
+          </ScrollView>
+        )}
+      </View>
+      {expanded ? (
+        <ExpandedPreview
+          kind={expanded}
+          fileURL={fileURL}
+          convertedPDFURL={convertedPDFURL}
+          onClose={() => setExpanded(null)}
+        />
+      ) : null}
+    </View>
+  )
 
-    const buildRenamedDisplayName = (basename, ext, version) => (
-        version > 0 ? `${basename} (${version}).${ext}` : `${basename}.${ext}`
-    )
-
-    const renameFile = () => {
-        const ext = getFileExtension(file.fileName)
-        const baseName = normalizeRenameInput(newFileName, ext)
-        if (!baseName) return
-
-        const version = getRenameVersion(baseName)
-        const finalFileName = `${baseName}.${ext}`
-
-        if (baseName !== getFileBasename(file.fileName) || version !== (file.version || 0) || finalFileName !== file.fileName) {
-            const newFile = {
-                ...file,
-                fileName: finalFileName,
-                version: version
-            }
-            const newFileObj = {
-                ...fileObj,
-                fileName: finalFileName,
-                fileId: file.fileId,
-                version: version
-            }
-            renameFileFunction({newFileRef: newFile, newFileInst: newFileObj})
-            setNewFileName(buildRenamedDisplayName(baseName, ext, version))
-        }
-    }
-
-    const renameAndMove = () => {
-        const ext = getFileExtension(file.fileName)
-        const baseName = normalizeRenameInput(newFileName, ext)
-        if (!baseName) {
-            alert('Please enter a file name')
-            return
-        }
-
-        const version = getRenameVersion(baseName)
-        const finalFileName = `${baseName}.${ext}`
-
-        try {
-            if (destination.id !== null) {
-
-                //create a new file instance with the modified name and flag
-                console.log('In the destination !== null check')
-                const newFile = {
-                    ...file,
-                    flag: destination.id,
-                    fileName: finalFileName,
-                    version: version
-                }
-                const newFileObj = {
-                    ...fileObj,
-                    fileName: finalFileName,
-                    fileId: file.fileId,
-                    version: version
-                }
-                renameFileFunction({newFileRef: newFile, newFileInst: newFileObj})
-                setNewFileName(buildRenamedDisplayName(baseName, ext, version))
-
-                focus(false)
-                setDestination({id: null, fileName: null, nestedUnder: null})
-                setMoveFile(false)
-                /* handleFileMove(newFile) */
-                toast.show(`Moved file to ${destination.fileName} and renamed it`, {
-                    type: 'success'
-                })
-            } else if (destination.id === null && focusedFolder !== null && focusedFolder !== undefined) {
-
-                //create a new file instance with the modified name and flag
-                console.log('in the destination does equal null check')
-                const folderInst = folders.filter(folder => folder.id === focusedFolder)
-                const newFile = {
-                    ...file,
-                    flag: folderInst[0].id,
-                    fileName: finalFileName,
-                    version: version
-                }
-                const newFileObj = {
-                    ...fileObj,
-                    fileName: finalFileName,
-                    fileId: file.fileId,
-                    version: version
-                }
-                renameFileFunction({newFileRef: newFile, newFileInst: newFileObj})
-                setNewFileName(buildRenamedDisplayName(baseName, ext, version))
-                focus(false)
-                setDestination({id: null, fileName: null, nestedUnder: null})
-                setMoveFile(false)
-                /* handleFileMove(newFile) */
-                toast.show(`Moved file to ${folderInst[0].fileName} and renamed it`, {
-                    type: 'success'
-                })
-            }
-        } catch (err) {
-            alert(err)
-        }
-    }
-
-    //move a file by changing its flag property
-    const handleMove = () => {
-        if (destination.id !== null) {
-            console.log('In the destination !== null check')
-            const newFile = {
-                ...file,
-                flag: destination.id,
-                fileName: newFileName ? newFileName : file.fileName
-            }
-            focus(false)
-            setDestination({id: null, fileName: null, nestedUnder: null})
-            setMoveFile(false)
-            handleFileMove(newFile)
-            toast.show(`Moved file to ${destination.fileName}`, {
-                type: 'success'
-            })
-        } else if (destination.id === null && focusedFolder !== null && focusedFolder !== undefined) {
-            console.log('in the destination does equal null check')
-            const folderInst = folders.filter(folder => folder.id === focusedFolder)
-            const newFile = {
-                ...file,
-                flag: folderInst[0].id,
-                fileName: newFileName ? newFileName + '.' + file.fileName.split('.')[1] : file.fileName
-            }
-            focus(false)
-            setDestination({id: null, fileName: null, nestedUnder: null})
-            setMoveFile(false)
-            handleFileMove(newFile)
-            toast.show(`Moved file to ${folderInst[0].fileName}`, {
-                type: 'success'
-            })
-        }
-    }
-
-    //call download async method on url passed from firebase storage bucket
-    const downloadFileFunction = async () => {
-        const fileName = file.fileName
-        const result = await FileSystem.downloadAsync(fileURL, FileSystem.documentDirectory + fileName)
-        save(result.uri)
-    }
-    
-    //save the file by opening up the share menu
-    const save = (uri) => {
-        shareAsync(uri)
-    }  
-
-    //load in the sound, set callback function interval to 10 mills, and check the finished status
-    //play sound and set playing status to true
-    async function playSound() {
-        setPlaying(true)
-        const { sound, status } = await Audio.Sound.createAsync({uri: fileURL}, 10, (status) => {if(status.didJustFinish) {
-            //reset the playback position, set playing to false
-            setPlaybackPosition(0) 
-            setPlaying(false)}}
-        );
-        //play the sound from the playback position
-        setSound(sound);
-        await sound.playFromPositionAsync(playbackPosition, [0, 0]);
-    }
-
-    //get status of the sound, check if it's loaded
-    //if the sound is playing, pause the sound
-    //set the playbackPosition to result.positionMillis, set playing to false
-    const pauseSound = async () => {
-        setPlaying(false)
-        try {
-            const result = await sound.getStatusAsync();
-            if (result.isLoaded) {
-            if (result.isPlaying === true) {
-                sound.pauseAsync();
-                if (playbackPosition === result.playableDurationMillis) setPlaybackPosition(0)
-                else setPlaybackPosition(result.positionMillis)
-            }
-            }
-        } catch (error) {}
-    };
-    
-    const updateNote = async () => {
-        
-        //get file doc and setup a formatted date
-        const fileDoc = await getFile(file.fileId)
-        const formattedDate = format(new Date(), "yyyy-MM-dd:hh:mm:ss")
-
-        //upload the new note before deleting the old one so a failed upload can't lose it
-        const fileUri = `${userInst.uid}/${formattedDate}`
-        const fileRef = refFunction(storage, fileUri)
-        const { blob: textFile, cleanup } = await createTextBlob(noteText)
-        try {
-            await uploadBytes(fileRef, textFile, TEXT_UPLOAD_METADATA)
-        } finally {
-            cleanup()
-        }
-
-        const deleteRef = refFunction(storage, fileObj.uri)
-        deleteObject(deleteRef).catch((err) => console.log('old note delete failed: ', err))
-
-        //create a new file object
-        const newFileObj = {
-            ...fileDoc,
-            fileId: file.fileId,
-            uri: 'gs://elephantapp-21e34.appspot.com' + '/' + userInst.uid + '/' + formattedDate
-        }
-
-        //update the file object
-        await updateFileObj(newFileObj)
-
-        //create a new fileRef
-        const newFileRef = {
-            ...file,
-            uri: 'gs://elephantapp-21e34.appspot.com' + '/' + userInst.uid + '/' + formattedDate
-        }
-
-
-        //append newFileRef to the user's fileRef array
-        //update the user
-        const newFileRefs = userInst.fileRefs.map(fileRef => fileRef.fileId === newFileRef.fileId ? newFileRef : fileRef)
-        await updateUser({...userInst, fileRefs: newFileRefs})
-
-        setEditNote(false)
-    }
-
-    //add a folder
-    const addFolder = async (folderName, targetNest) => {
-        try {
-            const { newFile, newFiles } = await addFolderToUser(userInst, folderName, targetNest)
-            setNewFolderName('')
-            setAddFolderForm(false)
-            setFolders(newFiles)
-            setFocusedFolder(newFile.id)
-        } catch (err) {
-            alert(err?.message || String(err))
-        }
-    }
-
-    //gesture handlers
-    /* const handlePinch = Animated.event([ { nativeEvent: {scale} } ], {useNativeDriver: false})
-    const handlePan = Animated.event([ {nativeEvent: {
-            translationX: translateX,
-            translationY: translateY
-        }
-        } ],
-        {
-            useNativeDriver: true
-        },
-    ) */
-
-    /* if (fileObj) {
-        alert(fileObj.linksTo)
-    }
-    if (navigateURL) {
-        alert(navigateURL)
-    } */
-
-    return (
-        <>
-            {fileObj ? 
-
-                <Modal animationType='slide' presentationStyle='pageSheet'>
-                    <>
-                        
-                    {preDelete ? 
-                            (   
-                                <Modal animationType='slide' presentationStyle='pageSheet'>
-                                    <View style={[{ paddingTop: '10%', backgroundColor: '#fff', height: '100%', width: '100%'}, tabletModalPanel]}>
-                                        {/* if the user hits the delete button on a file, open a modal that confirms they want to delete the file*/}
-                                        <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', paddingRight: '5%', paddingTop: '10%',     width: '100%'}}>
-                                            <TouchableOpacity onPress={() => setPreDelete(false)}>
-                                                <FontAwesomeIcon icon={faXmark} color={'#593060'} size={30}/>
-                                            </TouchableOpacity>
-                                        </View>
-                                        <View style={{width: '100%', display: 'flex', flexDirection: 'column', paddingTop: '10%', justifyContent: 'center', alignItems: 'center'}}>
-                                        <Text style={{fontSize: 32, color: '#593060', textAlign: 'center', paddingLeft: 8, paddingRight: 8, fontWeight: '600', marginBottom: '6%'}}>Are you sure you want to <Text style={{color: '#871313'}}>delete</Text> the file:</Text>
-                                        <Text style={{fontSize: 18, color: '#593060', textAlign: 'center', paddingLeft: 30, paddingRight: 30, fontWeight: '600'}}>{file.fileName}?</Text>
-                                        <View style={{width: '100%', display: 'flex', flexDirection: 'row', justifyContent: 'space-around', paddingTop: '10%'}}>
-                                            {/* button with onPress function to delete the file */}
-                                            <YellowButton
-                                                size="sm"
-                                                variant="danger"
-                                                icon={faTrash}
-                                                label="Delete"
-                                                onPress={() => {
-                                                    setPreDelete(false)
-                                                    focus(false)
-                                                    deleteFile(file.fileId)
-                                                }}
-                                            />
-
-                                            <YellowButton size="sm" icon={faXmark} label="Cancel" onPress={() => setPreDelete(false)} />
-                                        </View>
-
-
-                                        </View>
-                                    </View>
-                                </Modal>
-                            )
-                        :
-                        moveFile ? 
-                        (
-                                <View style={[{flex: 1, height: '100%', width: '100%', backgroundColor: '#fff'}, tabletModalPanel]}>
-                                    {/* Move UI lives in the parent Modal — nested pageSheets break flex height */}
-                                    <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', paddingRight: '5%', paddingTop: Math.max(insets.top, 24), paddingBottom: 8, width: '100%'}}>
-                                        <TouchableOpacity onPress={() => {
-                                                if (addFolderForm) {
-                                                    setAddFolderForm(false)
-                                                    setNewFolderName('')
-                                                }
-                                                else {
-                                                    setFocusedFolder(null)
-                                                    setMoveFile(false)
-                                                }
-                                            }
-                                            }>
-                                            <FontAwesomeIcon icon={faXmark} color={'#593060'} size={30}/>
-                                        </TouchableOpacity>
-                                    </View>
-                                    
-                                    {addFolderForm ? 
-                                        <KeyboardSafeForm>
-                                        <>
-                                            <Text style={{color: '#593060', fontSize: 35, fontWeight: '700', marginTop: '40%', textAlign: 'center'}}>Add A New Folder:</Text>
-                                            <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', marginTop: '10%'}}>
-                                                <View style={styles.iconHolder}> 
-                                                    <FontAwesomeIcon icon={faFolder} size={22} color='#9F37B0'/>
-                                                </View>
-                                                <TextInput value={newFolderName} style={{color: '#593060', fontSize: 20, fontWeight: 'bold', borderBottomColor: '#593060', borderBottomWidth: 2, width: '70%'}} placeholderTextColor={'#593060'} placeholder='Enter new name' onChangeText={(e) => setNewFolderName(e)} autoFocus showSoftInputOnFocus ref={addFolderInputRef} onLayout={() => setTimeout(() => addFolderInputRef.current?.focus?.(), 50)}/>
-                                            </View>
-                                            <View style={{width: '100%', paddingTop: '10%', display: 'flex', flexDirection: 'row', justifyContent: 'center'}}>
-                                                <YellowButton
-                                                    size="md"
-                                                    icon={faFloppyDisk}
-                                                    label="Save"
-                                                    onPress={() => addFolder(newFolderName, focusedFolder ? focusedFolder : '')}
-                                                />
-                                            </View>
-                                        </>
-                                        </KeyboardSafeForm>
-
-                                    :
-
-                                        <View style={{width: '100%', flex: 1, minHeight: 0, backgroundColor: '#fff'}}>
-                                            <Text style={{fontSize: 40, color: '#593060', fontWeight: 'bold', textAlign: 'left', width: '100%', paddingLeft: '5%', marginBottom: 8}}>Move To...</Text>
-                                            {focusedFolderInst &&
-                                                <Text style={{fontSize: 20, color: '#593060', fontWeight: 'bold', textAlign: 'left', width: '100%', paddingLeft: '5%', marginBottom: 8}}>Viewing: {focusedFolderInst.fileName}</Text>
-                                            }
-                                            {focusedFolder ? 
-                                                <YellowButton size="xs" icon={faArrowLeft} label="Back" style={{alignSelf: 'flex-start', marginBottom: 8, marginLeft: '5%'}} onPress={() => {
-                                                    try {
-                                                        const folderInst = folders.filter(folder => folder.id === focusedFolder) 
-                                                        const parentFolderInst = folders.filter(folder => folder.id === folderInst[0].nestedUnder)
-                                                        console.log(parentFolderInst)
-                                                        if (parentFolderInst.length > 0) {
-                                                            setDestination({id: parentFolderInst[0].id, fileName: parentFolderInst[0].fileName, nestedUnder: parentFolderInst[0].nestedUnder})
-                                                            setFocusedFolder(folderInst[0].nestedUnder)
-                                                        } else {
-                                                            setDestination({id: null, fileName: null, nestedUnder: null})
-                                                            setFocusedFolder(null)
-                                                        }
-                                                    } catch (error) {
-                                                        console.log('this is an error within focusedFile: ', error)
-                                                    }
-                                                }} />
-                                            :
-                                                null
-                                            }
-                                            <DestinationFolderScroller centerEmpty={!!(focusedFolder && !subFolders)}>
-                                                        {focusedFolder && !subFolders ? (
-                                                            <Text style={{fontSize: 30, color: '#593060', fontWeight: 'bold', textAlign: 'center'}}>No Subfolders...</Text>
-                                                        ) : (
-                                                            <>
-                                                                {(Array.isArray(folders) ? folders : []).map((f, index) => {
-                                                                    if (focusedFolder) {
-                                                                        if (f.nestedUnder === focusedFolder) {
-                                                                            return (
-                                                                                <MoveFolderDestinationRow
-                                                                                    key={index}
-                                                                                    selected={f.id === destination.id}
-                                                                                    fileName={f.fileName}
-                                                                                    onPress={() => {
-                                                                                        if (destination.id === null || f.id !== destination.id) {
-                                                                                            setDestination({id: f.id, fileName: f.fileName, nestedUnder: f.nestedUnder})
-                                                                                        } else {
-                                                                                            setFocusedFolder(f.id)
-                                                                                            setDestination({id: null, fileName: null, nestedUnder: null})
-                                                                                        }
-                                                                                    }}
-                                                                                />
-                                                                            )
-                                                                        }
-                                                                        return null
-                                                                    }
-                                                                    if (f.id !== file.flag && f.nestedUnder === '') {
-                                                                        return (
-                                                                            <MoveFolderDestinationRow
-                                                                                key={index}
-                                                                                selected={f.id === destination.id}
-                                                                                fileName={f.fileName}
-                                                                                onPress={() => {
-                                                                                    if (destination.id === null || f.id !== destination.id) {
-                                                                                        setDestination({id: f.id, fileName: f.fileName, nestedUnder: f.nestedUnder})
-                                                                                    } else {
-                                                                                        setFocusedFolder(f.id)
-                                                                                        setDestination({id: null, fileName: null, nestedUnder: null})
-                                                                                    }
-                                                                                }}
-                                                                            />
-                                                                        )
-                                                                    }
-                                                                    return null
-                                                                })}
-                                                            </>
-                                                        )}
-                                            </DestinationFolderScroller>
-                                            
-                                            <StickyFooter>
-                                            {add ?
-                                                <>
-                                                    <View style={{width: '100%', display: 'flex', flexDirection: 'row', justifyContent: 'space-around'}}>
-                                                        <YellowButton size="sm" icon={faPlus} label="Add Folder" onPress={() => setAddFolderForm(true)} />
-                                                        <YellowButton
-                                                            size="sm"
-                                                            icon={faArrowRight}
-                                                            label="Name + Move"
-                                                            onPress={() => {
-                                                                renameAndMove()
-                                                            }}
-                                                        />
-                                                    </View>
-                                                    <Text style={{color: '#593060', fontSize: 22, marginBottom: 10, marginTop: 10, textAlign: 'center'}}>Or</Text>
-                                                    <View style={{width: '100%', display: 'flex', flexDirection: 'row', justifyContent: 'center'}}>
-                                                        <YellowButton
-                                                            size="md"
-                                                            icon={faPencil}
-                                                            label="Name without moving"
-                                                            onPress={() => {
-                                                                    renameFile()
-                                                                    setAdd(false)
-                                                                    setMoveFile(false)
-                                                            }}
-                                                        />
-                                                    </View>
-                                                </>
-                                            :
-                                                <View style={{display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'space-around'}}>
-                                                    
-                                                    <YellowButton size="sm" icon={faPlus} label="Add Folder" onPress={() => setAddFolderForm(true)} />
-                                                    <YellowButton size="sm" icon={faArrowRight} label="Confirm Move" onPress={handleMove} />
-                                                </View>
-                                            }
-                                            </StickyFooter>
-                                        </View>
-                                        
-                                    }
-
-                                </View>
-                        )
-                        : editNote ?
-                            (
-                                <Modal animationType='slide' presentationStyle='pageSheet' onShow={() => setTimeout(()=>{
-                                    ref.current?.focus()
-                                }, 200)}>
-                                    {/* Pad by keyboard height instead of translating: the note box starts at the top, so a lift would push it off-screen */}
-                                    <View style={[{height: '100%', width: '100%', backgroundColor: '#fff', paddingBottom: keyboardHeight > 0 ? keyboardHeight + 12 : Math.max(insets.bottom, 16)}, tabletModalPanel]}>
-                                        {/* if the moveFile state is true, display the modal with the file movement code*/}
-                                        {/* xMark icon for closing out the moveFile modal */}
-                                        <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', paddingRight: '5%', paddingTop: '10%', width: '100%'}}>
-                                            <Pressable onPress={() => {
-                                                    setEditNote(false)
-                                                }
-                                                }>
-                                                <FontAwesomeIcon icon={faXmark} color={'#593060'} size={30}/>
-                                            </Pressable>
-                                        </View>
-                                        <Text style={{fontSize: 40, color: '#593060', fontWeight: 'bold', textAlign: 'left', width: '100%', paddingLeft: '5%', marginBottom: keyboardHeight > 0 ? 12 : 24}}>Edit Note:</Text>
-                                        <View style={{width: '100%', flex: 1, paddingLeft: '5%', paddingRight: '5%'}}>
-                                        <TextInput 
-                                            multiline={true}
-                                            value={noteText}
-                                            editable={noteStatus === 'ready'}
-                                            style={{
-                                                width: '100%',
-                                                flex: 1,
-                                                minHeight: 160,
-                                                backgroundColor: 'white',
-                                                borderWidth: 2,
-                                                borderColor: '#593060',
-                                                borderRadius: 12,
-                                                color: '#593060',
-                                                fontSize: 20,
-                                                textAlignVertical: 'top',
-                                                padding: '3%'
-                                            }}
-                                            placeholder={
-                                                noteStatus === 'loading' ? 'Loading note...'
-                                                : noteStatus === 'error' ? "Couldn't load this note. Close and try again."
-                                                : 'Enter note'
-                                            }
-                                            placeholderTextColor={'#593060'}
-                                            onChangeText={(text) => setNoteText(text)}
-                                            onFocus={() => { if (noteStatus === 'ready') setEditingMode(true) }}
-                                            ref={ref}
-                                            />
-                                            <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'center', marginTop: 16}}>
-                                                <YellowButton
-                                                    size="md"
-                                                    icon={faCheck}
-                                                    dimmed={noteStatus !== 'ready'}
-                                                    label={editingMode ? 'Finished Editing' : 'Save Note'}
-                                                    onPress={() => {
-                                                        if (editingMode) setEditingMode(false)
-                                                        else {
-                                                            updateNote()
-                                                            toast.show('Note successfully edited', {
-                                                                type: 'success'
-                                                            })
-                                                        }
-                                                    }}
-                                                />
-                                            </View>
-                                        </View>
-                                    </View>
-                                </Modal>
-                            )
-                        :
-                            <View style={[{ flex: 1, paddingTop: Math.max(insets.top, 24), backgroundColor: '#fff', height: '100%', width: '100%'}, tabletModalPanel]}>
-                                    
-                                    {/*x button container */}
-                                    <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', paddingRight: '5%'}}>
-                                        <Pressable onPress={() => {
-                                            if (add) {
-                                                // Restore display name after cancelling a blank rename field
-                                                const ext = getFileExtension(file.fileName)
-                                                const base = getFileBasename(file.fileName)
-                                                setNewFileName(buildRenamedDisplayName(base, ext, file.version || 0))
-                                                setAdd(false)
-                                            }
-                                            else focus(null)
-                                        }}>
-                                            <FontAwesomeIcon icon={faXmark} color={'#593060'} size={30}/>
-                                        </Pressable>
-                                    </View>
-                                    <View style={{ flex: 1, width: '100%' }}>
-
-                                        {/* handle file rename*/}
-                                        {add ?  
-                                                <KeyboardSafeForm>
-                                                <View style={{paddingTop: '40%', display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%'}}>
-                                                    <Text style={{color: '#593060', fontSize: 35, fontWeight: '700'}}>Rename File:</Text>
-                                                    <View style={{display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center',  marginTop: '10%'}}>
-                                                        <View style={styles.iconHolder}>
-                                                            <FontAwesomeIcon icon={faFile} size={22} color='#9F37B0'/>
-                                                        </View>
-                                                        <TextInput
-                                                            value={newFileName}
-                                                            style={{color: '#593060', fontSize: 20, fontWeight: 'bold', borderBottomColor: '#593060', borderBottomWidth: 2, width: '70%', marginLeft: '5%'}}
-                                                            placeholder='Enter new name'
-                                                            placeholderTextColor={'#593060'}
-                                                            onChangeText={(e) => setNewFileName(e)}
-                                                            autoFocus
-                                                            ref={renameFileInputRef}
-                                                        />
-                                                    </View>
-                                                    <View style={{display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: '10%', width: '100%'}}>
-                                                        <YellowButton
-                                                            size="md"
-                                                            icon={faPencil}
-                                                            label="Rename"
-                                                            onPress={() => {
-                                                                if (newFileName !== '') {
-                                                                    renameFile()
-                                                                    setAdd(false)
-                                                                } else {
-                                                                    alert('Please enter a file name')
-                                                                }
-                                                            }}
-                                                        />
-                                                        <YellowButton
-                                                            size="md"
-                                                            icon={faArrowRight}
-                                                            label="Rename + move"
-                                                            style={{ marginTop: 12 }}
-                                                            onPress={() => {
-                                                                if (newFileName !== '') {
-                                                                    setMoveFile(true)
-                                                                } else {
-                                                                    alert('Please enter a file name')
-                                                                }
-                                                            }}
-                                                        />
-                                                    </View>
-                                                </View>
-                                                </KeyboardSafeForm>
-                                                : expanded ? 
-                                                <Modal animationType='slide' presentationStyle='pageSheet'>
-                                                    {/* code to render expanded images */}
-                                                    <View style={[{ paddingTop: '10%', backgroundColor: '#593060', height: '100%', width: '100%'}, tabletModalPanel]}>
-                                                        <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', paddingRight: '5%', paddingTop: '5%', width: '100%'}}>
-                                                            <Pressable onPress={() => setExpanded(false)}>
-                                                                <FontAwesomeIcon icon={faXmark} color={'white'} size={30}/>
-                                                            </Pressable>
-                                                        </View>
-                                                        <View style={{height: '80%', marginTop: '10%'}}>
-                                                            {expanded === 'img' ?
-                                                                <ReactNativeZoomableView
-                                                                    maxZoom={10}
-                                                                    minZoom={1}
-                                                                    zoomStep={.5}
-                                                                    initialZoom={1}
-                                                                    bindToBorders={true}
-                                                                    captureEvent={true}
-                                                                >
-                                                                    <Image source={{uri: `${fileURL}`}} style={{width: '100%', height: '100%', objectFit: 'contain'}}/>
-                                                                </ReactNativeZoomableView>
-                                                            : expanded === 'wordDoc' ?
-                                                                <PDFViewer fileURL={convertedPDFURL}/>
-                                                            :
-                                                                <PDFViewer fileURL={fileURL}/>
-                                                            }
-                                                        </View>     
-                                                    </View>
-                                                </Modal>
-
-                                                :
-                                                    <ScrollView
-                                                      style={{ flex: 1, width: '100%' }}
-                                                      contentContainerStyle={{
-                                                        paddingBottom: Math.max(insets.bottom, 16) + 40,
-                                                        flexGrow: 1,
-                                                      }}
-                                                      showsVerticalScrollIndicator={false}
-                                                      keyboardShouldPersistTaps="handled"
-                                                    >
-                                                        <Text style={{fontSize: 22, fontWeight: 'bold', color: '#593060', marginTop: '5%', paddingLeft: '5%', paddingRight: '5%'}} numberOfLines={3}>{newFileName}</Text>
-
-                                                        {((file.fileName.split('.')[1] === 'jpg' || file.fileName.split('.')[1] === 'png' || file.fileName.split('.')[1] === 'JPG' || file.fileName.split('.')[1] === 'PNG' || file.fileName.split('.')[1] === 'jpeg' || file.fileName.split('.')[1] === 'JPEG')) ? 
-                                                            <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'center', marginTop: '10%', marginBottom: '10%'}}>
-                                                                {fileURL ? 
-                                                                    <Pressable width={300} height={150} onPress={() => setExpanded('img')}>
-                                                                        <Image source={{uri: `${fileURL}`}} style={{width: '100%', height: '100%', objectFit: 'contain'}}/>
-                                                                    </Pressable>
-                                                                : 
-                                                                    <View style={{height: 150}}>
-                                                                        <FontAwesomeIcon icon={faImage} color='#593060' size={125}/>
-                                                                        <Text style={{color: '#593060', textAlign: 'center', marginTop: 15, fontSize: 10}}>Fetching Image...</Text>
-                                                                    </View>
-                                                                }
-                                                            </View>
-                                                        : file.fileName.split('.')[1] === 'pdf' ?
-                                                                <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'center', marginTop: '10%', marginBottom: '10%'}}>
-                                                                    {fileURL ? 
-                                                                        <View width={300} height={300} /* onPress={() => setExpanded(true)} */>
-                                                                            <Pressable style={{width: '100%', height: '100%'}} onPress={() => setExpanded('pdf')}>
-                                                                                <PDFViewer fileURL={fileURL}/>
-                                                                            </Pressable>
-                                                                        </View>
-                                                                    : 
-                                                                        <View style={{height: 150}}>
-                                                                            <FontAwesomeIcon icon={faImage} color='#593060' size={125}/>
-                                                                            <Text style={{color: '#593060', textAlign: 'center', marginTop: 15, fontSize: 10}}>Fetching PDF...</Text>
-                                                                        </View>
-                                                                    }
-                                                                </View>
-                                                        : file.fileName.split('.')[1] === 'docx' || file.fileName.split('.')[1] === 'doc' || file.fileName.split('.')[1] === 'docm' || file.fileName.split('.')[1] === 'dot' || file.fileName.split('.')[1] === 'dotx' || file.fileName.split('.')[1] === 'dotm' && convertedPDFURL ?
-                                                            <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'center', marginTop: '10%', marginBottom: '10%'}}>
-                                                                {convertedPDFURL ? 
-                                                                    <View width={300} height={300} /* onPress={() => setExpanded(true)} */>
-                                                                        <Pressable style={{width: '100%', height: '100%'}} onPress={() => setExpanded('wordDoc')}>
-                                                                            {/* <WebView source={{ uri: `https://drive.google.com/viewerng/viewer?embedded=true&url=${fileURL}` }}
-                                                                            style={{ flex: 1 }} /> */}
-                                                                            <PDFViewer fileURL={convertedPDFURL}/>
-                                                                        </Pressable>
-                                                                    </View>
-                                                                : 
-                                                                    <View style={{height: 150}}>
-                                                                        <FontAwesomeIcon icon={faImage} color='#593060' size={125}/>
-                                                                        <Text style={{color: '#593060', textAlign: 'center', marginTop: 15, fontSize: 10}}>Fetching Document...</Text>
-                                                                    </View>
-                                                                }
-                                                            </View>     
-                                                        :
-                                                        (file.fileName.split('.')[1] === 'mp4' || file.fileName.split('.')[1] === 'mov') ? 
-                                                            <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'center', marginTop: '10%', marginBottom: '10%', height: 200, width: 340, width: '100%', backgroundColor: 'black'}}>
-                                                                {fileURL ? 
-                                                                    <Video style={{flex: 1, alignSelf: 'stretch', height: '100%'}} source={{uri: `${fileURL}`}} useNativeControls resizeMode ='contain' isLooping onError={(error) => alert(error)}/>
-                                                                : 
-                                                                    <View style={{height: 150}}>
-                                                                        <FontAwesomeIcon icon={faImage} color='#593060' size={125}/>
-                                                                            <Text style={{color: '#593060', textAlign: 'center', marginTop: 15, fontSize: 10}}>Fetching Video...</Text>
-                                                                    </View>
-                                                                }
-                                                            </View>
-                                                        : <></>
-                                                        }
-                                                        <View style={{width: '100%', marginTop: '5%'}}>
-                                                            
-                                                            <View style={styles.renameMoveButtonContainer}>
-                                                                <YellowButton
-                                                                    size="sm"
-                                                                    icon={faFont}
-                                                                    label="Rename file"
-                                                                    onPress={() => {
-                                                                        setNewFileName('')
-                                                                        setAdd(true)
-                                                                    }}
-                                                                />
-                                                                <YellowButton size="sm" icon={faFolder} label="Move file..." onPress={() => setMoveFile(true)} />
-                                                            </View>
-                                                            
-                                                        </View>
-                                                        <View style={{width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', paddingTop: '10%'}}>
-                                                            {/* button that links to a non jpg or png file */}
-                                                            {(file.fileName.split('.')[1] !== 'jpg' && file.fileName.split('.')[1] !== 'png' && file.fileName.split('.')[1] !== 'PNG' && file.fileName.split('.')[1] !== 'JPG' && file.fileName.split('.')[1] !== 'jpeg' && file.fileName.split('.')[1] !== 'JPEG' && file.fileName.split('.')[1] !== 'docx' && file.fileName.split('.')[1] !== 'doc' && file.fileName.split('.')[1] !== 'docm' && file.fileName.split('.')[1] !== 'dot' && file.fileName.split('.')[1] !== 'dotx' && file.fileName.split('.')[1] !== 'dotm')  ? 
-                                                                <>  
-                                                                    {fileObj.documentType === 'm4a' || fileObj.documentType === 'mp3' ? 
-                                                                        <YellowButton
-                                                                            size="lg"
-                                                                            icon={fileURL ? (playing ? faPause : faPlay) : undefined}
-                                                                            label={fileURL && !playing ? 'Play Sound' : fileURL && playing ? 'Pause Sound' : 'Fetching File...'}
-                                                                            disabled={!fileURL}
-                                                                            style={{ marginTop: '2%' }}
-                                                                            onPress={() => {
-                                                                                if (!playing) playSound()
-                                                                                else pauseSound()
-                                                                            }}
-                                                                        />
-                                                                    : fileObj.documentType === 'txt' ?    
-                                                                        <YellowButton
-                                                                            size="lg"
-                                                                            icon={faPencil}
-                                                                            label="View/Edit Note"
-                                                                            disabled={!fileURL}
-                                                                            style={{ marginTop: '2%' }}
-                                                                            onPress={() => setEditNote(true)}
-                                                                        />
-                                                                        :
-                                                                        <></>}
-                                                                        <YellowButton
-                                                                            size="lg"
-                                                                            icon={fileURL ? faArrowUpRightFromSquare : undefined}
-                                                                            label={fileURL ? 'View File In Browser' : 'Fetching File...'}
-                                                                            disabled={!fileURL}
-                                                                            style={{ marginTop: '2%' }}
-                                                                            onPress={() => Linking.openURL(fileURL)}
-                                                                        />
-                                                                    
-                                                                </>
-
-                                                            : 
-                                                                <></>
-                                                            }    
-                                                            {fileObj.linksTo &&    
-                                                                        <YellowButton
-                                                                            size="lg"
-                                                                            icon={fileURL ? faArrowUpRightFromSquare : undefined}
-                                                                            label="Go To URL"
-                                                                            disabled={!fileURL}
-                                                                            style={{ marginTop: '2%' }}
-                                                                            onPress={() => Linking.openURL(navigateURL)}
-                                                                        />
-                                                            }                   
-                                                            <YellowButton
-                                                                size="lg"
-                                                                icon={faShare}
-                                                                label="Download or share file"
-                                                                style={{ marginTop: '2%' }}
-                                                                onPress={downloadFileFunction}
-                                                            />
-                                                        
-                                                            <YellowButton
-                                                                size="lg"
-                                                                variant="danger"
-                                                                icon={faTrash}
-                                                                label="Delete File"
-                                                                style={{ marginTop: '2%' }}
-                                                                onPress={() => setPreDelete(true)}
-                                                            />
-                                                        </View>
-                                                    </ScrollView>
-                                                }
-                                    </View>
-                            </View>
-                        }
-                    </>
-                </Modal>
-                
-            : <></>}
-                    
-        </>
-    )
-
-   
+  return (
+    <Modal animationType="slide" presentationStyle="pageSheet" onRequestClose={handleClose}>
+      {view === 'delete' ? (
+        <DeleteFileConfirm
+          fileName={file.fileName}
+          onCancel={() => setView('details')}
+          onConfirm={() => {
+            setView('details')
+            focus(null)
+            deleteFile(file.fileId)
+          }}
+        />
+      ) : view === 'move' || view === 'renameAndMove' ? (
+        <MoveFileSheet
+          file={file}
+          renaming={view === 'renameAndMove'}
+          onMove={move}
+          onRenameAndMove={renameAndMove}
+          onRenameOnly={renameOnly}
+          onClose={() => setView(view === 'renameAndMove' ? 'rename' : 'details')}
+        />
+      ) : view === 'note' ? (
+        <NoteEditor note={note} onSave={saveNote} onClose={() => setView('details')} />
+      ) : (
+        renderDetails()
+      )}
+    </Modal>
+  )
 }
 
 const styles = StyleSheet.create({
-    renameMoveButtonContainer: {
-        display: 'flex',
-        flexDirection: 'row',
-        width: '100%',
-        justifyContent: 'space-around',
-    },
-    iconHolder: {
-        backgroundColor: 'white', 
-        width: 44, 
-        height: 44, 
-        display: 'flex', 
-        flexDirection: 'row', 
-        justifyContent: 'center', 
-        alignItems: 'center', 
-        borderRadius: 100
-    },
-    iconHolderBlack: {
-        backgroundColor: 'black', 
-        width: 44, 
-        height: 44, 
-        display: 'flex', 
-        flexDirection: 'row', 
-        justifyContent: 'center', 
-        alignItems: 'center', 
-        borderRadius: 100
-    },
-    folder: {
-        display: 'flex',
-        justifyContent: 'space-between',
-        paddingRight: '2%',
-        flexDirection: 'row',
-        marginLeft: 'auto',
-        marginRight: 'auto',
-        backgroundColor: '#BCBCBC',
-        width: '90%',
-        paddingTop: '2%',
-        paddingBottom: '2%',
-        paddingLeft: '2%',
-        marginBottom: '2%',
-        borderRadius: 100
-    },
-    folderWhite: {
-        display: 'flex',
-        justifyContent: 'space-between',
-        paddingRight: '2%',
-        flexDirection: 'row',
-        marginLeft: 'auto',
-        marginRight: 'auto',
-        backgroundColor: 'white',
-        width: '90%',
-        paddingTop: '2%',
-        paddingBottom: '2%',
-        paddingLeft: '2%',
-        marginBottom: '2%',
-        borderRadius: 100
-    },
+  panel: {
+    flex: 1,
+    backgroundColor: '#fff',
+    height: '100%',
+    width: '100%',
+  },
+  closeRow: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    paddingRight: '5%',
+  },
+  fileName: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: '#593060',
+    marginTop: '5%',
+    paddingLeft: '5%',
+    paddingRight: '5%',
+  },
 })
 
 export default FocusedFileComp

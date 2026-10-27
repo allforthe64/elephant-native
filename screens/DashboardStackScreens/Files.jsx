@@ -240,11 +240,18 @@ export default function Files({navigation: { navigate }, route}) {
 
     let searchFor = [target.id.toString()]
 
-    currentUser.files.forEach(folder => {
-      if (searchFor.includes(folder.nestedUnder.toString())) {
-        searchFor.push(folder.id.toString())
-      }
-    })
+    // Repeat until no new descendants are found: a subfolder can appear before its parent in the array.
+    let found = true
+    while (found) {
+      found = false
+      currentUser.files.forEach(folder => {
+        const id = folder.id.toString()
+        if (!searchFor.includes(id) && searchFor.includes(folder.nestedUnder.toString())) {
+          searchFor.push(id)
+          found = true
+        }
+      })
+    }
 
     const refsToKeep = currentUser.fileRefs.filter(ref => {
       if (!searchFor.includes(ref.flag.toString())) return ref
