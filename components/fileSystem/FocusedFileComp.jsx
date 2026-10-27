@@ -59,10 +59,7 @@ const FocusedFileComp = ({ file, focus, deleteFile, renameFileFunction, handleFi
     const unchanged = resolved.fileName === file.fileName && resolved.version === (file.version || 0)
     if (unchanged && flag === undefined) return true
 
-    renameFileFunction({
-      newFileRef: { ...file, ...resolved, ...(flag !== undefined && { flag }) },
-      newFileInst: { ...fileObj, ...resolved, fileId: file.fileId },
-    })
+    renameFileFunction(file.fileId, { ...resolved, flag })
     return true
   }
 
@@ -88,7 +85,7 @@ const FocusedFileComp = ({ file, focus, deleteFile, renameFileFunction, handleFi
 
   const move = (folder) => {
     focus(null)
-    handleFileMove({ ...file, flag: folder.id })
+    handleFileMove(file.fileId, folder.id)
     toast.show(`Moved file to ${folder.fileName}`, { type: 'success' })
   }
 

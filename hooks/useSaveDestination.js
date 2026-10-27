@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { addFolderToUser } from '../firebase/firestore'
+import { addFolder as addFolderToUser } from '../firebase/fileSystem'
 import { sortByName } from '../utils/sortByName'
 import { useAutoFocusOn } from './useAutoFocusOn'
 import { useUserDoc } from './useUserDoc'

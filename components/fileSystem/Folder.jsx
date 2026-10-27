@@ -17,7 +17,7 @@ import YellowButton from '../ui/YellowButton';
 import { useAutoFocusOn } from '../../hooks/useAutoFocusOn';
 import MoveFolderSheet from './MoveFolderSheet';
 
-const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolderFunc, folders}) => {
+const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolder: moveFolderTo, folders}) => {
   const { isTablet, contentFill, modalMaxWidth } = useResponsiveLayout()
   const tabletModalPanel = isTablet
     ? { width: '100%', maxWidth: modalMaxWidth, alignSelf: 'center' }
@@ -36,7 +36,7 @@ const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolder
 
   //call the delete folder function from the main component and hide both modals
   const deleteFolderFunction = () => {
-    deleteFolder({id: folder.id, folderName: folder.fileName})
+    deleteFolder(folder)
     setPreDelete(false)
     setVisible(false)
   }
@@ -52,11 +52,7 @@ const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolder
     })
     if (!resolvedName) return
 
-    const newFolder = {
-      ...folder,
-      fileName: resolvedName
-    }
-    renameFolder(newFolder)
+    renameFolder(folder.id, resolvedName)
     setNewName('')
     setEditName(false)
   }
@@ -64,7 +60,7 @@ const Folder = ({folder, getTargetFolder, deleteFolder, renameFolder, moveFolder
   const handleMove = (target) => {
     setMoveFolder(false)
     setVisible(false)
-    moveFolderFunc({newFolder: {...folder, nestedUnder: target.id}, target: target.fileName})
+    moveFolderTo(folder.id, target)
   }
 
   const closeMenu = () => {

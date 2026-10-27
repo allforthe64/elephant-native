@@ -1,11 +1,10 @@
-import { StyleSheet, Text, View, Keyboard, Modal, Pressable, TextInput } from 'react-native'
-import React, {useEffect, useState} from 'react'
+import { StyleSheet, Text, View, Modal, Pressable, TextInput } from 'react-native'
+import React, {useMemo, useState} from 'react'
 import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler'
 
 //fontAwesome imports
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
-import { faArrowLeft, faXmark } from '@fortawesome/free-solid-svg-icons'
-import { faFolder, faFloppyDisk } from '@fortawesome/free-solid-svg-icons'
+import { faArrowLeft, faXmark, faFolder, faFloppyDisk } from '@fortawesome/free-solid-svg-icons'
 
 //file system component imports
 import Folder from './Folder'
@@ -18,141 +17,31 @@ import { tabletStyle, useResponsiveLayout } from '../../hooks/useResponsiveLayou
 import KeyboardSafeForm from '../ui/KeyboardSafeForm'
 import YellowButton from '../ui/YellowButton'
 import { useAutoFocusOn } from '../../hooks/useAutoFocusOn'
+import { sortByName } from '../../utils/sortByName'
 
-const FocusedFolder = ({folder, folders, clear, getTargetFolder, addFolder, renameFolder, moveFolder, deleteFolder, deleteFile, renameFile, moveFile, files, updateUser}) => {
+const FocusedFolder = ({folder, folders, files, clear, getTargetFolder, addFolder, renameFolder, moveFolder, deleteFolder, deleteFile, renameFile, moveFile}) => {
     const { isTablet, contentFill, modalMaxWidth } = useResponsiveLayout()
+    const insets = useSafeAreaInsets()
 
-    const [nestedFolder, setNestedFolder] = useState()
-    const [loading, setLoading] = useState(true)
     const [add, setAdd] = useState(false)
     const [newFolderName, setNewFolderName] = useState('')
-    const [focusedFile, setFocusedFile] = useState()
-    const [keybaordClosed, setKeyboardClosed] = useState(true)
-    const [nestedFiles, setNestedFiles] = useState([])
-    const [alphaSortedFolders, setAlphaSortedFolders] = useState([])
-
-    //initialize ref for addFolder form
+    const [focusedFileId, setFocusedFileId] = useState(null)
     const folderRef = useAutoFocusOn(add, 350)
-    
-    //alpha sort helper functions
-    const getSortableValue = (val) => {
-        if (typeof val !== "string") return { original: "", isNumber: false };
 
-        const trimmed = val.trim();
-        const firstChar = trimmed.charAt(0);
+    // Read the folder and its contents from the live lists so renames and moves show up immediately.
+    const current = folders.find(f => f.id === folder.folder.id) || folder.folder
+    const parent = current.nestedUnder === '' ? undefined : folders.find(f => String(f.id) === String(current.nestedUnder))
+    const subFolders = useMemo(() => sortByName(folders.filter(f => f.nestedUnder === current.id)), [folders, current.id])
+    const folderFiles = useMemo(() => sortByName(files.filter(f => f.flag === current.id)), [files, current.id])
+    const focusedFile = focusedFileId ? folderFiles.find(f => f.fileId === focusedFileId) : undefined
 
-        const isNumber = /^[0-9]/.test(firstChar);
-
-        return {
-        original: trimmed,
-        isNumber,
-        firstChar
-        };
-    };
-
-    const safeLocaleCompare = (a, b) => {
-        try {
-        return a.localeCompare(b, undefined, { numeric: true });
-        } catch {
-        return a.localeCompare(b);
-        }
-    }
-
-    //refresh the folder when the files change
-    useEffect(() => {
-        getTargetFolder(folder.folder)
-        if (focusedFile) {
-            const newFile = files.filter(fileRef => fileRef.fileId === focusedFile.fileId)
-            setFocusedFile(newFile[0])
-        }
-    }, [files, folders])
-
-    //get the folder above this one so the user can navigate up a level
-    useEffect(() => {
-        const getNestedFolder = () => {
-            const targetFolder = folders.filter(f => {
-            if(f.id.toString() === folder.folder.nestedUnder.toString()) return f})
-            return targetFolder
-        }   
-        const targetFolder = getNestedFolder()
-        setLoading(false)
-        setNestedFolder(targetFolder)
-        
-        //sorting the subfolders
-        const sortedFolders = [...(Array.isArray(folder.folders) ? folder.folders : [])].sort((a, b) => {
-            const aVal = getSortableValue(a.fileName);
-            const bVal = getSortableValue(b.fileName);
-
-            // Numbers first (descending)
-            if (aVal.isNumber && bVal.isNumber) {
-            const numA = parseFloat(aVal.original) || 0;
-            const numB = parseFloat(bVal.original) || 0;
-            return numA - numB; // ascending
-            }
-
-            if (aVal.isNumber && !bVal.isNumber) return -1; // number before non-number
-            if (!aVal.isNumber && bVal.isNumber) return 1;  // non-number after number
-
-            // Both non-numbers → alphabetical (UTF-8 safe)
-            return safeLocaleCompare(aVal.firstChar, bVal.firstChar);
-        })
-        setAlphaSortedFolders(sortedFolders)
-
-        //if a file is currently being focused on, refresh the file instance being passed to the focus file component
-        if (focusedFile) {
-            const newFile = folder.files.filter(file => {
-                if (focusedFile.fileId === file.fileId) return file
-                else return false
-            })
-            setFocusedFile(newFile[0])
-        }
-
-        //alpha sorting the files
-        const sortedFiles = [...(Array.isArray(folder.files) ? folder.files : [])].sort((a, b) => {
-            const aVal = getSortableValue(a.fileName);
-            const bVal = getSortableValue(b.fileName);
-
-            // Numbers first (descending)
-            if (aVal.isNumber && bVal.isNumber) {
-            const numA = parseFloat(aVal.original) || 0;
-            const numB = parseFloat(bVal.original) || 0;
-            return numA - numB; // ascending
-            }
-
-            if (aVal.isNumber && !bVal.isNumber) return -1; // number before non-number
-            if (!aVal.isNumber && bVal.isNumber) return 1;  // non-number after number
-
-            // Both non-numbers → alphabetical (UTF-8 safe)
-            return safeLocaleCompare(aVal.firstChar, bVal.firstChar);
-        })
-
-        setNestedFiles(sortedFiles)
-
-    }, [folder])
+    const focusFile = (file) => setFocusedFileId(file ? file.fileId : null)
 
     //navigate up a level in the folder tree
     const navigateUp = () => {
-        const targetFolder = folders.filter(f => {
-            if(f.id === folder.folder.nestedUnder) return f}
-        ) 
-        getTargetFolder(targetFolder[0])
+        if (parent) getTargetFolder(parent)
+        else clear(null)
     }
-
-    const insets = useSafeAreaInsets()
-
-    //Set an event listener to shrink down the scrollview once the keyboard has been closed
-    useEffect(() => {
-        const keyboardDidHideListener = Keyboard.addListener(
-            'keyboardWillHide',
-            () => {
-                setKeyboardClosed(true); // or some other action
-            }
-        );
-
-        return () => {
-            keyboardDidHideListener.remove();
-        };
-    }, [])
 
   return (
     <View style={[
@@ -163,16 +52,15 @@ const FocusedFolder = ({folder, folders, clear, getTargetFolder, addFolder, rena
       },
       isTablet && styles.rootTablet,
     ]}>
-        {loading ? <></> 
-        : focusedFile ?
-            <FocusedFileComp file={focusedFile} focus={setFocusedFile} deleteFile={deleteFile} renameFileFunction={renameFile} folders={folders} handleFileMove={moveFile} /> 
+        {focusedFile ?
+            <FocusedFileComp file={focusedFile} focus={focusFile} deleteFile={deleteFile} renameFileFunction={renameFile} handleFileMove={moveFile} /> 
         :      
                 <View style={[styles.body, isTablet && contentFill]}>
 
                     <View style={styles.buttonContainer}>
-                        <TouchableOpacity style={styles.backButtonContainer} onPress={folder.folder.nestedUnder === '' ? () => clear(null) : () => navigateUp()}>
+                        <TouchableOpacity style={styles.backButtonContainer} onPress={navigateUp}>
                             <FontAwesomeIcon icon={faArrowLeft} color='#593060' size={30} />
-                            <Text style={styles.smallHeader}>Back To {nestedFolder.length > 0 ? nestedFolder[0].fileName : 'Home'}</Text>
+                            <Text style={styles.smallHeader}>Back To {parent ? parent.fileName : 'Home'}</Text>
                         </TouchableOpacity>
                         <TouchableOpacity onPressOut={() => clear(null)}>
                             <FontAwesomeIcon icon={faXmark} size={30} color='#593060' />
@@ -180,7 +68,7 @@ const FocusedFolder = ({folder, folders, clear, getTargetFolder, addFolder, rena
                     </View>
                     
                     <View style={styles.title}>
-                        <Text style={styles.header}>{folder.folder.fileName}</Text>
+                        <Text style={styles.header}>{current.fileName}</Text>
                     </View>
                     <ScrollView
                       style={styles.listScroll}
@@ -188,11 +76,11 @@ const FocusedFolder = ({folder, folders, clear, getTargetFolder, addFolder, rena
                       showsVerticalScrollIndicator={false}
                       keyboardShouldPersistTaps="handled"
                     >
-                            {alphaSortedFolders.map((f, i) => {return <Folder key={f + i} focusedFolder={folder} getTargetFolder={getTargetFolder} folders={folders} renameFolder={renameFolder} moveFolderFunc={moveFolder} folder={f} deleteFolder={deleteFolder} updateUser={updateUser}/>})}
-                            {nestedFiles.map((file, i) => {return <File key={file + i} focus={setFocusedFile} file={file} />})}
+                            {subFolders.map((f) => <Folder key={f.id} folder={f} folders={folders} getTargetFolder={getTargetFolder} renameFolder={renameFolder} moveFolder={moveFolder} deleteFolder={deleteFolder}/>)}
+                            {folderFiles.map((file) => <File key={file.fileId} focus={focusFile} file={file} />)}
                     </ScrollView> 
                     {add ? 
-                        <Modal presentationStyle='pageSheet' animationType='slide' onShow={() => setTimeout(()=>{
+                        <Modal presentationStyle='pageSheet' animationType='slide' onRequestClose={() => setAdd(false)} onShow={() => setTimeout(()=>{
                             folderRef.current?.focus?.()
                         }, 350)}>
                             <View style={tabletStyle(isTablet, {height: '100%', width: '100%', backgroundColor: '#fff'}, {maxWidth: modalMaxWidth, alignSelf: 'center'})}>
@@ -207,19 +95,18 @@ const FocusedFolder = ({folder, folders, clear, getTargetFolder, addFolder, rena
                                 <KeyboardSafeForm>
                                 <View style={styles.addFolderContainer}>
                                     <Text style={styles.addFolderHeading}>Add new folder:</Text>
-                                    <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-around', marginBottom: '6%'}}  
-                                    >
+                                    <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-around', marginBottom: '6%'}}>
                                         <View style={styles.iconHolder}>
                                         <FontAwesomeIcon icon={faFolder} size={22} color='#9F37B0'/>
                                         </View>
-                                        <TextInput placeholder='Enter new name' placeholderTextColor={'#593060'} value={newFolderName} style={{color: '#593060', fontSize: 22, fontWeight: 'bold', borderBottomColor: '#593060', borderBottomWidth: 2, width: '70%', marginLeft: '5%'}} onChangeText={(e) => setNewFolderName(e)} onFocus={() => setKeyboardClosed(false)} ref={folderRef} autoFocus showSoftInputOnFocus onLayout={() => setTimeout(() => folderRef.current?.focus?.(), 50)}/>
+                                        <TextInput placeholder='Enter new name' placeholderTextColor={'#593060'} value={newFolderName} style={{color: '#593060', fontSize: 22, fontWeight: 'bold', borderBottomColor: '#593060', borderBottomWidth: 2, width: '70%', marginLeft: '5%'}} onChangeText={(e) => setNewFolderName(e)} ref={folderRef} autoFocus showSoftInputOnFocus onLayout={() => setTimeout(() => folderRef.current?.focus?.(), 50)}/>
                                     </View>
                                     <YellowButton
                                         size="md"
                                         icon={faFloppyDisk}
                                         label="Save"
                                         onPress={async () => {
-                                            const ok = await addFolder(newFolderName, folder.folder.id)
+                                            const ok = await addFolder(newFolderName, current.id)
                                             if (ok) {
                                                 setNewFolderName('')
                                                 setAdd(false)
@@ -237,10 +124,7 @@ const FocusedFolder = ({folder, folders, clear, getTargetFolder, addFolder, rena
                                 icon={faFolder}
                                 label="Add New Folder"
                                 style={isTablet ? {width: '100%', maxWidth: '100%', alignSelf: 'stretch'} : undefined}
-                                onPress={() => {
-                                    setAdd(true)
-                                    setKeyboardClosed(false)
-                                }}
+                                onPress={() => setAdd(true)}
                             />
                         </View>
                     }

@@ -2,7 +2,8 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { ref as storageRef, uploadBytes, deleteObject } from 'firebase/storage'
 import { format } from 'date-fns'
 import { storage } from '../firebaseConfig'
-import { getFile, updateFileObj, updateUser } from '../firebase/firestore'
+import { getFile } from '../firebase/firestore'
+import { setFileUri } from '../firebase/fileSystem'
 import { createTextBlob, TEXT_UPLOAD_METADATA } from '../utils/textBlob'
 
 const BUCKET = 'gs://elephantapp-21e34.appspot.com'
@@ -52,9 +53,7 @@ export function useNote({ file, fileObj, fileURL, userInst }) {
       cleanup()
     }
 
-    await updateFileObj({ ...fileDoc, fileId: file.fileId, uri })
-    const fileRefs = userInst.fileRefs.map((ref) => (ref.fileId === file.fileId ? { ...ref, uri } : ref))
-    await updateUser({ ...userInst, fileRefs })
+    await setFileUri(userInst, file.fileId, uri)
 
     // Only delete the old text once nothing points at it.
     deleteObject(storageRef(storage, fileDoc.uri)).catch((err) => console.log('old note delete failed: ', err))

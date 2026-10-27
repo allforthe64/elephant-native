@@ -1,52 +1,22 @@
 import {
-    setDoc,
     getDoc,
     addDoc,
     updateDoc,
     doc,
     collection,
     onSnapshot,
-    deleteDoc,
     arrayUnion,
     increment
 } from 'firebase/firestore'
 import { db } from '../firebaseConfig'
 
-import { getStorage, ref, getDownloadURL } from 'firebase/storage'
-
-const storage = getStorage()
-
 const BUCKET_URL = 'gs://elephantapp-21e34.appspot.com'
 
-//cloud storage function imports
-import { deleteFile } from './cloudStorage'
+// User documents are created by the web app at sign-up; this app only reads and edits them.
+// File and folder edits live in ./fileSystem.js.
 
-
-
-//fetch/manipulate user data:
-
-//pull a user from the firestore data base by using a localId/uid token
-export async function getUser(user) {
-    const docSnap = await getDoc(doc(db, 'users', user.localId))
-
-    if (!docSnap.exists()) {
-        const newUser = addUser(user)
-        return newUser
-    } else {
-        return {...docSnap.data(), uid: user.localId}
-    }
-}
-
-export async function addUser(user) {
-    const userRef = setDoc(doc(db, 'users', user.uid), {
-        email: user.email,
-        displayName: user.email,
-        files: [{id: Math.floor(Math.random() * 9e11) + 1e11, fileName: 'My House', nestedUnder: ''}, {id: Math.floor(Math.random() * 9e11) + 1e11, fileName: 'Financial', nestedUnder: ''}, {id: Math.floor(Math.random() * 9e11) + 1e11, fileName: 'Personal/Medical', nestedUnder: ''}, {id: Math.floor(Math.random() * 9e11) + 1e11, fileName: 'Pictures/Videos', nestedUnder: ''}, {id: Math.floor(Math.random() * 9e11) + 1e11, fileName: 'Work', nestedUnder: ''}, {id: Math.floor(Math.random() * 9e11) + 1e11, fileName: 'Hobbies', nestedUnder: ''}, {id: Math.floor(Math.random() * 9e11) + 1e11, fileName: 'Basement/Mech', nestedUnder: 1}, {id: Math.floor(Math.random() * 9e11) + 1e11, fileName: 'Garage', nestedUnder: 1}, {id: Math.floor(Math.random() * 9e11) + 1e11, fileName: 'Kitchen', nestedUnder: 1}, {id: Math.floor(Math.random() * 9e11) + 1e11, fileName: 'Main Floor', nestedUnder: 1}, {id: Math.floor(Math.random() * 9e11) + 1e11, fileName: 'Second Floor', nestedUnder: 1}, {id: Math.floor(Math.random() * 9e11) + 1e11, fileName: 'Structure', nestedUnder: 1}, {id: Math.floor(Math.random() * 9e11) + 1e11, fileName: 'Mortgage', nestedUnder: 2}, {id: Math.floor(Math.random() * 9e11) + 1e11, fileName: 'Insurance', nestedUnder: 2}, {id: Math.floor(Math.random() * 9e11) + 1e11, fileName: 'Tax Info', nestedUnder: 2}, {id: Math.floor(Math.random() * 9e11) + 1e11, fileName: 'Banking', nestedUnder: 2}, {id: Math.floor(Math.random() * 9e11) + 1e11, fileName: 'Friends', nestedUnder: 4}, {id: Math.floor(Math.random() * 9e11) + 1e11, fileName: 'Family', nestedUnder: 4}, {id: Math.floor(Math.random() * 9e11) + 1e11, fileName: 'Pets', nestedUnder: 4}, {id: Math.floor(Math.random() * 9e11) + 1e11, fileName: 'Vacations', nestedUnder: 4}, {id: Math.floor(Math.random() * 9e11) + 1e11, fileName: 'Events', nestedUnder: 4}, {id: Math.floor(Math.random() * 9e11) + 1e11, fileName: 'Receipts', nestedUnder: 15}, {id: Math.floor(Math.random() * 9e11) + 1e11, fileName: 'Returns', nestedUnder: 15}],
-        fileRefs: [],
-        sharedWith: {},
-        passcodeAuthenticated: false,
-        spaceUsed: 0
-    })
+export function createFolderId() {
+    return Math.floor(Math.random() * 9e11) + 1e11
 }
 
 //get a user document using a uid, setup snapshot listener to monitor changes
@@ -69,16 +39,6 @@ export async function userListener(setCurrentUser, setStaging, user) {
     )
 
     return unsub
-}
-
-//find a user by uid, replace current user data with new user data object (coming in as input for function)
-export async function updateUser(updatedUser) {
-    const userRef = doc(db, 'users', updatedUser.uid)
-    await updateDoc(userRef, {...updatedUser})
-}
-
-export function createFolderId() {
-    return Math.floor(Math.random() * 9e11) + 1e11
 }
 
 /** Strip a trailing " (N)" so collision checks use the clean folder basename. */
@@ -108,34 +68,8 @@ export function resolveUniqueFolderName(desiredName, folders, { parentId = '', e
     return conflicts > 0 ? `${base} (${conflicts})` : base
 }
 
-export async function addFolderToUser(userInst, folderName, targetNest = '') {
-    const name = String(folderName ?? '').trim()
-    if (!name) {
-        throw new Error('Please enter a folder name')
-    }
-    if (!userInst?.uid) {
-        throw new Error('Still loading your folders. Tap Save again.')
-    }
-    const existing = Array.isArray(userInst.files) ? userInst.files : []
-    const nest = targetNest === '' || targetNest == null ? '' : targetNest
-    const resolvedName = resolveUniqueFolderName(name, existing, { parentId: nest })
-    const newFile = {
-        id: createFolderId(),
-        fileName: resolvedName,
-        nestedUnder: nest
-    }
-    const newFiles = [...existing, newFile]
-    await updateUser({ ...userInst, files: newFiles })
-    return { newFile, newFiles }
-}
-
 //function to specifically add new files to user, using the atomic atomic updates
 export async function addFileToUser(userId, reference, fileSize) {
-
-    console.log('from within addFileToUser userId: ', userId)
-    console.log('from within addFileToUser reference: ', reference)
-    console.log('from within addFileToUser fileSize: ', fileSize)
-
     const userRef = doc(db, 'users', userId)
     await updateDoc(userRef, {
         fileRefs: arrayUnion(reference),
@@ -148,7 +82,6 @@ export async function addFileToUser(userId, reference, fileSize) {
 
 //create a new fileData obj, upload the document into cloud storage
 export async function addfile(file, destination) {
-    console.log(file)
     try {
         // Use the real extension (last segment) so names like "URL for https://a.b/c.txt" still work
         const nameExt = (String(file.name || '').split('.').pop() || '').toLowerCase()
@@ -206,22 +139,4 @@ export async function addfile(file, destination) {
 export const getFile = async (fileId) => {
     const docSnap = await getDoc(doc(db, 'files', fileId))
     return {...docSnap.data()}
-}
-
-//find a fileData obj using a file id and replace the existing data with the data from the incoming fileData obj
-export const updateFileObj = async (input) => {
-    console.log(input)
-    const fileRef = doc(db, 'files', input.fileId)
-    console.log(fileRef)
-    await updateDoc(fileRef, {...input})
-}
-
-//find a fileData obj using a file id and delete it/call deleteFile method to remove the physical file using the uri contained within the fileData obj
-export const deleteFileObj = async (id) => {
-    const file = await getDoc(doc(db, 'files', id))
-    deleteFile(file.data().uri)
-    if (file.data().thumbnailUri) {
-        deleteFile(file.data().thumbnailUri)
-    }
-    await deleteDoc(doc(db, 'files', id))
 }

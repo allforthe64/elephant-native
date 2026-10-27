@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View } from 'react-native'
-import React, {useEffect, useState} from 'react'
+import React, {useMemo, useState} from 'react'
 import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler'
 
 //fontAwesome imports
@@ -13,84 +13,22 @@ import File from './File'
 //safe area context imports
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { tabletStyle, useResponsiveLayout } from '../../hooks/useResponsiveLayout'
+import { sortByName } from '../../utils/sortByName'
 
-const Staging = ({staging, reset, folders, deleteFile, renameFile, moveFile, userFiles}) => {
+const Staging = ({staging, reset, deleteFile, renameFile, moveFile}) => {
     const { isTablet, contentFill } = useResponsiveLayout()
-
-    const [focusedFile, setFocusedFile] = useState()
-    const [alphaSortedFiles, setAlphaSortedFiles] = useState([])
-
     const insets = useSafeAreaInsets()
 
-    //alpha sort functionality
-    const getSortableValue = (val) => {
-        if (typeof val !== "string") return { original: "", isNumber: false };
+    const [focusedFileId, setFocusedFileId] = useState(null)
+    const sortedFiles = useMemo(() => sortByName(staging), [staging])
+    const focusedFile = focusedFileId ? sortedFiles.find(f => f.fileId === focusedFileId) : undefined
 
-        const trimmed = val.trim();
-        const firstChar = trimmed.charAt(0);
-
-        const isNumber = /^[0-9]/.test(firstChar);
-
-        return {
-        original: trimmed,
-        isNumber,
-        firstChar
-        };
-    };
-
-    const safeLocaleCompare = (a, b) => {
-        try {
-        return a.localeCompare(b, undefined, { numeric: true });
-        } catch {
-        return a.localeCompare(b);
-        }
-    }
-
-    useEffect(() => {
-        if (focusedFile) {
-            const newFile = userFiles.filter(fileRef => fileRef.fileId === focusedFile.fileId)
-            setFocusedFile(newFile[0])
-        }
-
-    }, [userFiles])
-
-    //alpha sort the subfolders
-    useEffect(() => {
-        try {
-            if (staging) {
-                if (Array.isArray(staging)) {
-                    const sortedFiles = staging.sort((a, b) => {
-                        const aVal = getSortableValue(a.fileName);
-                        const bVal = getSortableValue(b.fileName);
-
-                        // Numbers first (descending)
-                        if (aVal.isNumber && bVal.isNumber) {
-                        const numA = parseFloat(aVal.original) || 0;
-                        const numB = parseFloat(bVal.original) || 0;
-                        return numA - numB; // ascending
-                        }
-
-                        if (aVal.isNumber && !bVal.isNumber) return -1; // number before non-number
-                        if (!aVal.isNumber && bVal.isNumber) return 1;  // non-number after number
-
-                        // Both non-numbers → alphabetical (UTF-8 safe)
-                        return safeLocaleCompare(aVal.firstChar, bVal.firstChar);
-                    })
-
-                    setAlphaSortedFiles(sortedFiles)
-                } else {
-                    alert('staging is not an array')
-                }
-            }
-        } catch (err) {
-            alert(err)
-        }
-    }, [staging])
+    const focusFile = (file) => setFocusedFileId(file ? file.fileId : null)
 
   return (
     <>
         {focusedFile ?
-                <FocusedFileComp file={focusedFile} focus={setFocusedFile} deleteFile={deleteFile} renameFileFunction={renameFile} folders={folders} handleFileMove={moveFile}/> 
+                <FocusedFileComp file={focusedFile} focus={focusFile} deleteFile={deleteFile} renameFileFunction={renameFile} handleFileMove={moveFile}/> 
         :
         <View style={tabletStyle(isTablet, {
                 flex: 1,
@@ -108,11 +46,9 @@ const Staging = ({staging, reset, folders, deleteFile, renameFile, moveFile, use
                 </TouchableOpacity>
             </View>
             <View style={{height: '80%', paddingBottom: '5%'}}>
-                {alphaSortedFiles.length > 0 ? 
+                {sortedFiles.length > 0 ? 
                     <ScrollView>
-                        {alphaSortedFiles.map((file, i) => {
-                            return <File key={file + i}  file={file} focus={setFocusedFile}/>
-                        })}        
+                        {sortedFiles.map((file) => <File key={file.fileId} file={file} focus={focusFile}/>)}
                     </ScrollView> 
                     : <Text style={{color: '#593060', marginLeft: 'auto', marginRight: 'auto', marginTop: 'auto', marginBottom: 'auto'}}>No Files to be filed!</Text>
                 }
