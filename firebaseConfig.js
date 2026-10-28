@@ -55,8 +55,7 @@ const generateCustomToken = async () => {
 }
 
 // Skip App Check for Test Lab / local builds that cannot reach the token endpoint
-if (!disableAppCheck) {
-  initializeAppCheck(app, {
+export const appCheck = disableAppCheck ? null : initializeAppCheck(app, {
     provider: new CustomProvider({
       getToken: async () => {
         const token = await generateCustomToken()
@@ -68,7 +67,6 @@ if (!disableAppCheck) {
     }),
     isTokenAutoRefreshEnabled: true,
   })
-}
 
 export const db = getFirestore(app)
 export const storage = getStorage(app)

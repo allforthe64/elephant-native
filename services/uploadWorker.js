@@ -6,7 +6,7 @@ import { manipulateAsync, SaveFormat } from 'expo-image-manipulator'
 
 import { storage, firebaseAuth } from '../firebaseConfig'
 import { addfile, addFileToUser } from '../firebase/firestore'
-import { createTextBlob, TEXT_UPLOAD_METADATA } from '../utils/textBlob'
+import { uploadText } from '../firebase/uploadText'
 import {
   readUploadQueue,
   removeQueueItem,
@@ -99,13 +99,8 @@ const uploaders = {
   },
 
   async text(item, uid, stamp) {
-    const { blob, cleanup } = await createTextBlob(item.noteBody)
-    try {
-      const size = await uploadBlob(`${uid}/${stamp}`, blob, TEXT_UPLOAD_METADATA)
-      return { size, fields: item.linksTo ? { linksTo: item.linksTo } : {} }
-    } finally {
-      cleanup()
-    }
+    const size = await uploadText(`${uid}/${stamp}`, item.noteBody)
+    return { size, fields: item.linksTo ? { linksTo: item.linksTo } : {} }
   },
 
   async office(item, uid, stamp) {

@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { ref as storageRef, uploadBytes, deleteObject } from 'firebase/storage'
+import { ref as storageRef, deleteObject } from 'firebase/storage'
 import { format } from 'date-fns'
 import { storage } from '../firebaseConfig'
 import { getFile } from '../firebase/firestore'
 import { setFileUri } from '../firebase/fileSystem'
-import { createTextBlob, TEXT_UPLOAD_METADATA } from '../utils/textBlob'
+import { uploadText } from '../firebase/uploadText'
 
 const BUCKET = 'gs://elephantapp-21e34.appspot.com'
 
@@ -46,12 +46,7 @@ export function useNote({ file, fileObj, fileURL, userInst }) {
     const path = `${userInst.uid}/${format(new Date(), 'yyyy-MM-dd:hh:mm:ss')}`
     const uri = `${BUCKET}/${path}`
 
-    const { blob, cleanup } = await createTextBlob(text)
-    try {
-      await uploadBytes(storageRef(storage, path), blob, TEXT_UPLOAD_METADATA)
-    } finally {
-      cleanup()
-    }
+    await uploadText(path, text)
 
     await setFileUri(userInst, file.fileId, uri)
 
