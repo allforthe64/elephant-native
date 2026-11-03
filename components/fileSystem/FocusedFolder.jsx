@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View, Modal, Pressable, TextInput } from 'react-native'
 import React, {useMemo, useState} from 'react'
-import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler'
+import { ScrollView } from 'react-native-gesture-handler'
 
 //fontAwesome imports
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
@@ -61,13 +61,14 @@ const FocusedFolder = ({folder, folders, files, clear, getTargetFolder, addFolde
                 <View style={[styles.body, isTablet && contentFill]}>
 
                     <View style={styles.buttonContainer}>
-                        <TouchableOpacity style={styles.backButtonContainer} onPress={navigateUp}>
+                        <Pressable
+                            style={({ pressed }) => [styles.backButtonContainer, pressed && { opacity: 0.6 }]}
+                            onPress={navigateUp}
+                        >
                             <FontAwesomeIcon icon={faArrowLeft} color='#593060' size={30} />
-                            <Text style={styles.smallHeader}>Back To {parent ? parent.fileName : 'Home'}</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity onPressOut={() => clear(null)}>
-                            <FontAwesomeIcon icon={faXmark} size={30} color='#593060' />
-                        </TouchableOpacity>
+                            <Text style={styles.smallHeader} numberOfLines={2}>Back To {parent ? parent.fileName : 'Home'}</Text>
+                        </Pressable>
+                        <YellowButton size="xs" icon={faXmark} label="Save and close" style={styles.closeButton} onPress={() => clear(null)} />
                     </View>
                     
                     <View style={styles.title}>
@@ -184,13 +185,18 @@ const styles = StyleSheet.create({
         width: '100%', 
         display: 'flex', 
         flexDirection: 'row', 
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        gap: 8,
         paddingLeft: '4%', 
+        paddingRight: '4%',
         marginBottom: '6%'
     },
     backButtonContainer: {
         display: 'flex', 
         flexDirection: 'row', 
-        width: '78%', 
+        alignItems: 'center',
+        flexShrink: 1,
     },
     header: {
         color: '#593060',
@@ -199,12 +205,16 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         width: '100%',
     },
+    closeButton: {
+        alignSelf: 'center',
+        flexShrink: 0,
+    },
     smallHeader: {
         color: '#593060',
         fontSize: 22,
         fontWeight: '500',
-        width: '100%',
-        paddingLeft: '2.5%',
+        flexShrink: 1,
+        paddingLeft: 8,
     },
       iconHolder: {
         backgroundColor: 'white', 

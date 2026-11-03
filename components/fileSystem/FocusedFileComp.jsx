@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { View, Text, Modal, Pressable, ScrollView, StyleSheet } from 'react-native'
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
+import { View, Text, Modal, ScrollView, StyleSheet } from 'react-native'
 import { faXmark } from '@fortawesome/free-solid-svg-icons'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useToast } from 'react-native-toast-notifications'
@@ -18,6 +17,7 @@ import RenameFileForm from './focusedFile/RenameFileForm'
 import MoveFileSheet from './focusedFile/MoveFileSheet'
 import NoteEditor from './focusedFile/NoteEditor'
 import DeleteFileConfirm from './focusedFile/DeleteFileConfirm'
+import YellowButton from '../ui/YellowButton'
 
 /**
  * Full-screen view of one file: preview, rename, move, note editing, share and delete.
@@ -110,9 +110,7 @@ const FocusedFileComp = ({ file, focus, deleteFile, renameFileFunction, handleFi
   const renderDetails = () => (
     <View style={[styles.panel, { paddingTop: Math.max(insets.top, 24) }, isTablet && { maxWidth: modalMaxWidth, alignSelf: 'center' }]}>
       <View style={styles.closeRow}>
-        <Pressable onPress={handleClose} hitSlop={10}>
-          <FontAwesomeIcon icon={faXmark} color="#593060" size={30} />
-        </Pressable>
+        <YellowButton size="xs" icon={faXmark} label="Save and close" onPress={handleClose} />
       </View>
       <View style={{ flex: 1, width: '100%' }}>
         {view === 'rename' ? (
