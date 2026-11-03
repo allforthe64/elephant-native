@@ -88,7 +88,10 @@
             "compileSdkVersion": 36,
             "targetSdkVersion": 36,
             "buildToolsVersion": "36.0.0",
-            "kotlinVersion": "2.0.21"
+            "kotlinVersion": "2.0.21",
+            "enableProguardInReleaseBuilds": true,
+            "enableShrinkResourcesInReleaseBuilds": true,
+            "extraProguardRules": "-keep class org.wonday.pdf.** { *; }\n-keep class com.github.barteksc.pdfviewer.** { *; }\n-keep class io.legere.pdfiumandroid.** { *; }\n-keep class com.shockwave.** { *; }\n-keep class com.ReactNativeBlobUtil.** { *; }\n-keep class com.reactnativedocumentscanner.** { *; }\n-keep class com.imagespdf.** { *; }\n-dontwarn com.google.errorprone.annotations.**\n-dontwarn com.google.j2objc.annotations.**\n-dontwarn javax.lang.model.**\n-dontwarn org.checkerframework.**\n-dontwarn sun.misc.Unsafe"
           }
         }
       ],
