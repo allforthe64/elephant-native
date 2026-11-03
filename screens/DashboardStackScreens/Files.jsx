@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, Modal, Pressable } from 'react-native';
-import { ScrollView, TextInput } from 'react-native-gesture-handler';
+import { StyleSheet, Text, View, Modal, Pressable, TextInput } from 'react-native';
+import { ScrollView } from 'react-native-gesture-handler';
 
 import * as fileSystem from '../../firebase/fileSystem';
 
@@ -37,7 +37,7 @@ export default function Files({navigation: { navigate }, route}) {
   const [focusedFolder, setFocusedFolder] = useState()
   const [add, setAdd] = useState(false)
   const [newFolderName, setNewFolderName] = useState('')
-  const inputRef = useAutoFocusOn(add)
+  const inputRef = useAutoFocusOn(add, 350)
 
   const userFolders = Array.isArray(currentUser?.files) ? currentUser.files : []
   const userFileRefs = Array.isArray(currentUser?.fileRefs) ? currentUser.fileRefs : []
@@ -109,8 +109,8 @@ export default function Files({navigation: { navigate }, route}) {
                     </ScrollView>
                     {add ? 
                       <Modal animationType='slide' presentationStyle='pageSheet' onRequestClose={() => setAdd(false)} onShow={() => setTimeout(()=>{
-                          inputRef.current?.focus()
-                        }, 200)}>
+                          inputRef.current?.focus?.()
+                        }, 350)}>
                         <View style={{height: '100%', width: '100%', backgroundColor: '#fff'}}>
                           <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', paddingRight: '5%', paddingTop: '10%',width: '100%'}}>
                               <Pressable onPress={() => {
@@ -128,7 +128,7 @@ export default function Files({navigation: { navigate }, route}) {
                               <View style={styles.iconHolder}>
                                 <FontAwesomeIcon icon={faFolder} size={22} color='#9F37B0'/>
                               </View>
-                              <TextInput value={newFolderName} placeholder='Enter new name' placeholderTextColor={'#593060'} style={{color: '#593060', fontSize: 22, fontWeight: 'bold', borderBottomColor: '#593060', borderBottomWidth: 2, width: '70%', marginLeft: '5%'}} onChangeText={(e) => setNewFolderName(e)} ref={inputRef} autoFocus showSoftInputOnFocus onLayout={() => inputRef.current?.focus?.()}/>
+                              <TextInput value={newFolderName} placeholder='Enter new name' placeholderTextColor={'#593060'} style={{color: '#593060', fontSize: 22, fontWeight: 'bold', borderBottomColor: '#593060', borderBottomWidth: 2, width: '70%', marginLeft: '5%'}} onChangeText={(e) => setNewFolderName(e)} ref={inputRef} autoFocus showSoftInputOnFocus onLayout={() => setTimeout(() => inputRef.current?.focus?.(), 50)}/>
                             </View>
                             <YellowButton
                               size="md"
