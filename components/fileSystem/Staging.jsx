@@ -14,6 +14,7 @@ import File from './File'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { tabletStyle, useResponsiveLayout } from '../../hooks/useResponsiveLayout'
 import { sortByName } from '../../utils/sortByName'
+import { useHardwareBack } from '../../hooks/useHardwareBack'
 
 const Staging = ({staging, reset, deleteFile, renameFile, moveFile}) => {
     const { isTablet, contentFill } = useResponsiveLayout()
@@ -24,6 +25,8 @@ const Staging = ({staging, reset, deleteFile, renameFile, moveFile}) => {
     const focusedFile = focusedFileId ? sortedFiles.find(f => f.fileId === focusedFileId) : undefined
 
     const focusFile = (file) => setFocusedFileId(file ? file.fileId : null)
+
+    useHardwareBack(() => reset(false), !focusedFile)
 
   return (
     <>

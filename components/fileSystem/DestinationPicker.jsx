@@ -109,6 +109,7 @@ const DestinationPicker = ({ save, title, footer, nameHeading, nameRef, onClose 
                 selected={folder.id === save.destination.id}
                 fileName={folder.fileName}
                 onPress={() => save.selectFolder(folder)}
+                onOpen={save.hasChildren(folder) ? () => save.openFolder(folder) : undefined}
               />
             ))
           )}

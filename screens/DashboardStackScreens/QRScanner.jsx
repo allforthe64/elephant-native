@@ -20,8 +20,6 @@ import { useSaveDestination } from '../../hooks/useSaveDestination'
 import { enqueueUploads, randomQueueId } from '../../utils/uploadQueue'
 
 const Scanner = () => {
-
-  try {
     const { isTablet } = useResponsiveLayout()
     const insets = useSafeAreaInsets()
     const keyboardHeight = useKeyboardHeight()
@@ -71,7 +69,6 @@ const Scanner = () => {
         let arr = [...urls]
         setScanData(data)
         arr.push({data: data, title: ''})
-        console.log('edited arr: ', arr)
         setUrls(arr)
     }
 
@@ -202,10 +199,6 @@ return (
         }
     </>
 )
-
-} catch (error) {
-    alert(error)
-}
 }
 
 export default Scanner

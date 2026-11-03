@@ -18,8 +18,9 @@ const toDestination = (folder) => ({
  *
  * `isHidden(folder)` removes folders from the picker (and with them, everything
  * nested inside, since the user can't open them).
+ * `startIn` opens the picker inside that folder id instead of at the top level.
  */
-export function useSaveDestination({ isHidden } = {}) {
+export function useSaveDestination({ isHidden, startIn = null } = {}) {
   const userInst = useUserDoc()
 
   const [folders, setFolders] = useState([])
@@ -28,7 +29,7 @@ export function useSaveDestination({ isHidden } = {}) {
   const [nameGiven, setNameGiven] = useState(false)
   const [addFolderForm, setAddFolderForm] = useState(false)
   const [newFolderName, setNewFolderName] = useState('')
-  const [focusedFolder, setFocusedFolder] = useState(null)
+  const [focusedFolder, setFocusedFolder] = useState(startIn || null)
   const [destination, setDestination] = useState(NO_DESTINATION)
   const addFolderInputRef = useAutoFocusOn(addFolderForm)
 
@@ -80,6 +81,13 @@ export function useSaveDestination({ isHidden } = {}) {
       setDestination(NO_DESTINATION)
     }
   }, [destination.id])
+
+  const openFolder = useCallback((folder) => {
+    setFocusedFolder(folder.id)
+    setDestination(NO_DESTINATION)
+  }, [])
+
+  const hasChildren = (folder) => folders.some((f) => f.nestedUnder === folder.id && !isHidden?.(f))
 
   const goBack = useCallback(() => {
     const current = folders.find((f) => f.id === focusedFolder)
@@ -136,6 +144,8 @@ export function useSaveDestination({ isHidden } = {}) {
     hasSubFolders: visibleFolders.length > 0,
     destination,
     selectFolder,
+    openFolder,
+    hasChildren,
     goBack,
     resolveDestination,
     targetFolder,

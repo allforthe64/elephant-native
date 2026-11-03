@@ -2,7 +2,7 @@
   "expo": {
     "name": "elephant-native",
     "slug": "elephant-native",
-    "version": "1.4.6",
+    "version": "1.4.7",
     "orientation": "default",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -15,7 +15,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.billiam.elephantapp",
-      "googleServicesFile": "./test_firebase_app_config_files/GoogleService-Info.plist",
+      "googleServicesFile": "./GoogleService-Info.plist",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }
@@ -25,8 +25,8 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.elephantdev.elephantnative",
-      "googleServicesFile": "./test_firebase_app_config_files/google-services.json",
+      "package": "com.billiam.elephantapp",
+      "googleServicesFile": "./google-services.json",
       "permissions": [
         "android.permission.CAMERA",
         "android.permission.RECORD_AUDIO",
@@ -44,7 +44,6 @@
       "favicon": "./assets/favicon.png"
     },
     "extra": {
-      "EXPO_CLOUDMERSIVE": "aff46c84-15ba-4bb7-b6c2-b827cec256fb",
       "eas": {
         "projectId": "80101e5c-fa58-4995-8377-557df0002a8b"
       }
@@ -94,7 +93,8 @@
         }
       ],
       "expo-font",
-      "expo-asset"
+      "expo-asset",
+      "./plugins/withLegacyBackHandling"
     ],
     "owner": "bisforbilliam"
   }

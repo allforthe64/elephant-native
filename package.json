@@ -1,6 +1,6 @@
 {
   "name": "elephant-native",
-  "version": "1.4.6",
+  "version": "1.4.7",
   "main": "expo/AppEntry.js",
   "scripts": {
     "start": "expo start",
@@ -51,7 +51,6 @@
     "react-native-blob-util": "^0.19.11",
     "react-native-collapsible": "^1.6.1",
     "react-native-document-scanner-plugin": "^1.0.1",
-    "react-native-exception-handler": "^2.10.10",
     "react-native-gesture-handler": "~2.24.0",
     "react-native-image-modal": "^1.0.16",
     "react-native-images-to-pdf": "^0.2.1",
@@ -79,7 +78,6 @@
         "listUnknownPackages": false,
         "exclude": [
           "expo-av",
-          "react-native-exception-handler",
           "react-native-image-modal",
           "react-native-toast-notifications",
           "@react-native-community/masked-view"

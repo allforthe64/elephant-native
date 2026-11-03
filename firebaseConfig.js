@@ -2,7 +2,6 @@ import { initializeApp } from 'firebase/app'
 import { initializeAuth, getReactNativePersistence } from 'firebase/auth'
 import { getFirestore } from 'firebase/firestore'
 import { getStorage } from 'firebase/storage'
-import firebase from 'firebase/compat/app'
 import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage';
 import { Platform } from 'react-native'
 import { initializeAppCheck, CustomProvider } from 'firebase/app-check';
@@ -70,9 +69,3 @@ export const appCheck = disableAppCheck ? null : initializeAppCheck(app, {
 
 export const db = getFirestore(app)
 export const storage = getStorage(app)
-
-if (!firebase.apps.length) {
-  firebase.initializeApp(firebaseConfig)
-}
-
-export { firebase }

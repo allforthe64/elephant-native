@@ -17,6 +17,7 @@ import { tabletStyle, useResponsiveLayout } from '../../hooks/useResponsiveLayou
 import KeyboardSafeForm from '../ui/KeyboardSafeForm'
 import YellowButton from '../ui/YellowButton'
 import { useAutoFocusOn } from '../../hooks/useAutoFocusOn'
+import { useHardwareBack } from '../../hooks/useHardwareBack'
 import { sortByName } from '../../utils/sortByName'
 
 const FocusedFolder = ({folder, folders, files, clear, getTargetFolder, addFolder, renameFolder, moveFolder, deleteFolder, deleteFile, renameFile, moveFile}) => {
@@ -42,6 +43,8 @@ const FocusedFolder = ({folder, folders, files, clear, getTargetFolder, addFolde
         if (parent) getTargetFolder(parent)
         else clear(null)
     }
+
+    useHardwareBack(navigateUp, !focusedFile && !add)
 
   return (
     <View style={[

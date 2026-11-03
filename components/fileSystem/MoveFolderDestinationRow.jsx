@@ -1,7 +1,7 @@
 import React from 'react'
 import { Pressable, View, Text } from 'react-native'
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
-import { faFolder } from '@fortawesome/free-solid-svg-icons'
+import { faChevronRight, faFolder } from '@fortawesome/free-solid-svg-icons'
 import {
   fileSystemRowStyles,
   FILE_SYSTEM_ROW_ACTIVE_OPACITY,
@@ -11,8 +11,9 @@ import { useResponsiveLayout, tabletStyle } from '../../hooks/useResponsiveLayou
 /**
  * Squared folder row for Move To / Save To destination pickers.
  * Matches the file-system Folder row language (radius 14, square icon holder).
+ * `onOpen` adds a chevron that opens the folder to show its subfolders.
  */
-const MoveFolderDestinationRow = ({ selected, fileName, onPress }) => {
+const MoveFolderDestinationRow = ({ selected, fileName, onPress, onOpen }) => {
   const { isTablet, contentFill } = useResponsiveLayout()
 
   return (
@@ -62,6 +63,19 @@ const MoveFolderDestinationRow = ({ selected, fileName, onPress }) => {
             {fileName}
           </Text>
         </View>
+        {onOpen ? (
+          <Pressable
+            onPress={onOpen}
+            hitSlop={8}
+            accessibilityLabel={`Open ${fileName}`}
+            style={({ pressed }) => [
+              fileSystemRowStyles.trailing,
+              pressed && fileSystemRowStyles.trailingActive,
+            ]}
+          >
+            <FontAwesomeIcon icon={faChevronRight} size={20} color={selected ? '#593060' : '#fff'} />
+          </Pressable>
+        ) : null}
       </View>
     </Pressable>
   )

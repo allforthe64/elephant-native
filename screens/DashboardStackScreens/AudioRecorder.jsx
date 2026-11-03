@@ -26,8 +26,6 @@ import { ensurePermission } from '../../utils/permissions'
 import { enqueueUploads } from '../../utils/uploadQueue'
 
 const AudioRecorder = () => {
-
-    try {
         const { isTablet } = useResponsiveLayout()
         const insets = useSafeAreaInsets()
         const keyboardHeight = useKeyboardHeight()
@@ -388,10 +386,6 @@ const AudioRecorder = () => {
         }    
     </>
   )
-
-    } catch (err) {
-        alert(err)
-    }
 }
 
 const styles = StyleSheet.create({

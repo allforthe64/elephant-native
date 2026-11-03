@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'
-import { Image, Platform, PermissionsAndroid, Dimensions, View, StyleSheet } from 'react-native'
+import { Image, Platform, PermissionsAndroid, Dimensions, View, StyleSheet, Text } from 'react-native'
 
 //import DocumentScanner component from react-native-document-scanner-plugin
 import DocumentScanner from 'react-native-document-scanner-plugin'
@@ -27,13 +27,12 @@ import YellowButton from '../../components/ui/YellowButton'
 import SaveDestinationModal from '../../components/fileSystem/SaveDestinationModal'
 import { ensureAndroidPermission } from '../../utils/permissions'
 import { enqueueUploads, randomQueueId } from '../../utils/uploadQueue'
+import { compressScanPages } from '../../utils/compressScanPages'
 import { useResponsiveLayout } from '../../hooks/useResponsiveLayout'
 import { useSaveDestination } from '../../hooks/useSaveDestination'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 const DocScanner = () => {
-
-  try {
   const { isTablet, select } = useResponsiveLayout()
   const insets = useSafeAreaInsets()
   const bottomPad = Math.max(insets.bottom, 16) + 48
@@ -55,17 +54,14 @@ const DocScanner = () => {
       return
     }
 
-    // start the document scanner
-    const { scannedImages } = await DocumentScanner.scanDocument()
-  
-    // get back an array with scanned image file paths
-    if (scannedImages.length > 0) {
-      // set the img src, so we can view the first scanned image
-      if (scannedImageArray.length >= 1) {
+    try {
+      // Cancelling the scanner resolves without any images.
+      const { scannedImages } = await DocumentScanner.scanDocument()
+      if (scannedImages?.length > 0) {
         setScannedImageArray(prev => [...prev, ...scannedImages])
-      } else {
-        setScannedImageArray(scannedImages)
       }
+    } catch (error) {
+      toast.show(`Scanner failed: ${error?.message || error}`, { type: 'danger' })
     }
   }
 
@@ -75,17 +71,26 @@ const DocScanner = () => {
   }, []);
 
   //generate a pdf using the scanned images
-  const generatePDF = async (toStaging = false) => {
+  const creatingRef = useRef(false)
 
-    return createPdf({
-      pages: scannedImageArray.map(imagePath => ({imagePath})),
-      // Unique per scan: the upload queue may still be reading an earlier PDF.
-      outputPath: `file://${RNBlobUtil.fs.dirs.DocumentDir}/scan-${Date.now()}.pdf`
-    })
-    .then(path => uploadPDF(path, toStaging))
-    .catch(error => {
+  const generatePDF = async (toStaging = false) => {
+    if (creatingRef.current) return
+    creatingRef.current = true
+    toast.show('Preparing PDF...')
+    const { pages, cleanup } = await compressScanPages(scannedImageArray)
+    try {
+      const path = await createPdf({
+        pages: pages.map(imagePath => ({imagePath})),
+        // Unique per scan: the upload queue may still be reading an earlier PDF.
+        outputPath: `file://${RNBlobUtil.fs.dirs.DocumentDir}/scan-${Date.now()}.pdf`
+      })
+      await uploadPDF(path, toStaging)
+    } catch (error) {
       alert(`Failed to create PDF: ${error}`)
-    });
+    } finally {
+      cleanup()
+      creatingRef.current = false
+    }
   }
 
   const uploadPDF = async (path, toStaging = false) => {
@@ -103,6 +108,7 @@ const DocScanner = () => {
       }])
 
       setScannedImageArray([])
+      setProgress(0)
       save.reset()
     } catch (error) {
       alert('docScanner error: ' + error.message)
@@ -146,11 +152,10 @@ const DocScanner = () => {
                 <View style={{width: '100%', height: '60%'}}>
                   <Carousel
                       ref={carouselRef}
-                      loop
+                      loop={false}
                       width={select(width, Math.min(width, 720), Math.min(width, 840))}
                       style={{height: '90%', paddingRight: '5%'}}
-                      autoPlay
-                      autoPlayInterval={2000}
+                      onSnapToItem={setProgress}
                       mode='parallax'
                       modeConfig={{
                         parallaxScrollingScale: 0.9,
@@ -167,7 +172,7 @@ const DocScanner = () => {
                         }
                       }} */
                       data={scannedImageArray}
-                      scrollAnimationDuration={1000}
+                      scrollAnimationDuration={300}
                       renderItem={({ index }) => {
                         return (
                           <View
@@ -192,6 +197,9 @@ const DocScanner = () => {
                           </View>
                       )}}
                       />
+                    <Text style={styles.pageCounter}>
+                      Page {Math.min(progress, scannedImageArray.length - 1) + 1} of {scannedImageArray.length}
+                    </Text>
                     {/* <View style={{width: '100%', paddingLeft: '5%', paddingRight: '5%', display: 'flex', flexDirection: 'row', justifyContent: 'center', flexWrap: 'wrap'}}>
                       {scannedImageArray.map((index, counter) => {
                         return (
@@ -274,14 +282,17 @@ const DocScanner = () => {
       }
     </>
   )
-  } catch (error) {
-    alert(error)
-  }
 }
 
 export default DocScanner
 
 const styles = StyleSheet.create({ 
+  pageCounter: {
+    color: '#593060',
+    fontSize: 18,
+    fontWeight: '600',
+    textAlign: 'center',
+  },
   iconHolder: {
     backgroundColor: 'white', 
     width: 44, 

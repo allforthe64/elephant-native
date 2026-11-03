@@ -86,7 +86,7 @@ const DocumentPickerComp = () => {
         try {
         // No permissions request is necessary for launching the image library
         const imgs = await ImagePicker.launchImageLibraryAsync({
-          mediaTypes: ImagePicker.MediaTypeOptions.All,
+          mediaTypes: ['images', 'videos'],
           aspect: [4, 3],
           quality: 1,
           allowsMultipleSelection: true
@@ -94,11 +94,14 @@ const DocumentPickerComp = () => {
         if (!imgs.canceled) {
             addFiles(imgs.assets.map(img => {
                 const fileName = img.uri.substring(img.uri.lastIndexOf('/') + 1, img.uri.length)
-                return {name: fileName, uri: img.uri, fileType: fileName.split('.')[1], height: img.height, width: img.width}
+                const fileType = (fileName.includes('.') ? fileName.split('.').pop() : img.mimeType?.split('/')[1] || '').toLowerCase()
+                return {name: fileName, uri: img.uri, fileType, height: img.height, width: img.width}
             }))
         }
         
-        } catch (err) {console.log(err)}
+        } catch (err) {
+            alert(err?.message || String(err))
+        }
 
     };
 

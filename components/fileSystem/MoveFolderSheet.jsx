@@ -9,7 +9,10 @@ import { useSaveDestination } from '../../hooks/useSaveDestination'
 /** "Move To..." picker for a folder. */
 const MoveFolderSheet = ({ folder, onMove, onClose }) => {
   // Hiding the folder itself also hides everything inside it, so it can't be moved into its own subtree.
-  const save = useSaveDestination({ isHidden: (f) => f.id === folder.id })
+  // Start among the folder's siblings so moving it next door is one tap away.
+  const save = useSaveDestination({ isHidden: (f) => f.id === folder.id, startIn: folder.nestedUnder || null })
+  const target = save.targetFolder
+  const canMove = !!target && String(target.id) !== String(folder.nestedUnder)
 
   const closePicker = () => {
     if (save.addFolderForm) save.setAddFolderForm(false)
@@ -24,8 +27,8 @@ const MoveFolderSheet = ({ folder, onMove, onClose }) => {
           size="sm"
           icon={faArrowRight}
           label="Confirm Move"
-          dimmed={!save.canConfirm}
-          onPress={() => { if (save.targetFolder) onMove(save.targetFolder) }}
+          dimmed={!canMove}
+          onPress={() => { if (canMove) onMove(target) }}
         />
       </View>
     </StickyFooter>
