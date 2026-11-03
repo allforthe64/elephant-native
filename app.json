@@ -25,8 +25,8 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.billiam.elephantapp",
-      "googleServicesFile": "./google-services.json",
+      "package": "com.elephantdev.elephantnative",
+      "googleServicesFile": "./test_firebase_app_config_files/google-services.json",
       "permissions": [
         "android.permission.CAMERA",
         "android.permission.RECORD_AUDIO",
