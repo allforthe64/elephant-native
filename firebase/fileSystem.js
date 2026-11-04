@@ -1,7 +1,8 @@
-import { doc, getDoc, deleteDoc, updateDoc, writeBatch, arrayRemove, arrayUnion, increment } from 'firebase/firestore'
+import { doc, getDoc, deleteDoc, updateDoc, writeBatch, arrayRemove, arrayUnion } from 'firebase/firestore'
 import { ref, deleteObject } from 'firebase/storage'
 import { db, storage } from '../firebaseConfig'
 import { createFolderId, resolveUniqueFolderName } from './firestore'
+import { refreshStorageUsage } from './storageUsage'
 
 /*
  * File and folder edits for a user document.
@@ -17,7 +18,6 @@ import { createFolderId, resolveUniqueFolderName } from './firestore'
 
 const userRef = (uid) => doc(db, 'users', uid)
 const sameId = (a, b) => String(a) === String(b)
-const sizeOf = (fileRef) => Number(fileRef?.size) || 0
 
 function findFileRef(user, fileId) {
   const fileRef = (user?.fileRefs || []).find((r) => sameId(r.fileId, fileId))
@@ -99,11 +99,9 @@ export async function setFileUri(user, fileId, uri) {
 /** Remove a file from the user, then delete its record and storage objects. */
 export async function deleteFile(user, fileId) {
   const fileRef = findFileRef(user, fileId)
-  await updateDoc(userRef(user.uid), {
-    fileRefs: arrayRemove(fileRef),
-    spaceUsed: increment(-sizeOf(fileRef)),
-  })
+  await updateDoc(userRef(user.uid), { fileRefs: arrayRemove(fileRef) })
   await deleteFileRecord(fileRef.fileId)
+  refreshStorageUsage()
 }
 
 // Folders
@@ -146,11 +144,11 @@ export async function deleteFolder(user, folderId) {
   const fileRefs = (user.fileRefs || []).filter((r) => treeIds.has(String(r.flag)))
 
   const changes = { files: arrayRemove(...folders) }
-  if (fileRefs.length > 0) {
-    changes.fileRefs = arrayRemove(...fileRefs)
-    changes.spaceUsed = increment(-fileRefs.reduce((sum, r) => sum + sizeOf(r), 0))
-  }
+  if (fileRefs.length > 0) changes.fileRefs = arrayRemove(...fileRefs)
   await updateDoc(userRef(user.uid), changes)
 
-  await Promise.all(fileRefs.map((r) => deleteFileRecord(r.fileId)))
+  if (fileRefs.length > 0) {
+    await Promise.all(fileRefs.map((r) => deleteFileRecord(r.fileId)))
+    refreshStorageUsage()
+  }
 }

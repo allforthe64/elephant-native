@@ -7,6 +7,7 @@ import { manipulateAsync, SaveFormat } from 'expo-image-manipulator'
 import { storage, firebaseAuth } from '../firebaseConfig'
 import { addfile, addFileToUser } from '../firebase/firestore'
 import { uploadText } from '../firebase/uploadText'
+import { refreshStorageUsage } from '../firebase/storageUsage'
 import {
   readUploadQueue,
   removeQueueItem,
@@ -149,7 +150,7 @@ async function uploadItem(item, uid) {
     await updateQueueItem(key, { reference, uploadSize })
   }
 
-  await addFileToUser(uid, reference, uploadSize)
+  await addFileToUser(uid, reference)
 }
 
 const isAppOwnedFile = (uri) =>
@@ -177,6 +178,7 @@ export async function processUploadQueue({ onUploaded, onFailed } = {}) {
     return
   }
   running = true
+  let uploadedAny = false
 
   try {
     do {
@@ -192,6 +194,7 @@ export async function processUploadQueue({ onUploaded, onFailed } = {}) {
         try {
           await uploadItem(item, uid)
           await removeQueueItem(key)
+          uploadedAny = true
           if (typeOf(item) !== 'txt') deleteLocalFile(item.uri)
           onUploaded?.(item)
         } catch (err) {
@@ -216,5 +219,6 @@ export async function processUploadQueue({ onUploaded, onFailed } = {}) {
     } while (runAgain)
   } finally {
     running = false
+    if (uploadedAny) refreshStorageUsage()
   }
 }

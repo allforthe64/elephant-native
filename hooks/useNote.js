@@ -5,6 +5,7 @@ import { storage } from '../firebaseConfig'
 import { getFile } from '../firebase/firestore'
 import { setFileUri } from '../firebase/fileSystem'
 import { uploadText } from '../firebase/uploadText'
+import { refreshStorageUsage } from '../firebase/storageUsage'
 
 const BUCKET = 'gs://elephantapp-21e34.appspot.com'
 
@@ -51,7 +52,9 @@ export function useNote({ file, fileObj, fileURL, userInst }) {
     await setFileUri(userInst, file.fileId, uri)
 
     // Only delete the old text once nothing points at it.
-    deleteObject(storageRef(storage, fileDoc.uri)).catch((err) => console.log('old note delete failed: ', err))
+    deleteObject(storageRef(storage, fileDoc.uri))
+      .catch((err) => console.log('old note delete failed: ', err))
+      .finally(refreshStorageUsage)
   }, [file, userInst, text])
 
   return { isNote, text, setText, status, save }

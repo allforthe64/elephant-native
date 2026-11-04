@@ -6,7 +6,6 @@ import {
     collection,
     onSnapshot,
     arrayUnion,
-    increment
 } from 'firebase/firestore'
 import { db } from '../firebaseConfig'
 
@@ -68,13 +67,10 @@ export function resolveUniqueFolderName(desiredName, folders, { parentId = '', e
     return conflicts > 0 ? `${base} (${conflicts})` : base
 }
 
-//function to specifically add new files to user, using the atomic atomic updates
-export async function addFileToUser(userId, reference, fileSize) {
+// spaceUsed is server-owned; call refreshStorageUsage() after uploads instead of adjusting it here.
+export async function addFileToUser(userId, reference) {
     const userRef = doc(db, 'users', userId)
-    await updateDoc(userRef, {
-        fileRefs: arrayUnion(reference),
-        spaceUsed: increment(fileSize)
-    })
+    await updateDoc(userRef, { fileRefs: arrayUnion(reference) })
 }
 
 
@@ -90,9 +86,13 @@ export async function addfile(file, destination) {
             ? BUCKET_URL + '/' + file.timeStamp + '^&' + file.user
             : BUCKET_URL + '/' + file.user + '/' + file.timeStamp
 
+        // Firestore rules require new file docs to name their owner.
+        const ownerUid = file.user
+
         let fileRef
         if (file.linksTo) {
             fileRef = await addDoc(collection(db, 'files'), {
+                ownerUid,
                 fileName: file.name,
                 documentType: file.fileType,
                 linksTo: file.linksTo,
@@ -103,6 +103,7 @@ export async function addfile(file, destination) {
         } else {
             if (file.fileType !== 'jpg' && file.fileType !== 'jpeg' && file.fileType !== 'png' && file.fileType !== "JPG" && file.fileType !== 'JPEG' && file.fileType !== 'PNG') {
                 fileRef = await addDoc(collection(db, 'files'), {
+                    ownerUid,
                     fileName: file.name,
                     documentType: file.fileType,
                     size: file.size,
@@ -111,6 +112,7 @@ export async function addfile(file, destination) {
                 })
             } else {
                 fileRef = await addDoc(collection(db, 'files'), {
+                    ownerUid,
                     fileName: file.name,
                     documentType: file.fileType,
                     size: file.size,
