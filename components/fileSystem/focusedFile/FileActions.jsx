@@ -103,16 +103,15 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     width: '100%',
     justifyContent: 'space-around',
-    marginTop: '5%',
   },
   column: {
     width: '100%',
     flexDirection: 'column',
     alignItems: 'center',
-    paddingTop: '10%',
+    paddingTop: 8,
   },
   spaced: {
-    marginTop: '2%',
+    marginTop: 8,
   },
 })
 

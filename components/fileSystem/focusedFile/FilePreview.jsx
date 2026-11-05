@@ -107,8 +107,8 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
     justifyContent: 'center',
-    marginTop: '10%',
-    marginBottom: '10%',
+    marginTop: 16,
+    marginBottom: 16,
   },
   videoRow: {
     height: 200,
