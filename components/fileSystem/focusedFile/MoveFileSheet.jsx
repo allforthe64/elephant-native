@@ -11,8 +11,11 @@ import { useSaveDestination } from '../../../hooks/useSaveDestination'
  * offers renaming without moving.
  */
 const MoveFileSheet = ({ file, renaming, onMove, onRenameAndMove, onRenameOnly, onClose }) => {
-  // The top-level folder the file is already in isn't offered as a destination.
-  const save = useSaveDestination({ isHidden: (f) => f.nestedUnder === '' && f.id === file.flag })
+  // Open in the file's current folder so its subfolders are one tap away.
+  const currentFolder = file.flag && file.flag !== 'Staging' ? file.flag : null
+  const save = useSaveDestination({ startIn: currentFolder })
+  const target = save.targetFolder
+  const canMove = !!target && String(target.id) !== String(file.flag)
 
   const closePicker = () => {
     if (save.addFolderForm) save.setAddFolderForm(false)
@@ -20,7 +23,7 @@ const MoveFileSheet = ({ file, renaming, onMove, onRenameAndMove, onRenameOnly, 
   }
 
   const confirm = (handler) => () => {
-    if (save.targetFolder) handler(save.targetFolder)
+    if (canMove) handler(target)
   }
 
   const footer = (
@@ -29,7 +32,7 @@ const MoveFileSheet = ({ file, renaming, onMove, onRenameAndMove, onRenameOnly, 
         <>
           <View style={styles.row}>
             <YellowButton size="sm" icon={faPlus} label="Add Folder" onPress={() => save.setAddFolderForm(true)} />
-            <YellowButton size="sm" icon={faArrowRight} label="Name + Move" dimmed={!save.canConfirm} onPress={confirm(onRenameAndMove)} />
+            <YellowButton size="sm" icon={faArrowRight} label="Name + Move" dimmed={!canMove} onPress={confirm(onRenameAndMove)} />
           </View>
           <Text style={styles.orText}>Or</Text>
           <View style={styles.centered}>
@@ -39,7 +42,7 @@ const MoveFileSheet = ({ file, renaming, onMove, onRenameAndMove, onRenameOnly, 
       ) : (
         <View style={styles.row}>
           <YellowButton size="sm" icon={faPlus} label="Add Folder" onPress={() => save.setAddFolderForm(true)} />
-          <YellowButton size="sm" icon={faArrowRight} label="Confirm Move" dimmed={!save.canConfirm} onPress={confirm(onMove)} />
+          <YellowButton size="sm" icon={faArrowRight} label="Confirm Move" dimmed={!canMove} onPress={confirm(onMove)} />
         </View>
       )}
     </StickyFooter>

@@ -6,6 +6,9 @@ import { useUserDoc } from './useUserDoc'
 
 const NO_DESTINATION = { id: null, fileName: null, nestedUnder: null }
 
+// Folder ids are numbers, but older docs and file flags sometimes store them as strings.
+const sameId = (a, b) => a != null && b != null && String(a) === String(b)
+
 const toDestination = (folder) => ({
   id: folder.id,
   fileName: folder.fileName,
@@ -42,17 +45,17 @@ export function useSaveDestination({ isHidden, startIn = null } = {}) {
   }, [userInst])
 
   const focusedFolderInst = useMemo(
-    () => (focusedFolder ? folders.find((f) => f.id === focusedFolder) : undefined),
+    () => (focusedFolder ? folders.find((f) => sameId(f.id, focusedFolder)) : undefined),
     [folders, focusedFolder]
   )
 
   const visibleFolders = folders.filter((f) =>
-    (focusedFolder ? f.nestedUnder === focusedFolder : f.nestedUnder === '') && !isHidden?.(f)
+    (focusedFolder ? sameId(f.nestedUnder, focusedFolder) : f.nestedUnder === '') && !isHidden?.(f)
   )
 
   /** The folder a confirm would use: the selected row, else the folder being viewed. */
   const targetFolder = destination.id !== null
-    ? folders.find((f) => f.id === destination.id) || destination
+    ? folders.find((f) => sameId(f.id, destination.id)) || destination
     : focusedFolderInst || null
 
   const reset = useCallback(() => {
@@ -74,7 +77,7 @@ export function useSaveDestination({ isHidden, startIn = null } = {}) {
 
   // First tap selects a folder as the destination; a second tap opens it.
   const selectFolder = useCallback((folder) => {
-    if (destination.id === null || folder.id !== destination.id) {
+    if (destination.id === null || !sameId(folder.id, destination.id)) {
       setDestination(toDestination(folder))
     } else {
       setFocusedFolder(folder.id)
@@ -87,11 +90,11 @@ export function useSaveDestination({ isHidden, startIn = null } = {}) {
     setDestination(NO_DESTINATION)
   }, [])
 
-  const hasChildren = (folder) => folders.some((f) => f.nestedUnder === folder.id && !isHidden?.(f))
+  const hasChildren = (folder) => folders.some((f) => sameId(f.nestedUnder, folder.id) && !isHidden?.(f))
 
   const goBack = useCallback(() => {
-    const current = folders.find((f) => f.id === focusedFolder)
-    const parent = current ? folders.find((f) => f.id === current.nestedUnder) : undefined
+    const current = folders.find((f) => sameId(f.id, focusedFolder))
+    const parent = current ? folders.find((f) => sameId(f.id, current.nestedUnder)) : undefined
     if (parent) {
       setDestination(toDestination(parent))
       setFocusedFolder(parent.id)

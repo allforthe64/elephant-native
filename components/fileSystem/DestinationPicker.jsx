@@ -106,7 +106,7 @@ const DestinationPicker = ({ save, title, footer, nameHeading, nameRef, onClose 
             save.visibleFolders.map((folder) => (
               <MoveFolderDestinationRow
                 key={folder.id}
-                selected={folder.id === save.destination.id}
+                selected={save.destination.id != null && String(folder.id) === String(save.destination.id)}
                 fileName={folder.fileName}
                 onPress={() => save.selectFolder(folder)}
                 onOpen={save.hasChildren(folder) ? () => save.openFolder(folder) : undefined}
