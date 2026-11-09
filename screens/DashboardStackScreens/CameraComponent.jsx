@@ -1,11 +1,11 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import { View, StatusBar, StyleSheet, Image, Platform } from 'react-native'
 import { CameraView } from 'expo-camera';
 import { Video } from 'expo-av'
 import { shareAsync } from 'expo-sharing'
 import * as MediaLibrary from 'expo-media-library'
 import { format } from 'date-fns'
-import { PinchGestureHandler } from 'react-native-gesture-handler'
+import { Gesture, GestureDetector } from 'react-native-gesture-handler'
 import { manipulateAsync, SaveFormat } from 'expo-image-manipulator';
 
 import SaveDestinationModal from '../../components/fileSystem/SaveDestinationModal'
@@ -15,6 +15,23 @@ import CaptureReview from '../../components/camera/CaptureReview'
 import { enqueueUploads, randomQueueId } from '../../utils/uploadQueue'
 import { useSaveDestination } from '../../hooks/useSaveDestination'
 import { useCameraSetup } from '../../hooks/useCameraSetup'
+
+const clampZoom = (z) => Math.min(1, Math.max(0, z))
+
+// expo-camera maps `zoom` differently per platform: iOS uses maxZoom^zoom, Android
+// uses zoom * maxZoom (floored at 1x). Converting the pinch scale through the same
+// curve makes the image grow with the fingers on both.
+const IOS_ZOOM_RANGE = 30
+const ANDROID_ONE_X = 0.1
+
+function zoomForPinch(startZoom, scale) {
+    if (!(scale > 0)) return startZoom
+    if (Platform.OS === 'ios') {
+        return clampZoom(startZoom + Math.log(scale) / Math.log(IOS_ZOOM_RANGE))
+    }
+    const next = Math.max(startZoom, ANDROID_ONE_X) * scale
+    return next <= ANDROID_ONE_X ? 0 : clampZoom(next)
+}
 
 //save a capture to the phone's photo library
 const saveToDeviceLibrary = (uri) =>
@@ -114,12 +131,17 @@ export default function CameraComponent() {
         if (!recording) setFacing(prev => prev === 'back' ? 'front' : 'back')
     }
 
-    // Pinch velocity sets the zoom direction; zooming out on the front camera is finer.
-    const onPinchEvent = (event) => {
-        const zoomingIn = event.nativeEvent.velocity > 0
-        const step = !zoomingIn && facing === 'front' ? 0.001 : 0.01
-        setZoom(prev => Math.min(1, Math.max(0, prev + (zoomingIn ? step : -step))))
-    }
+    // Zoom follows the fingers: each update scales from the zoom the pinch started at.
+    const zoomRef = useRef(0)
+    const pinchStartZoom = useRef(0)
+    zoomRef.current = zoom
+
+    const pinch = useMemo(() => Gesture.Pinch()
+        .runOnJS(true)
+        .onStart(() => { pinchStartZoom.current = zoomRef.current })
+        .onUpdate((e) => setZoom(zoomForPinch(pinchStartZoom.current, e.scale))), [])
+
+    useEffect(() => { setZoom(0) }, [facing])
 
     if (!permission || !permission.granted) {
         return <CameraPermissionPrompt loading={!permission} onGrant={grantPermission} />
@@ -155,8 +177,8 @@ export default function CameraComponent() {
 
     return (
         <View style={styles.cameraContainer}>
-            <PinchGestureHandler onGestureEvent={onPinchEvent}>
-                <View style={styles.camera}>
+            <GestureDetector gesture={pinch}>
+                <View style={styles.camera} collapsable={false}>
                     <CameraView style={styles.camera} facing={facing} ref={cameraRef} mode={videoMode ? 'video' : 'picture'} zoom={zoom}>
                         <CameraControls
                             session={session}
@@ -172,7 +194,7 @@ export default function CameraComponent() {
                         <StatusBar style="auto" />
                     </CameraView>
                 </View>
-            </PinchGestureHandler>
+            </GestureDetector>
         </View>
     );
 }

@@ -2,6 +2,7 @@
 import './gestureHandler';
 
 import { StatusBar } from 'expo-status-bar';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 //import SafeAreaProvider to provide safe area context to the app
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -25,16 +26,18 @@ Sentry.init({
 
 function App() {
   return (
-    <SafeAreaProvider>
-      <Sentry.ErrorBoundary fallback={CrashFallback}>
-        <ToastProvider placement='top' offsetTop={150}>
-          <AuthContextProvider>
-            <Main />
-            <StatusBar style="auto" />
-          </AuthContextProvider>
-        </ToastProvider>
-      </Sentry.ErrorBoundary>
-    </SafeAreaProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <SafeAreaProvider>
+        <Sentry.ErrorBoundary fallback={CrashFallback}>
+          <ToastProvider placement='top' offsetTop={150}>
+            <AuthContextProvider>
+              <Main />
+              <StatusBar style="auto" />
+            </AuthContextProvider>
+          </ToastProvider>
+        </Sentry.ErrorBoundary>
+      </SafeAreaProvider>
+    </GestureHandlerRootView>
   );
 }
 
