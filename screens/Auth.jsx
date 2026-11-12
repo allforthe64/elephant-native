@@ -8,6 +8,26 @@ import { useToast } from 'react-native-toast-notifications'
 import AppPressable from '../components/ui/AppPressable'
 import AppTextInput from '../components/ui/AppTextInput'
 import ContentShell from '../components/ui/ContentShell'
+
+const signInErrorMessage = (err) => {
+    switch (err?.code) {
+        case 'auth/invalid-credential':
+        case 'auth/invalid-login-credentials':
+        case 'auth/wrong-password':
+        case 'auth/user-not-found':
+            return 'Incorrect email or password.'
+        case 'auth/invalid-email':
+            return 'That email address is not valid.'
+        case 'auth/user-disabled':
+            return 'This account has been disabled.'
+        case 'auth/too-many-requests':
+            return 'Too many attempts. Please wait a bit and try again.'
+        case 'auth/network-request-failed':
+            return 'Network error. Check your connection and try again.'
+        default:
+            return err?.code || err?.message || 'Please try again.'
+    }
+}
 import { TestIds } from '../constants/testIds'
 import { useResponsiveLayout, tabletStyle } from '../hooks/useResponsiveLayout'
 
@@ -41,7 +61,7 @@ const Login = ({navigation: {navigate}}) => {
             navigate('Dashboard')
         } catch (err) {
             console.log(err)
-            alert('Sign In failed: ', err)
+            alert(`Sign In failed: ${signInErrorMessage(err)}`)
         } finally {
             setLoading(false)
             setUserEmail('')

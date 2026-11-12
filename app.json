@@ -2,7 +2,7 @@
   "expo": {
     "name": "elephant-native",
     "slug": "elephant-native",
-    "version": "1.4.8",
+    "version": "1.4.9",
     "orientation": "default",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -38,7 +38,8 @@
         "android.permission.READ_MEDIA_AUDIO",
         "android.permission.READ_MEDIA_VISUAL_USER_SELECTED"
       ],
-      "softwareKeyboardLayoutMode": "resize"
+      "softwareKeyboardLayoutMode": "resize",
+      "edgeToEdgeEnabled": true
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -97,7 +98,8 @@
       ],
       "expo-font",
       "expo-asset",
-      "./plugins/withLegacyBackHandling"
+      "./plugins/withLegacyBackHandling",
+      "./plugins/withR8Optimization"
     ],
     "owner": "bisforbilliam"
   }

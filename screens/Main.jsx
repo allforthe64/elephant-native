@@ -1,5 +1,4 @@
 import React, { useContext, useEffect } from 'react';
-import { Linking } from 'react-native'
 
 //import drawer navigator from @react-navigation/drawer
 import { createDrawerNavigator } from "@react-navigation/drawer";
@@ -15,6 +14,7 @@ import ThankYou from './ThankYou';
 import FAQs from './FAQs';
 import TOSMain from './TOSMain';
 import PrivacyMain from './PrivacyMain';
+import ManageAccount from './ManageAccount';
 
 //import firebase auth object/AuthContext/onAuthStateChanged function
 import { AuthContext } from '../firebase/auth';
@@ -47,13 +47,7 @@ const Main = () => {
             <Drawer.Screen name='FAQs' component={FAQs} />
             <Drawer.Screen name='Contact' component={Contact} />
             <Drawer.Screen name="Dashboard" component={Dashboard} options={!authUser && {drawerItemStyle: {display: 'none'}, title: ''}} />
-            <Drawer.Screen name="Settings" component={Home} listeners={{
-              drawerItemPress: (e) => {
-                e.preventDefault()
-
-                Linking.openURL('https://myelephantapp.com/settings')
-              },
-            }} />
+            <Drawer.Screen name="Manage account" component={ManageAccount} options={!authUser && {drawerItemStyle: {display: 'none'}, title: ''}} />
             <Drawer.Screen name='Privacy Policy' component={PrivacyMain} />
             <Drawer.Screen name='Terms Of Service' component={TOSMain} />
             <Drawer.Screen name="Registration Complete" component={ThankYou} options={{drawerItemStyle: {height: 0}, title: ''}}/>
