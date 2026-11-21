@@ -2,7 +2,7 @@
   "expo": {
     "name": "elephant-native",
     "slug": "elephant-native",
-    "version": "1.4.9",
+    "version": "1.5.0",
     "orientation": "default",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -99,7 +99,8 @@
       "expo-font",
       "expo-asset",
       "./plugins/withLegacyBackHandling",
-      "./plugins/withR8Optimization"
+      "./plugins/withR8Optimization",
+      "./plugins/withOptionalHardwareFeatures"
     ],
     "owner": "bisforbilliam"
   }

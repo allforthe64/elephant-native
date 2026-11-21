@@ -1,5 +1,7 @@
 import { StyleSheet, Text, View, KeyboardAvoidingView, Platform } from 'react-native'
 import React, {useState, useEffect} from 'react'
+import Constants from 'expo-constants'
+import * as Sentry from '@sentry/react-native'
 import { firebaseAuth } from '../firebaseConfig'
 import { signInWithEmailAndPassword } from 'firebase/auth'
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
@@ -8,6 +10,13 @@ import { useToast } from 'react-native-toast-notifications'
 import AppPressable from '../components/ui/AppPressable'
 import AppTextInput from '../components/ui/AppTextInput'
 import ContentShell from '../components/ui/ContentShell'
+
+/** e.g. mye***@gmail.com — enough to spot the review account without storing the full address */
+const redactEmail = (email) => {
+    const [local, domain] = String(email).split('@')
+    if (!domain) return '(invalid)'
+    return `${local.slice(0, 3)}***@${domain}`
+}
 
 const signInErrorMessage = (err) => {
     switch (err?.code) {
@@ -31,7 +40,9 @@ const signInErrorMessage = (err) => {
 import { TestIds } from '../constants/testIds'
 import { useResponsiveLayout, tabletStyle } from '../hooks/useResponsiveLayout'
 
-const EMAIL_REGEX = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/
+// Keep this simple: the old nested ([\.-]?\w+)* pattern can throw
+// "Maximum regex stack depth reached" and crash the Auth screen.
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 /* const testEmail = process.env.EXPO_PUBLIC_TEST_EMAIL || ''
 const testPassword = process.env.EXPO_PUBLIC_TEST_PASSWORD || '' */
@@ -56,12 +67,30 @@ const Login = ({navigation: {navigate}}) => {
 
     const login = async () => {
         setLoading(true)
+        const email = userEmail.trim()
+        const passwordLength = password.length
         try {
-            await signInWithEmailAndPassword(auth, userEmail, password)
+            await signInWithEmailAndPassword(auth, email, password)
             navigate('Dashboard')
         } catch (err) {
             console.log(err)
-            alert(`Sign In failed: ${signInErrorMessage(err)}`)
+            Sentry.captureException(err, {
+                tags: { area: 'auth-sign-in' },
+                extra: {
+                    code: err?.code,
+                    firebaseMessage: err?.message,
+                    emailRedacted: redactEmail(email),
+                    emailLength: email.length,
+                    passwordLength,
+                    emailHadWhitespace: userEmail !== email,
+                    platform: Platform.OS,
+                    appVersion: Constants.expoConfig?.version,
+                    nativeBuild: Constants.nativeBuildVersion,
+                },
+            })
+            const detail = signInErrorMessage(err)
+            const code = err?.code ? ` (${err.code})` : ''
+            alert(`Sign In failed: ${detail}${code}`)
         } finally {
             setLoading(false)
             setUserEmail('')

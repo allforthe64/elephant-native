@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "746078858340",
+    "project_id": "elephant-dev-mode",
+    "storage_bucket": "elephant-dev-mode.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:746078858340:android:8c34f4724261e909f28371",
+        "android_client_info": {
+          "package_name": "com.elephantdev.elephantnative"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBRd7PqP9WfloiOyw0vAIgcsdc1l0C7HwU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
