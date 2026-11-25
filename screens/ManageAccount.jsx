@@ -47,7 +47,13 @@ const ManageAccount = () => {
     } catch (err) {
       console.warn('Cancel subscription failed:', err?.message || err)
       setDeleting(false)
-      toast.show('Failed to delete account', { type: 'danger' })
+      const message = String(err?.message || '')
+      toast.show(
+        message.includes('cannot be deleted')
+          ? message
+          : 'Failed to delete account',
+        { type: 'danger' }
+      )
       return
     }
 
