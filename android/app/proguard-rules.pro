@@ -21,6 +21,15 @@
 -keep class com.ReactNativeBlobUtil.** { *; }
 -keep class com.reactnativedocumentscanner.** { *; }
 -keep class com.imagespdf.** { *; }
+-keepattributes *Annotation*
+-keepattributes RuntimeVisibleAnnotations,RuntimeVisibleParameterAnnotations,AnnotationDefault
+-keep class expo.modules.** { *; }
+-keep interface expo.modules.kotlin.records.Record { *; }
+-keepclassmembers class * implements expo.modules.kotlin.records.Record { *; }
+-keep @interface expo.modules.kotlin.records.Field { *; }
+-keepclassmembers class * {
+    @expo.modules.kotlin.records.Field <fields>;
+}
 -dontwarn com.google.errorprone.annotations.**
 -dontwarn com.google.j2objc.annotations.**
 -dontwarn javax.lang.model.**
