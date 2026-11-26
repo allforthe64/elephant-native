@@ -24,7 +24,7 @@ const toDestination = (folder) => ({
  * `startIn` opens the picker inside that folder id instead of at the top level.
  */
 export function useSaveDestination({ isHidden, startIn = null } = {}) {
-  const userInst = useUserDoc()
+  const { userDoc: userInst } = useUserDoc()
 
   const [folders, setFolders] = useState([])
   const [preAdd, setPreAdd] = useState(false)

@@ -31,7 +31,7 @@ export default function Files({navigation: { navigate }, route}) {
   const { isTablet } = useResponsiveLayout()
   const insets = useSafeAreaInsets()
   const toast = useToast()
-  const currentUser = useUserDoc()
+  const { userDoc: currentUser } = useUserDoc()
 
   const [stagingMode, setStagingMode] = useState(route.params.staging)
   const [focusedFolder, setFocusedFolder] = useState()

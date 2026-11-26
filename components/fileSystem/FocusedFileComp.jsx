@@ -27,7 +27,7 @@ const FocusedFileComp = ({ file, focus, deleteFile, renameFileFunction, handleFi
   const { isTablet, modalMaxWidth } = useResponsiveLayout()
   const insets = useSafeAreaInsets()
   const toast = useToast()
-  const userInst = useUserDoc()
+  const { userDoc: userInst } = useUserDoc()
   const { fileObj, fileURL, error, convertedPDFURL, conversionFailed, reload } = useFocusedFile(file)
   const note = useNote({ file, fileObj, fileURL, userInst })
 

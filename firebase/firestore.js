@@ -24,7 +24,11 @@ export async function userListener(setCurrentUser, setStaging, user) {
         doc(db, 'users', user),
         (snap) => {
             try {
-                if (!snap.exists()) return
+                if (!snap.exists()) {
+                    setCurrentUser(null)
+                    if (setStaging) setStaging([])
+                    return
+                }
                 const data = snap.data()
                 //filter file references from the current user that are in staging
                 const stagingRefs = (data.fileRefs || []).filter(el => el.flag === 'Staging')

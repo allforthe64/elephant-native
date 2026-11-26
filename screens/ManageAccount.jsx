@@ -31,7 +31,7 @@ const formatPlan = (planId) => {
 const ManageAccount = () => {
   const navigation = useNavigation()
   const toast = useToast()
-  const userDoc = useUserDoc()
+  const { userDoc } = useUserDoc()
   const { isTablet } = useResponsiveLayout()
 
   const [expanded, setExpanded] = useState(null)
